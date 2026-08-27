@@ -16,9 +16,10 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
-Design phase. There is no runnable code yet; the deliverables so far are the documents above. Until the
-solution skeleton lands, "making a change" usually means changing a document — treat docs with the same
-rigor as code.
+Phase 0 in progress. The solution skeleton, the pinned-TLS session loop (enroll → authorize → build →
+artifacts), and the first tier-2 protocol tests exist and pass; nothing is end-user usable yet. The
+docs remain authoritative for shape — when code and a decision disagree, fix one of them in the same
+commit, never neither.
 
 ## Repository conventions
 
@@ -26,8 +27,8 @@ rigor as code.
 - Target stack: **.NET 10 / C#** for controller, agent, bootstrap, CLI; protocol in **proto3**
   (`Vivarium.Contracts`). Blazor Server for the panel. SQLite + a blob directory for storage — no
   external service dependencies.
-- Planned layout: `src/Vivarium.Contracts`, `src/Vivarium.Controller`, `src/Vivarium.Agent`,
-  `src/Vivarium.Bootstrap`, `src/Vivarium.Cli`, plus `images/` for image recipes and `docs/`.
+- Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, `tests/Vivarium.Tests`, `docs/`,
+  plus `images/` for image recipes (later).
 - Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
 - The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
   Changes to it require an explicit design discussion first — it is the one piece baked into every VM

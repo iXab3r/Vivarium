@@ -1,0 +1,150 @@
+// Vivarium agent protocol v1 — see docs/ARCHITECTURE.md §5.
+// One bidirectional stream per agent: Hello -> Welcome, then builds down / status+logs+results up.
+syntax = "proto3";
+
+package vivarium.v1;
+
+option csharp_namespace = "Vivarium.Contracts.V1";
+
+service AgentHub {
+  rpc Session (stream AgentMsg) returns (stream ControllerMsg);
+}
+
+message AgentMsg {
+  oneof msg {
+    Hello hello = 1;
+    StepStatus status = 2;
+    LogChunk log = 3;
+    BuildResult result = 4;
+    Heartbeat heartbeat = 5;
+  }
+}
+
+message ControllerMsg {
+  oneof msg {
+    Welcome welcome = 1;                  // reply to Hello: server wall-clock (D4), current authorization status
+    AuthorizationGranted authorized = 2;  // enrolled flow: auth_token when the operator clicks Authorize (D7)
+    BuildAssignment build = 3;
+    CancelBuild cancel = 4;
+    RestartAgent restart = 5;             // exit; bootstrap fetches the current agent version (D2)
+  }
+}
+
+message OsInfo {
+  string family = 1;   // windows | linux | macos
+  string version = 2;  // actual reported version/build — drift detection (D11)
+  string arch = 3;     // x64 | arm64
+}
+
+message Hello {
+  string agent_id = 1;           // persistent GUID (enrolled) / pool-VM identity (managed)
+  string auth_token = 2;         // issued at authorization; empty while unauthorized (D7)
+  string enroll_token = 3;       // from the setup one-liner / stamped zip; consumed at first contact (§8.4)
+  map<string, string> parameters = 4;
+  string image_id = 5;           // set for pool VMs
+  string session_id = 6;         // nonce per (re)connect — fencing (D4); pool VMs share one OS boot
+  string mac = 7;                // identity cross-check (D7)
+  string agent_version = 8;      // upgrade handshake (D2)
+  OsInfo os = 9;
+  bool interactive = 10;         // live desktop present
+  string running_build_id = 11;  // non-empty on re-hello: ghost re-adoption (D4)
+  string pool_nonce = 12;        // injected at CreatePoolVm (KVP / fw_cfg) — host-verified identity (D7)
+}
+
+message Welcome {
+  int64 server_time_unix_ms = 1;
+  bool authorized = 2;
+  string server_version = 3;
+}
+
+message AuthorizationGranted {
+  string auth_token = 1;
+}
+
+message Blob {
+  string sha256 = 1;     // lowercase hex
+  string file_name = 2;  // target path relative to the build workdir (forward slashes)
+  bool archive = 3;      // zip; extracted under unpack_to
+  string unpack_to = 4;  // extraction root relative to workdir; empty = workdir
+}
+
+enum StepPolicy {
+  STEP_POLICY_DEFAULT = 0;         // run only while no previous step has failed
+  STEP_POLICY_EVEN_IF_FAILED = 1;  // run even after failures
+  STEP_POLICY_ALWAYS = 2;          // run unconditionally (diagnostics collection)
+}
+
+message Step {
+  string program = 1;
+  repeated string args = 2;
+  map<string, string> env = 3;
+  string cwd = 4;          // relative to workdir
+  int32 timeout_sec = 5;   // 0 = no per-step timeout
+  StepPolicy policy = 6;
+  bool expected_reboot = 7;  // provisioning: suppress lost-heartbeat INFRA (D6/D9)
+}
+
+enum OnFail {
+  ON_FAIL_NONE = 0;
+  ON_FAIL_KEEP_MACHINE = 1;
+  ON_FAIL_SNAPSHOT_MACHINE = 2;
+}
+
+message BuildAssignment {
+  string build_id = 1;
+  repeated Blob payload = 2;
+  repeated Step steps = 3;
+  repeated string collect = 4;         // artifact globs relative to workdir
+  OnFail on_fail = 5;
+  map<string, string> parameters = 6;  // resolved scenario params -> env VIVARIUM_PARAM_* (D18)
+}
+
+message CancelBuild {
+  string build_id = 1;
+}
+
+message RestartAgent {
+  string reason = 1;
+}
+
+message StepStatus {
+  string build_id = 1;
+  int32 step_index = 2;   // -1 for build-level phases
+  string phase = 3;       // FETCHING | RUNNING | COLLECTING
+}
+
+enum LogStream {
+  LOG_STREAM_STDOUT = 0;
+  LOG_STREAM_STDERR = 1;
+}
+
+message LogChunk {
+  string build_id = 1;
+  int32 step_index = 2;
+  LogStream stream = 3;
+  bytes data = 4;
+}
+
+message StepResult {
+  int32 step_index = 1;
+  int32 exit_code = 2;
+  bool timed_out = 3;
+  bool skipped = 4;
+}
+
+message Artifact {
+  string path = 1;      // relative to workdir (forward slashes)
+  string sha256 = 2;
+  int64 size = 3;
+}
+
+message BuildResult {
+  string build_id = 1;
+  string session_id = 2;  // fencing: results from a superseded session are discarded (D4)
+  repeated StepResult steps = 3;
+  repeated Artifact artifacts = 4;
+}
+
+message Heartbeat {
+  string running_build_id = 1;
+}

@@ -6,14 +6,17 @@ Ordered so that every phase ends with something usable. Decision references (D1�
 ## Phase 0 — Design & skeleton *(current)*
 
 - [x] Architecture doc, prior-art survey, this roadmap.
-- [ ] Solution skeleton: `Vivarium.Contracts` (proto), `Vivarium.Controller` (gRPC AgentHub + blob
-      store + SQLite + empty panel), `Vivarium.Agent`, `Vivarium.Bootstrap`, `Vivarium.Cli`.
-- [ ] The `Session` loop alive end-to-end with an agent running on the same machine — protocol proven
-      before any VM exists; it lands as the first members of the tier-2 in-process protocol suite
-      (D20), not as throwaway code.
-- [ ] GitHub Actions CI: tier 1–3 tests on ubuntu/windows/macos; the payload smoke tests below run in
-      the same matrix — hosted runners bootstrap the farm that will replace them (DEVELOPMENT.md).
-- [ ] Pinned-TLS + `Welcome` handshake and result fencing proven in the local loop (D4, §5).
+- [x] Solution skeleton: `Vivarium.Contracts` (proto), `Vivarium.Controller` (gRPC AgentHub + blob
+      store + empty panel; SQLite lands with Phase 1 persistence), `Vivarium.Agent`,
+      `Vivarium.Bootstrap`, `Vivarium.Cli` (stub).
+- [x] The `Session` loop alive end-to-end with an agent running on the same machine — enroll →
+      authorize → payload → step → logs → artifacts → result, as the first members of the tier-2
+      in-process protocol suite (D20).
+- [x] GitHub Actions CI: build + tests on ubuntu/windows/macos — hosted runners bootstrap the farm
+      that will replace them (DEVELOPMENT.md).
+- [x] Pinned-TLS + `Welcome` handshake proven in the local loop (D4, §5); blob endpoints reject
+      anonymous callers and lying hashes.
+- [ ] Reconnect / ghost re-adoption and result-fencing scenarios exercised by tier-2 tests (D4).
 - [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
       three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
 - [ ] Hyper-V checkpoint spike on the dev machine: Standard vs Production types, automatic
