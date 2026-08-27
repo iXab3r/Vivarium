@@ -19,9 +19,10 @@ Ordered so that every phase ends with something usable. Decision references (D1�
 - [ ] Reconnect / ghost re-adoption and result-fencing scenarios exercised by tier-2 tests (D4).
 - [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
       three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
-- [ ] Hyper-V checkpoint spike on the dev machine: Standard vs Production types, automatic
-      checkpoints off, static memory; measure apply latency for 1 and 5 concurrent 4 GB reverts (D5).
-      One afternoon that de-risks the core latency claim before any driver code exists.
+- [x] Hyper-V checkpoint spike (D5): ~1 s per revert cycle, 4.7 s for five concurrent; apply lands in
+      `Saved`, resume → `Running`; `.vmrs` = full assigned RAM; Production silently falls back to
+      Standard on OS-less guests — the pin is confirmed necessary.
+      Results: [`docs/spikes/hyperv-checkpoints.md`](spikes/hyperv-checkpoints.md).
 
 ## Phase 1 — TeamCity core: agents, queue, builds (no hypervisors yet)
 

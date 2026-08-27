@@ -182,7 +182,9 @@ one. So the unit is a pool: for each `ImageVersion` the provider pre-creates N p
 differencing disks off the sealed parent VHDX/qcow2 are the genuinely instant, near-free part — and
 each pool VM boots once *as itself* (own MAC, own hostname), reaches the logged-in idle state, and
 takes **its own** memory checkpoint. Revert = restore-own-checkpoint: honestly ~2–5 s to a live agent
-instead of a 30–90 s cold Windows boot. Pool capacity is the parallelism knob and grows in the
+instead of a 30–90 s cold Windows boot — the Phase 0 spike measured ~1 s per cycle and 4.7 s for five
+concurrent reverts on an NVMe dev host with OS-less guests
+([spike results](spikes/hyperv-checkpoints.md)); 2–5 s stays the planning number for real guests. Pool capacity is the parallelism knob and grows in the
 background (one first-boot per added VM). Cold boot remains a per-scenario option — boot-time behavior
 is itself worth testing. Sizing reality: a 32 GB host runs ~5–6 Windows pool VMs at 2 vCPU / 4 GB —
 fewer when the host doubles as somebody's dev machine.
