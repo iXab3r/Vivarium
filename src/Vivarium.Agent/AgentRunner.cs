@@ -8,7 +8,9 @@ namespace Vivarium.Agent;
 
 /// <summary>
 /// The whole agent: reverse-connect session loop (D1), deliberately dumb — every decision lives in
-/// the controller. Reconnects forever; a restart request ends RunAsync so the launcher can swap us (D2).
+/// the controller. Reconnects forever; builds survive a dropped connection (the result is queued and
+/// delivered through the next session — re-adoption, D4). A restart request ends RunAsync so the
+/// launcher can swap us (D2).
 /// </summary>
 public sealed class AgentRunner
 {
@@ -19,8 +21,12 @@ public sealed class AgentRunner
     private readonly BlobClient blobs;
     private readonly TaskCompletionSource<bool> authorized = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly CancellationTokenSource restartRequested = new();
+    private readonly object pendingLock = new();
     private string? authToken;
     private volatile string? runningBuildId;
+    private volatile SessionWriter? currentWriter;
+    private volatile string currentSessionId = string.Empty;
+    private AgentMsg? pendingResult;
 
     public string AgentId { get; }
 
@@ -95,6 +101,8 @@ public sealed class AgentRunner
         var sessionId = Guid.NewGuid().ToString("N");
 
         await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
+        currentSessionId = sessionId;
+        currentWriter = writer;
 
         using var sessionCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         var heartbeats = HeartbeatLoopAsync(writer, sessionCts.Token);
@@ -111,6 +119,8 @@ public sealed class AgentRunner
                             authorized.TrySetResult(true);
                         }
 
+                        // A build finished while we were disconnected? Deliver it now (D4).
+                        await TryFlushPendingResultAsync(ct);
                         break;
 
                     case ControllerMsg.MsgOneofCase.Authorized:
@@ -122,7 +132,8 @@ public sealed class AgentRunner
 
                     case ControllerMsg.MsgOneofCase.Build:
                         var assignment = msg.Build;
-                        _ = Task.Run(() => ExecuteBuildAsync(assignment, writer, sessionId, sessionCts.Token), CancellationToken.None);
+                        // Builds run on the runner-level token: they survive session death.
+                        _ = Task.Run(() => ExecuteBuildAsync(assignment, ct), CancellationToken.None);
                         break;
 
                     case ControllerMsg.MsgOneofCase.Restart:
@@ -133,6 +144,11 @@ public sealed class AgentRunner
         }
         finally
         {
+            if (ReferenceEquals(currentWriter, writer))
+            {
+                currentWriter = null;
+            }
+
             sessionCts.Cancel();
             try
             {
@@ -144,14 +160,86 @@ public sealed class AgentRunner
         }
     }
 
-    private async Task ExecuteBuildAsync(BuildAssignment assignment, SessionWriter writer, string sessionId, CancellationToken ct)
+    /// <summary>
+    /// Routes a message through the current session, whatever it is by now. Logs and statuses are
+    /// best-effort; a BuildResult that cannot be sent is queued and retried until delivered.
+    /// </summary>
+    private async Task SendRoutedAsync(AgentMsg msg, CancellationToken ct)
+    {
+        var writer = currentWriter;
+        if (writer == null)
+        {
+            QueueIfResult(msg);
+            return;
+        }
+
+        try
+        {
+            await writer.SendAsync(msg, ct);
+        }
+        catch (Exception) when (!ct.IsCancellationRequested)
+        {
+            QueueIfResult(msg);
+        }
+    }
+
+    private void QueueIfResult(AgentMsg msg)
+    {
+        if (msg.MsgCase == AgentMsg.MsgOneofCase.Result)
+        {
+            lock (pendingLock)
+            {
+                pendingResult = msg;
+            }
+        }
+    }
+
+    private async Task TryFlushPendingResultAsync(CancellationToken ct)
+    {
+        AgentMsg? snapshot;
+        lock (pendingLock)
+        {
+            snapshot = pendingResult;
+        }
+
+        if (snapshot == null)
+        {
+            return;
+        }
+
+        var writer = currentWriter;
+        if (writer == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await writer.SendAsync(snapshot, ct);
+            lock (pendingLock)
+            {
+                if (ReferenceEquals(pendingResult, snapshot))
+                {
+                    pendingResult = null;
+                }
+            }
+        }
+        catch (Exception) when (!ct.IsCancellationRequested)
+        {
+            // still disconnected — the next Welcome or heartbeat tick retries
+        }
+    }
+
+    private async Task ExecuteBuildAsync(BuildAssignment assignment, CancellationToken ct)
     {
         runningBuildId = assignment.BuildId;
         try
         {
             var workRoot = Path.Combine(options.DataDir, "builds");
-            var result = await BuildExecutor.ExecuteAsync(workRoot, assignment, blobs, writer, sessionId, ct);
-            await writer.SendAsync(new AgentMsg { Result = result }, ct);
+            var result = await BuildExecutor.ExecuteAsync(
+                workRoot, assignment, blobs, SendRoutedAsync, currentSessionId, ct);
+            QueueIfResult(new AgentMsg { Result = result });
+            await TryFlushPendingResultAsync(ct);
         }
         catch (OperationCanceledException)
         {
@@ -171,10 +259,18 @@ public sealed class AgentRunner
         using var timer = new PeriodicTimer(options.HeartbeatInterval);
         while (await timer.WaitForNextTickAsync(ct))
         {
-            await writer.SendAsync(new AgentMsg
+            try
             {
-                Heartbeat = new Heartbeat { RunningBuildId = runningBuildId ?? string.Empty },
-            }, ct);
+                await writer.SendAsync(new AgentMsg
+                {
+                    Heartbeat = new Heartbeat { RunningBuildId = runningBuildId ?? string.Empty },
+                }, ct);
+                await TryFlushPendingResultAsync(ct);
+            }
+            catch (Exception) when (!ct.IsCancellationRequested)
+            {
+                return; // stream is dead; the session loop will reconnect
+            }
         }
     }
 

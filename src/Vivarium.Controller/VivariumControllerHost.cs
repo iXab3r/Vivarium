@@ -99,6 +99,9 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         return token;
     }
 
+    /// <summary>Force-drop an agent's live session; it reconnects and re-hellos (D4).</summary>
+    public void KickAgent(string agentId) => Registry.Get(agentId)?.SessionAbort?.Cancel();
+
     public Task WaitForShutdownAsync(CancellationToken ct = default) => app.WaitForShutdownAsync(ct);
 
     public async ValueTask DisposeAsync()

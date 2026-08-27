@@ -35,10 +35,18 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         var hello = requestStream.Current.Hello;
         var auth = Authenticate(hello);
         var agent = registry.Register(hello, auth);
+        using var session = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
+        agent.SessionAbort = session;
         agent.Connected = true;
         agent.LastHeartbeat = DateTimeOffset.UtcNow;
         log.LogInformation("agent {AgentId} connected ({Auth}, session {SessionId})",
             agent.AgentId, agent.Auth, hello.SessionId);
+        if (hello.RunningBuildId.Length > 0)
+        {
+            // Re-hello mid-build: the build is re-adopted, not double-scheduled (D4).
+            log.LogInformation("agent {AgentId} re-adopted with running build {BuildId}",
+                agent.AgentId, hello.RunningBuildId);
+        }
 
         await responseStream.WriteAsync(new ControllerMsg
         {
@@ -55,7 +63,7 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         {
             try
             {
-                await foreach (var msg in outbox.Reader.ReadAllAsync(context.CancellationToken))
+                await foreach (var msg in outbox.Reader.ReadAllAsync(session.Token))
                 {
                     await responseStream.WriteAsync(msg);
                 }
@@ -67,7 +75,7 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
 
         try
         {
-            while (await requestStream.MoveNext(context.CancellationToken))
+            while (await requestStream.MoveNext(session.Token))
             {
                 var msg = requestStream.Current;
                 switch (msg.MsgCase)
@@ -97,6 +105,11 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         finally
         {
             agent.Connected = false;
+            if (ReferenceEquals(agent.SessionAbort, session))
+            {
+                agent.SessionAbort = null;
+            }
+
             outbox.Writer.TryComplete();
             await writer;
             log.LogInformation("agent {AgentId} disconnected", agent.AgentId);

@@ -20,6 +20,9 @@ public sealed class ConnectedAgent
     public string SessionId { get; set; } = string.Empty;
     public DateTimeOffset LastHeartbeat { get; set; }
 
+    /// <summary>Cancelling this aborts the live session server-side ("kick": force reconnect).</summary>
+    public CancellationTokenSource? SessionAbort { get; set; }
+
     public Channel<ControllerMsg> Outbox { get; private set; } = Channel.CreateUnbounded<ControllerMsg>();
 
     /// <summary>A reconnect replaces the outbox so messages never land on a dead stream's channel.</summary>

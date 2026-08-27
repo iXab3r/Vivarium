@@ -17,7 +17,7 @@ public static class BuildExecutor
         string workRoot,
         BuildAssignment assignment,
         BlobClient blobs,
-        SessionWriter writer,
+        Func<AgentMsg, CancellationToken, Task> send,
         string sessionId,
         CancellationToken ct)
     {
@@ -26,7 +26,7 @@ public static class BuildExecutor
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
 
-        await SendStatusAsync(writer, assignment.BuildId, -1, "FETCHING", ct);
+        await SendStatusAsync(send, assignment.BuildId, -1, "FETCHING", ct);
         foreach (var blob in assignment.Payload)
         {
             await FetchBlobAsync(blob, workdir, blobs, ct);
@@ -42,8 +42,8 @@ public static class BuildExecutor
                 continue;
             }
 
-            await SendStatusAsync(writer, assignment.BuildId, i, "RUNNING", ct);
-            var stepResult = await RunStepAsync(workdir, assignment, i, step, writer, ct);
+            await SendStatusAsync(send, assignment.BuildId, i, "RUNNING", ct);
+            var stepResult = await RunStepAsync(workdir, assignment, i, step, send, ct);
             result.Steps.Add(stepResult);
             if (stepResult.ExitCode != 0 || stepResult.TimedOut)
             {
@@ -51,7 +51,7 @@ public static class BuildExecutor
             }
         }
 
-        await SendStatusAsync(writer, assignment.BuildId, -1, "COLLECTING", ct);
+        await SendStatusAsync(send, assignment.BuildId, -1, "COLLECTING", ct);
         foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect))
         {
             var fullPath = Path.Combine(workdir, relativePath);
@@ -110,7 +110,7 @@ public static class BuildExecutor
         BuildAssignment assignment,
         int stepIndex,
         Step step,
-        SessionWriter writer,
+        Func<AgentMsg, CancellationToken, Task> send,
         CancellationToken ct)
     {
         var psi = new ProcessStartInfo
@@ -176,7 +176,7 @@ public static class BuildExecutor
             int read;
             while ((read = await source.ReadAsync(buffer, CancellationToken.None)) > 0)
             {
-                await writer.SendAsync(new AgentMsg
+                await send(new AgentMsg
                 {
                     Log = new LogChunk
                     {
@@ -209,8 +209,8 @@ public static class BuildExecutor
         return result.Files.Select(f => f.Path);
     }
 
-    private static Task SendStatusAsync(SessionWriter writer, string buildId, int stepIndex, string phase, CancellationToken ct) =>
-        writer.SendAsync(new AgentMsg
+    private static Task SendStatusAsync(Func<AgentMsg, CancellationToken, Task> send, string buildId, int stepIndex, string phase, CancellationToken ct) =>
+        send(new AgentMsg
         {
             Status = new StepStatus { BuildId = buildId, StepIndex = stepIndex, Phase = phase },
         }, ct);

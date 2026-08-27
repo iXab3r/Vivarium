@@ -16,7 +16,10 @@ Ordered so that every phase ends with something usable. Decision references (D1�
       that will replace them (DEVELOPMENT.md).
 - [x] Pinned-TLS + `Welcome` handshake proven in the local loop (D4, §5); blob endpoints reject
       anonymous callers and lying hashes.
-- [ ] Reconnect / ghost re-adoption and result-fencing scenarios exercised by tier-2 tests (D4).
+- [x] Reconnect / re-adoption and result-fencing scenarios exercised by tier-2 tests (D4): a build
+      survives a kicked connection, its result and logs arrive via the new session, duplicate results
+      are idempotent. (Session-supersede fencing — discarding results after an INFRA re-dispatch —
+      arrives with the Phase 1 scheduler.)
 - [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
       three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
 - [x] Hyper-V checkpoint spike (D5): ~1 s per revert cycle, 4.7 s for five concurrent; apply lands in
