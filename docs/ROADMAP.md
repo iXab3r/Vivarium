@@ -3,7 +3,7 @@
 Ordered so that every phase ends with something usable. Decision references (D1…D18) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-## Phase 0 — Design & skeleton *(current)*
+## Phase 0 — Design & skeleton *(complete)*
 
 - [x] Architecture doc, prior-art survey, this roadmap.
 - [x] Solution skeleton: `Vivarium.Contracts` (proto), `Vivarium.Controller` (gRPC AgentHub + blob
@@ -20,14 +20,17 @@ Ordered so that every phase ends with something usable. Decision references (D1�
       survives a kicked connection, its result and logs arrive via the new session, duplicate results
       are idempotent. (Session-supersede fencing — discarding results after an INFRA re-dispatch —
       arrives with the Phase 1 scheduler.)
-- [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
-      three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
+- [x] Payload portability smokes in CI (D3): the NUnit/MTP self-contained exe runs bare and emits TRX
+      on all three OSes; a **Linux-published** `osx-arm64` binary runs on macOS (the SDK ad-hoc signs
+      cross-platform — the review-flagged `Killed: 9` risk did not materialize); a nextest archive
+      runs on a simulated target with only the nextest binary + source tree + `--workspace-remap`.
+      Reference payloads live in `samples/`.
 - [x] Hyper-V checkpoint spike (D5): ~1 s per revert cycle, 4.7 s for five concurrent; apply lands in
       `Saved`, resume → `Running`; `.vmrs` = full assigned RAM; Production silently falls back to
       Standard on OS-less guests — the pin is confirmed necessary.
       Results: [`docs/spikes/hyperv-checkpoints.md`](spikes/hyperv-checkpoints.md).
 
-## Phase 1 — TeamCity core: agents, queue, builds (no hypervisors yet)
+## Phase 1 — TeamCity core: agents, queue, builds (no hypervisors yet) *(current)*
 
 The control host from day one — already useful with zero VMs: enroll the machines you have (physical
 included) and run the matrix across them.

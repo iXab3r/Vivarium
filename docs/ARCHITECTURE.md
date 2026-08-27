@@ -127,7 +127,8 @@ side parse well-known formats into the result model:
 pristine machines: Rust/MSVC binaries with `crt-static` (or they silently die on a machine without the
 VC++ redist), self-contained .NET with `InvariantGlobalization` or bundled ICU for minimal Linux, a
 documented glibc floor, cross-published macOS binaries verified to carry at least ad-hoc signatures
-(smoke-tested in Phase 0), and `cargo nextest` archives shipped **with the source tree** and run with
+(Phase 0 smoke-verified: a Linux-published arm64 binary runs on macOS — the SDK ad-hoc signs
+cross-platform), and `cargo nextest` archives shipped **with the source tree** and run with
 `--workspace-remap` — nextest requires the workspace layout on the target; a static nextest binary
 alone is not enough. TRX output requires the `Microsoft.Testing.Extensions.TrxReport` package in the
 test project.
