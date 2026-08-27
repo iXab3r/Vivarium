@@ -81,10 +81,18 @@ and Gatekeeper prompts on macOS are known and documented (§13).
 - **CLI**: replace the binary; protocol compat within a minor means a slightly stale `viv` keeps
   working against a newer controller.
 
-## Enrollment fallbacks
+## Enrollment paths
 
-The one-liner (§8.4) is the primary path. The portable agent zip from the panel's **Downloads** page
-covers the rest — no LAN route yet, air-gap, USB-stick provisioning:
+Two equivalent doors (§8.4, D19), both converging on the panel's **Authorize** click:
+
+1. **Preconfigured zip** — TeamCity-style, the comfortable default: the panel's Downloads page stamps
+   the archive at request time with a ready `bootstrap.json` (controller URL, certificate
+   fingerprint, enroll token). Unzip → run → the machine appears unauthorized. Works from a USB stick
+   and in air-gapped labs; the GitHub-Releases agent zips are the unstamped templates this is built
+   from.
+2. **One-liner** — for a shell you are already in (§8.4).
+
+For automation there is also the scriptable form:
 
 ```
 vivarium-agent enroll --url https://ctrl:8443 --fp SHA256:9F3A... --token <enroll-token>

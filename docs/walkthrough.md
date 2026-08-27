@@ -34,8 +34,10 @@ viv login https://192.168.1.10:8443
 ## 1. Connect three machines — five minutes each
 
 You need one Windows, one Linux, one macOS machine. Anything counts: a spare laptop, a VM you already
-have, a Mac mini in a drawer. Panel → **Agents → Add machine** shows a one-liner with a short-lived
-enroll token baked in; run it *on the machine*:
+have, a Mac mini in a drawer. Panel → **Agents → Add machine** offers two equivalent routes. The lazy
+one, TeamCity-style: download the **preconfigured agent zip** right on the machine — it already
+contains `bootstrap.json` pointing at this controller — unzip, run, done. Or, for a shell you are
+already in, the one-liner:
 
 ```
 # Windows (elevated; curl.exe ships with Windows)

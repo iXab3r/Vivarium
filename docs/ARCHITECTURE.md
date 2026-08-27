@@ -428,11 +428,16 @@ phones GitHub. The store also accepts side-loaded builds: `viv agent push out/ag
 scope) publishes a dev build, and every agent picks it up at its next restart — the core dev loop for
 agent work is build → push → watch the farm swap in seconds.
 
-The downloadable agent zip is the enrollment fallback for machines where the one-liner is awkward (no
-LAN route yet, air-gap, USB-stick provisioning): unzip, then `vivarium-agent enroll --url … --fp …
---token …` — `enroll` is an *agent* verb that writes `bootstrap.json` and registers the logon task,
-so bootstrap stays the frozen dumb loop (§7). Running the agent interactively in a console is a
-first-class mode for debugging.
+Agent downloads are **preconfigured, TeamCity-style**: the panel's Downloads page stamps the zip at
+request time with a ready `bootstrap.json` — controller URL, certificate fingerprint, enroll token —
+so on the target machine the whole ceremony is *unzip → run → the agent appears unauthorized → click
+Authorize*. No flags, no config editing; works from a USB stick and in air-gapped labs. (The
+GitHub-Releases agent zips are the unstamped templates this is built from — the controller is the
+place to download agents.) A stamped enroll token gets a lenient TTL: it only gates appearing in the
+unauthorized list, while authorization remains the real gate — exactly TeamCity's model. For
+automation and hand-rolled setups the scriptable form still exists (`vivarium-agent enroll --url …
+--fp … --token …` — an *agent* verb; bootstrap stays the frozen dumb loop, §7), and running the agent
+interactively in a console is a first-class mode for debugging.
 
 ### D20. Four test tiers; the hypervisor is faked until it can't be
 
@@ -635,8 +640,11 @@ reconnects fresh. Replacing an `ImageVersion` = draining and rebuilding its pool
 
 ### 8.4 Enrollment and authorization
 
-Getting any machine — a physical box or a hand-made VM — into the farm is TeamCity's flow. Install the
-OS by hand if needed, then run the command the panel generates. It must actually work on a stock
+Getting any machine — a physical box or a hand-made VM — into the farm is TeamCity's flow, with
+TeamCity's two doors. The comfortable one: download the **preconfigured agent zip** from the panel on
+the target machine — stamped at request time with `bootstrap.json` (controller URL, certificate
+fingerprint, enroll token), so the ceremony is unzip → run → Authorize (D19). The scripted one, for a
+shell you are already in: run the command the panel generates. It must actually work on a stock
 machine — naive `iwr`/`curl` reject self-signed TLS outright — so the generated command handles trust
 explicitly and carries the fingerprint as an argument:
 
@@ -700,9 +708,9 @@ Views: **Agents** (TeamCity-style, mandatory first screen: status axes, paramete
 unauthorized newcomers awaiting authorization), **Fleet** (hosts + the D8 conveyor for managed
 machines), **Images** (registry: lineage, versions, drift badges, snapshot chains,
 build/promote/rollback/prune), **Queue & Builds** (TeamCity-shaped, with live service-message test
-progress), **Matrix** (test × scenario — the product of the whole system), **Downloads** (portable
-agent/CLI packages and pre-filled enroll commands, served from the controller's own store, D19),
-console links. The admin
+progress), **Matrix** (test × scenario — the product of the whole system), **Downloads**
+(preconfigured agent zips stamped with this controller's `bootstrap.json`, CLI packages, pre-filled
+enroll commands — all served from the controller's own store, D19), console links. The admin
 token is exchanged at a login page for an auth cookie (D4) — a panel that authorizes agents is never
 an open page — and the browser's one-time self-signed-certificate warning is expected and documented.
 
