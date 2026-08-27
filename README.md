@@ -48,6 +48,7 @@ flowchart LR
 - Interactive-desktop guests by default (autologon, unlocked session) — input, overlay, and UI tests are first-class.
 - Debugging affordances: keep-VM-on-fail, snapshot-the-corpse, console access, crash dumps, failure screenshots.
 - `viv exec --image win10-19044 -- <cmd>` — ad-hoc commands on a pristine clone of any image.
+- Portable everything: self-contained single-file binaries, xcopy deploy, air-gap friendly — the controller bundles and serves the agent packages itself, and agents auto-update from it.
 
 ## Non-goals
 

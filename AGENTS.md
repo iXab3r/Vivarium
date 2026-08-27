@@ -4,10 +4,11 @@ Vivarium is an OSS test farm that runs test corpora against snapshot-managed VMs
 levels, machines with specific software preinstalled, Ubuntu, macOS) and produces a test × scenario matrix.
 
 > **Docs map:** this file (AGENTS.md) holds the *rules*; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-> holds the *shape* (all design decisions, numbered D1…D18); [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
+> holds the *shape* (all design decisions, numbered D1…D20); [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
 > the order of work; [`docs/prior-art.md`](docs/prior-art.md) records what we borrowed from existing
-> systems; [`docs/walkthrough.md`](docs/walkthrough.md) is the normative end-to-end UX. Read
-> ARCHITECTURE.md before proposing or implementing anything structural.
+> systems; [`docs/walkthrough.md`](docs/walkthrough.md) is the normative end-to-end UX;
+> [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) covers building, test tiers, releases, and farm
+> upgrades. Read ARCHITECTURE.md before proposing or implementing anything structural.
 
 This repository is worked on by humans and multiple AI agents (Claude Code, Codex, and others). This
 file is the shared contract for all of them; keep it harness-agnostic. Subdirectories may add their own
@@ -62,6 +63,7 @@ should trace to the task at hand.
 
 ### 4. Verification
 
-Once code exists: `dotnet build` and `dotnet test` at the solution root must pass before handoff, and
+Once code exists: `dotnet build` and `dotnet test` at the solution root must pass before handoff
+(test-tier definitions and CI mapping: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)), and
 protocol changes must keep `Vivarium.Contracts` backward-compatible within a minor version (pool
 checkpoints may carry a stale agent until its post-revert upgrade).

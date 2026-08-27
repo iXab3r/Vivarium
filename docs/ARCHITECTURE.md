@@ -413,6 +413,46 @@ Cell identity is the scenario name *plus* the machine it resolved to: when an ex
 matching a different machine, history and pass rates do not silently blend — the matrix badges the
 change (§6).
 
+### D19. Everything ships portable; the controller is the distribution point
+
+All four binaries — controller, agent, bootstrap, `viv` — are self-contained single-file .NET
+publishes per RID: no installers, no registry, no machine-wide state. Config and data live beside the
+executable, uninstall = delete the folder, and admin rights are needed only for elevated/autologon
+*duties* (D10), never just to run. GitHub Releases carry the zips plus `SHA256SUMS`
+([`DEVELOPMENT.md`](DEVELOPMENT.md) has the pipeline); code signing is deferred and recorded (§13).
+
+At runtime the farm depends only on itself: the controller **bundles the agent + bootstrap packages
+for every supported RID** and serves them from its own store — `/bootstrap/manifest` (D2), the
+panel's Downloads page, and the enroll scripts all read from that store, so an air-gapped farm never
+phones GitHub. The store also accepts side-loaded builds: `viv agent push out/agent/win-x64` (admin
+scope) publishes a dev build, and every agent picks it up at its next restart — the core dev loop for
+agent work is build → push → watch the farm swap in seconds.
+
+The downloadable agent zip is the enrollment fallback for machines where the one-liner is awkward (no
+LAN route yet, air-gap, USB-stick provisioning): unzip, then `vivarium-agent enroll --url … --fp …
+--token …` — `enroll` is an *agent* verb that writes `bootstrap.json` and registers the logon task,
+so bootstrap stays the frozen dumb loop (§7). Running the agent interactively in a console is a
+first-class mode for debugging.
+
+### D20. Four test tiers; the hypervisor is faked until it can't be
+
+(1) **Logic tests** — NUnit on Microsoft.Testing.Platform, the same stack payloads use: scheduler and
+compatibility matching, matrix expansion, adapters against golden files, blob GC, fencing — with
+**virtual time**, so lease and queue timeouts never sleep. (2) **In-process protocol tests** — a real
+Kestrel controller on a loopback port plus real agent child processes: Session/Welcome, enrollment,
+authorization, upgrade handshake, reconnect-and-re-adopt, result idempotency. Phase 0's "session loop
+alive" is this suite's first member, not throwaway code. (3) **FakeMachineProvider** — simulated pool
+VMs backed by local agent processes (revert = process restart + workdir reset) drive the full D8
+conveyor deterministically with zero hypervisors. (4) **Real-hypervisor E2E** — QEMU/KVM smoke on
+GitHub's hosted Linux runners once that driver exists (they expose `/dev/kvm`; hosted Windows runners
+cannot do Hyper-V), and Hyper-V E2E on a self-hosted runner: the dev machine first, later the farm
+itself.
+
+Two structural consequences: protocol backward-compatibility is enforced by CI running the tier-2
+suite against the **previous release's agent binaries** (the HLK lock-step lesson), and from Phase 1
+Vivarium dogfoods — the repo's own `vivarium.yaml` runs the suite across the farm, with canary builds
+gating agent rollouts. Details and CI mapping: [`DEVELOPMENT.md`](DEVELOPMENT.md).
+
 ## 5. Protocol sketch
 
 ```proto
@@ -660,7 +700,9 @@ Views: **Agents** (TeamCity-style, mandatory first screen: status axes, paramete
 unauthorized newcomers awaiting authorization), **Fleet** (hosts + the D8 conveyor for managed
 machines), **Images** (registry: lineage, versions, drift badges, snapshot chains,
 build/promote/rollback/prune), **Queue & Builds** (TeamCity-shaped, with live service-message test
-progress), **Matrix** (test × scenario — the product of the whole system), console links. The admin
+progress), **Matrix** (test × scenario — the product of the whole system), **Downloads** (portable
+agent/CLI packages and pre-filled enroll commands, served from the controller's own store, D19),
+console links. The admin
 token is exchanged at a login page for an auth cookie (D4) — a panel that authorizes agents is never
 an open page — and the browser's one-time self-signed-certificate warning is expected and documented.
 
@@ -693,3 +735,6 @@ project invites strangers.
   machine lives on. Needs stated budgets and panel visibility before fleets grow.
 - **Blob access scope** — any agent-scoped token can `GET` any blob by hash; acceptable single-admin,
   recorded here for the multi-user future.
+- **Code signing** — unsigned binaries mean SmartScreen/MOTW friction on Windows and Gatekeeper
+  prompts for the CLI on macOS; certificates cost money and identity. Deferred, documented in
+  [`DEVELOPMENT.md`](DEVELOPMENT.md).

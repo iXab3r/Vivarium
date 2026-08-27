@@ -9,7 +9,10 @@ Ordered so that every phase ends with something usable. Decision references (D1�
 - [ ] Solution skeleton: `Vivarium.Contracts` (proto), `Vivarium.Controller` (gRPC AgentHub + blob
       store + SQLite + empty panel), `Vivarium.Agent`, `Vivarium.Bootstrap`, `Vivarium.Cli`.
 - [ ] The `Session` loop alive end-to-end with an agent running on the same machine — protocol proven
-      before any VM exists.
+      before any VM exists; it lands as the first members of the tier-2 in-process protocol suite
+      (D20), not as throwaway code.
+- [ ] GitHub Actions CI: tier 1–3 tests on ubuntu/windows/macos; the payload smoke tests below run in
+      the same matrix — hosted runners bootstrap the farm that will replace them (DEVELOPMENT.md).
 - [ ] Pinned-TLS + `Welcome` handshake and result fencing proven in the local loop (D4, §5).
 - [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
       three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
@@ -37,6 +40,9 @@ included) and run the matrix across them.
 - Panel: Agents / Queue & Builds / live log tail; a plain per-build results table (the full matrix
   view with history comes later).
 - Normative UX: `vivarium.yaml` + `viv run` per [`walkthrough.md`](walkthrough.md) §0–§6 (D17).
+- Panel Downloads page (portable agent/CLI zips from the controller's bundled store), `vivarium-agent
+  enroll`, and the `viv agent push` dev flow (D19).
+- Tagged releases via GitHub Actions: self-contained per-RID zips + SHA256SUMS (D19, DEVELOPMENT.md).
 
 Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,
 scenario lists, `repeat`/pass-rate cells, live service messages, `clean: reboot` (drags in autologon
