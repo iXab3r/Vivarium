@@ -1,0 +1,24 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+artifacts/
+*.binlog
+
+# .NET / IDE
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+
+# Test results
+TestResults/
+*.trx
+
+# Local state
+*.db
+*.db-shm
+*.db-wal
+.env
