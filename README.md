@@ -6,7 +6,8 @@ A vivarium is an enclosure that keeps organisms under controlled conditions for 
 
 > **Status: design phase.** There is no runnable code yet. The design is documented in
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the shape), [`docs/ROADMAP.md`](docs/ROADMAP.md) (the order),
-> and [`docs/prior-art.md`](docs/prior-art.md) (what we learned from the systems that came before).
+> [`docs/prior-art.md`](docs/prior-art.md) (what we learned from the systems that came before), and
+> [`docs/walkthrough.md`](docs/walkthrough.md) (what using it will feel like, end to end).
 
 ## Why
 

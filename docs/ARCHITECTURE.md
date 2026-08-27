@@ -277,6 +277,18 @@ there is nothing to recycle. Later options for pristine-on-metal: PXE re-imaging
 tooling, plus WoL/IPMI power management. Builds on physical cells record the agent's full parameter
 snapshot in place of an `ImageVersion` (§6).
 
+### D17. Build configurations are code in the tested repo
+
+`vivarium.yaml` lives next to the code it tests; `viv run` submits it together with payload blobs
+(sha256-deduped upload). The panel authors the *fleet* — agents, images, pools — and shows results; it
+does not author test configurations in v1. Automation-first means the run definition versions with the
+product, GitHub-Actions-style, rather than living in server-side UI state. Named matrix cells select
+agents via requirement expressions (`os.family == windows`) or, from Phase 2, images
+(`image: win10-19044-clean`); template variables (`{rid}`, `{os}`, `{arch}`, `{exe}`, `{results}`)
+specialize payload paths and steps per cell so one definition covers every OS. Any red cell makes
+`viv run --wait` exit nonzero — CI integration is an exit code, not a plugin.
+[`walkthrough.md`](walkthrough.md) is the normative UX for all of this.
+
 ## 5. Protocol sketch
 
 ```proto

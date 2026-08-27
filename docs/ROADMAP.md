@@ -22,6 +22,8 @@ included) and run the matrix across them.
   (D5); failure taxonomy in the data model (D9).
 - Self-contained NUnit payload → TRX adapter; TeamCity service messages for live test progress (D14).
 - Panel: Agents / Queue & Builds / live logs; matrix view over enrolled machines.
+- `vivarium.yaml` + `viv run` matrix UX — normative walkthrough in
+  [`walkthrough.md`](walkthrough.md) (D17).
 - `viv run`, `viv exec --agent <name>`.
 
 ## Phase 2 — Pristine: the Hyper-V provider

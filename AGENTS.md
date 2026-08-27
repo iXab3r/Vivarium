@@ -6,7 +6,8 @@ levels, machines with specific software preinstalled, Ubuntu, macOS) and produce
 > **Docs map:** this file (AGENTS.md) holds the *rules*; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 > holds the *shape* (all design decisions, numbered D1…D16); [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
 > the order of work; [`docs/prior-art.md`](docs/prior-art.md) records what we borrowed from existing
-> systems. Read ARCHITECTURE.md before proposing or implementing anything structural.
+> systems; [`docs/walkthrough.md`](docs/walkthrough.md) is the normative end-to-end UX. Read
+> ARCHITECTURE.md before proposing or implementing anything structural.
 
 This repository is worked on by humans and multiple AI agents (Claude Code, Codex, and others). This
 file is the shared contract for all of them; keep it harness-agnostic. Subdirectories may add their own
