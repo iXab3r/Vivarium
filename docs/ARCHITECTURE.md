@@ -12,9 +12,11 @@ from a pristine, versioned machine state, and results land in one *test × scena
 
 Goals, in priority order:
 
-1. **Reproducible machine state.** A scenario is a versioned image; a job always starts from its sealed snapshot.
+1. **Reproducible machine state.** An image-backed scenario is a versioned, sealed snapshot; a
+   pristine build always starts from it. Physical scenarios trade reproducibility for realness —
+   deliberately (D16).
 2. **Central control.** One controller with a web panel: queue, fleet, image registry, results. Monitoring a farm by hand does not scale past two VMs.
-3. **Payload-agnostic jobs.** NUnit/.NET is the default test vehicle, but the runner contract must fit anything — Rust test binaries, plain scripts, one-off commands.
+3. **Payload-agnostic builds.** NUnit/.NET is the default test vehicle, but the runner contract must fit anything — Rust test binaries, plain scripts, one-off commands.
 4. **Cheap scenario authoring.** Adding "Win10 19044 + product X v1.2" is a small recipe diff plus one build command, not an afternoon of clicking.
 
 Non-goals:
@@ -25,20 +27,31 @@ Non-goals:
 
 ## 2. Core model
 
-The mental model is TeamCity's, with one deliberate inversion: TeamCity agents are *pets*
-(long-lived, cherished), Vivarium agents are *cattle* — a clone lives for exactly one job.
-The first-class entity TeamCity does not have is the **versioned image**.
+Vivarium adopts TeamCity's model **wholesale — entities, statuses, and semantics** — and gives it an
+automation-first spin: builds run bulk test corpora across machine *conditions*, and the machine side
+grows providers, a pristine lifecycle, and an image registry. TeamCity even contains the seed of our
+split already: regular agents (installed once, authorized, auto-upgraded) vs cloud profiles (agents
+spawned from images on demand, auto-authorized, discarded after idle). Vivarium generalizes the second
+into machine providers (D15) and adds what TeamCity never had: versioned images with sealed snapshots
+and revert-to-pristine before a build.
 
 | TeamCity | Vivarium |
 |---|---|
-| Build Configuration | **Suite** — payload definition + scenario matrix |
-| Build | **Run** — suite × set of image versions, expands into Jobs |
-| Build Queue | Job queue with leases and heartbeats |
-| Agent | Ephemeral VM clone (cattle) |
-| Agent Pool / requirements | Host pools + scenario selectors (os, build, installed software) |
-| Artifacts / Build Log | Content-addressed blob store / streamed job log |
-| Unauthorized agent | *Unadopted* machine → adopt flow (§8.4) |
-| — | **Image registry**: images, versions, snapshots, lineage — the core addition |
+| Project / Build Configuration / Build | Same, verbatim (D14) |
+| Build Queue; agent requirements vs agent parameters | Same, verbatim |
+| Agent status: connected × authorized × enabled × idle/building | Same, verbatim (D8) |
+| Agent auto-upgrade from the server | Same — launcher handshake (D2) |
+| Regular agents | **Enrolled agents**: physical boxes, long-lived VMs (D16) |
+| Cloud profiles / cloud agents | **Machine providers**: hypervisor (clones of ImageVersions), cloud, static pool (D15) |
+| Service messages `##teamcity[…]` | Same, verbatim (D14) |
+| Artifacts / build log | Content-addressed blob store / streamed log |
+| Investigations & muted tests | Planned: matrix triage — mute a test × scenario cell |
+| — | **Image registry + pristine clean policy**: sealed versioned snapshots, recipes, drift detection |
+
+Agents may be pets *or* cattle: an enrolled physical machine is a classic TeamCity agent; a
+provider-spawned clone lives for exactly one build. **Pristine is a capability and a clean policy
+(D5), not the only lifecycle** — a build configuration that just wants a real connected machine runs
+on one, as is.
 
 ## 3. Components
 
@@ -50,19 +63,20 @@ flowchart LR
     UI["Blazor Server panel"] --- C
     C["Controller<br/>ASP.NET Core: gRPC AgentHub + HTTP blob store + scheduler + SQLite"]
     C -- "clone / revert / start / stop / console-endpoint" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
-    subgraph Clone ["VM clone (per job)"]
-        B["Bootstrap (frozen, baked into image)"] --> A["Agent (pulled at boot)"]
+    subgraph Clone ["Machine: VM clone or enrolled physical box"]
+        B["Bootstrap (frozen, baked into image / installed once)"] --> A["Agent (pulled + auto-upgraded)"]
     end
     D --> Clone
     A -- "gRPC reverse connect: hello / jobs / logs / status" --> C
     A -- "HTTP: pull payload, push artifacts (sha256)" --> C
 ```
 
-- **Controller** (`Vivarium.Controller`): job queue, image registry, scheduler, host drivers, agent rendezvous (gRPC), blob store, result store (SQLite), Blazor Server web panel. One Kestrel host serves all of it.
+- **Controller** (`Vivarium.Controller`): build queue, image registry, scheduler, machine providers, agent rendezvous (gRPC), blob store, result store (SQLite), Blazor Server web panel. One Kestrel host serves all of it.
+- **Machine providers** (D15): supply agents to the queue — a static pool of enrolled machines (physical boxes, hand-managed VMs), hypervisor providers that spawn clones of `ImageVersion`s on demand (host drivers live here), and later cloud providers for short-living instances.
 - **Host driver** (per hypervisor): `Clone(imageVersion) → VmInstance`, `Revert`, `Start`, `Stop`, `TakeSnapshot`, `GetConsoleEndpoint`, plus MAC assignment on clone. Nothing else — no guest file copy, no guest exec (see D1). In-process .NET implementations first; if third-party drivers ever appear, garm's external-executable provider contract is the sanctioned escape hatch.
 - **Bootstrap** (`Vivarium.Bootstrap`): the only thing baked into images. Frozen contract (§7).
 - **Agent** (`Vivarium.Agent`): pulled by bootstrap at boot; executes jobs, streams logs, uploads results. Deliberately dumb — all decisions live in the controller.
-- **CLI** (`Vivarium.Cli`, binary `viv`): submit runs, ad-hoc exec, status, adopt — a client of the same gRPC API as the panel. This is also the CI integration point.
+- **CLI** (`Vivarium.Cli`, binary `viv`): submit builds, ad-hoc exec, status, authorize — a client of the same gRPC API as the panel. This is also the CI integration point.
 - **Contracts** (`Vivarium.Contracts`): the `.proto` files and generated types shared by all of the above.
 
 ## 4. Key decisions
@@ -73,9 +87,10 @@ Numbered so later docs and commits can reference them.
 
 The controller never reaches *into* a guest (no SSH, WinRM, PowerShell Direct, guest-ops APIs — every
 hypervisor has a different zoo of these). Instead the guest agent dials out to a well-known controller
-address after boot: hello → receive job → pull payload → stream logs → push results. This is the model
+address after boot: hello → receive build → pull payload → stream logs → push results. This is the model
 every CI agent uses, and it collapses the per-hypervisor driver surface to clone/revert/start/stop —
-which is exactly why adding QEMU or Tart later is cheap. No IP discovery, no firewall pain, no guest credentials.
+which is exactly why adding QEMU or Tart later is cheap. No IP discovery, no firewall pain, no guest
+credentials. Physical machines make this non-negotiable: there is no hypervisor to reach through at all.
 
 ### D2. Only a frozen bootstrap is baked into images
 
@@ -84,10 +99,16 @@ pain of VM farms. Images carry only a tiny **bootstrap** with a frozen contract 
 downloaded from the controller at boot (manifest + sha256), so agent updates are "publish a file".
 The controller can tell a running agent to restart (`RestartAgent`), and bootstrap picks up the new version.
 
-### D3. The job contract is files-in / process / files-out
+The handshake is TeamCity's: on hello the controller compares agent versions and orders a restart when
+stale. On physical machines this is the *only* update path — install once by hand, upgrade centrally
+forever — which is why bootstrap must stay boring. Sealed snapshots may carry yesterday's agent; the
+post-revert upgrade costs one small LAN download, and a periodic maintenance re-seal folds the current
+agent back into hot images (D13).
 
-The runner does not know what NUnit is. A job is: payload blobs (sha256-addressed) → unpack → run one
-command with env/cwd/timeout → collect declared globs → exit code. *Result adapters* on the controller
+### D3. The build contract is files-in / process / files-out
+
+The runner does not know what NUnit is. A build is: payload blobs (sha256-addressed) → unpack → run
+steps (commands with env/cwd/timeout, D14) → collect declared globs → exit codes. *Result adapters* on the controller
 side parse well-known formats into the result model:
 
 - **Default payload — NUnit on .NET**, published **self-contained** per RID, executed as a plain exe
@@ -110,24 +131,31 @@ Two consequences of memory-restore drive transport details:
 - **Guest clocks wake up in the past**, which breaks TLS certificate validation — including the agent's
   own connection. MVP: h2c (gRPC over cleartext HTTP/2) inside an isolated host-only network, plus a
   bearer token. Later option: pinned self-signed cert with a validation callback that ignores dates.
-  Additionally, the controller sends its wall-clock with every hello response and job assignment, and
+  Additionally, the controller sends its wall-clock with every hello response and build assignment, and
   the elevated agent corrects guest skew immediately — Cuckoo has shipped exactly this `clock`
   parameter for fifteen years.
 - **The agent's TCP connection is dead after restore but doesn't know it.** gRPC keepalive pings
   (~10 s interval / 5 s timeout) on both sides detect it in seconds; the agent treats any disconnect
   as "reconnect and re-hello"; the controller treats a lost lease as an INFRA failure (D9).
 
-### D5. Revert point = snapshot with memory; linked clones for parallelism
+### D5. Pristine is a clean policy; its revert point is a memory snapshot
+
+Per build configuration (or machine), the **clean policy** is one of: `pristine` (revert to the sealed
+checkpoint before the build — requires snapshot capability), `reboot` (the honest reset physical
+machines can offer), `clean-workdir`, or `none` (run on the connected machine as-is — plain TeamCity
+behavior). Configurations state what they need through ordinary agent requirements; checkpoints are
+first-class, not mandatory. The rest of this decision describes how `pristine` works on managed VMs.
 
 The runtime snapshot of an image version is taken on a *booted, logged-in, idle* system with bootstrap
 waiting. Revert-with-memory brings a live agent back in ~2–5 s instead of a 30–90 s cold Windows boot.
-Cold boot remains a per-scenario option (boot-time behavior is itself worth testing). Parallel jobs use
-linked clones / differencing disks (AVHDX, qcow2 backing, APFS COW for Tart) so N clones of a 40 GB
+Cold boot remains a per-scenario option (boot-time behavior is itself worth testing). Parallel pristine
+builds use linked clones / differencing disks (AVHDX, qcow2 backing, APFS COW for Tart) so N clones of a 40 GB
 image are instant and near-free; a 32 GB host comfortably runs ~5–6 Windows VMs at 2 vCPU / 4 GB.
 
-### D6. Provisioning is a job with a different epilogue
+### D6. Provisioning is a build with a different epilogue
 
-A job's epilogue is one of: **revert** (test jobs), **keep** (ad-hoc/debug), or **seal** (provisioning):
+A build's epilogue is one of: **revert** (pristine builds), **none** (persistent machines — plain
+TeamCity behavior), **keep** (debug quarantine), or **seal** (provisioning):
 reboot → autologon → wait for a clean hello → take the memory snapshot → register a new `ImageVersion`.
 One machinery for everything; there is no separate "image builder" tool. Recipes are declarative files
 in git (§8.2), including honest `manual` steps for software that cannot be installed silently.
@@ -138,20 +166,36 @@ With three parallel clones of the same image, "which VM just said hello?" must b
 assigns each clone a known MAC; the agent reports its MAC (plus a per-boot `boot_id` GUID) in `Hello`.
 No per-boot config injection into guests is needed, which keeps memory snapshots valid.
 
-### D8. The VM lifecycle is an explicit state machine
+This applies to provider-spawned clones, which are **auto-authorized** because their parent image is
+trusted (TeamCity treats cloud agents the same way). Enrolled agents — physical machines, long-lived
+VMs — carry a persistent identity instead: a GUID generated at install plus an authorization token
+issued when the operator authorizes them, exactly TeamCity's regular-agent flow (§8.4, D16).
 
-`CLONING → BOOTING → READY → BUSY → COLLECTING → REVERTING | DESTROYING`, plus `SEALING`
+### D8. Agent status is TeamCity's; machine lifecycle is Vivarium's
+
+Two separate layers, deliberately.
+
+**Agent status — TeamCity 1:1.** Four independent axes: *connected/disconnected* (a network fact),
+*authorized/unauthorized* (an operator decision — unauthorized agents connect and are visible but
+never receive builds), *enabled/disabled* (an operator toggle), *idle/building/upgrading*.
+Compatibility is computed per build configuration from requirements vs agent parameters, exactly as
+TeamCity does. These statuses are mandatory, first-screen information.
+
+**Machine lifecycle — managed machines only.** Provider-spawned VMs additionally walk an explicit
+conveyor: `CLONING → BOOTING → READY → BUSY → COLLECTING → REVERTING | DESTROYING`, plus `SEALING`
 (provisioning) and `QUARANTINE` (keep-on-fail). Every transition is timestamped and has a timeout;
-"stuck in BOOTING for 120 s" is an INFRA alert and an automatic recycle. This state machine is
-simultaneously the scheduler skeleton, the main panel view, and the alerting source — it is what makes
-"monitoring the farm" tractable. Following LAVA, *health* (good / bad / maintenance / retired — set by
-canaries and operators) is a separate axis from *state*: a canary failure marks an image version or
-host bad and removes it from scheduling without touching in-flight jobs.
+"stuck in BOOTING for 120 s" is an INFRA alert and an automatic recycle. Physical machines have no
+conveyor — their recycle is a reboot, or an operator.
+
+Following LAVA, *health* (good / bad / maintenance / retired — set by canaries and operators) is a
+third, orthogonal axis: a canary failure marks an image version, machine, or host bad and removes it
+from scheduling without touching in-flight builds. Together these three layers are the scheduler
+skeleton, the main panel view, and the alerting source — what makes "monitoring the farm" tractable.
 
 ### D9. Failure taxonomy: INFRA / TEST / CRASH
 
 - `INFRA` — no hello, lost heartbeat, revert failure, timeout before the payload ever ran. Retried
-  silently on another clone; never shown as a test failure.
+  silently — on another clone, or after a reboot on a physical machine; never shown as a test failure.
 - `TEST` — the payload ran and reported failures (TRX/JUnit). Never auto-retried.
 - `CRASH` — nonzero exit without a result file; dumps collected.
 
@@ -166,8 +210,9 @@ bounded-retry infra errors.
 Input synthesis, overlays, foreground windows, and installers need a real unlocked session. Images are
 built with: autologon, agent launched as a logon task of that user, **elevated** (UAC off or
 highest-available — a non-elevated agent can neither fix the clock nor send input to elevated windows
-past UIPI), screen lock/screensaver disabled, fixed resolution. Session type is reported in `Hello`;
-jobs can require `interactive`.
+past UIPI), screen lock/screensaver disabled, fixed resolution. Session type is reported in `Hello`; build configurations
+can require `interactive`. Enrolled physical machines intended for UI tests follow the same checklist
+by hand — the agent reports the truth either way.
 
 ### D11. Drift detection
 
@@ -190,8 +235,47 @@ work directory (unless "AV enabled" *is* the scenario — then it is a scenario 
 
 Linked-clone chains grow; blobs accumulate; images rot. The controller schedules: periodic re-baseline
 (fresh clone from base), disk compaction, blob GC, snapshot-chain pruning, and **health-check canary
-jobs** — a trivial boot-hello-run job per image version on a cadence, so a rotten image is caught by a
-canary, not by a real run at 2 a.m. Host disk/CPU/RAM are shown on the panel with alerts.
+builds** — a trivial boot-hello-run build per image version on a cadence, so a rotten image is caught
+by a canary, not by a real run at 2 a.m. Host disk/CPU/RAM are shown on the panel with alerts.
+
+### D14. The work model is TeamCity's, names included
+
+`Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
+(queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
+matrix expands into a **matrix build** whose cells are ordinary builds, aggregated composite-style.
+Steps have execution policies (default / even-if-failed / always) so diagnostics collection runs even
+after a failing test step. Earlier drafts of this document said Suite/Run/Job; the adopted names are
+build configuration / matrix build / build.
+
+Live progress uses **TeamCity's service-message protocol verbatim**: the agent scans step stdout for
+`##teamcity[testStarted …]` / `testFailed` / `progressMessage` / … and forwards them as structured
+events. Every reporter that already speaks TeamCity — NUnit's TeamCity listener, pytest-teamcity,
+Gradle, dozens more — becomes a live Vivarium progress source with zero integration work. Authoritative
+results remain the collected TRX/JUnit files (D3); service messages only stream the build as it runs.
+
+### D15. Machines come from providers
+
+The scheduler asks `MachineProvider`s for capacity; a provider implements
+`Acquire(requirements) → machine` / `Release(machine)`:
+
+- **Static pool** — enrolled machines (physical boxes, hand-managed VMs). Capacity is what it is.
+- **Hypervisor provider** (Hyper-V / QEMU / Tart) — spawns clones of sealed `ImageVersion`s when the
+  queue holds compatible builds and the pool is below its cap, and destroys/reverts them per policy.
+  This is TeamCity's cloud-profile logic verbatim, with snapshots added; spawned agents are
+  auto-authorized (D7).
+- **Cloud provider** (Azure first; later) — short-living instances from cloud images; the agent is
+  baked into the image or installed by an init script and reverse-connects like everyone else. Not in
+  the first release, but the seam exists from day one — GitLab's fleeting and garm validated exactly
+  this scaler-vs-provider split (see prior-art).
+
+### D16. Physical machines are first-class
+
+A physical box is enrolled with the same one-liner, authorized like any TeamCity agent, and described
+by its parameters — it *is* a scenario, with capacity 1 and no pristine capability. Its clean policies
+are `reboot` / `clean-workdir` / `none`; INFRA failures mark it bad and notify instead of recycling —
+there is nothing to recycle. Later options for pristine-on-metal: PXE re-imaging or disk-restore
+tooling, plus WoL/IPMI power management. Builds on physical cells record the agent's full parameter
+snapshot in place of an `ImageVersion` (§6).
 
 ## 5. Protocol sketch
 
@@ -206,61 +290,76 @@ service AgentHub {
 message AgentMsg {
   oneof msg {
     Hello hello = 1;
-    JobStatus status = 2;     // FETCHING / RUNNING / COLLECTING
-    LogChunk log = 3;         // stdout/stderr, chunked, bounded buffering
-    JobResult result = 4;     // exit code + sha256 list of uploaded artifacts
-    Heartbeat heartbeat = 5;
+    StepStatus status = 2;     // FETCHING / RUNNING step N / COLLECTING
+    LogChunk log = 3;          // stdout/stderr, chunked, bounded buffering
+    ServiceMessage event = 4;  // parsed ##teamcity[...] from step stdout (D14)
+    BuildResult result = 5;    // per-step exit codes + sha256 list of uploaded artifacts
+    Heartbeat heartbeat = 6;
   }
 }
 
 message ControllerMsg {
   oneof msg {
-    JobAssignment job = 1;
-    CancelJob cancel = 2;
-    RestartAgent restart = 3; // exit; bootstrap fetches the current agent version
+    BuildAssignment build = 1;
+    CancelBuild cancel = 2;
+    RestartAgent restart = 3;  // exit; bootstrap fetches the current agent version (D2)
   }
 }
 
 message Hello {
-  string image_id = 1;        // from bootstrap.json
-  string boot_id = 2;         // GUID per boot
-  string mac = 3;             // clone correlation (D7)
-  string agent_version = 4;
-  OsInfo os = 5;              // ACTUAL os/build — drift detection (D11)
-  bool interactive = 6;       // live desktop present
+  string agent_id = 1;         // persistent GUID (enrolled) / ephemeral (provider-spawned)
+  string auth_token = 2;       // issued at authorization; empty while unauthorized (D7)
+  map<string, string> parameters = 3;  // os.build, software.*, machine.kind, pristine, ...
+  string image_id = 4;         // set for provider-spawned agents
+  string boot_id = 5;          // GUID per boot
+  string mac = 6;              // clone correlation (D7)
+  string agent_version = 7;    // upgrade handshake (D2)
+  OsInfo os = 8;               // ACTUAL os/build — drift detection (D11)
+  bool interactive = 9;        // live desktop present
 }
 
-message JobAssignment {
-  string job_id = 1;
+message BuildAssignment {
+  string build_id = 1;
   repeated Blob payload = 2;      // {url, sha256, unpack_to}
-  RunSpec run = 3;                // cmd/args/env/cwd/timeout/session
-  repeated string collect = 4;    // result globs
-  OnFail on_fail = 5;             // NONE / KEEP_VM / SNAPSHOT_VM
+  repeated Step steps = 3;        // RunSpec + execution policy (default/even-if-failed/always)
+  repeated string collect = 4;    // artifact globs
+  OnFail on_fail = 5;             // NONE / KEEP_MACHINE / SNAPSHOT_MACHINE
 }
 ```
 
 Blob endpoints: `GET/PUT /blobs/{sha256}`. Bootstrap endpoints: `GET /bootstrap/manifest?os=&arch=`,
 `GET /setup.ps1`, `GET /setup.sh` (§8.4).
 
-Job flow: scheduler picks (scenario × suite) → driver clones/reverts + starts → hello → assignment →
-payload pull (sha-verified) → exec (log stream + heartbeats) → artifact push → result → adapter parses
-TRX/JUnit → epilogue (revert/seal/keep per D6).
+Build flow: the queue holds builds awaiting compatible agents → a provider supplies one (an idle
+enrolled agent, or a freshly spawned clone) → assignment → payload pull (sha-verified) → steps run
+(log stream + service messages + heartbeats) → artifact push → result → adapters parse TRX/JUnit →
+epilogue per clean policy (D5/D6).
 
 ## 6. Data model
 
-`Host` (driver, capabilities, cpu/ram/disk) → `Image` (recipe ref, lineage) → `ImageVersion`
-(snapshot ref, recipe hash, parent version, declared+actual OS build, sealed-at) → `VmInstance`
-(clone: state per D8, current job, MAC). Plus `Suite`, `Run`, `Job` (with failure class per D9),
-`Blob`, `TestResult` (normalized from TRX/JUnit: case, outcome, duration, artifacts).
+TeamCity's entities plus the machine/image layer:
 
-Results are tagged with the exact `ImageVersion`, so updating an image never silently changes what a
-historical run means, and the matrix can show "started failing at product-X 1.2 → 1.3".
+`Project` → `BuildConfiguration` (steps, requirements, parameters, artifact rules, matrix axes) →
+`Build` (state, failure class per D9, log, `TestOccurrence`s, artifacts; a matrix build is a composite
+aggregating its per-scenario cells). Queue rows reference builds awaiting compatible agents.
+
+`Agent` (identity, version, status axes per D8, parameters, pool) ↔ `Machine` (kind:
+`physical | managed-vm | cloud`; capabilities: pristine / console / power; conveyor state for managed
+kinds) ← `MachineProvider` (static pool / hypervisor / cloud). `Host` (hypervisor node: driver,
+capacity, cpu/ram/disk) → `Image` (recipe ref, lineage) → `ImageVersion` (snapshot ref, recipe hash,
+parent version, declared+actual OS build, sealed-at) → managed machines cloned from it. Plus `Blob`.
+
+Every build records what it actually ran on: the exact `ImageVersion` for image-backed cells, or the
+agent's full parameter snapshot for physical cells — a historical cell never silently changes meaning,
+and the matrix can show "started failing at product-X 1.2 → 1.3".
 
 Storage: SQLite + blob directory. No external services.
 
 ## 7. Bootstrap contract (frozen)
 
-The only code inside images; it must never need to change. Entirety of its behavior:
+The only code baked into images — and installed on physical machines by the setup one-liner. In role
+it is exactly TeamCity's agent launcher: the version handshake and the swap live here. It must never
+need to change; entirety of its behavior:
 
 1. Read `bootstrap.json` next to itself: `{ controllerUrl, imageId, secret }`.
 2. Loop: `GET /bootstrap/manifest?os=…&arch=…` → `{version, sha256, url}`; if the local agent differs,
@@ -302,8 +401,8 @@ manual work is legalized and versioned instead of happening outside the system.
 Steps will grow into a typed catalog (Azure DevTest Labs' artifact manifests — title, target OS, typed
 parameters, run command — rendered as forms in the panel) and support reboot-and-resume semantics for
 multi-reboot installs (Boxstarter's trick). Network profiles are enforced at the host level — deny-all
-with an allowlist for the job's duration, as Ludus' testing mode does — which also stops Windows Update
-drift *during* long jobs, not only between rebuilds.
+with an allowlist for the build's duration, as Ludus' testing mode does — which also stops Windows
+Update drift *during* long builds, not only between rebuilds.
 
 ### 8.3 Runtime snapshot definition
 
@@ -312,36 +411,45 @@ After every revert, bootstrap's pending connection naturally dies (D4) and it re
 A sealed `ImageVersion` is immutable — clones derive only from sealed versions and never mutate them
 (Proxmox's linked-clones-only-from-templates invariant).
 
-### 8.4 Adopting hand-made machines
+### 8.4 Enrollment and authorization
 
-Install the OS by hand, run one line inside the guest:
+Getting any machine — a physical box or a hand-made VM — into the farm is TeamCity's flow. Install the
+OS by hand if needed, then run one line inside it:
 
 ```
 iwr http://ctrl:8080/setup.ps1 | iex          # Windows
 curl -fsSL http://ctrl:8080/setup.sh | sh     # Linux / macOS
 ```
 
-The script installs bootstrap + autologon task + `bootstrap.json` and starts it. The machine appears on
-the panel as **unadopted**; *Adopt* snapshots it and registers `Image v1`. This is also the complete
-answer to "how do I get the agent onto a machine" — after this one-liner, agent delivery is automatic forever.
+The script installs bootstrap + autologon task + `bootstrap.json` and starts it. The agent appears on
+the panel **unauthorized** — visible, never scheduled; *Authorize* turns it into an enrolled agent
+with a persistent identity and token (D7). This is the complete answer to "how do I get the agent onto
+a machine": after the one-liner, agent delivery and upgrades are central and automatic forever (D2).
+
+An enrolled VM that lives on a managed hypervisor can additionally be **adopted as an image**: the
+controller snapshots it and registers `Image v1`, making it cloneable and pristine-capable. Physical
+machines skip this step — they stay persistent agents whose parameters describe their setup (D16).
 
 ## 9. Ad-hoc execution
 
-Both are ordinary `JobAssignment`s:
+Both are ordinary `BuildAssignment`s:
 
 - `viv exec --image win10-19044-avx -- powershell -c "..."` — clone, run, stream output, revert.
   "Check this quickly on a clean 19044" as a one-liner.
-- `viv exec --vm <id> -- ...` — same on a *live* machine (unadopted / quarantined / mid-provisioning),
-  no revert. Line-based streaming first; a real interactive terminal (ConPTY + stdin channel over the
-  same gRPC session) is a later feature — until then, the console button covers interactivity.
+- `viv exec --agent <name> -- ...` — same on a *live* machine (a physical box, a quarantined clone, a
+  machine mid-provisioning), no revert. Line-based streaming first; a real interactive terminal
+  (ConPTY + stdin channel over the same gRPC session) is a later feature — until then, the console
+  button covers interactivity.
 
 ## 10. Platforms
 
-| Guests | Host | Hypervisor | Memory snapshots |
+| Guests | Runs on | Driver / provider | Pristine mechanism |
 |---|---|---|---|
-| Windows, Linux | Windows host | Hyper-V (first driver) | yes (standard checkpoints) |
-| Windows, Linux | Linux host | QEMU/KVM (second) | yes (savevm) |
-| macOS | Apple hardware only (EULA) | Tart on a Mac mini | no — instant APFS clones + ~20 s boot instead |
+| Windows, Linux | Windows host | Hyper-V (first driver) | memory checkpoints |
+| Windows, Linux | Linux host | QEMU/KVM (second) | savevm memory snapshots |
+| macOS | Apple hardware only (EULA) | Tart on a Mac mini | none — instant APFS clone + ~20 s boot |
+| any | the machine itself | physical / enrolled agent (D16) | none — clean policy `reboot` / `clean-workdir` / `none` |
+| any | Azure and friends | cloud provider (later, D15) | fresh short-living instance per build |
 
 The controller sees hosts as pools with capabilities; a Mac mini is just another node running the same
 agent contract. Tart is driven as an external CLI, so its Fair Source license (free below 100 CPU
@@ -351,9 +459,11 @@ orchestrator — is the reference for that driver.
 ## 11. Web panel
 
 Blazor Server in the controller process (SignalR gives live updates for free; no JS toolchain).
-Views: **Fleet** (hosts + VM state machine, the D8 conveyor), **Images** (registry: lineage, versions,
-drift badges, snapshot chains, build/promote/rollback/prune), **Runs/Queue** (TeamCity-shaped),
-**Matrix** (test × scenario, the product of the whole system), **VM console** links.
+Views: **Agents** (TeamCity-style, mandatory first screen: status axes, parameters, compatibility,
+unauthorized newcomers awaiting authorization), **Fleet** (hosts + the D8 conveyor for managed
+machines), **Images** (registry: lineage, versions, drift badges, snapshot chains,
+build/promote/rollback/prune), **Queue & Builds** (TeamCity-shaped, with live service-message test
+progress), **Matrix** (test × scenario — the product of the whole system), console links.
 
 ## 12. Prior art
 

@@ -27,20 +27,21 @@ flowchart LR
     UI["Web panel (Blazor)"] --- C
     C["Controller<br/>queue + image registry + results<br/>gRPC + blob store + SQLite"]
     C -- "clone / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]
-    D --> VM["VM clone (cattle)"]
-    VM -- "reverse-connect gRPC<br/>hello / job / logs / results" --> C
+    D --> VM["VM clone / enrolled physical machine"]
+    VM -- "reverse-connect gRPC<br/>hello / builds / logs / results" --> C
 ```
 
-- **Controller** — one process: job queue, versioned image registry, scheduler, result store, web panel. Think TeamCity, except agents are cattle and the first-class entity is the *image*.
+- **Controller** — one process: build queue, versioned image registry, scheduler, result store, web panel. TeamCity's model adopted wholesale — projects, build configurations, builds, agent authorization and statuses, parameters/requirements, even the `##teamcity[…]` service-message protocol — with an automation-first spin.
 - **Host drivers** — reduced to four verbs per hypervisor: clone, revert, start, stop. Everything else happens over the agent channel, which is why adding a hypervisor is cheap.
-- **Guest agent** — deliberately dumb, reverse-connects to the controller over gRPC. Only a tiny frozen *bootstrap* is baked into images; the agent itself is pulled at boot, so agent updates never require rebuilding snapshots.
-- **Jobs** — files in → process → exit code + files out. NUnit (self-contained, TRX) is the default payload; anything that produces JUnit XML (e.g. `cargo nextest`) plugs into the same pipe. Guests stay pristine: no SDKs, no runtimes.
+- **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in VM clones *and* on enrolled physical machines. Only a tiny frozen *bootstrap* is installed once (baked into images, or via a one-liner on a physical box); the agent itself is pulled and auto-upgraded centrally, TeamCity-style — snapshots never get rebuilt for an agent update.
+- **Builds** — files in → steps → exit codes + files out. NUnit (self-contained, TRX) is the default payload; anything that produces JUnit XML (e.g. `cargo nextest`) or speaks TeamCity service messages plugs into the same pipe. Guests stay pristine: no SDKs, no runtimes. *Pristine* itself is a per-configuration clean policy — revert-to-snapshot where the machine supports it, plain reboot or nothing where it doesn't.
 - **Images** — built as *base → declarative provisioning recipe → sealed snapshot*, versioned, with drift detection. Provisioning runs through the same job machinery; a memory-state snapshot makes revert-to-pristine a matter of seconds.
 
 ## Planned features
 
 - Test matrix across Windows / Linux / macOS guests with per-scenario network profiles (NAT / offline / full).
-- Snapshot-with-memory revert per job; linked clones for parallelism.
+- Physical machines as first-class agents: enroll → authorize → they are scenarios too.
+- Snapshot-with-memory revert per build; linked clones for parallelism; machine-provider seam for short-living cloud instances (Azure) later.
 - Image registry UI: lineage, versions, actual-vs-declared OS build (drift detection), snapshot chains.
 - Declarative image recipes in git, including honest `manual` steps for software with no silent installer.
 - Interactive-desktop guests by default (autologon, unlocked session) — input, overlay, and UI tests are first-class.
