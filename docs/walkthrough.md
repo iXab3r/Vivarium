@@ -38,9 +38,16 @@ have, a Mac mini in a drawer. Panel → **Agents → Add machine** shows a one-l
 enroll token baked in; run it *on the machine*:
 
 ```
-iwr https://192.168.1.10:8443/setup.ps1?t=<enroll-token> | iex     # Windows (elevated prompt)
-curl -fsSL https://192.168.1.10:8443/setup.sh?t=<token> | sh       # Linux / macOS
+# Windows (elevated; curl.exe ships with Windows)
+curl.exe -k https://192.168.1.10:8443/setup.ps1 -o setup.ps1; powershell -ep bypass .\setup.ps1 -Fp SHA256:9F3A... -Token <enroll-token>
+
+# Linux / macOS
+curl -fsSLk https://192.168.1.10:8443/setup.sh | sh -s -- --fp SHA256:9F3A... --token <token>
 ```
+
+The script re-checks the live certificate against the fingerprint argument before doing anything else;
+the panel shows this exact command pre-filled — token, fingerprint and all (§8.4 explains the trust
+handshake).
 
 Each machine appears under **Agents** as *unauthorized* within seconds (D8). Click **Authorize**, give
 it a name. The agent has already reported its parameters — you add tags only if you want them:
@@ -93,7 +100,8 @@ configurations:
   archive (executable bits and symlinks preserved — this matters the moment a Linux agent unpacks your
   tests), content-addressed and deduplicated — unchanged content never uploads twice.
 - Results come back as TRX (parsed by the controller's adapter); if the runner also emits TeamCity
-  service messages, tests stream live while the build runs (D14).
+  service messages, tests stream live while the build runs (D14 — lands after the Phase 1 core, which
+  shows step status and delivers full results at build end).
 
 ## 3. Build the payloads
 
@@ -121,9 +129,9 @@ macOS binaries must carry at least an ad-hoc signature; and TRX needs the
 ```
 $ viv run integration
 Uploading payload… 3 cells, 214 MB → 38 MB new (dedup)
-Matrix build #12 queued → http://192.168.1.10:8080/builds/12
+Matrix build #12 queued → https://192.168.1.10:8443/builds/12
 
-  windows  win10-box      ▶ running   NUnit: 92/148…
+  windows  win10-box      ▶ running   step 1/1
   linux    ubuntu-2204    ▶ running
   macos    macbook        ⏳ queued (agent busy)
 
@@ -132,14 +140,15 @@ Matrix build #12 queued → http://192.168.1.10:8080/builds/12
   macos    macbook        ✓ passed    148/148   3m 40s
 
 FAILED on linux: PortBindingTest, UnixSocketPermissionsTest
-Details: http://192.168.1.10:8080/builds/12
+Details: https://192.168.1.10:8443/builds/12
 $ echo $?   # → 1 (any red cell = nonzero; CI-friendly)
 ```
 
 `viv run integration --no-wait` just enqueues and prints the URL.
 
 Under the hood, per cell: queue → compatible agent (D8) → `BuildAssignment` → agent pulls blobs by
-sha256 → steps run with logs, heartbeats, and service messages streaming (D14) → artifacts pushed →
+sha256 → steps run with logs and heartbeats streaming (live service messages join post-Phase 1, D14) →
+artifacts pushed →
 TRX parsed → matrix updated. Infra hiccups (agent lost mid-build) retry silently on the taxonomy's
 INFRA branch and never masquerade as test failures (D9).
 

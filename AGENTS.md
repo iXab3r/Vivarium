@@ -63,5 +63,5 @@ should trace to the task at hand.
 ### 4. Verification
 
 Once code exists: `dotnet build` and `dotnet test` at the solution root must pass before handoff, and
-protocol changes must keep `Vivarium.Contracts` backward-compatible within a minor version (agents in
-sealed images may be one version behind until their next boot).
+protocol changes must keep `Vivarium.Contracts` backward-compatible within a minor version (pool
+checkpoints may carry a stale agent until its post-revert upgrade).

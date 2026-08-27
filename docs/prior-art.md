@@ -43,8 +43,8 @@ result class born from misattribution pain (D9).
 
 ### syzkaller (Google) — [pkg.go.dev/github.com/google/syzkaller/vm](https://pkg.go.dev/github.com/google/syzkaller/vm)
 Kernel fuzzer with the best minimal hypervisor abstraction in OSS, field-proven at ~10k VMs. Apache-2.0.
-**Borrowed:** the tiny per-backend driver contract (Copy/Forward/Run/Diagnose ≈ our
-clone/revert/start/stop, D1); outcome classification over a merged console+process stream into
+**Borrowed:** the tiny per-backend driver contract (Copy/Forward/Run/Diagnose ≈ our small driver verb
+set, D1); outcome classification over a merged console+process stream into
 *crash / lost-connection / no-output*, with typed infra errors retried N times and never reported as
 crashes (D9); the "isolated" backend (pool of physical machines, "revert" = reboot) as the cheap path
 to bare-metal scenarios (roadmap).

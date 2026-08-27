@@ -62,8 +62,8 @@ flowchart LR
     CLI["viv CLI / CI"] --> C
     UI["Blazor Server panel"] --- C
     C["Controller<br/>ASP.NET Core: gRPC AgentHub + HTTP blob store + scheduler + SQLite"]
-    C -- "clone / revert / start / stop / console-endpoint" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
-    subgraph Clone ["Machine: VM clone or enrolled physical box"]
+    C -- "create pool VM / checkpoint / revert / destroy" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
+    subgraph Clone ["Machine: pool VM or enrolled physical box"]
         B["Bootstrap (frozen, baked into image / installed once)"] --> A["Agent (pulled + auto-upgraded)"]
     end
     D --> Clone
@@ -88,7 +88,7 @@ Numbered so later docs and commits can reference them.
 The controller never reaches *into* a guest (no SSH, WinRM, PowerShell Direct, guest-ops APIs — every
 hypervisor has a different zoo of these). Instead the guest agent dials out to a well-known controller
 address after boot: hello → receive build → pull payload → stream logs → push results. This is the model
-every CI agent uses, and it collapses the per-hypervisor driver surface to clone/revert/start/stop —
+every CI agent uses, and it collapses the per-hypervisor driver surface to the small §3 verb set —
 which is exactly why adding QEMU or Tart later is cheap. No IP discovery, no firewall pain, no guest
 credentials. Physical machines make this non-negotiable: there is no hypervisor to reach through at all.
 
@@ -102,8 +102,9 @@ The controller can tell a running agent to restart (`RestartAgent`), and bootstr
 The handshake is TeamCity's: on hello the controller compares agent versions and orders a restart when
 stale. On physical machines this is the *only* update path — install once by hand, upgrade centrally
 forever — which is why bootstrap must stay boring. Pool checkpoints may carry yesterday's agent; the
-post-revert upgrade costs one small LAN download, and periodic maintenance re-checkpoints pool VMs
-with the current agent (D13) — no image rebuild involved.
+post-revert upgrade costs one small LAN download **and an agent process restart, not a reboot** —
+pool VMs never reboot between builds (D5). Periodic maintenance re-checkpoints pool VMs with the
+current agent (D13); no image rebuild involved.
 
 ### D3. The build contract is files-in / process / files-out
 
@@ -139,7 +140,10 @@ host (`GET/PUT /blobs/{sha256}`): idempotent and retryable, deduplicated by cons
 with curl, and free of gRPC message-size ceilings. Blob and bootstrap endpoints carry the same bearer
 tokens as gRPC — nothing is anonymous. Tokens are scoped: **agent** (session + blobs), **submit**
 (what CI gets: run builds, read results), **admin** (authorize agents, manage images, ad-hoc exec).
-A CI secret must not be able to `viv exec` on a dev box.
+A CI secret must not be able to `viv exec` on a dev box. The panel authenticates the same way — the
+admin token is exchanged once at a login page for an auth cookie; a page that can authorize agents is
+never an open page. And the blob store defends itself: the server verifies that a `PUT /blobs/{sha256}`
+body actually hashes to its name — a content-addressed cache an agent can poison is worse than none.
 
 Two consequences of memory-restore drive transport details:
 
@@ -156,9 +160,11 @@ Two consequences of memory-restore drive transport details:
   (~10 s interval / 5 s timeout) on both sides detect it in seconds; the agent treats any disconnect
   as "reconnect and re-hello". A re-hello carries the build the agent still believes it is running, so
   the controller **re-adopts or aborts** the ghost instead of double-scheduling next to it; every
-  retry is fenced on `boot_id`, and result submission is idempotent on `(build_id, boot_id)` — a
-  stream that dies between artifact push and `BuildResult` cannot make a build both pass and retry.
-  A lease lost past its timeout is an INFRA failure (D9).
+  retry is fenced on the agent's `session_id` — a nonce regenerated at every (re)connect, because a
+  pool VM resumes the *same OS boot* across reverts (D5) and a per-boot id would never change — and
+  result submission is idempotent on `(build_id, session_id)`: a stream that dies between artifact
+  push and `BuildResult` cannot make a build both pass and retry. A lease lost past its timeout is an
+  INFRA failure (D9).
 
 ### D5. Pristine is a clean policy; its revert point is a memory snapshot
 
@@ -181,11 +187,31 @@ background (one first-boot per added VM). Cold boot remains a per-scenario optio
 is itself worth testing. Sizing reality: a 32 GB host runs ~5–6 Windows pool VMs at 2 vCPU / 4 GB —
 fewer when the host doubles as somebody's dev machine.
 
+Hyper-V specifics the model depends on — pinned in the driver, because they are not the defaults:
+**Standard** checkpoints (the modern default is Production: VSS, no memory state, applies to *off* —
+which silently degrades "2–5 s" into a cold boot), automatic checkpoints disabled, **static memory**
+(dynamic memory can fail a restore under host pressure, and memory size is scenario identity anyway),
+static MAC. A revert resumes the *same OS boot* — pool VMs never reboot between builds, so per-boot
+identifiers cannot fence anything (D4) and the guest wakes with stale DHCP/ARP/TCP state: the agent's
+post-restore ritual is clock fix (D4), then network refresh (DHCP renew / ARP flush), then reconnect.
+QEMU's `savevm` writes guest RAM into the qcow2 — expect tens of seconds per revert, not Hyper-V-class
+latency. Tart has no checkpoints at all and runs the clone-per-build lifecycle instead (D15, §10).
+
 ### D6. Provisioning is a build with a different epilogue
 
 A build's epilogue is one of: **revert** (pristine builds), **none** (persistent machines — plain
-TeamCity behavior), **keep** (debug quarantine), or **seal** (provisioning):
-reboot → autologon → wait for a clean hello → take the memory snapshot → register a new `ImageVersion`.
+TeamCity behavior), **keep** (debug quarantine), or **seal** (provisioning). Sealing is **disk-only**
+(§8.3): the provision VM's checkpoints are deleted (an online merge), it shuts down cleanly, and its
+disk chain is merged into a **standalone parent VHDX** registered as the new `ImageVersion` — flat
+parents beat diff-on-diff version chains, whose read amplification grows with every generation. A
+provision build runs on a fresh dedicated VM created from the parent version and consumed by the seal —
+never on a serving pool VM. Sealed parents are immutable forever: Hyper-V invalidates every child of a
+touched parent, so "patch the parent" is always "new ImageVersion + rebuild pools" (§8.3).
+
+Provisioning steps may legitimately reboot the machine (installers do). Such steps are marked
+`expected-reboot`, which suppresses D9's lost-heartbeat INFRA classification and re-adopts the build
+on the agent's next hello (D4) instead of retry-storming half-provisioned VMs.
+
 One machinery for everything; there is no separate "image builder" tool. Recipes are declarative files
 in git (§8.2), including honest `manual` steps for software that cannot be installed silently.
 
@@ -193,14 +219,19 @@ in git (§8.2), including honest `manual` steps for software that cannot be inst
 
 Provider-managed pool VMs (D5) have stable identity by construction — each is a persistent VM the
 controller created, with its own MAC and hostname known up front, so "which VM just said hello?"
-answers itself; the agent still reports MAC plus a per-boot `boot_id` GUID in `Hello` as a cross-check
-and for fencing (D4). Pool agents are **auto-authorized** because their parent image is trusted —
-TeamCity treats cloud agents the same way.
+answers itself; the agent still reports its MAC and a per-connect `session_id` nonce in `Hello` as a
+cross-check and for fencing (D4). Pool agents are **auto-authorized** — but authorization must rest on
+more than self-reported claims: the provider verifies the connection against **host-side facts** (the
+hypervisor knows each pool VM's MAC and switch port without any guest channel — reading them breaks no
+D1 rule) and a per-VM nonce injected at `CreatePoolVm` time (Hyper-V KVP, QEMU fw_cfg) and echoed in
+`Hello`. An `image_id` anyone can type is not an identity.
 
 Enrolled agents — physical machines, long-lived VMs — carry a persistent identity instead: a GUID
 generated at install plus an authorization token issued when the operator authorizes them, delivered
-in `Welcome` (§5) — exactly TeamCity's regular-agent flow (§8.4, D16). The agent stores its identity
-and token in its own data directory, never in `bootstrap.json` (§7).
+over the live session in an explicit `AuthorizationGranted` message (§5) — `Welcome` only reports the
+current status at connect time. One name everywhere: the token is `auth_token` in `Hello` and in
+`AuthorizationGranted`. The agent stores its identity and token in its own data directory, never in
+`bootstrap.json` (§7).
 
 ### D8. Agent status is TeamCity's; machine lifecycle is Vivarium's
 
@@ -214,8 +245,9 @@ TeamCity does. These statuses are mandatory, first-screen information.
 
 **Machine lifecycle — managed machines only.** Pool VMs additionally walk an explicit conveyor:
 `CREATING → FIRST_BOOT → CHECKPOINTING → READY → BUSY → COLLECTING → REVERTING → READY … → DESTROYING`,
-plus `SEALING` (provisioning) and `QUARANTINE` (keep-on-fail). Every transition is timestamped and has
-a timeout; "stuck in FIRST_BOOT for 120 s" is an INFRA alert and an automatic recycle. Physical
+plus `SEALING` (provisioning) and `QUARANTINE` (keep-on-fail); clone-per-build providers (D15) walk
+the degenerate form `CREATING → FIRST_BOOT → BUSY → DESTROYING`. Every transition is timestamped and
+has a timeout; "stuck in FIRST_BOOT for 120 s" is an INFRA alert and an automatic recycle. Physical
 machines have no conveyor — their recycle is a reboot, or an operator. `on_fail: keep` on a physical
 machine preserves the workdir and flags the build for inspection but does not quarantine the box — a
 capacity-1 machine cannot be held hostage by one red build; the operator's *disable* toggle exists for
@@ -272,14 +304,16 @@ work directory (unless "AV enabled" *is* the scenario — then it is a scenario 
 - **Screenshot on failure** taken by the agent.
 - **keep-on-fail**: the pool VM moves to `QUARANTINE` instead of being reverted (its pool backfills); connect via console.
 - **snapshot-the-corpse**: optionally snapshot the VM *at the moment of failure* — the failed state
-  becomes revertable-to forever. Nearly free with this machinery; almost nobody offers it.
+  becomes revertable-to later. Nearly free with this machinery; almost nobody offers it. Corpses pin
+  their VM's disk chain, so they carry a retention budget (count + age), not an eternal freeze.
 - **Console access**: the driver exposes a console endpoint (Hyper-V `.rdp` / vmconnect, VNC for
   QEMU/Tart). An embedded web console is a later nicety.
 
 ### D13. Fleet maintenance is scheduled work, not heroics
 
-Linked-clone chains grow; blobs accumulate; images rot. The controller schedules: periodic re-baseline
-(fresh clone from base), disk compaction, blob GC, snapshot-chain pruning, and **health-check canary
+Checkpoint chains and pool diff disks grow; blobs accumulate; images rot. The controller schedules:
+periodic pool re-baseline (rebuild pool VMs from the sealed parent), disk compaction, blob GC,
+checkpoint pruning, and **health-check canary
 builds** — a trivial boot-hello-run build per image version on a cadence, so a rotten image is caught
 by a canary, not by a real run at 2 a.m. Host disk/CPU/RAM are shown on the panel with alerts. Blob GC is
 reference-counted with a grace window (an in-flight `PUT` or a just-submitted build must not race
@@ -292,7 +326,9 @@ collection), and retention is explicit: blobs referenced by retained builds are 
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
 matrix expands into a **matrix build** whose cells are ordinary builds, aggregated composite-style.
 Steps have execution policies (default / even-if-failed / always) so diagnostics collection runs even
-after a failing test step. Earlier drafts of this document said Suite/Run/Job; the adopted names are
+after a failing test step. A cell whose requirement matches no known agent **fails fast at submit**
+("no compatible agents") instead of queueing forever, and queue-wait has its own timeout, separate
+from the run `timeout:`. Earlier drafts of this document said Suite/Run/Job; the adopted names are
 build configuration / matrix build / build.
 
 Live progress uses **TeamCity's service-message protocol verbatim**: the agent scans step stdout for
@@ -316,7 +352,10 @@ The scheduler asks `MachineProvider`s for capacity; a provider implements
 - **Hypervisor provider** (Hyper-V / QEMU / Tart) — maintains a pool of pristine VMs per sealed
   `ImageVersion` (D5): reverts a pool VM before each build, grows or drains pools as the queue
   demands, within host caps. TeamCity's cloud-profile logic verbatim, with checkpoints added; pool
-  agents are auto-authorized (D7).
+  agents are auto-authorized against host-side identity (D7). Providers declare a **lifecycle mode**:
+  *revert-pool* (Hyper-V, QEMU) or *clone-per-build* (Tart — no checkpoints today; `tart suspend` on
+  macOS 14+ may enable pools later; cloud providers are clone-per-build by nature). Same seam, two
+  honest lifecycles.
 - **Cloud provider** (Azure first; later) — short-living instances from cloud images; the agent is
   baked into the image or installed by an init script and reverse-connects like everyone else. Not in
   the first release, but the seam exists from day one — GitLab's fleeting and garm validated exactly
@@ -397,11 +436,11 @@ message AgentMsg {
 
 message ControllerMsg {
   oneof msg {
-    Welcome welcome = 1;       // reply to Hello: server wall-clock (D4), authorized?,
-                               // agent_token on first authorization (D7)
-    BuildAssignment build = 2;
-    CancelBuild cancel = 3;
-    RestartAgent restart = 4;  // exit; bootstrap fetches the current agent version (D2)
+    Welcome welcome = 1;       // reply to Hello: server wall-clock (D4), current authorization status
+    AuthorizationGranted authorized = 2;  // enrolled flow: auth_token, sent when the operator clicks Authorize (D7)
+    BuildAssignment build = 3;
+    CancelBuild cancel = 4;
+    RestartAgent restart = 5;  // exit; bootstrap fetches the current agent version (D2)
   }
 }
 
@@ -411,12 +450,13 @@ message Hello {
   string enroll_token = 3;     // from the setup one-liner; consumed at first contact (§8.4)
   map<string, string> parameters = 4;  // os.build, software.*, machine.kind, pristine, ...
   string image_id = 5;         // set for pool VMs
-  string boot_id = 6;          // GUID per boot — fencing (D4)
+  string session_id = 6;       // nonce per (re)connect — fencing (D4); pool VMs share one OS boot
   string mac = 7;              // identity cross-check (D7)
   string agent_version = 8;    // upgrade handshake (D2)
   OsInfo os = 9;               // ACTUAL os/build — drift detection (D11)
   bool interactive = 10;       // live desktop present
   string running_build_id = 11;  // non-empty on re-hello: ghost re-adoption (D4)
+  string pool_nonce = 12;      // injected at CreatePoolVm (KVP / fw_cfg) — host-verified identity (D7)
 }
 
 message BuildAssignment {
@@ -430,9 +470,11 @@ message BuildAssignment {
 ```
 
 Blob endpoints: `GET/PUT /blobs/{sha256}`. Bootstrap endpoints: `GET /bootstrap/manifest?os=&arch=`,
-`GET /setup.ps1`, `GET /setup.sh` (§8.4). Everything is bearer-authenticated (D4); the enroll
-one-liner carries a short-lived enroll token plus the controller's certificate fingerprint, and the
-setup script pins that fingerprint before it downloads anything else.
+`GET /setup.ps1`, `GET /setup.sh` (§8.4). Everything is bearer-authenticated (D4), and the server
+verifies that a `PUT /blobs/{sha256}` body hashes to its name. The enroll command carries a
+short-lived, **single-use** enroll token and the certificate fingerprint as explicit arguments; the
+setup script's first act is to re-validate the live TLS certificate against that fingerprint and abort
+on mismatch (§8.4).
 
 The management plane is a second, ordinary gRPC service on the same host — the CLI's contract (the
 panel is in-process Blazor Server and does not need it):
@@ -469,9 +511,14 @@ hash, parent version, declared+actual OS build, sealed-at) → pool VMs derived 
 
 Every build records what it actually ran on: the exact `ImageVersion` for image-backed cells, or the
 agent's full parameter snapshot for physical cells — a historical cell never silently changes meaning,
-and the matrix can show "started failing at product-X 1.2 → 1.3".
+and the matrix can show "started failing at product-X 1.2 → 1.3". It also records what it *ran*:
+`BuildConfiguration` identity is `(project, name)`, the yaml is authoritative at submit time (D17),
+and each build stores a hash + snapshot of the resolved definition — history keys on the name while
+any drift in steps or cells is visible per build instead of silently rewriting the past.
 
-Storage: SQLite + blob directory. No external services.
+Storage: SQLite in WAL mode with **one serialized writer channel** — agent streams, the scheduler, and
+panel actions all funnel writes through it — plus a blob directory; streamed build logs land in the
+blob store as chunked files. No external services.
 
 ## 7. Bootstrap contract (frozen after Phase 0)
 
@@ -503,7 +550,11 @@ only when the scenario's software set changes (legitimate) or bootstrap itself c
    boot sets a unique hostname before the checkpoint (duplicate names on one subnet are noisy — even
    though duplicate SIDs off-domain are, contrary to myth, harmless; domain-join scenarios are the
    ones that need sysprep). Windows activation is an operator concern the docs must not dodge:
-   unactivated watermarks perturb UI tests, so plan KMS/MAK/eval licensing per pool (§13).
+   unactivated watermarks perturb UI tests, so plan KMS/MAK/eval licensing per pool (§13). Clock
+   policy is per-platform: Hyper-V guests keep the TimeSync integration service (it corrects after a
+   restore; the agent's `Welcome`-clock fix is the fallback), QEMU and physical machines rely on the
+   agent alone, and in-guest NTP/w32time is disabled in images so a third writer never steps the clock
+   mid-test (D4).
 2. **Scenario versions** — base + provisioning recipe, sealed (D6) into an `ImageVersion` with a
    memory-state runtime snapshot.
 
@@ -528,7 +579,9 @@ Steps will grow into a typed catalog (Azure DevTest Labs' artifact manifests —
 parameters, run command — rendered as forms in the panel) and support reboot-and-resume semantics for
 multi-reboot installs (Boxstarter's trick). Network profiles are enforced at the host level — deny-all
 with an allowlist for the build's duration, as Ludus' testing mode does — which also stops Windows
-Update drift *during* long builds, not only between rebuilds.
+Update drift *during* long builds, not only between rebuilds. `offline` honestly means *deny-all
+except the controller path*: the agent channel must stay up or every offline build becomes an INFRA
+ghost (D9), so a test asserting literal zero traffic must account for the harness itself.
 
 ### 8.3 Sealing and pool checkpoints
 
@@ -543,32 +596,43 @@ reconnects fresh. Replacing an `ImageVersion` = draining and rebuilding its pool
 ### 8.4 Enrollment and authorization
 
 Getting any machine — a physical box or a hand-made VM — into the farm is TeamCity's flow. Install the
-OS by hand if needed, then run one line inside it — the panel generates it, carrying a short-lived
-enroll token and the controller's certificate fingerprint, which the setup script pins before
-downloading anything (D4):
+OS by hand if needed, then run the command the panel generates. It must actually work on a stock
+machine — naive `iwr`/`curl` reject self-signed TLS outright — so the generated command handles trust
+explicitly and carries the fingerprint as an argument:
 
 ```
-iwr https://ctrl:8443/setup.ps1?t=<enroll-token> | iex     # Windows (elevated)
-curl -fsSL https://ctrl:8443/setup.sh?t=<token> | sh       # Linux / macOS
+# Windows (elevated; curl.exe ships with Windows 10 1803+)
+curl.exe -k https://ctrl:8443/setup.ps1 -o setup.ps1; powershell -ep bypass .\setup.ps1 -Fp SHA256:9F3A... -Token <enroll-token>
+
+# Linux / macOS
+curl -fsSLk https://ctrl:8443/setup.sh | sh -s -- --fp SHA256:9F3A... --token <token>
 ```
 
-The script installs bootstrap + `bootstrap.json` and starts it; enabling autologon for UI-test duty is
-an explicit optional step that asks for credentials — it cannot and must not happen silently. The
-agent appears on
+The script's **first act** is to re-validate the live certificate against the fingerprint argument and
+abort on mismatch — after that, everything it downloads is pinned. The `-k` on the initial fetch is
+the honest residual TOFU window (closed by the fingerprint check a second later); enroll tokens are
+single-use with a short TTL, and they do land in shell history — the panel says so next to the
+command. The script installs bootstrap + `bootstrap.json` and starts it; enabling autologon for
+UI-test duty is an explicit optional step that asks for credentials — it cannot and must not happen
+silently. The agent appears on
 the panel **unauthorized** — visible, never scheduled; *Authorize* turns it into an enrolled agent
 with a persistent identity and token (D7). This is the complete answer to "how do I get the agent onto
 a machine": after the one-liner, agent delivery and upgrades are central and automatic forever (D2).
 
-An enrolled VM that lives on a managed hypervisor can additionally be **adopted as an image**: the
-controller snapshots it and registers `Image v1`, making it cloneable and pristine-capable. Physical
-machines skip this step — they stay persistent agents whose parameters describe their setup (D16).
+An enrolled VM that lives on a managed hypervisor can additionally be **adopted as an image** — a
+disk-only seal (§8.3) with one extra rule: the enrolled agent's identity is **scrubbed first**
+(quiesce → wipe the agent data directory's GUID and token → write `imageId` into `bootstrap.json` →
+shut down → merge the disk into a sealed parent). Otherwise every pool VM derived from the image would
+hello as the original enrolled agent, token and all. The original machine re-enrolls afterwards or is
+retired. Physical machines skip this step — they stay persistent agents whose parameters describe
+their setup (D16).
 
 ## 9. Ad-hoc execution
 
 Both are ordinary `BuildAssignment`s:
 
-- `viv exec --image win10-19044-avx -- powershell -c "..."` — clone, run, stream output, revert.
-  "Check this quickly on a clean 19044" as a one-liner.
+- `viv exec --image win10-19044-avx -- powershell -c "..."` — borrow a pool VM (reverted before and
+  after), run, stream output. "Check this quickly on a clean 19044" as a one-liner.
 - `viv exec --agent <name> -- ...` — same on a *live* machine (a physical box, a quarantined clone, a
   machine mid-provisioning), no revert. Line-based streaming first; a real interactive terminal
   (ConPTY + stdin channel over the same gRPC session) is a later feature — until then, the console
@@ -596,7 +660,9 @@ Views: **Agents** (TeamCity-style, mandatory first screen: status axes, paramete
 unauthorized newcomers awaiting authorization), **Fleet** (hosts + the D8 conveyor for managed
 machines), **Images** (registry: lineage, versions, drift badges, snapshot chains,
 build/promote/rollback/prune), **Queue & Builds** (TeamCity-shaped, with live service-message test
-progress), **Matrix** (test × scenario — the product of the whole system), console links.
+progress), **Matrix** (test × scenario — the product of the whole system), console links. The admin
+token is exchanged at a login page for an auth cookie (D4) — a panel that authorizes agents is never
+an open page — and the browser's one-time self-signed-certificate warning is expected and documented.
 
 ## 12. Prior art
 
@@ -622,3 +688,8 @@ project invites strangers.
 - **Windows licensing at scale** — pools of activated Windows VMs are a cost/compliance question the
   docs must answer before recommending big fleets (§8.1).
 - **Wayland input synthesis** and a real macOS TCC automation story (D10) — currently manual.
+- **Pool disk budget** — every Standard checkpoint stores ≈ RAM (`.vmrs`): 5 VMs × 4 GB ≈ 20 GB *per
+  image version*, plus diff disks, plus doubled space during pool rebuilds — on the same SSD the dev
+  machine lives on. Needs stated budgets and panel visibility before fleets grow.
+- **Blob access scope** — any agent-scoped token can `GET` any blob by hash; acceptable single-admin,
+  recorded here for the multi-user future.

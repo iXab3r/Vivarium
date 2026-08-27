@@ -13,6 +13,9 @@ Ordered so that every phase ends with something usable. Decision references (D1�
 - [ ] Pinned-TLS + `Welcome` handshake and result fencing proven in the local loop (D4, §5).
 - [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
       three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
+- [ ] Hyper-V checkpoint spike on the dev machine: Standard vs Production types, automatic
+      checkpoints off, static memory; measure apply latency for 1 and 5 concurrent 4 GB reverts (D5).
+      One afternoon that de-risks the core latency claim before any driver code exists.
 
 ## Phase 1 — TeamCity core: agents, queue, builds (no hypervisors yet)
 
@@ -22,10 +25,13 @@ included) and run the matrix across them.
 - Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
   **unauthorized** → authorize (§8.4, D4).
 - Agent status axes, parameters, requirements/compatibility, central auto-upgrade (D2, D8, D14).
-- `ControlPlane` API (§5) + `viv login` / `viv run` / `viv exec --agent <name>`.
+- `ControlPlane` API (§5) + `viv login` / `viv run` (fail-fast on unmatchable cells, queue-wait
+  timeout, `--only <cell>` rerun) / `viv exec --agent <name>`; panel login: admin token → cookie (D4).
+- An enroll one-liner that actually runs on stock machines — explicit fingerprint argument, `curl.exe
+  -k` initial fetch, single-use tokens (§8.4).
 - Build configurations with **named cells only** (`agent:` expressions, per-cell `rid:`), queue,
-  builds with steps; clean policies `clean-workdir` / `none`; failure taxonomy + reconnect fencing
-  (D9, D4).
+  builds with steps; clean policies `clean-workdir` / `none` + `on_fail: keep` for persistent
+  machines; failure taxonomy + reconnect fencing (D9, D4).
 - Archive payloads (modes/symlinks, traversal hardening) → self-contained NUnit → TRX adapter at
   build end (D3). No live service-message streaming yet — step status + heartbeats suffice.
 - Panel: Agents / Queue & Builds / live log tail; a plain per-build results table (the full matrix
@@ -33,8 +39,8 @@ included) and run the matrix across them.
 - Normative UX: `vivarium.yaml` + `viv run` per [`walkthrough.md`](walkthrough.md) §0–§6 (D17).
 
 Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,
-scenario lists, `repeat`/pass-rate cells, live service messages, `--only`, `clean: reboot` (drags in
-autologon credentials), drift canaries.
+scenario lists, `repeat`/pass-rate cells, live service messages, `clean: reboot` (drags in autologon
+credentials), drift canaries.
 
 ## Phase 2 — Pristine: the Hyper-V provider
 
