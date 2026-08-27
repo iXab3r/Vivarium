@@ -24,6 +24,8 @@ included) and run the matrix across them.
 - Panel: Agents / Queue & Builds / live logs; matrix view over enrolled machines.
 - `vivarium.yaml` + `viv run` matrix UX — normative walkthrough in
   [`walkthrough.md`](walkthrough.md) (D17).
+- Scenario generalization: parameter axes with `exclude`, explicit named scenario lists, `repeat`
+  with pass-rate cells (D18).
 - `viv run`, `viv exec --agent <name>`.
 
 ## Phase 2 — Pristine: the Hyper-V provider

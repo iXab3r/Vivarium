@@ -289,6 +289,29 @@ specialize payload paths and steps per cell so one definition covers every OS. A
 `viv run --wait` exit nonzero — CI integration is an exit code, not a plugin.
 [`walkthrough.md`](walkthrough.md) is the normative UX for all of this.
 
+### D18. Scenarios are environment × parameters × repetition
+
+The matrix is not an OS list. A **scenario** — the named unit that becomes a matrix column and a rerun
+target — is a machine selector (`agent:` expression or `image:`) *plus* a parameter bag *plus* an
+optional repeat count. Two definition styles normalize to the same thing: cross-product axes
+(`matrix:` with `exclude:`/`include:` pruning, GitHub-Actions-style — the machine axis is just one
+axis among value axes) and an explicit named `scenarios:` list for hand-picked combos. Parameters
+reach the build as `{param.*}` template variables and `VIVARIUM_PARAM_*` environment variables;
+selecting a test subset per scenario is just an argument (`--filter {param.suite}`), not machinery.
+Each cell build records its scenario name, resolved parameters, and iteration index alongside "what it
+ran on" (§6).
+
+`repeat: N` is first-class (flake hunting, stress): every iteration is an ordinary build; the matrix
+cell aggregates them into a pass rate (47/50), and `viv run --repeat N` overrides ad hoc. Repeats on
+pristine cells are truly independent runs — that combination is the honest flakiness detector. Several
+scenarios matching the same persistent agent serialize on its queue (TeamCity semantics); image-backed
+scenarios fan out as parallel clones instead.
+
+The boundary with in-test parameterization stays sharp: values only the test process cares about
+belong in NUnit `[TestCase]`; Vivarium parameterizes what the process cannot — the environment, the
+invocation, the machine. Naming follows from the matrix itself: *rows* are already test cases (the
+payload framework's, with per-test history across scenarios), so the columns are *scenarios*, not cases.
+
 ## 5. Protocol sketch
 
 ```proto
@@ -336,6 +359,7 @@ message BuildAssignment {
   repeated Step steps = 3;        // RunSpec + execution policy (default/even-if-failed/always)
   repeated string collect = 4;    // artifact globs
   OnFail on_fail = 5;             // NONE / KEEP_MACHINE / SNAPSHOT_MACHINE
+  map<string, string> parameters = 6;  // resolved scenario params → env VIVARIUM_PARAM_* (D18)
 }
 ```
 

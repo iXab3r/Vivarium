@@ -4,7 +4,7 @@ Vivarium is an OSS test farm that runs test corpora against snapshot-managed VMs
 levels, machines with specific software preinstalled, Ubuntu, macOS) and produces a test × scenario matrix.
 
 > **Docs map:** this file (AGENTS.md) holds the *rules*; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-> holds the *shape* (all design decisions, numbered D1…D16); [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
+> holds the *shape* (all design decisions, numbered D1…D18); [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
 > the order of work; [`docs/prior-art.md`](docs/prior-art.md) records what we borrowed from existing
 > systems; [`docs/walkthrough.md`](docs/walkthrough.md) is the normative end-to-end UX. Read
 > ARCHITECTURE.md before proposing or implementing anything structural.

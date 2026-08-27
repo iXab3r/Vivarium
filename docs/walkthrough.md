@@ -170,7 +170,52 @@ Image-backed cells are spawned on demand by the hypervisor provider, revert to a
 before every build, and are destroyed after — while physical cells keep behaving like classic
 TeamCity agents. One matrix, both worlds (D15, D16).
 
-## UX decisions this walkthrough pins (D17)
+## 8. Beyond OS: parameter axes and repeats
+
+The machine is just one axis (D18). The same configuration can sweep parameters — including several
+scenarios on the *same* machine — and repeat cells for flake hunting:
+
+```yaml
+    matrix:
+      os:                                  # the machine axis is one axis among many
+        windows: { agent: "os.family == windows" }
+        linux:   { agent: "os.family == linux" }
+      renderer: [dx11, vulkan]             # value axes multiply into scenarios
+      locale:   [en-US, tr-TR]
+    exclude:
+      - { os: linux, renderer: dx11 }      # prune impossible combos
+    steps:
+      - run: IntegrationTests{exe} --renderer {param.renderer} --locale {param.locale}
+             --report-trx --results-directory {results}
+```
+
+Six scenarios; the three that match `ubuntu-2204` simply queue on it one after another (TeamCity
+semantics), while image-backed cells would fan out as parallel clones. Parameters reach the build as
+`{param.*}` template variables and `VIVARIUM_PARAM_*` environment variables — running a subset of
+tests per scenario is just an argument (`--filter {param.suite}`), not special machinery.
+
+When combos are hand-picked rather than a cross product, name them explicitly:
+
+```yaml
+    scenarios:
+      win-vulkan-turkish:
+        agent: "os.family == windows"
+        params: { renderer: vulkan, locale: tr-TR }
+      linux-restart-storm:
+        agent: "os.family == linux"
+        params: { mode: restart-storm }
+        repeat: 50                          # 50 ordinary builds, one matrix cell
+```
+
+`repeat` turns the cell into a pass rate — `47/50 (94%)` with drill-down into individual iterations —
+and `viv run integration --repeat 20` overrides it ad hoc. Repeats on pristine cells are truly
+independent runs: that combination is the honest flakiness detector.
+
+Rule of thumb for where a parameter belongs: values only the test process cares about stay in NUnit
+`[TestCase]`; Vivarium parameterizes what the process cannot — the environment, the invocation, the
+machine.
+
+## UX decisions this walkthrough pins (D17, D18)
 
 1. Configuration-as-code: `vivarium.yaml` in the tested repo; the panel manages the fleet and shows
    results, it does not author test configurations (v1).
@@ -179,3 +224,9 @@ TeamCity agents. One matrix, both worlds (D15, D16).
 3. `viv run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.
 4. Named matrix cells are the unit of rerun (`--only <cell>`) and of matrix columns.
 5. Ad-hoc access is `viv exec --agent/--image`, console links live in the panel.
+6. The matrix generalizes past OS: the machine selector is one axis among parameter axes
+   (cross-product with `exclude`, or an explicit named `scenarios:` list); parameters flow in as
+   `{param.*}` and `VIVARIUM_PARAM_*`.
+7. `repeat` is first-class; repeated cells aggregate into pass rates. Matrix *rows* are test cases
+   (the payload framework's, with per-test history across scenarios) — which is why the columns are
+   called *scenarios*, not cases.
