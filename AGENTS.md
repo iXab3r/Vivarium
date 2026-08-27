@@ -28,8 +28,9 @@ rigor as code.
 - Planned layout: `src/Vivarium.Contracts`, `src/Vivarium.Controller`, `src/Vivarium.Agent`,
   `src/Vivarium.Bootstrap`, `src/Vivarium.Cli`, plus `images/` for image recipes and `docs/`.
 - Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
-- The bootstrap component is contractually **frozen** (ARCHITECTURE §7). Changes to it require an
-  explicit design discussion first — it is the one piece baked into every VM image.
+- The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
+  Changes to it require an explicit design discussion first — it is the one piece baked into every VM
+  image and installed on every physical machine.
 
 ## Design-change discipline
 

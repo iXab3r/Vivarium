@@ -19,14 +19,16 @@ vivarium-controller.exe        # self-contained; creates ./vivarium-data (SQLite
 First run prints the panel URL and an admin token:
 
 ```
-Vivarium controller listening on http://192.168.1.10:8080
-Panel:  http://192.168.1.10:8080  (token: k3v9…)
+Vivarium controller listening on https://192.168.1.10:8443
+Panel: https://192.168.1.10:8443  (admin token: k3v9…)
+TLS:   self-signed, fingerprint SHA256:9F3A…  (embedded in enroll commands automatically)
 ```
 
-On your workstation, point the CLI at it once:
+On your workstation, point the CLI at it once — the fingerprint is confirmed on first contact and
+pinned from then on:
 
 ```
-viv login http://192.168.1.10:8080
+viv login https://192.168.1.10:8443
 ```
 
 ## 1. Connect three machines — five minutes each
@@ -36,8 +38,8 @@ have, a Mac mini in a drawer. Panel → **Agents → Add machine** shows a one-l
 enroll token baked in; run it *on the machine*:
 
 ```
-iwr http://192.168.1.10:8080/setup.ps1 | iex          # Windows
-curl -fsSL http://192.168.1.10:8080/setup.sh | sh     # Linux / macOS
+iwr https://192.168.1.10:8443/setup.ps1?t=<enroll-token> | iex     # Windows (elevated prompt)
+curl -fsSL https://192.168.1.10:8443/setup.sh?t=<token> | sh       # Linux / macOS
 ```
 
 Each machine appears under **Agents** as *unauthorized* within seconds (D8). Click **Authorize**, give
@@ -49,8 +51,13 @@ it a name. The agent has already reported its parameters — you add tags only i
 | `ubuntu-2204` | `os.family=linux os.version=22.04 arch=x64` |
 | `macbook` | `os.family=macos os.version=14.5 arch=arm64` |
 
-That is the last time you touch these machines by hand: the agent auto-upgrades centrally from now on
-(D2), and everything else arrives through builds.
+Two honest caveats. UI-test duty needs extras the setup script *offers* but never does silently:
+autologon on Windows asks for credentials, and macOS TCC grants (Accessibility / Input Monitoring)
+are clicks Apple reserves for a human (D10). And a headless box needs a display (dummy plug) before
+UI results mean anything.
+
+That aside, this is the last time you touch these machines by hand: the agent auto-upgrades centrally
+from now on (D2), and everything else arrives through builds.
 
 ## 2. Describe the check — `vivarium.yaml` in your repo
 
@@ -63,9 +70,9 @@ project: myapp
 configurations:
   integration:
     matrix:
-      windows: { agent: "os.family == windows" }
-      linux:   { agent: "os.family == linux" }
-      macos:   { agent: "os.family == macos" }
+      windows: { agent: "os.family == windows", rid: win-x64 }
+      linux:   { agent: "os.family == linux",   rid: linux-x64 }
+      macos:   { agent: "os.family == macos",   rid: osx-arm64 }
     payload: out/{rid}/**
     steps:
       - run: IntegrationTests{exe} --report-trx --results-directory {results}
@@ -79,11 +86,12 @@ configurations:
 
 - **Matrix cells** are named (`windows`, `linux`, `macos`) — the names become matrix columns and
   rerun targets. A cell selects agents with a requirement expression over their parameters (D8, D14).
-- **Template variables** specialize one definition per cell: `{rid}` (`win-x64` / `linux-x64` /
-  `osx-arm64`, derived from the matched agent), `{os}`, `{arch}`, `{exe}` (`.exe` on Windows, empty
-  elsewhere), `{results}`, `{workdir}`.
-- **Payload** is files-in / process / files-out (D3): whatever `out/{rid}/` holds gets shipped,
-  content-addressed and deduplicated — unchanged files never upload twice.
+- **Template variables** specialize one definition per cell: `{rid}` (declared per cell — payload
+  paths must resolve at upload time, before any agent has matched), `{os}`, `{arch}`, `{exe}` (`.exe`
+  on Windows, empty elsewhere), `{results}`, `{workdir}`.
+- **Payload** is files-in / process / files-out (D3): whatever `out/{rid}/` holds is packed into an
+  archive (executable bits and symlinks preserved — this matters the moment a Linux agent unpacks your
+  tests), content-addressed and deduplicated — unchanged content never uploads twice.
 - Results come back as TRX (parsed by the controller's adapter); if the runner also emits TeamCity
   service messages, tests stream live while the build runs (D14).
 
@@ -102,6 +110,11 @@ cargo build --release --target x86_64-pc-windows-msvc   # …then copy into out/
 
 Test code locates the SUT relatively (`AppContext.BaseDirectory/sut/myapp{exe}`) and can read
 `VIVARIUM_RESULTS_DIR`, `VIVARIUM_CELL`, `VIVARIUM_BUILD_ID` from the environment when it cares.
+
+Pristine machines are unforgiving (D3's portability doctrine): Rust binaries want `crt-static` — there
+is no VC++ redist out there; .NET wants `InvariantGlobalization` for minimal Linux; cross-published
+macOS binaries must carry at least an ad-hoc signature; and TRX needs the
+`Microsoft.Testing.Extensions.TrxReport` package.
 
 ## 4. Run
 
@@ -145,10 +158,10 @@ Vivarium is not a CI server (non-goal); your CI calls it like any other tool:
 
 ```yaml
 # GitHub Actions / TeamCity step, after publishing out/*
-- run: viv run integration --wait
+- run: viv run integration          # waits by default
   env:
     VIVARIUM_URL: ${{ vars.VIVARIUM_URL }}
-    VIVARIUM_TOKEN: ${{ secrets.VIVARIUM_TOKEN }}
+    VIVARIUM_TOKEN: ${{ secrets.VIVARIUM_TOKEN }}   # submit-scoped token, not admin (D4)
 ```
 
 Exit code gates the pipeline; the CI log carries the matrix summary and the deep link.
@@ -159,18 +172,20 @@ The yaml is the only thing that changes — commands and habits stay identical:
 
 ```yaml
     matrix:
-      win10-clean: { image: win10-19044-clean }      # pristine clone per build (D5, D15)
+      win10-clean: { image: win10-19044-clean }      # pristine pool VM per build (D5, D15)
       win11-avx:   { image: win11-23h2-avx@v4 }      # "with product X installed" scenario
       linux:       { agent: "os.family == linux" }   # still a persistent machine
       macos:       { agent: "name == macbook" }
     clean: pristine                                   # image-backed cells revert every build
 ```
 
-Image-backed cells are spawned on demand by the hypervisor provider, revert to a sealed snapshot
-before every build, and are destroyed after — while physical cells keep behaving like classic
-TeamCity agents. One matrix, both worlds (D15, D16).
+Image-backed cells run on the provider's pool of pristine VMs, each reverted to its own checkpoint
+before the build — while physical cells keep behaving like classic TeamCity agents. One matrix, both
+worlds (D15, D16).
 
 ## 8. Beyond OS: parameter axes and repeats
+
+*(These land after the Phase 1 core — recorded here so the yaml's final shape is visible.)*
 
 The machine is just one axis (D18). The same configuration can sweep parameters — including several
 scenarios on the *same* machine — and repeat cells for flake hunting:
@@ -220,7 +235,7 @@ machine.
 1. Configuration-as-code: `vivarium.yaml` in the tested repo; the panel manages the fleet and shows
    results, it does not author test configurations (v1).
 2. Payload/steps specialization per cell via template variables (`{rid}`, `{exe}`, …), not per-cell
-   copy-paste.
+   copy-paste; `rid:` is declared per cell so payload resolves at upload time.
 3. `viv run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.
 4. Named matrix cells are the unit of rerun (`--only <cell>`) and of matrix columns.
 5. Ad-hoc access is `viv exec --agent/--image`, console links live in the panel.

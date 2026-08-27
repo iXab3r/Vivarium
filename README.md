@@ -27,13 +27,13 @@ flowchart LR
     CLI["viv CLI / your CI"] --> C
     UI["Web panel (Blazor)"] --- C
     C["Controller<br/>queue + image registry + results<br/>gRPC + blob store + SQLite"]
-    C -- "clone / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]
+    C -- "checkpoint / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]
     D --> VM["VM clone / enrolled physical machine"]
     VM -- "reverse-connect gRPC<br/>hello / builds / logs / results" --> C
 ```
 
 - **Controller** — one process: build queue, versioned image registry, scheduler, result store, web panel. TeamCity's model adopted wholesale — projects, build configurations, builds, agent authorization and statuses, parameters/requirements, even the `##teamcity[…]` service-message protocol — with an automation-first spin.
-- **Host drivers** — reduced to four verbs per hypervisor: clone, revert, start, stop. Everything else happens over the agent channel, which is why adding a hypervisor is cheap.
+- **Host drivers** — a handful of verbs per hypervisor: create pool VM, checkpoint, revert, start, stop, destroy. Everything else happens over the agent channel, which is why adding a hypervisor is cheap.
 - **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in VM clones *and* on enrolled physical machines. Only a tiny frozen *bootstrap* is installed once (baked into images, or via a one-liner on a physical box); the agent itself is pulled and auto-upgraded centrally, TeamCity-style — snapshots never get rebuilt for an agent update.
 - **Builds** — files in → steps → exit codes + files out. NUnit (self-contained, TRX) is the default payload; anything that produces JUnit XML (e.g. `cargo nextest`) or speaks TeamCity service messages plugs into the same pipe. Guests stay pristine: no SDKs, no runtimes. *Pristine* itself is a per-configuration clean policy — revert-to-snapshot where the machine supports it, plain reboot or nothing where it doesn't.
 - **Images** — built as *base → declarative provisioning recipe → sealed snapshot*, versioned, with drift detection. Provisioning runs through the same job machinery; a memory-state snapshot makes revert-to-pristine a matter of seconds.
@@ -42,7 +42,7 @@ flowchart LR
 
 - Test matrix across Windows / Linux / macOS guests with per-scenario network profiles (NAT / offline / full).
 - Physical machines as first-class agents: enroll → authorize → they are scenarios too.
-- Snapshot-with-memory revert per build; linked clones for parallelism; machine-provider seam for short-living cloud instances (Azure) later.
+- Checkpoint-with-memory revert per build; pooled pristine VMs for parallelism; machine-provider seam for short-living cloud instances (Azure) later.
 - Image registry UI: lineage, versions, actual-vs-declared OS build (drift detection), snapshot chains.
 - Declarative image recipes in git, including honest `manual` steps for software with no silent installer.
 - Interactive-desktop guests by default (autologon, unlocked session) — input, overlay, and UI tests are first-class.

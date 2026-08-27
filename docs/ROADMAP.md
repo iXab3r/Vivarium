@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D13) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D18) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Phase 0 — Design & skeleton *(current)*
@@ -10,28 +10,36 @@ Ordered so that every phase ends with something usable. Decision references (D1�
       store + SQLite + empty panel), `Vivarium.Agent`, `Vivarium.Bootstrap`, `Vivarium.Cli`.
 - [ ] The `Session` loop alive end-to-end with an agent running on the same machine — protocol proven
       before any VM exists.
+- [ ] Pinned-TLS + `Welcome` handshake and result fencing proven in the local loop (D4, §5).
+- [ ] Payload portability smoke tests on real machines: NUnit/MTP self-contained exe + TRX on all
+      three OSes, cross-published macOS ad-hoc signing, nextest archive + `--workspace-remap` (D3).
 
 ## Phase 1 — TeamCity core: agents, queue, builds (no hypervisors yet)
 
 The control host from day one — already useful with zero VMs: enroll the machines you have (physical
 included) and run the matrix across them.
 
-- Bootstrap + `setup.ps1` / `setup.sh` one-liners; enroll → **unauthorized** → authorize (§8.4).
+- Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
+  **unauthorized** → authorize (§8.4, D4).
 - Agent status axes, parameters, requirements/compatibility, central auto-upgrade (D2, D8, D14).
-- Build configurations, queue, builds with steps; clean policies `reboot` / `clean-workdir` / `none`
-  (D5); failure taxonomy in the data model (D9).
-- Self-contained NUnit payload → TRX adapter; TeamCity service messages for live test progress (D14).
-- Panel: Agents / Queue & Builds / live logs; matrix view over enrolled machines.
-- `vivarium.yaml` + `viv run` matrix UX — normative walkthrough in
-  [`walkthrough.md`](walkthrough.md) (D17).
-- Scenario generalization: parameter axes with `exclude`, explicit named scenario lists, `repeat`
-  with pass-rate cells (D18).
-- `viv run`, `viv exec --agent <name>`.
+- `ControlPlane` API (§5) + `viv login` / `viv run` / `viv exec --agent <name>`.
+- Build configurations with **named cells only** (`agent:` expressions, per-cell `rid:`), queue,
+  builds with steps; clean policies `clean-workdir` / `none`; failure taxonomy + reconnect fencing
+  (D9, D4).
+- Archive payloads (modes/symlinks, traversal hardening) → self-contained NUnit → TRX adapter at
+  build end (D3). No live service-message streaming yet — step status + heartbeats suffice.
+- Panel: Agents / Queue & Builds / live log tail; a plain per-build results table (the full matrix
+  view with history comes later).
+- Normative UX: `vivarium.yaml` + `viv run` per [`walkthrough.md`](walkthrough.md) §0–§6 (D17).
+
+Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,
+scenario lists, `repeat`/pass-rate cells, live service messages, `--only`, `clean: reboot` (drags in
+autologon credentials), drift canaries.
 
 ## Phase 2 — Pristine: the Hyper-V provider
 
-- Hyper-V driver: clone / revert (memory checkpoints, D5) / start / stop / console endpoint / MAC (D7).
-- Provider-spawned auto-authorized agents — TeamCity cloud-profile logic (D15); `viv exec --image`.
+- Hyper-V driver: pool-VM create / own checkpoint / revert / destroy / console endpoint (D5, D7).
+- Pool provider with auto-authorized agents — TeamCity cloud-profile logic (D15); `viv exec --image`.
 - Image adoption of enrolled VMs (§8.4); the `pristine` clean policy end-to-end.
 - Crash dumps, screenshot-on-fail, keep-on-fail / snapshot-the-corpse (D12).
 - Hyper-V implementation references: AutomatedLab, fdcastel/Hyper-V-Automation (see prior-art).
