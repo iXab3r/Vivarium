@@ -1,0 +1,8 @@
+[package]
+name = "payload-rust"
+version = "0.1.0"
+edition = "2021"
+
+# The reference Rust payload (D3): tests archived with `cargo nextest archive`, executed on a
+# machine that has the nextest binary and this source tree, but no cargo build - via
+# `cargo-nextest nextest run --archive-file ... --workspace-remap <dir>`.

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The reference Vivarium payload (D3): NUnit on Microsoft.Testing.Platform, published
+    self-contained, executed as a bare exe on a machine with no SDK and no runtimes,
+    producing TRX. Not part of the solution - built by the payload-smoke CI jobs.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>PayloadTests</AssemblyName>
+    <EnableNUnitRunner>true</EnableNUnitRunner>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="1.6.3" />
+  </ItemGroup>
+
+</Project>
