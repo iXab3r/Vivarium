@@ -1,0 +1,111 @@
+// Vivarium management protocol v1 — see docs/ARCHITECTURE.md §5.
+// The CLI/CI plane is independent from the long-lived AgentHub protocol.
+syntax = "proto3";
+
+package vivarium.v1;
+
+option csharp_namespace = "Vivarium.Contracts.V1";
+
+import "vivarium/v1/agent_hub.proto";
+
+service ControlPlane {
+  rpc SubmitBuild (SubmitBuildRequest) returns (BuildRef);
+  rpc WatchBuild (BuildRef) returns (stream BuildSnapshot);
+  rpc CancelBuild (CancelBuildRequest) returns (BuildSnapshot);
+  rpc MissingBlobs (BlobHashes) returns (BlobHashes);
+  rpc ListAgents (ListAgentsRequest) returns (AgentList);
+  rpc AuthorizeAgent (AgentRef) returns (AgentInfo);
+}
+
+message SubmitBuildRequest {
+  string request_id = 1;              // caller-generated idempotency key
+  string project = 2;
+  string configuration = 3;
+  bytes definition_snapshot = 4;      // resolved vivarium.yaml submitted for provenance
+  repeated MatrixBuildCell cells = 5;
+}
+
+message MatrixBuildCell {
+  string name = 1;
+  string agent_expression = 2;
+  string rid = 3;                     // resolved payload runtime identity, e.g. win-x64
+  BuildAssignment assignment = 4;     // build_id must be empty; the controller owns identity
+  int32 queue_timeout_sec = 5;        // 0 uses the controller default
+}
+
+message BuildRef {
+  string build_id = 1;                // matrix-build id
+}
+
+message CancelBuildRequest {
+  string build_id = 1;                // matrix-build id
+  string reason = 2;                  // first reason wins for every active child
+}
+
+enum DurableBuildState {
+  DURABLE_BUILD_STATE_UNSPECIFIED = 0;
+  DURABLE_BUILD_STATE_QUEUED = 1;
+  DURABLE_BUILD_STATE_RUNNING = 2;
+  DURABLE_BUILD_STATE_CANCEL_REQUESTED = 3;
+  DURABLE_BUILD_STATE_FINISHED = 4;
+}
+
+message BuildSnapshot {
+  BuildRef build = 1;
+  string project = 2;
+  string configuration = 3;
+  DurableBuildState state = 4;
+  BuildOutcome outcome = 5;
+  repeated BuildCellSnapshot cells = 6;
+  int64 created_unix_ms = 7;
+  int64 updated_unix_ms = 8;
+}
+
+message BuildCellSnapshot {
+  string name = 1;
+  string build_id = 2;
+  string agent_expression = 3;
+  DurableBuildState state = 4;
+  string agent_id = 5;
+  BuildOutcome outcome = 6;
+  string status_text = 7;
+  string rid = 8;
+  int64 queue_deadline_unix_ms = 9;
+  repeated Artifact artifacts = 10;
+  repeated StepResult steps = 11;
+  string agent_name = 12;             // immutable name copied when this cell was assigned
+  map<string, string> agent_parameters = 13; // immutable reported-parameter snapshot at assignment
+  map<string, string> agent_custom_parameters = 14; // immutable operator-owned snapshot at assignment
+}
+
+message BlobHashes {
+  repeated string sha256 = 1;
+}
+
+message ListAgentsRequest {}
+
+message AgentRef {
+  string agent_id = 1;
+}
+
+message AgentList {
+  repeated AgentInfo agents = 1;
+}
+
+message AgentInfo {
+  string agent_id = 1;
+  string name = 2;
+  bool connected = 3;
+  bool reconciled = 4;
+  bool authorized = 5;
+  bool enabled = 6;
+  string activity = 7;
+  string current_build_id = 8;
+  int64 last_communication_unix_ms = 9;
+  map<string, string> parameters = 10;
+  string agent_version = 11;
+  string os_family = 12;
+  string os_version = 13;
+  string architecture = 14;
+  bool interactive = 15;
+}

@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+
+<div class="shell">
+    <header class="topbar">
+        <a class="brand" href="/agents">
+            <span class="brand-mark">V</span>
+            <span>Vivarium</span>
+        </a>
+        <nav aria-label="Primary navigation">
+            <NavLink class="nav-link" href="/agents">Agents</NavLink>
+            <NavLink class="nav-link" href="/builds">Builds</NavLink>
+            <span class="nav-link muted" aria-disabled="true">Fleet</span>
+        </nav>
+        <form method="post" action="/logout">
+            <button class="quiet-button" type="submit">Sign out</button>
+        </form>
+    </header>
+    <main>
+        @Body
+    </main>
+</div>

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO.Compression;
 using Google.Protobuf;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -21,7 +20,7 @@ public static class BuildExecutor
         string sessionId,
         CancellationToken ct)
     {
-        var workdir = Path.Combine(workRoot, assignment.BuildId);
+        var workdir = ResolveUnder(workRoot, assignment.BuildId);
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
@@ -64,6 +63,8 @@ public static class BuildExecutor
             });
         }
 
+        result.Outcome = anyFailed ? BuildOutcome.Failed : BuildOutcome.Succeeded;
+
         return result;
     }
 
@@ -75,9 +76,7 @@ public static class BuildExecutor
             await blobs.DownloadAsync(blob.Sha256, zipPath, ct);
             var destination = ResolveUnder(workdir, blob.UnpackTo);
             Directory.CreateDirectory(destination);
-            // ZipFile validates that entries stay under the destination (zip-slip, D3);
-            // the agent runs elevated, so that guarantee is load-bearing.
-            ZipFile.ExtractToDirectory(zipPath, destination, overwriteFiles: true);
+            PayloadArchiveExtractor.Extract(zipPath, destination);
             File.Delete(zipPath);
         }
         else
@@ -89,8 +88,12 @@ public static class BuildExecutor
 
     private static string ResolveUnder(string workdir, string relative)
     {
-        var full = Path.GetFullPath(Path.Combine(workdir, relative.Replace('/', Path.DirectorySeparatorChar)));
-        if (!full.StartsWith(Path.GetFullPath(workdir), StringComparison.OrdinalIgnoreCase))
+        var root = Path.GetFullPath(workdir);
+        var full = Path.GetFullPath(Path.Combine(root, relative.Replace('/', Path.DirectorySeparatorChar)));
+        var relativeToRoot = Path.GetRelativePath(root, full);
+        if (Path.IsPathRooted(relativeToRoot) ||
+            relativeToRoot.Equals("..", StringComparison.Ordinal) ||
+            relativeToRoot.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
         {
             throw new InvalidOperationException($"payload path escapes the workdir: '{relative}'");
         }
@@ -113,10 +116,14 @@ public static class BuildExecutor
         Func<AgentMsg, CancellationToken, Task> send,
         CancellationToken ct)
     {
+        var resultsDir = ResolveUnder(workdir, "results");
+        Directory.CreateDirectory(resultsDir);
+        var workingDirectory = step.Cwd.Length > 0 ? ResolveUnder(workdir, step.Cwd) : workdir;
+
         var psi = new ProcessStartInfo
         {
-            FileName = step.Program,
-            WorkingDirectory = step.Cwd.Length > 0 ? ResolveUnder(workdir, step.Cwd) : workdir,
+            FileName = ResolveProgram(workdir, workingDirectory, step.Program),
+            WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -128,6 +135,12 @@ public static class BuildExecutor
 
         psi.Environment["VIVARIUM_BUILD_ID"] = assignment.BuildId;
         psi.Environment["VIVARIUM_WORKDIR"] = workdir;
+        psi.Environment["VIVARIUM_RESULTS_DIR"] = resultsDir;
+        if (assignment.Parameters.TryGetValue("cell", out var cell))
+        {
+            psi.Environment["VIVARIUM_CELL"] = cell;
+        }
+
         foreach (var (key, value) in assignment.Parameters)
         {
             psi.Environment["VIVARIUM_PARAM_" + key.ToUpperInvariant()] = value;
@@ -161,6 +174,16 @@ public static class BuildExecutor
             process.Kill(entireProcessTree: true);
             await process.WaitForExitAsync(ct);
         }
+        catch (OperationCanceledException)
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+                await process.WaitForExitAsync(CancellationToken.None);
+            }
+
+            throw;
+        }
 
         await Task.WhenAll(stdout, stderr);
         return new StepResult
@@ -188,6 +211,25 @@ public static class BuildExecutor
                 }, CancellationToken.None);
             }
         }
+    }
+
+    private static string ResolveProgram(string workdir, string workingDirectory, string program)
+    {
+        if (Path.IsPathRooted(program))
+        {
+            return program;
+        }
+
+        var normalized = program.Replace('/', Path.DirectorySeparatorChar);
+        var candidate = Path.GetFullPath(Path.Combine(workingDirectory, normalized));
+        var pathLike = program.Contains('/') || program.Contains('\\');
+        if (!pathLike && !File.Exists(candidate))
+        {
+            return program; // A system command resolved through PATH.
+        }
+
+        var relativeToWorkdir = Path.GetRelativePath(workdir, candidate);
+        return ResolveUnder(workdir, relativeToWorkdir);
     }
 
     private static IEnumerable<string> MatchCollectGlobs(string workdir, IEnumerable<string> globs)

@@ -1,5 +1,6 @@
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Vivarium.Contracts.V1;
@@ -9,7 +10,7 @@ namespace Vivarium.Agent;
 /// <summary>
 /// The whole agent: reverse-connect session loop (D1), deliberately dumb — every decision lives in
 /// the controller. Reconnects forever; builds survive a dropped connection (the result is queued and
-/// delivered through the next session — re-adoption, D4). A restart request ends RunAsync so the
+/// kept on disk until acknowledged through a later session — re-adoption, D4). A restart request ends RunAsync so the
 /// launcher can swap us (D2).
 /// </summary>
 public sealed class AgentRunner
@@ -22,11 +23,13 @@ public sealed class AgentRunner
     private readonly TaskCompletionSource<bool> authorized = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly CancellationTokenSource restartRequested = new();
     private readonly object pendingLock = new();
+    private readonly object activeBuildLock = new();
     private string? authToken;
     private volatile string? runningBuildId;
     private volatile SessionWriter? currentWriter;
     private volatile string currentSessionId = string.Empty;
-    private AgentMsg? pendingResult;
+    private BuildResult? pendingResult;
+    private ActiveBuild? activeBuild;
 
     public string AgentId { get; }
 
@@ -36,7 +39,7 @@ public sealed class AgentRunner
     public AgentRunner(AgentOptions options)
     {
         this.options = options;
-        Directory.CreateDirectory(options.DataDir);
+        PrivateStorage.EnsureDirectory(options.DataDir);
 
         var idPath = Path.Combine(options.DataDir, "agent-id");
         if (File.Exists(idPath))
@@ -50,39 +53,66 @@ public sealed class AgentRunner
         }
 
         var tokenPath = TokenPath;
+        if (File.Exists(tokenPath))
+        {
+            PrivateStorage.RestrictSecretFile(tokenPath);
+        }
+
         authToken = File.Exists(tokenPath) ? File.ReadAllText(tokenPath).Trim() : null;
+        if (File.Exists(PendingResultPath))
+        {
+            pendingResult = BuildResult.Parser.ParseFrom(File.ReadAllBytes(PendingResultPath));
+            if (string.IsNullOrWhiteSpace(pendingResult.BuildId))
+            {
+                throw new InvalidDataException("the pending build result has no build id");
+            }
+
+            runningBuildId = pendingResult.BuildId;
+        }
+
         blobs = new BlobClient(options.ControllerUrl, options.CertFingerprintSha256) { BearerToken = authToken };
     }
 
     private string TokenPath => Path.Combine(options.DataDir, "auth.token");
+    private string PendingResultPath => Path.Combine(options.DataDir, "pending-build-result.pb");
 
     public Task WaitAuthorizedAsync(TimeSpan timeout) => authorized.Task.WaitAsync(timeout);
 
     public async Task RunAsync(CancellationToken ct)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, restartRequested.Token);
-        while (!linked.IsCancellationRequested)
+        try
         {
-            try
+            while (!linked.IsCancellationRequested)
             {
-                await RunSessionAsync(linked.Token);
-            }
-            catch (OperationCanceledException) when (linked.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[agent] session ended: {ex.Message}");
-            }
+                try
+                {
+                    await RunSessionAsync(linked.Token);
+                }
+                catch (OperationCanceledException) when (linked.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[agent] session ended: {ex.Message}");
+                }
 
-            try
-            {
-                await Task.Delay(options.ReconnectDelay, linked.Token);
+                try
+                {
+                    await Task.Delay(options.ReconnectDelay, linked.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
             }
-            catch (OperationCanceledException)
+        }
+        finally
+        {
+            lock (activeBuildLock)
             {
-                break;
+                activeBuild?.Cancellation.Cancel();
             }
         }
     }
@@ -125,15 +155,21 @@ public sealed class AgentRunner
 
                     case ControllerMsg.MsgOneofCase.Authorized:
                         authToken = msg.Authorized.AuthToken;
-                        File.WriteAllText(TokenPath, authToken);
+                        PrivateStorage.WriteSecretText(TokenPath, authToken);
                         blobs.BearerToken = authToken;
                         authorized.TrySetResult(true);
                         break;
 
                     case ControllerMsg.MsgOneofCase.Build:
-                        var assignment = msg.Build;
-                        // Builds run on the runner-level token: they survive session death.
-                        _ = Task.Run(() => ExecuteBuildAsync(assignment, ct), CancellationToken.None);
+                        await AcceptBuildAsync(msg.Build);
+                        break;
+
+                    case ControllerMsg.MsgOneofCase.Cancel:
+                        CancelBuild(msg.Cancel);
+                        break;
+
+                    case ControllerMsg.MsgOneofCase.ResultAccepted:
+                        AcceptResult(msg.ResultAccepted);
                         break;
 
                     case ControllerMsg.MsgOneofCase.Restart:
@@ -162,7 +198,7 @@ public sealed class AgentRunner
 
     /// <summary>
     /// Routes a message through the current session, whatever it is by now. Logs and statuses are
-    /// best-effort; a BuildResult that cannot be sent is queued and retried until delivered.
+    /// best-effort; terminal results are persisted separately and retried until acknowledged.
     /// </summary>
     private async Task SendRoutedAsync(AgentMsg msg, CancellationToken ct)
     {
@@ -187,19 +223,57 @@ public sealed class AgentRunner
     {
         if (msg.MsgCase == AgentMsg.MsgOneofCase.Result)
         {
-            lock (pendingLock)
+            QueueResultDurably(msg.Result);
+        }
+    }
+
+    private void QueueResultDurably(BuildResult result)
+    {
+        lock (pendingLock)
+        {
+            if (pendingResult != null && pendingResult.BuildId != result.BuildId)
             {
-                pendingResult = msg;
+                throw new InvalidOperationException(
+                    $"build '{pendingResult.BuildId}' is still awaiting result acknowledgement");
             }
+
+            var tempPath = PendingResultPath + ".tmp";
+            using (var file = new FileStream(
+                       tempPath, FileMode.Create, FileAccess.Write, FileShare.None,
+                       bufferSize: 4096, FileOptions.WriteThrough))
+            {
+                result.WriteTo(file);
+                file.Flush(flushToDisk: true);
+            }
+
+            File.Move(tempPath, PendingResultPath, overwrite: true);
+            pendingResult = result.Clone();
+            runningBuildId = result.BuildId;
+        }
+    }
+
+    private void AcceptResult(BuildResultAccepted accepted)
+    {
+        lock (pendingLock)
+        {
+            if (pendingResult?.BuildId != accepted.BuildId ||
+                accepted.SessionId != currentSessionId)
+            {
+                return;
+            }
+
+            File.Delete(PendingResultPath);
+            pendingResult = null;
+            runningBuildId = null;
         }
     }
 
     private async Task TryFlushPendingResultAsync(CancellationToken ct)
     {
-        AgentMsg? snapshot;
+        BuildResult? snapshot;
         lock (pendingLock)
         {
-            snapshot = pendingResult;
+            snapshot = pendingResult?.Clone();
         }
 
         if (snapshot == null)
@@ -215,14 +289,8 @@ public sealed class AgentRunner
 
         try
         {
-            await writer.SendAsync(snapshot, ct);
-            lock (pendingLock)
-            {
-                if (ReferenceEquals(pendingResult, snapshot))
-                {
-                    pendingResult = null;
-                }
-            }
+            snapshot.SessionId = currentSessionId;
+            await writer.SendAsync(new AgentMsg { Result = snapshot }, ct);
         }
         catch (Exception) when (!ct.IsCancellationRequested)
         {
@@ -230,28 +298,123 @@ public sealed class AgentRunner
         }
     }
 
-    private async Task ExecuteBuildAsync(BuildAssignment assignment, CancellationToken ct)
+    private async Task AcceptBuildAsync(BuildAssignment assignment)
     {
-        runningBuildId = assignment.BuildId;
+        ActiveBuild? build = null;
+        var accepted = false;
+        lock (activeBuildLock)
+        {
+            if (activeBuild != null)
+            {
+                // The controller deliberately resends an unacknowledged assignment after a stream
+                // or controller restart. Re-acknowledge the same ownership without starting twice;
+                // a different concurrent assignment is rejected by withholding acknowledgement.
+                accepted = activeBuild.Assignment.BuildId == assignment.BuildId;
+            }
+            else
+            {
+                lock (pendingLock)
+                {
+                    if (pendingResult != null)
+                    {
+                        // A terminal result is stronger proof of ownership than an active process.
+                        // ACK its duplicate assignment but never execute the payload again.
+                        accepted = pendingResult.BuildId == assignment.BuildId;
+                    }
+                    else
+                    {
+                        build = new ActiveBuild(
+                            assignment.Clone(),
+                            CancellationTokenSource.CreateLinkedTokenSource(
+                                restartRequested.Token));
+                        activeBuild = build;
+                        runningBuildId = assignment.BuildId;
+                        accepted = true;
+                    }
+                }
+            }
+        }
+
+        if (!accepted)
+        {
+            return;
+        }
+
+        await SendRoutedAsync(new AgentMsg
+        {
+            AssignmentAccepted = new AssignmentAccepted
+            {
+                BuildId = assignment.BuildId,
+                SessionId = currentSessionId,
+            },
+        }, CancellationToken.None);
+
+        // Builds run on the runner-level token: they survive session death.
+        if (build != null)
+        {
+            _ = Task.Run(() => ExecuteBuildAsync(build), CancellationToken.None);
+        }
+    }
+
+    private void CancelBuild(CancelBuild cancellation)
+    {
+        lock (activeBuildLock)
+        {
+            if (activeBuild?.Assignment.BuildId != cancellation.BuildId)
+            {
+                return; // idempotent: already finished or belongs to another build
+            }
+
+            activeBuild.CancellationReason = cancellation.Reason;
+            activeBuild.Cancellation.Cancel();
+        }
+    }
+
+    private async Task ExecuteBuildAsync(ActiveBuild build)
+    {
+        var assignment = build.Assignment;
+        BuildResult result;
         try
         {
             var workRoot = Path.Combine(options.DataDir, "builds");
-            var result = await BuildExecutor.ExecuteAsync(
-                workRoot, assignment, blobs, SendRoutedAsync, currentSessionId, ct);
-            QueueIfResult(new AgentMsg { Result = result });
-            await TryFlushPendingResultAsync(ct);
+            result = await BuildExecutor.ExecuteAsync(
+                workRoot, assignment, blobs, SendRoutedAsync, currentSessionId, build.Cancellation.Token);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (build.Cancellation.IsCancellationRequested)
         {
+            result = new BuildResult
+            {
+                BuildId = assignment.BuildId,
+                SessionId = currentSessionId,
+                Outcome = BuildOutcome.Cancelled,
+                StatusText = build.CancellationReason ?? "build stopped",
+            };
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"[agent] build {assignment.BuildId} failed: {ex}");
+            result = new BuildResult
+            {
+                BuildId = assignment.BuildId,
+                SessionId = currentSessionId,
+                Outcome = BuildOutcome.InfrastructureFailed,
+                StatusText = ex.Message,
+            };
         }
-        finally
+
+        // Make the terminal result durable before releasing active ownership. This closes the small
+        // window in which a second assignment could otherwise start before the first result existed.
+        QueueResultDurably(result);
+        lock (activeBuildLock)
         {
-            runningBuildId = null;
+            if (ReferenceEquals(activeBuild, build))
+            {
+                activeBuild = null;
+            }
         }
+
+        build.Cancellation.Dispose();
+        await TryFlushPendingResultAsync(CancellationToken.None);
     }
 
     private async Task HeartbeatLoopAsync(SessionWriter writer, CancellationToken ct)
@@ -315,5 +478,18 @@ public sealed class AgentRunner
         {
             return string.Empty;
         }
+    }
+
+    private sealed class ActiveBuild
+    {
+        public ActiveBuild(BuildAssignment assignment, CancellationTokenSource cancellation)
+        {
+            Assignment = assignment;
+            Cancellation = cancellation;
+        }
+
+        public BuildAssignment Assignment { get; }
+        public CancellationTokenSource Cancellation { get; }
+        public string? CancellationReason { get; set; }
     }
 }

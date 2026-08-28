@@ -1,12 +1,24 @@
 # Vivarium
 
-**A test farm for real operating systems.** Vivarium runs your test corpus against a fleet of snapshot-managed virtual machines — Windows at an exact patch level, Windows with a specific third-party product installed, Ubuntu, macOS — and turns the results into a single *test × OS-configuration* matrix.
+**A test farm and AgentExplorer fleet manager for real operating systems.** Vivarium uses one cross-platform agent for
+TeamCity-style jobs and for safe fleet inspection/operations across physical machines and, later,
+snapshot-managed VMs. Test runs become one centralized *test × OS-configuration* matrix.
 
 A vivarium is an enclosure that keeps organisms under controlled conditions for observation. This one keeps operating systems.
 
-> **Status: Phase 0.** The pinned-TLS agent ↔ controller protocol loop (enroll → authorize → build →
-> artifacts) runs and is tested on Windows/Linux/macOS; nothing is end-user usable yet. The design is documented in
+> **Status: Phase 1 foundation.** The pinned-TLS agent ↔ controller loop now has persistent
+> registrations, TeamCity-style status axes and reported/custom parameters, heartbeats, a durable
+> compatible-agent build queue, queue-wait deadlines, controller-restart-safe
+> assignment/cancellation/result handshakes, protected Agents and Queue & Builds panels, a scoped
+> ControlPlane API, and working `viv login`, `viv run`, and explicit durable `viv cancel` clients with
+> hardened payload archives, immutable assigned-agent provenance, and centralized per-cell
+> results/artifact downloads. Install one-liners, central agent upgrades, TRX result adapters, and
+> provider integrations are still in
+> progress; this is not an end-user release yet.
+> The design is documented in
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the shape), [`docs/ROADMAP.md`](docs/ROADMAP.md) (the order),
+> [`docs/design/README.md`](docs/design/README.md) (focused subsystem designs),
+> [`docs/roles/README.md`](docs/roles/README.md) (AI expert routing),
 > [`docs/prior-art.md`](docs/prior-art.md) (what we learned from the systems that came before), and
 > [`docs/walkthrough.md`](docs/walkthrough.md) (what using it will feel like, end to end).
 
@@ -21,21 +33,25 @@ CI matrixes answer *"does it pass on windows-latest and ubuntu-latest?"*. They c
 
 Answering those requires real OS installations with versioned, restorable state — virtual machines reverted to a pristine snapshot before every run. Vivarium is the controller, the guest agent, and the image registry that make that loop boring.
 
-## How it works
+## How it works (target architecture)
 
 ```mermaid
 flowchart LR
-    CLI["viv CLI / your CI"] --> C
-    UI["Web panel (Blazor)"] --- C
-    C["Controller<br/>queue + image registry + results<br/>gRPC + blob store + SQLite"]
+    CLI["viv CLI / your CI"] --> REST
+    UI["React + Workbench panel"] --> REST
+    REST["REST + SSE management plane"] --> C
+    C["Controller<br/>Git desired state + scheduler + results<br/>AgentHub gRPC + blob store + SQLite"]
     C -- "checkpoint / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]
     D --> VM["Pool VM / enrolled physical machine"]
     VM -- "reverse-connect gRPC<br/>hello / builds / logs / results" --> C
 ```
 
-- **Controller** — one process: build queue, versioned image registry, scheduler, result store, web panel. TeamCity's model adopted wholesale — projects, build configurations, builds, agent authorization and statuses, parameters/requirements, even the `##teamcity[…]` service-message protocol — with an automation-first spin.
+- **Controller** — one process with two product planes over the same fleet. TeamCity mode owns projects,
+  build configurations, queues, builds, and centralized results. AgentExplorer mode owns host inventory and
+  explicit remote operations outside builds. REST is the public management plane; desired configuration
+  is committed to Git, while runtime state, secrets, logs, and results remain durable operational data.
 - **Host drivers** — a handful of verbs per hypervisor: create pool VM, checkpoint, revert, start, stop, destroy. Everything else happens over the agent channel, which is why adding a hypervisor is cheap.
-- **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in pooled pristine VMs *and* on enrolled physical machines. Only a tiny frozen *bootstrap* is installed once (baked into images, or via a one-liner on a physical box); the agent itself is pulled and auto-upgraded centrally, TeamCity-style — snapshots never get rebuilt for an agent update.
+- **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in pooled pristine VMs *and* on enrolled physical machines. The target is a tiny frozen *bootstrap* installed once (baked into images, or through authenticated setup on a physical box), with the real agent pulled and auto-upgraded centrally, TeamCity-style. The current prototype has not yet passed the authenticated-manifest freeze gate (D2, D21).
 - **Builds** — files in → steps → exit codes + files out. NUnit (self-contained, TRX) is the default payload; anything that produces JUnit XML (e.g. `cargo nextest`) or speaks TeamCity service messages plugs into the same pipe. Guests stay pristine: no SDKs, no runtimes. *Pristine* itself is a per-configuration clean policy — revert-to-snapshot where the machine supports it, plain reboot or nothing where it doesn't.
 - **Images** — built as *base → declarative provisioning recipe → sealed disk*, versioned, with drift detection. Provisioning runs through the same build machinery; pooled VMs with per-VM memory checkpoints make revert-to-pristine a matter of seconds.
 
@@ -53,9 +69,11 @@ flowchart LR
 
 ## Non-goals
 
-- Not a CI server — your CI calls Vivarium through the CLI/API and gets a matrix back.
+- Not a source-control pipeline orchestrator — Vivarium can be called by CI, but its TeamCity-style job
+  runner is also useful directly for tests and future builds.
 - Not container-based — the whole point is real OS installations: patch levels, drivers, desktop sessions, macOS.
-- Not a general-purpose VM manager — it manages exactly what the test loop needs.
+- Not an unrestricted RMM/configuration-management system — AgentExplorer exposes only explicit,
+  capability-negotiated, authorized, audited operations.
 
 ## License
 

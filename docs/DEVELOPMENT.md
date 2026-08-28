@@ -7,13 +7,14 @@ the practical companion.
 ## Building
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root are the whole story (AGENTS.md →
-Verification). Publishing is a matrix of self-contained single-file builds:
+Verification). The release target is a matrix of self-contained single-file builds; explicit
+`PublishSingleFile` is required because the project files do not set it globally:
 
 ```
-dotnet publish src/Vivarium.Controller -c Release -r win-x64    --self-contained -o out/controller/win-x64
-dotnet publish src/Vivarium.Agent      -c Release -r <rid>      --self-contained -o out/agent/<rid>
-dotnet publish src/Vivarium.Bootstrap  -c Release -r <rid>      --self-contained -o out/bootstrap/<rid>
-dotnet publish src/Vivarium.Cli        -c Release -r <rid>      --self-contained -o out/cli/<rid>
+dotnet publish src/Vivarium.Controller -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/controller/win-x64
+dotnet publish src/Vivarium.Agent -c Release -r <rid> --self-contained -p:PublishSingleFile=true -o out/agent/<rid>
+dotnet publish src/Vivarium.Bootstrap -c Release -r <rid> --self-contained -p:PublishSingleFile=true -o out/bootstrap/<rid>
+dotnet publish src/Vivarium.Cli -c Release -r <rid> --self-contained -p:PublishSingleFile=true -o out/cli/<rid>
 ```
 
 Supported RIDs: `win-x64`, `linux-x64`, `linux-arm64`, `osx-arm64`. Trimming is enabled only where
@@ -29,36 +30,42 @@ never a requirement.
 | 3. FakeMachineProvider | simulated pool VMs backed by local agent processes (revert = process restart + workdir reset): full D8 conveyor, pool grow/drain, INFRA recycling, canaries — deterministic, zero hypervisors | every push, GitHub Actions |
 | 4. Real hypervisor E2E | QEMU/KVM smoke once that driver exists — GitHub's hosted **Linux** runners expose `/dev/kvm` (Windows runners cannot do Hyper-V); Hyper-V E2E on a **self-hosted** runner: the dev machine first, later the farm itself | KVM: CI, later; Hyper-V: self-hosted, scheduled/manual |
 
+Today CI runs the solution and payload portability jobs on all three hosted OSes. Tier 2 contains the
+implemented session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build
+cross-process cases are not complete; tiers 3 and 4 await providers.
+
 Payload portability smoke tests (ROADMAP Phase 0) run in the same hosted matrix: NUnit/MTP
 self-contained + TRX on all three OSes, macOS ad-hoc signing of cross-published binaries, nextest
 archive + `--workspace-remap`. Until the farm exists, GitHub Actions *is* our matrix — it bootstraps
 the farm that will replace it for everything hosted runners cannot do (exact patch levels,
 preinstalled software, interactive desktops, pristine reverts).
 
-**Protocol compatibility is a CI job, not a promise**: the tier-2 suite also runs against the
-*previous release's* agent binaries (cached from GitHub Releases). Backward compatibility within a
-minor version is the AGENTS.md rule; this job is what enforces it — the HLK lock-step failure is the
-cautionary tale (prior-art).
+**Protocol compatibility must be a CI job, not just a promise**: after the first release exists, the
+tier-2 suite will also run against the *previous release's* agent binaries cached from GitHub
+Releases. Backward compatibility within a minor version is already the AGENTS.md rule; that pending
+job will enforce it — the HLK lock-step failure is the cautionary tale (prior-art).
 
-**Dogfooding (from Phase 1)**: the Vivarium repo carries its own `vivarium.yaml`; the farm runs the
-agent suite across its own machines. Canary builds gate agent rollouts — a broken agent build never
-reaches the whole fleet because the canary catches it on one machine first.
+**Dogfooding target**: once installers, launcher upgrades, and a managed farm exist, the Vivarium repo
+will carry its own `vivarium.yaml` and the farm will run the agent suite across its own machines.
+Canary builds then gate agent rollouts so a broken agent build never reaches the whole fleet.
 
 ## The agent dev loop
 
-Working on the agent must not involve rebuilding images or touching machines:
+Once D2's authenticated manifest store ships, working on the agent will not involve rebuilding images
+or touching machines:
 
 ```
 dotnet publish src/Vivarium.Agent -c Release -r win-x64 --self-contained -o out/agent/win-x64
 viv agent push out/agent/win-x64          # admin scope: publish to the controller's store
 ```
 
-Every connected agent picks the build up on its next restart (`RestartAgent` broadcasts it
-immediately). Bootstrap never changes — that is the point of D2.
+The target is for every connected agent to pick the build up on its next restart, with
+`RestartAgent` broadcasting it immediately. Neither `viv agent push` nor the manifest endpoint exists
+in the current binaries, and the bootstrap freeze gate remains pending (§7/D21).
 
 ## Releases (D19)
 
-Tag `vX.Y.Z` → GitHub Actions release workflow:
+Planned: tag `vX.Y.Z` → GitHub Actions release workflow:
 
 1. Build + test the full matrix.
 2. Publish per-RID zips: `vivarium-controller-<rid>.zip` (the controller zip **embeds the agent +
@@ -66,24 +73,27 @@ Tag `vX.Y.Z` → GitHub Actions release workflow:
    (bootstrap + current agent + `bootstrap.json.sample`), `viv-<rid>.zip`.
 3. Attach `SHA256SUMS` and create the GitHub Release; the version flows from the tag (MinVer).
 
-No installers, no registry, no machine-wide state: config and data live beside the executables,
-uninstall = delete the folder. Binaries are unsigned for now — SmartScreen/MOTW friction on Windows
-and Gatekeeper prompts on macOS are known and documented (§13).
+There is no release workflow yet. The portable controller/agent/bootstrap target keeps state in an
+explicit data/install directory so uninstall is removal of that directory; `viv login` intentionally
+keeps per-user trust and credentials in AppData/XDG config. Binaries are unsigned for now —
+SmartScreen/MOTW friction on Windows and Gatekeeper prompts on macOS are known and documented (§13).
 
 ## Upgrading a farm
 
 - **Controller**: stop → back up `vivarium-data/` (SQLite backup + blob dir copy) → replace the
   binary → start. Schema migrations are forward-only and applied on startup.
-- **Agents**: update themselves from the controller's store (D2) — nothing to do. Roll out with a
-  canary build before broadcasting `RestartAgent` fleet-wide.
-- **Bootstrap**: frozen (§7). If it ever must change, that is an image-rebuild + re-enroll event and
-  a design discussion first.
-- **CLI**: replace the binary; protocol compat within a minor means a slightly stale `viv` keeps
-  working against a newer controller.
+- **Agents (target after D2 ships)**: update from the controller's store. Roll out with a canary build
+  before broadcasting `RestartAgent` fleet-wide. The current Phase 1 implementation does not yet
+  publish or serve agent manifests.
+- **Bootstrap**: change-controlled, with its freeze gate still pending (§7). Resolving authenticated
+  manifest/token handoff requires a numbered design discussion before any source change.
+- **CLI**: replace the binary. Slightly stale clients are a compatibility target, not yet an enforced
+  guarantee; the previous-release suite and capability handshake remain roadmap work.
 
 ## Enrollment paths
 
-Two equivalent doors (§8.4, D19), both converging on the panel's **Authorize** click:
+The planned installer slice provides two equivalent doors (§8.4, D19), both converging on the panel's
+**Authorize** click:
 
 1. **Preconfigured zip** — TeamCity-style, the comfortable default: the panel's Downloads page stamps
    the archive at request time with a ready `bootstrap.json` (controller URL, certificate
@@ -97,6 +107,9 @@ For automation there is also the scriptable form:
 ```
 vivarium-agent enroll --url https://ctrl:8443 --fp SHA256:9F3A... --token <enroll-token>
 ```
+
+These Downloads, setup-script, and explicit `enroll` entry points are target UX, not commands exposed
+by the current binaries.
 
 `enroll` is an **agent** verb (it writes `bootstrap.json` and registers the logon task for
 bootstrap); bootstrap itself stays the frozen dumb loop. Running the agent interactively in a console

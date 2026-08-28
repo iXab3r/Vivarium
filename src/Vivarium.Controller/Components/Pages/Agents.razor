@@ -1,0 +1,314 @@
+@page "/agents"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@implements IDisposable
+@inject AgentAdministration Administration
+@inject AgentRegistry Registry
+@inject BuildTracker Builds
+
+<PageTitle>Agents · Vivarium</PageTitle>
+
+<section class="workspace-heading">
+    <div>
+        <p class="eyebrow">Build infrastructure</p>
+        <h1>Agents</h1>
+        <p class="lede">Authorize machines, remove them from scheduling, and inspect what each agent can run.</p>
+    </div>
+    <button class="primary-button" @onclick="CreateEnrollTokenAsync" disabled="@busy">
+        Create enrollment token
+    </button>
+</section>
+
+@if (enrollToken is not null)
+{
+    <section class="enroll-strip" aria-live="polite">
+        <div>
+            <span class="status-label">Single-use · expires in 24 hours</span>
+            <code>@enrollToken</code>
+        </div>
+        <button class="quiet-button on-dark" @onclick="DismissEnrollToken">Dismiss</button>
+    </section>
+}
+
+<section class="agent-summary" aria-label="Agent summary">
+    <div><strong>@agents.Count(a => a.Connected)</strong><span>connected</span></div>
+    <div><strong>@agents.Count(a => a.Authorization == AgentAuth.Unauthorized)</strong><span>awaiting authorization</span></div>
+    <div><strong>@agents.Count(a => a.Activity == AgentActivity.Building)</strong><span>building</span></div>
+</section>
+
+@if (message is not null)
+{
+    <p class="operation-message" role="status">@message</p>
+}
+
+<section class="agent-list" aria-label="Known agents">
+    <div class="agent-list-header">
+        <span>Agent</span>
+        <span>Connection</span>
+        <span>Authorization</span>
+        <span>Scheduling</span>
+        <span>Activity</span>
+        <span class="sr-only">Actions</span>
+    </div>
+
+    @if (agents.Count == 0)
+    {
+        <div class="empty-state">
+            <strong>No agents have registered.</strong>
+            Start a preconfigured agent with an enrollment token; it will appear here unauthorized.
+        </div>
+    }
+
+    @foreach (var agent in agents)
+    {
+        <article class="agent-row @(selectedAgentId == agent.AgentId ? "selected" : null)" @key="agent.AgentId">
+            <button class="agent-identity" @onclick="() => Select(agent.AgentId)">
+                <span class="connection-dot @(agent.Connected ? "online" : "offline")"></span>
+                <span>
+                    <strong>@agent.Name</strong>
+                    <small>@AgentDescriptor(agent)</small>
+                </span>
+            </button>
+            <span class="state-text" data-label="Connection">@(agent.Connected ? "Connected" : "Disconnected")</span>
+            <span class="state-text @(agent.Authorization == AgentAuth.Unauthorized ? "warning" : null)" data-label="Authorization">@AuthorizationText(agent)</span>
+            <span class="state-text" data-label="Scheduling">@(agent.Enabled ? "Enabled" : "Disabled")</span>
+            <span class="state-text activity" data-label="Activity">@ActivityText(agent)</span>
+            <div class="row-actions">
+                @if (agent.Authorization == AgentAuth.Unauthorized)
+                {
+                    <button class="small-button primary" @onclick="() => AuthorizeAsync(agent.AgentId)" disabled="@busy">Authorize</button>
+                }
+                else
+                {
+                    <button class="small-button" @onclick="() => SetEnabledAsync(agent.AgentId, !agent.Enabled)" disabled="@busy">
+                        @(agent.Enabled ? "Disable" : "Enable")
+                    </button>
+                }
+            </div>
+        </article>
+
+        @if (selectedAgentId == agent.AgentId)
+        {
+            <section class="agent-detail" @key="@(agent.AgentId + "-detail")">
+                <div class="detail-column">
+                    <h2>Identity</h2>
+                    <label>
+                        Display name
+                        <span class="rename-line">
+                            <input @bind="renameValue" aria-label="Agent display name" />
+                            <button class="small-button" @onclick="() => RenameAsync(agent.AgentId)" disabled="@busy">Save</button>
+                        </span>
+                    </label>
+                    <dl>
+                        <dt>Agent ID</dt><dd><code>@agent.AgentId</code></dd>
+                        <dt>Version</dt><dd>@Fallback(agent.AgentVersion)</dd>
+                        <dt>Interactive</dt><dd>@(agent.Interactive ? "Yes" : "No")</dd>
+                        <dt>Last communication</dt><dd>@RelativeTime(agent.LastCommunication)</dd>
+                    </dl>
+                </div>
+                <div class="detail-column">
+                    <h2>Reported parameters</h2>
+                    <dl class="parameters">
+                        @foreach (var parameter in agent.ReportedParameters.OrderBy(x => x.Key))
+                        {
+                            <dt>@parameter.Key</dt><dd>@parameter.Value</dd>
+                        }
+                    </dl>
+                </div>
+                <div class="detail-column">
+                    <h2>Custom parameters</h2>
+                    <p class="parameter-help">Operator-owned values used for compatibility matching.</p>
+                    @if (agent.CustomParameters.Count == 0)
+                    {
+                        <p class="parameter-empty">No custom parameters.</p>
+                    }
+                    else
+                    {
+                        <ul class="custom-parameters">
+                            @foreach (var parameter in agent.CustomParameters.OrderBy(x => x.Key))
+                            {
+                                <li>
+                                    <button class="parameter-value" type="button"
+                                            @onclick="() => EditCustom(parameter.Key, parameter.Value)"
+                                            disabled="@(busy || agent.CurrentBuildId is not null)"
+                                            title="Edit this custom parameter">
+                                        <code>@parameter.Key</code><span>@parameter.Value</span>
+                                    </button>
+                                    <button class="quiet-button parameter-delete" type="button"
+                                            @onclick="() => DeleteCustomParameterAsync(agent.AgentId, parameter.Key)"
+                                            disabled="@(busy || agent.CurrentBuildId is not null)"
+                                            aria-label="Delete custom parameter @parameter.Key">Delete</button>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <div class="parameter-editor">
+                        <label>
+                            Key
+                            <input @bind="customParameterKey" aria-label="Custom parameter key" />
+                        </label>
+                        <label>
+                            Value
+                            <input @bind="customParameterValue" aria-label="Custom parameter value" />
+                        </label>
+                        <button class="small-button" type="button"
+                                @onclick="() => SetCustomParameterAsync(agent.AgentId)"
+                                disabled="@(busy || agent.CurrentBuildId is not null)"
+                                title="@(agent.CurrentBuildId is null ? "Add or update a custom parameter" : "Stop the current build before editing custom parameters")">
+                            Add or update
+                        </button>
+                    </div>
+                </div>
+                <div class="detail-column controls">
+                    <h2>Controls</h2>
+                    @if (agent.CurrentBuildId is not null)
+                    {
+                        <p>Running <code>@agent.CurrentBuildId</code></p>
+                        <button class="small-button danger" @onclick="() => CancelBuildAsync(agent.CurrentBuildId)" disabled="@busy">Stop build</button>
+                    }
+                    <button class="small-button" @onclick="() => SetAuthorizedAsync(agent.AgentId, agent.Authorization != AgentAuth.Authorized)" disabled="@busy">
+                        @(agent.Authorization == AgentAuth.Authorized ? "Unauthorize" : "Authorize")
+                    </button>
+                    <button class="small-button danger-quiet" @onclick="() => DeleteAsync(agent.AgentId)"
+                            disabled="@(busy || agent.CurrentBuildId is not null)"
+                            title="@(agent.CurrentBuildId is null ? "Delete this agent registration" : "Stop the current build before deleting this agent")">
+                        Delete agent
+                    </button>
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "agent")]
+    public string? RequestedAgentId { get; set; }
+
+    private IReadOnlyList<AgentSnapshot> agents = [];
+    private string? selectedAgentId;
+    private string renameValue = string.Empty;
+    private string customParameterKey = string.Empty;
+    private string customParameterValue = string.Empty;
+    private string? enrollToken;
+    private string? message;
+    private bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Registry.Changed += RegistryChanged;
+        await ReloadAsync();
+        if (RequestedAgentId is not null && agents.Any(agent => agent.AgentId == RequestedAgentId))
+        {
+            Select(RequestedAgentId);
+        }
+    }
+
+    public void Dispose() => Registry.Changed -= RegistryChanged;
+
+    private void RegistryChanged() => _ = InvokeAsync(async () =>
+    {
+        await ReloadAsync();
+        StateHasChanged();
+    });
+
+    private async Task ReloadAsync() => agents = await Administration.ListAsync();
+
+    private void Select(string agentId)
+    {
+        selectedAgentId = selectedAgentId == agentId ? null : agentId;
+        renameValue = agents.FirstOrDefault(a => a.AgentId == selectedAgentId)?.Name ?? string.Empty;
+        customParameterKey = string.Empty;
+        customParameterValue = string.Empty;
+    }
+
+    private async Task RunActionAsync(Func<Task> action, string success)
+    {
+        busy = true;
+        message = null;
+        try
+        {
+            await action();
+            await ReloadAsync();
+            message = success;
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private Task AuthorizeAsync(string id) => RunActionAsync(() => Administration.AuthorizeAsync(id), "Agent authorized.");
+    private Task SetEnabledAsync(string id, bool enabled) => RunActionAsync(
+        () => Administration.SetEnabledAsync(id, enabled), enabled ? "Agent enabled." : "Agent disabled after its current build.");
+    private Task SetAuthorizedAsync(string id, bool authorized) => RunActionAsync(
+        () => authorized ? Administration.AuthorizeAsync(id) : Administration.UnauthorizeAsync(id),
+        authorized ? "Agent authorized." : "Agent unauthorized.");
+    private Task RenameAsync(string id) => RunActionAsync(() => Administration.RenameAsync(id, renameValue), "Agent renamed.");
+    private Task SetCustomParameterAsync(string id) => RunActionAsync(async () =>
+    {
+        await Administration.SetCustomParameterAsync(id, customParameterKey, customParameterValue);
+        customParameterKey = string.Empty;
+        customParameterValue = string.Empty;
+    }, "Custom parameter saved.");
+    private Task DeleteCustomParameterAsync(string id, string key) => RunActionAsync(
+        () => Administration.DeleteCustomParameterAsync(id, key),
+        $"Custom parameter '{key}' deleted.");
+    private Task DeleteAsync(string id) => RunActionAsync(async () =>
+    {
+        await Administration.DeleteAsync(id);
+        selectedAgentId = null;
+    }, "Agent deleted. A still-running installation must enroll again before it can return.");
+
+    private Task CancelBuildAsync(string buildId) => RunActionAsync(async () =>
+    {
+        if (!await Builds.CancelBuildAsync(buildId, "Stopped from the Agents page"))
+        {
+            throw new InvalidOperationException("The build has already finished.");
+        }
+    }, "Stop requested.");
+
+    private async Task CreateEnrollTokenAsync()
+    {
+        enrollToken = await Administration.CreateEnrollTokenAsync();
+        message = null;
+    }
+
+    private void DismissEnrollToken() => enrollToken = null;
+
+    private void EditCustom(string key, string value)
+    {
+        customParameterKey = key;
+        customParameterValue = value;
+    }
+
+    private static string AuthorizationText(AgentSnapshot agent) =>
+        agent.Authorization == AgentAuth.Authorized ? "Authorized" : "Unauthorized";
+
+    private static string ActivityText(AgentSnapshot agent) => agent.Activity switch
+    {
+        AgentActivity.Building when agent.CurrentBuildId is not null => $"Building · {agent.CurrentBuildId}",
+        AgentActivity.Upgrading => "Upgrading",
+        _ => "Idle",
+    };
+
+    private static string AgentDescriptor(AgentSnapshot agent)
+    {
+        var os = string.Join(" ", new[] { agent.OsFamily, agent.OsVersion }.Where(x => x.Length > 0));
+        return string.Join(" · ", new[] { os, agent.Architecture }.Where(x => x.Length > 0));
+    }
+
+    private static string Fallback(string value) => value.Length == 0 ? "—" : value;
+
+    private static string RelativeTime(DateTimeOffset value)
+    {
+        var age = DateTimeOffset.UtcNow - value;
+        return age.TotalSeconds < 10 ? "just now"
+            : age.TotalMinutes < 1 ? $"{(int)age.TotalSeconds}s ago"
+            : age.TotalHours < 1 ? $"{(int)age.TotalMinutes}m ago"
+            : $"{(int)age.TotalHours}h ago";
+    }
+}

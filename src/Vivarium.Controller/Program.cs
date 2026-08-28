@@ -11,9 +11,10 @@ var host = await VivariumControllerHost.StartAsync(new ControllerOptions
     Port = port,
 });
 
-var enrollToken = host.Tokens.CreateEnrollToken();
+var enrollToken = await host.Tokens.CreateEnrollTokenAsync();
 Console.WriteLine($"Vivarium controller listening on {host.Url}");
 Console.WriteLine($"Panel: {host.Url}  (admin token: {host.Tokens.AdminToken})");
+Console.WriteLine($"Submit token: {host.Tokens.SubmitToken}");
 Console.WriteLine($"TLS:   self-signed, fingerprint SHA256:{host.Certificate.FingerprintSha256}");
 Console.WriteLine($"Enroll token (single-use): {enrollToken}");
 Console.WriteLine($"Data:  {dataDir}");

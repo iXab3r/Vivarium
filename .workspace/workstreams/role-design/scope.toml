@@ -1,0 +1,18 @@
+[workstream]
+id = "role-design"
+status = "complete"
+source = "User-defined expert streams plus existing Reconciliation Lead and Test Steward patterns"
+target_root = "D:/Work/Vivarium"
+stable_item_identity = "role slug"
+
+[inventory]
+command = "rg --files docs/roles docs/design .codex/agents .claude/agents"
+generated_file = "inventory.tsv"
+ledger = "ledger.md"
+
+[baseline]
+domain_roles = 16
+function_roles = 2
+focused_design_documents = 16
+codex_adapters = 18
+claude_adapters = 18

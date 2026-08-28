@@ -4,9 +4,12 @@ The normative UX document. Scenario: you have a program (`myapp`, any language) 
 Windows, Linux, and macOS, and an NUnit integration-test project that can verify it. You want to set
 the check up once and run it on demand — locally or from CI.
 
-Written against Phase 1 capabilities (persistent machines, no hypervisors); §7 shows how the same
-setup grows into pristine snapshots at Phase 2. Decision references (D…) point into
-[`ARCHITECTURE.md`](ARCHITECTURE.md).
+This is the normative Phase 1 target UX for persistent machines; §7 shows how the same setup grows
+into pristine snapshots at Phase 2. The durable queue, `vivarium.yaml`, `viv run`, agent lifecycle,
+explicit matrix cancellation, and raw build/artifact results exist now. Installer/Downloads flows,
+central agent upgrade, parsed test occurrences, and `viv exec` are marked below where they remain
+work.
+Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## 0. Install the controller — one machine, once
 
@@ -21,7 +24,10 @@ First run prints the panel URL and an admin token:
 ```
 Vivarium controller listening on https://192.168.1.10:8443
 Panel: https://192.168.1.10:8443  (admin token: k3v9…)
-TLS:   self-signed, fingerprint SHA256:9F3A…  (embedded in enroll commands automatically)
+Submit token: s7d2…
+TLS:   self-signed, fingerprint SHA256:9F3A…
+Enroll token (single-use): e5a1…
+Data:  ./vivarium-data
 ```
 
 On your workstation, point the CLI at it once — the fingerprint is confirmed on first contact and
@@ -34,39 +40,41 @@ viv login https://192.168.1.10:8443
 ## 1. Connect three machines — five minutes each
 
 You need one Windows, one Linux, one macOS machine. Anything counts: a spare laptop, a VM you already
-have, a Mac mini in a drawer. Panel → **Agents → Add machine** offers two equivalent routes. The lazy
-one, TeamCity-style: download the **preconfigured agent zip** right on the machine — it already
-contains `bootstrap.json` pointing at this controller — unzip, run, done. Or, for a shell you are
-already in, the one-liner:
+have, a Mac mini in a drawer. The target installer UX is Panel → **Agents → Add Agent**, with two
+equivalent routes. The TeamCity-style route downloads a preconfigured agent zip containing
+`bootstrap.json`; the shell route will be a generated one-liner. It must authenticate the downloaded
+installer bytes *before* executing them: use a trusted SPKI pin when the stock downloader supports it,
+or verify an independently obtained package digest first, and send the single-use enroll token as
+fetch authorization. A `curl -k ... | sh` command is intentionally not specified: validation inside
+the downloaded script is too late if a MITM replaced that script (D21). The current Phase 1 binaries
+require manual agent launch/configuration because the Downloads page and setup scripts are not
+implemented yet.
 
-```
-# Windows (elevated; curl.exe ships with Windows)
-curl.exe -k https://192.168.1.10:8443/setup.ps1 -o setup.ps1; powershell -ep bypass .\setup.ps1 -Fp SHA256:9F3A... -Token <enroll-token>
-
-# Linux / macOS
-curl -fsSLk https://192.168.1.10:8443/setup.sh | sh -s -- --fp SHA256:9F3A... --token <token>
-```
-
-The script re-checks the live certificate against the fingerprint argument before doing anything else;
-the panel shows this exact command pre-filled — token, fingerprint and all (§8.4 explains the trust
-handshake).
-
-Each machine appears under **Agents** as *unauthorized* within seconds (D8). Click **Authorize**, give
-it a name. The agent has already reported its parameters — you add tags only if you want them:
+Each Agent appears under **Agents** as *unauthorized* within seconds (D8). Click **Authorize** and
+give it a name. The controller projects the small Phase-1 fact set into canonical `system.*` keys;
+legacy `os.*` reports are translated during migration:
 
 | Agent | Reported (excerpt) |
 |---|---|
-| `win10-box` | `os.family=windows os.build=19045 arch=x64 interactive=true` |
-| `ubuntu-2204` | `os.family=linux os.version=22.04 arch=x64` |
-| `macbook` | `os.family=macos os.version=14.5 arch=arm64` |
+| `win10-box` | `system.os.family=windows system.os.version=<Environment.OSVersion> system.os.arch=x64 system.hostname=…` |
+| `ubuntu-2204` | `system.os.family=linux system.os.version=<kernel-version> system.os.arch=x64 system.hostname=…` |
+| `macbook` | `system.os.family=macos system.os.version=<Environment.OSVersion> system.os.arch=arm64 system.hostname=…` |
+
+The Agents panel now keeps operator-owned custom parameters such as `software.browser=chrome`
+separate from reported facts and merges both maps deterministically for requirement matching. Custom
+parameter changes are assignment-fenced, and both maps are copied into the selected build's immutable
+provenance. Platform-specific reported inventory (Windows build + UBR, `/etc/os-release`, macOS
+product version) is still pending, so do not use the current raw `os.version` as an exact
+distro/patch selector.
 
 Two honest caveats. UI-test duty needs extras the setup script *offers* but never does silently:
 autologon on Windows asks for credentials, and macOS TCC grants (Accessibility / Input Monitoring)
 are clicks Apple reserves for a human (D10). And a headless box needs a display (dummy plug) before
 UI results mean anything.
 
-That aside, this is the last time you touch these machines by hand: the agent auto-upgrades centrally
-from now on (D2), and everything else arrives through builds.
+Once D2's authenticated manifest/launcher path ships, this is the last time you touch these machines
+by hand: agents auto-upgrade centrally and everything else arrives through builds. Auto-upgrade is not
+part of the current runnable slice.
 
 ## 2. Describe the check — `vivarium.yaml` in your repo
 
@@ -79,18 +87,22 @@ project: myapp
 configurations:
   integration:
     matrix:
-      windows: { agent: "os.family == windows", rid: win-x64 }
-      linux:   { agent: "os.family == linux",   rid: linux-x64 }
-      macos:   { agent: "os.family == macos",   rid: osx-arm64 }
+        windows: { agent: "system.os.family == windows", rid: win-x64 }
+        linux:   { agent: "system.os.family == linux",   rid: linux-x64 }
+        macos:   { agent: "system.os.family == macos",   rid: osx-arm64 }
     payload: out/{rid}/**
     steps:
-      - run: IntegrationTests{exe} --report-trx --results-directory {results}
+      - program: IntegrationTests{exe}
+        args: [--report-trx, --results-directory, "{results}"]
+        cwd: .
+        timeout: 30m
+        policy: default
     collect:
       - "{results}/**"
       - logs/**
-    timeout: 30m
+    queue_timeout: 30m
     clean: none          # Phase 1 fleet; `pristine` arrives with image-backed cells
-    on_fail: keep        # optional: leave the machine/workdir alone for inspection
+    on_fail: none        # `keep` is parsed but its cleanup/provider semantics are still pending
 ```
 
 - **Matrix cells** are named (`windows`, `linux`, `macos`) — the names become matrix columns and
@@ -101,9 +113,9 @@ configurations:
 - **Payload** is files-in / process / files-out (D3): whatever `out/{rid}/` holds is packed into an
   archive (executable bits and symlinks preserved — this matters the moment a Linux agent unpacks your
   tests), content-addressed and deduplicated — unchanged content never uploads twice.
-- Results come back as TRX (parsed by the controller's adapter); if the runner also emits TeamCity
-  service messages, tests stream live while the build runs (D14 — lands after the Phase 1 core, which
-  shows step status and delivers full results at build end).
+- Collected TRX and logs come back as immutable artifacts and are downloadable from each cell's
+  durable build-results page. The controller-side TRX adapter and per-test matrix are the next results
+  layer; TeamCity service messages then add live progress without becoming authoritative results (D14).
 
 ## 3. Build the payloads
 
@@ -130,49 +142,64 @@ macOS binaries must carry at least an ad-hoc signature; and TRX needs the
 
 ```
 $ viv run integration
-Uploading payload… 3 cells, 214 MB → 38 MB new (dedup)
-Matrix build #12 queued → https://192.168.1.10:8443/builds/12
-
-  windows  win10-box      ▶ running   step 1/1
-  linux    ubuntu-2204    ▶ running
-  macos    macbook        ⏳ queued (agent busy)
-
-  windows  win10-box      ✓ passed    148/148   2m 11s
-  linux    ubuntu-2204    ✗ failed    146/148   1m 58s
-  macos    macbook        ✓ passed    148/148   3m 40s
-
-FAILED on linux: PortBindingTest, UnixSocketPermissionsTest
-Details: https://192.168.1.10:8443/builds/12
+Submitted matrix build 867b6095-0e12-42e6-a4a8-299c128f21a4
+Results: https://192.168.1.10:8443/builds/867b6095-0e12-42e6-a4a8-299c128f21a4
+matrix: QUEUED
+windows: QUEUED
+linux: QUEUED
+macos: QUEUED
+matrix: RUNNING
+windows: RUNNING on 73e7d9ea-…
+linux: RUNNING on 91016bf1-…
+windows: FINISHED/SUCCEEDED on 73e7d9ea-…
+linux: FINISHED/FAILED on 91016bf1-…
+macos: RUNNING on 73e7d9ea-…
+macos: FINISHED/SUCCEEDED on 73e7d9ea-…
+matrix: FINISHED/FAILED
 $ echo $?   # → 1 (any red cell = nonzero; CI-friendly)
 ```
 
 `viv run integration --no-wait` just enqueues and prints the URL.
 
+Stopping is explicit and durable:
+
+```
+$ viv cancel 867b6095-0e12-42e6-a4a8-299c128f21a4 --reason "superseded by a newer commit"
+Cancellation requested for matrix build 867b6095-0e12-42e6-a4a8-299c128f21a4
+State: CANCEL_REQUESTED
+Results: https://192.168.1.10:8443/builds/867b6095-0e12-42e6-a4a8-299c128f21a4
+```
+
+The parent results page has the same **Stop matrix build** action. Ctrl+C only detaches the local
+`viv run` watch; it deliberately does not cancel remote work.
+
 Under the hood, per cell: queue → compatible agent (D8) → `BuildAssignment` → agent pulls blobs by
-sha256 → steps run with logs and heartbeats streaming (live service messages join post-Phase 1, D14) →
-artifacts pushed →
-TRX parsed → matrix updated. Infra hiccups (agent lost mid-build) retry silently on the taxonomy's
-INFRA branch and never masquerade as test failures (D9).
+sha256 → steps run while status and heartbeats update centrally → artifacts are pushed → the durable
+cell/matrix result is updated. Live log/service-message streaming joins later (D14). The current
+results page exposes the raw TRX; controller-side parsing into test occurrences is the next slice.
+Queue and lost-agent timeouts end as explicit `INFRASTRUCTURE_FAILED`, never as a test failure; full
+TEST/CRASH classification and automatic INFRA retry remain D9 work.
 
 ## 5. When a cell is red
 
-- The **matrix view** is rows = tests × columns = cells; the red cell links to the build page: full
-  log, per-test outcomes, collected artifacts (`*.trx`, `logs/`), and — because `on_fail: keep` — a
-  note that `ubuntu-2204` still holds the workdir.
-- Poke the machine without leaving your desk:
-  `viv exec --agent ubuntu-2204 -- ./sut/myapp --version`
+- The current **build-results view** lists cells with terminal outcomes, step results, and downloadable
+  artifacts (`*.trx`, `logs/`). The next result-adapter slice turns those reports into the full
+  rows = tests × columns = cells matrix and adds durable per-test details and logs.
+- Planned ad-hoc access without leaving your desk:
+  `viv exec --agent ubuntu-2204 -- ./sut/myapp --version` (not implemented yet).
 - Rerun one cell after a fix: `viv run integration --only linux`.
 
 ## 6. Wire into CI
 
-Vivarium is not a CI server (non-goal); your CI calls it like any other tool:
+Vivarium can run jobs directly or be called by an existing CI/source-control pipeline:
 
 ```yaml
 # GitHub Actions / TeamCity step, after publishing out/*
 - run: viv run integration          # waits by default
   env:
     VIVARIUM_URL: ${{ vars.VIVARIUM_URL }}
-    VIVARIUM_TOKEN: ${{ secrets.VIVARIUM_TOKEN }}   # submit-scoped token, not admin (D4)
+    VIVARIUM_TOKEN: ${{ secrets.VIVARIUM_TOKEN }}   # service credential with project Run permission (D26)
+    VIVARIUM_CERT_FINGERPRINT: ${{ vars.VIVARIUM_CERT_FINGERPRINT }}
 ```
 
 Exit code gates the pipeline; the CI log carries the matrix summary and the deep link.
@@ -185,7 +212,7 @@ The yaml is the only thing that changes — commands and habits stay identical:
     matrix:
       win10-clean: { image: win10-19044-clean }      # pristine pool VM per build (D5, D15)
       win11-avx:   { image: win11-23h2-avx@v4 }      # "with product X installed" scenario
-      linux:       { agent: "os.family == linux" }   # still a persistent machine
+      linux:       { agent: "system.os.family == linux" }   # still a persistent machine
       macos:       { agent: "name == macbook" }
     clean: pristine                                   # image-backed cells revert every build
 ```
@@ -204,15 +231,16 @@ scenarios on the *same* machine — and repeat cells for flake hunting:
 ```yaml
     matrix:
       os:                                  # the machine axis is one axis among many
-        windows: { agent: "os.family == windows" }
-        linux:   { agent: "os.family == linux" }
+        windows: { agent: "system.os.family == windows" }
+        linux:   { agent: "system.os.family == linux" }
       renderer: [dx11, vulkan]             # value axes multiply into scenarios
       locale:   [en-US, tr-TR]
     exclude:
       - { os: linux, renderer: dx11 }      # prune impossible combos
     steps:
-      - run: IntegrationTests{exe} --renderer {param.renderer} --locale {param.locale}
-             --report-trx --results-directory {results}
+      - program: IntegrationTests{exe}
+        args: [--renderer, "{param.renderer}", --locale, "{param.locale}",
+               --report-trx, --results-directory, "{results}"]
 ```
 
 Six scenarios; the three that match `ubuntu-2204` simply queue on it one after another (TeamCity
@@ -225,10 +253,10 @@ When combos are hand-picked rather than a cross product, name them explicitly:
 ```yaml
     scenarios:
       win-vulkan-turkish:
-        agent: "os.family == windows"
+        agent: "system.os.family == windows"
         params: { renderer: vulkan, locale: tr-TR }
       linux-restart-storm:
-        agent: "os.family == linux"
+        agent: "system.os.family == linux"
         params: { mode: restart-storm }
         repeat: 50                          # 50 ordinary builds, one matrix cell
 ```
@@ -249,7 +277,7 @@ machine.
    copy-paste; `rid:` is declared per cell so payload resolves at upload time.
 3. `viv run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.
 4. Named matrix cells are the unit of rerun (`--only <cell>`) and of matrix columns.
-5. Ad-hoc access is `viv exec --agent/--image`, console links live in the panel.
+5. Ad-hoc access will be `viv exec --agent/--image`; console links and the Exec RPC remain planned.
 6. The matrix generalizes past OS: the machine selector is one axis among parameter axes
    (cross-product with `exclude`, or an explicit named `scenarios:` list); parameters flow in as
    `{param.*}` and `VIVARIUM_PARAM_*`.

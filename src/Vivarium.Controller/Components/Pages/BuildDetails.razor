@@ -1,0 +1,267 @@
+@page "/builds/{MatrixBuildId}"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject MatrixBuildStore MatrixBuilds
+@inject MatrixBuildCancellationService MatrixCancellation
+@inject DatabaseChangeNotifier Changes
+
+<PageTitle>@(snapshot is null ? "Build Not Found" : $"{snapshot.Project} / {snapshot.Configuration}") · Vivarium</PageTitle>
+
+@if (snapshot is null)
+{
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">Build results</p>
+            <h1>Not Found</h1>
+            <p class="lede">No durable matrix build exists with id <code>@MatrixBuildId</code>.</p>
+        </div>
+    </section>
+    <a class="back-link" href="/builds">Back to Queue &amp; Builds</a>
+}
+else
+{
+    <section class="workspace-heading build-detail-heading">
+        <div>
+            <p class="eyebrow">@snapshot.Project</p>
+            <h1>@snapshot.Configuration</h1>
+            <p class="lede"><code>@snapshot.Build.BuildId</code></p>
+        </div>
+        <div class="build-detail-actions">
+            @if (snapshot.State != DurableBuildState.Finished)
+            {
+                <button class="small-button danger" @onclick="StopMatrixAsync"
+                        disabled="@(stopping || snapshot.State == DurableBuildState.CancelRequested)">
+                    @(snapshot.State == DurableBuildState.CancelRequested ? "Stop requested" : "Stop matrix build")
+                </button>
+            }
+            <a class="back-link" href="/builds">Queue &amp; Builds</a>
+        </div>
+    </section>
+
+    @if (operationMessage is not null)
+    {
+        <p class="operation-message" role="status">@operationMessage</p>
+    }
+
+    <section class="build-detail-summary" aria-label="Build result summary">
+        <div><span>State</span><strong>@StateText(snapshot.State)</strong></div>
+        <div><span>Outcome</span><strong>@OutcomeText(snapshot.Outcome)</strong></div>
+        <div><span>Cells</span><strong>@snapshot.Cells.Count(cell => cell.State == DurableBuildState.Finished)/@snapshot.Cells.Count</strong></div>
+        <div><span>Created</span><strong>@Timestamp(snapshot.CreatedUnixMs)</strong></div>
+    </section>
+
+    <section class="cell-results" aria-labelledby="cells-heading">
+        <h2 id="cells-heading">Scenario cells</h2>
+        @foreach (var cell in snapshot.Cells)
+        {
+            <article class="cell-result" @key="cell.BuildId">
+                <header>
+                    <div>
+                        <h3>@cell.Name</h3>
+                        <code>@cell.BuildId</code>
+                    </div>
+                    <strong class="cell-outcome">@OutcomeText(cell.Outcome)</strong>
+                </header>
+                <dl class="cell-facts">
+                    <dt>RID</dt><dd>@ValueOrDash(cell.Rid)</dd>
+                    <dt>Agent</dt>
+                    <dd>
+                        @ValueOrDash(string.IsNullOrWhiteSpace(cell.AgentName) ? cell.AgentId : cell.AgentName)
+                        @if (!string.IsNullOrWhiteSpace(cell.AgentName) &&
+                            !string.IsNullOrWhiteSpace(cell.AgentId) &&
+                            !string.Equals(cell.AgentName, cell.AgentId, StringComparison.Ordinal))
+                        {
+                            <code>@cell.AgentId</code>
+                        }
+                    </dd>
+                    <dt>State</dt><dd>@StateText(cell.State)</dd>
+                    <dt>Status</dt><dd>@ValueOrDash(cell.StatusText)</dd>
+                </dl>
+
+                @if (cell.AgentParameters.Count > 0)
+                {
+                    <section class="agent-provenance" aria-label="Reported agent parameters at assignment">
+                        <h4>Reported agent parameters at assignment</h4>
+                        <dl>
+                            @foreach (var parameter in cell.AgentParameters.OrderBy(
+                                pair => pair.Key, StringComparer.Ordinal))
+                            {
+                                <dt>@parameter.Key</dt><dd>@parameter.Value</dd>
+                            }
+                        </dl>
+                    </section>
+                }
+
+                @if (cell.AgentCustomParameters.Count > 0)
+                {
+                    <section class="agent-provenance" aria-label="Custom agent parameters at assignment">
+                        <h4>Custom agent parameters at assignment</h4>
+                        <dl>
+                            @foreach (var parameter in cell.AgentCustomParameters.OrderBy(
+                                pair => pair.Key, StringComparer.Ordinal))
+                            {
+                                <dt>@parameter.Key</dt><dd>@parameter.Value</dd>
+                            }
+                        </dl>
+                    </section>
+                }
+
+                <div class="result-columns">
+                    <section>
+                        <h4>Steps</h4>
+                        @if (cell.Steps.Count == 0)
+                        {
+                            <p class="empty-result">No step results yet.</p>
+                        }
+                        else
+                        {
+                            <ol class="step-results">
+                                @foreach (var step in cell.Steps)
+                                {
+                                    <li>
+                                        <code>#@step.StepIndex</code>
+                                        <span>exit @step.ExitCode</span>
+                                        @if (step.TimedOut) { <span>timed out</span> }
+                                        @if (step.Skipped) { <span>skipped</span> }
+                                    </li>
+                                }
+                            </ol>
+                        }
+                    </section>
+                    <section>
+                        <h4>Artifacts</h4>
+                        @if (cell.Artifacts.Count == 0)
+                        {
+                            <p class="empty-result">No artifacts.</p>
+                        }
+                        else
+                        {
+                            <ul class="artifact-results">
+                                @for (var ordinal = 0; ordinal < cell.Artifacts.Count; ordinal++)
+                                {
+                                    var artifact = cell.Artifacts[ordinal];
+                                    <li>
+                                        <a href="@ArtifactUrl(snapshot.Build.BuildId, cell.BuildId, ordinal)">@artifact.Path</a>
+                                        <span>@SizeText(artifact.Size)</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </section>
+                </div>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string MatrixBuildId { get; set; } = string.Empty;
+
+    private readonly CancellationTokenSource disposal = new();
+    private BuildSnapshot? snapshot;
+    private Task? watcher;
+    private bool stopping;
+    private string? operationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var version = Changes.Version;
+        await ReloadAsync();
+        watcher = WatchChangesAsync(version, disposal.Token);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await disposal.CancelAsync();
+        if (watcher is not null)
+        {
+            try
+            {
+                await watcher;
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+        disposal.Dispose();
+    }
+
+    private async Task WatchChangesAsync(long version, CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            version = await Changes.WaitForChangeAsync(
+                version, TimeSpan.FromMinutes(5), cancellationToken);
+            await InvokeAsync(async () =>
+            {
+                await ReloadAsync();
+                StateHasChanged();
+            });
+        }
+    }
+
+    private async Task ReloadAsync() => snapshot = await MatrixBuilds.GetSnapshotAsync(MatrixBuildId);
+
+    private async Task StopMatrixAsync()
+    {
+        stopping = true;
+        operationMessage = null;
+        try
+        {
+            snapshot = await MatrixCancellation.CancelAsync(
+                MatrixBuildId, "Stopped from the matrix build details page")
+                ?? throw new InvalidOperationException("The matrix build no longer exists.");
+            operationMessage = snapshot.State == DurableBuildState.Finished
+                ? "Matrix build cancelled."
+                : "Stop requested. Running agents will report terminal cancelled results.";
+        }
+        catch (Exception exception)
+        {
+            await ReloadAsync();
+            operationMessage = exception.Message;
+        }
+        finally
+        {
+            stopping = false;
+        }
+    }
+
+    private static string ArtifactUrl(string matrixId, string cellBuildId, int ordinal) =>
+        $"/builds/{Uri.EscapeDataString(matrixId)}/cells/{Uri.EscapeDataString(cellBuildId)}/artifacts/{ordinal}";
+
+    private static string ValueOrDash(string value) => string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private static string StateText(DurableBuildState state) => state switch
+    {
+        DurableBuildState.CancelRequested => "Stop requested",
+        DurableBuildState.Unspecified => "—",
+        _ => state.ToString(),
+    };
+
+    private static string OutcomeText(BuildOutcome outcome) => outcome switch
+    {
+        BuildOutcome.InfrastructureFailed => "Infrastructure failed",
+        BuildOutcome.Unspecified => "—",
+        _ => outcome.ToString(),
+    };
+
+    private static string Timestamp(long unixMilliseconds) =>
+        DateTimeOffset.FromUnixTimeMilliseconds(unixMilliseconds).ToString("yyyy-MM-dd HH:mm:ss 'UTC'");
+
+    private static string SizeText(long bytes)
+    {
+        if (bytes < 1024)
+        {
+            return $"{bytes} B";
+        }
+
+        if (bytes < 1024 * 1024)
+        {
+            return $"{bytes / 1024d:0.#} KiB";
+        }
+
+        return $"{bytes / (1024d * 1024d):0.#} MiB";
+    }
+}

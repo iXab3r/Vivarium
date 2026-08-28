@@ -25,8 +25,10 @@ public sealed class ControllerCertificate
         var path = Path.Combine(dataDir, "controller.pfx");
         if (!File.Exists(path))
         {
-            File.WriteAllBytes(path, CreateSelfSigned());
+            PrivateStorage.WriteSecretBytes(path, CreateSelfSigned());
         }
+
+        PrivateStorage.RestrictSecretFile(path);
 
         var cert = X509CertificateLoader.LoadPkcs12FromFile(path, password: null, X509KeyStorageFlags.Exportable);
         return new ControllerCertificate(cert);

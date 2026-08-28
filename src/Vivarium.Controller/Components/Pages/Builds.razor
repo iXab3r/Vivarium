@@ -1,0 +1,305 @@
+@page "/builds"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@implements IDisposable
+@inject BuildQueueService Queue
+@inject BuildStore Store
+@inject BuildTracker Tracker
+@inject MatrixBuildStore MatrixBuilds
+
+<PageTitle>Queue &amp; Builds · Vivarium</PageTitle>
+
+<section class="workspace-heading">
+    <div>
+        <p class="eyebrow">Build infrastructure</p>
+        <h1>Queue &amp; Builds</h1>
+        <p class="lede">See which builds are waiting for a compatible agent and stop work from one central place.</p>
+    </div>
+</section>
+
+<section class="build-summary" aria-label="Build summary">
+    <div><strong>@queueItems.Count</strong><span>queued</span></div>
+    <div><strong>@queueItems.Count(item => item.State == BuildQueueItemState.Claimed)</strong><span>being dispatched</span></div>
+    <div><strong>@activeBuilds.Count</strong><span>assigned</span></div>
+</section>
+
+@if (message is not null)
+{
+    <p class="operation-message" role="status">@message</p>
+}
+
+<section class="build-section recent-section" aria-labelledby="recent-heading">
+    <div class="section-heading">
+        <div>
+            <p class="section-kicker">Matrix builds</p>
+            <h2 id="recent-heading">Recent results</h2>
+        </div>
+        <span>@recentBuilds.Count recent</span>
+    </div>
+
+    @if (recentBuilds.Count == 0)
+    {
+        <div class="empty-state compact">
+            <strong>No matrix builds yet.</strong>
+            Runs submitted through <code>viv run</code> will appear here.
+        </div>
+    }
+    else
+    {
+        <div class="recent-header" aria-hidden="true">
+            <span>Configuration</span>
+            <span>Build</span>
+            <span>State</span>
+            <span>Outcome</span>
+            <span>Cells</span>
+        </div>
+        @foreach (var build in recentBuilds)
+        {
+            <a class="recent-row" href="/builds/@build.MatrixBuildId" @key="build.MatrixBuildId">
+                <strong data-label="Configuration">@build.Project / @build.Configuration</strong>
+                <code data-label="Build">@build.MatrixBuildId</code>
+                <span data-label="State">@MatrixState(build.State)</span>
+                <span data-label="Outcome">@MatrixOutcome(build.Outcome)</span>
+                <span data-label="Cells">@build.FinishedCellCount/@build.CellCount</span>
+            </a>
+        }
+    }
+</section>
+
+<section class="build-section" aria-labelledby="queue-heading">
+    <div class="section-heading">
+        <div>
+            <p class="section-kicker">Build Queue</p>
+            <h2 id="queue-heading">Waiting for an agent</h2>
+        </div>
+        <span>@queueItems.Count @(queueItems.Count == 1 ? "build" : "builds")</span>
+    </div>
+
+    <div class="queue-header" aria-hidden="true">
+        <span>Position</span>
+        <span>Build</span>
+        <span>Agent requirements</span>
+        <span>Wait state</span>
+        <span>Agent</span>
+        <span></span>
+    </div>
+
+    @if (queueItems.Count == 0)
+    {
+        <div class="empty-state compact">
+            <strong>The queue is empty.</strong>
+            New builds will wait here until an authorized, enabled, compatible agent is idle.
+        </div>
+    }
+
+    @for (var index = 0; index < queueItems.Count; index++)
+    {
+        var item = queueItems[index];
+        <article class="queue-row" @key="item.BuildId">
+            <strong class="queue-position" data-label="Position">#@(index + 1)</strong>
+            <span class="build-identity" data-label="Build">
+                <code>@item.BuildId</code>
+                <small>
+                    queued @RelativeTime(item.EnqueuedAt) · @DeadlineText(item.QueueDeadline)
+                </small>
+            </span>
+            <code class="requirements" data-label="Agent requirements">@RequirementText(item.AgentExpression)</code>
+            <span class="state-text @StateClass(item)" data-label="Wait state">@WaitState(item)</span>
+            <span class="agent-value" data-label="Agent">@AgentText(item)</span>
+            <div class="row-actions">
+                <button class="small-button danger-quiet" @onclick="() => RemoveAsync(item.BuildId)"
+                        disabled="@(busyBuildId is not null)">
+                    Remove
+                </button>
+            </div>
+        </article>
+    }
+</section>
+
+<section class="build-section active-section" aria-labelledby="active-heading">
+    <div class="section-heading">
+        <div>
+            <p class="section-kicker">Assigned builds</p>
+            <h2 id="active-heading">Running on agents</h2>
+        </div>
+        <span>@activeBuilds.Count active</span>
+    </div>
+
+    <div class="active-header" aria-hidden="true">
+        <span>Build</span>
+        <span>Agent</span>
+        <span>State</span>
+        <span>Cancellation</span>
+        <span></span>
+    </div>
+
+    @if (activeBuilds.Count == 0)
+    {
+        <div class="empty-state compact">
+            <strong>No builds are assigned.</strong>
+            An idle compatible agent will take the next runnable build from the queue.
+        </div>
+    }
+
+    @foreach (var build in activeBuilds)
+    {
+        <article class="active-row" @key="build.BuildId">
+            <code class="active-build" data-label="Build">@build.BuildId</code>
+            <code class="agent-value" data-label="Agent">@build.AgentId</code>
+            <span class="state-text @(build.State == TrackedBuildState.CancelRequested ? "warning" : "running")" data-label="State">
+                @BuildState(build.State)
+            </span>
+            <span class="cancellation" data-label="Cancellation">@(build.CancellationReason ?? "—")</span>
+            <div class="row-actions">
+                <button class="small-button danger" @onclick="() => StopAsync(build.BuildId)"
+                        disabled="@(busyBuildId is not null || build.State == TrackedBuildState.CancelRequested)">
+                    @(build.State == TrackedBuildState.CancelRequested ? "Stop requested" : "Stop build")
+                </button>
+            </div>
+        </article>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<BuildQueueItem> queueItems = [];
+    private IReadOnlyList<StoredBuild> activeBuilds = [];
+    private IReadOnlyList<MatrixBuildSummary> recentBuilds = [];
+    private string? busyBuildId;
+    private string? message;
+    private bool disposed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Queue.Changed += QueueChanged;
+        await ReloadAsync();
+    }
+
+    public void Dispose()
+    {
+        disposed = true;
+        Queue.Changed -= QueueChanged;
+    }
+
+    private void QueueChanged() => _ = InvokeAsync(async () =>
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        await ReloadAsync();
+        StateHasChanged();
+    });
+
+    private async Task ReloadAsync()
+    {
+        var queueTask = Queue.ListPendingAsync();
+        var activeTask = Store.ListAssignedActiveAsync();
+        var recentTask = MatrixBuilds.ListRecentAsync();
+        await Task.WhenAll(queueTask, activeTask, recentTask);
+        queueItems = await queueTask;
+        activeBuilds = await activeTask;
+        recentBuilds = await recentTask;
+    }
+
+    private async Task RunActionAsync(string buildId, Func<Task<bool>> action, string success)
+    {
+        busyBuildId = buildId;
+        message = null;
+        try
+        {
+            if (!await action())
+            {
+                throw new InvalidOperationException("The build changed state before the operation could be applied.");
+            }
+
+            await ReloadAsync();
+            message = success;
+        }
+        catch (Exception ex)
+        {
+            await ReloadAsync();
+            message = ex.Message;
+        }
+        finally
+        {
+            busyBuildId = null;
+        }
+    }
+
+    private Task RemoveAsync(string buildId) => RunActionAsync(
+        buildId,
+        () => Queue.RemoveAsync(buildId, "Removed from the Queue & Builds page"),
+        "Build removed from the queue.");
+
+    private Task StopAsync(string buildId) => RunActionAsync(
+        buildId,
+        () => Tracker.CancelBuildAsync(buildId, "Stopped from the Queue & Builds page"),
+        "Stop requested. The agent will report a terminal cancelled result.");
+
+    private static string WaitState(BuildQueueItem item) => item switch
+    {
+        { State: BuildQueueItemState.Claimed, DispatchPrepared: true } => "Dispatching",
+        { State: BuildQueueItemState.Claimed } => "Agent reserved",
+        _ => "Waiting for compatible agent",
+    };
+
+    private static string StateClass(BuildQueueItem item) =>
+        item.State == BuildQueueItemState.Claimed ? "dispatching" : "waiting";
+
+    private static string AgentText(BuildQueueItem item) =>
+        item.ClaimedAgentId is null ? "Not assigned" : item.ClaimedAgentId;
+
+    private static string RequirementText(string expression) =>
+        string.IsNullOrWhiteSpace(expression) ? "Any known agent" : expression;
+
+    private static string BuildState(TrackedBuildState state) => state switch
+    {
+        TrackedBuildState.CancelRequested => "Stop requested",
+        TrackedBuildState.Running => "Running",
+        _ => state.ToString(),
+    };
+
+    private static string MatrixState(DurableBuildState state) => state switch
+    {
+        DurableBuildState.CancelRequested => "Stop requested",
+        DurableBuildState.Unspecified => "—",
+        _ => state.ToString(),
+    };
+
+    private static string MatrixOutcome(BuildOutcome outcome) => outcome switch
+    {
+        BuildOutcome.InfrastructureFailed => "Infrastructure failed",
+        BuildOutcome.Unspecified => "—",
+        _ => outcome.ToString(),
+    };
+
+    private static string RelativeTime(DateTimeOffset value)
+    {
+        var age = DateTimeOffset.UtcNow - value;
+        return age.TotalSeconds < 10 ? "just now"
+            : age.TotalMinutes < 1 ? $"{(int)age.TotalSeconds}s ago"
+            : age.TotalHours < 1 ? $"{(int)age.TotalMinutes}m ago"
+            : age.TotalDays < 1 ? $"{(int)age.TotalHours}h ago"
+            : $"{(int)age.TotalDays}d ago";
+    }
+
+    private static string DeadlineText(DateTimeOffset? deadline)
+    {
+        if (deadline is null)
+        {
+            return "deadline pending";
+        }
+
+        var remaining = deadline.Value - DateTimeOffset.UtcNow;
+        if (remaining <= TimeSpan.Zero)
+        {
+            return "deadline reached";
+        }
+
+        return remaining.TotalMinutes < 1 ? $"expires in {(int)remaining.TotalSeconds}s"
+            : remaining.TotalHours < 1 ? $"expires in {(int)remaining.TotalMinutes}m"
+            : remaining.TotalDays < 1 ? $"expires in {(int)remaining.TotalHours}h"
+            : $"expires in {(int)remaining.TotalDays}d";
+    }
+}

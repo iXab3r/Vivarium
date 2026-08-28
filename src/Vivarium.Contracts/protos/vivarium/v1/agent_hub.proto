@@ -17,6 +17,7 @@ message AgentMsg {
     LogChunk log = 3;
     BuildResult result = 4;
     Heartbeat heartbeat = 5;
+    AssignmentAccepted assignment_accepted = 6; // ownership accepted by this exact session (D4/D14)
   }
 }
 
@@ -27,6 +28,7 @@ message ControllerMsg {
     BuildAssignment build = 3;
     CancelBuild cancel = 4;
     RestartAgent restart = 5;             // exit; bootstrap fetches the current agent version (D2)
+    BuildResultAccepted result_accepted = 6; // durable terminal-result acknowledgement (D4)
   }
 }
 
@@ -99,8 +101,14 @@ message BuildAssignment {
   map<string, string> parameters = 6;  // resolved scenario params -> env VIVARIUM_PARAM_* (D18)
 }
 
+message AssignmentAccepted {
+  string build_id = 1;
+  string session_id = 2;  // acknowledgement is fenced to the accepting connection (D4)
+}
+
 message CancelBuild {
   string build_id = 1;
+  string reason = 2;
 }
 
 message RestartAgent {
@@ -143,6 +151,21 @@ message BuildResult {
   string session_id = 2;  // fencing: results from a superseded session are discarded (D4)
   repeated StepResult steps = 3;
   repeated Artifact artifacts = 4;
+  BuildOutcome outcome = 5;
+  string status_text = 6;
+}
+
+message BuildResultAccepted {
+  string build_id = 1;
+  string session_id = 2;  // the submission attempt being acknowledged
+}
+
+enum BuildOutcome {
+  BUILD_OUTCOME_UNSPECIFIED = 0;
+  BUILD_OUTCOME_SUCCEEDED = 1;
+  BUILD_OUTCOME_FAILED = 2;
+  BUILD_OUTCOME_CANCELLED = 3;
+  BUILD_OUTCOME_INFRASTRUCTURE_FAILED = 4;
 }
 
 message Heartbeat {

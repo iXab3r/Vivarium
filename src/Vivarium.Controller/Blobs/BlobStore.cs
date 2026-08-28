@@ -18,6 +18,11 @@ public sealed class BlobStore
 
     public string? GetPath(string sha256)
     {
+        if (!IsSha256(sha256))
+        {
+            return null;
+        }
+
         var path = PathFor(sha256);
         return File.Exists(path) ? path : null;
     }
@@ -27,12 +32,24 @@ public sealed class BlobStore
     /// <summary>Streams the body to a temp file while hashing; commits only on a hash match.</summary>
     public async Task<bool> PutAsync(string sha256, Stream body, CancellationToken ct)
     {
+        if (!IsSha256(sha256))
+        {
+            return false;
+        }
+
         var target = PathFor(sha256);
         if (File.Exists(target))
         {
-            // Idempotent: content-addressing means an existing blob is by definition correct.
-            await body.CopyToAsync(Stream.Null, ct);
-            return true;
+            using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var buffer = new byte[81920];
+            int read;
+            while ((read = await body.ReadAsync(buffer, ct)) > 0)
+            {
+                hash.AppendData(buffer, 0, read);
+            }
+
+            var actual = Convert.ToHexString(hash.GetHashAndReset());
+            return actual.Equals(sha256, StringComparison.OrdinalIgnoreCase);
         }
 
         var temp = target + "." + Guid.NewGuid().ToString("N") + ".tmp";
@@ -75,6 +92,9 @@ public sealed class BlobStore
             }
         }
     }
+
+    public static bool IsSha256(string value) =>
+        value.Length == 64 && value.All(Uri.IsHexDigit);
 
     private string PathFor(string sha256) => Path.Combine(root, sha256.ToLowerInvariant());
 }

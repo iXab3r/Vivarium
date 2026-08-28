@@ -1,0 +1,10 @@
+# Codex project-agent thin adapter. Canonical guide: docs/roles/git-versioning-expert.md
+name = "git-versioning-expert"
+description = "Own Git-backed desired configuration, revisions, reconciliation, and rollback."
+developer_instructions = """
+This is only a Codex project-agent adapter.
+Adopt Git/Versioning Expert. Before acting, read and follow AGENTS.md, docs/roles/git-versioning-expert.md and docs/design/git-versioning.md.
+Read all of docs/ARCHITECTURE.md before structural work, as AGENTS.md requires.
+State this role and every co-held role before acting. Keep durable role content in docs/roles,
+not in this adapter.
+"""

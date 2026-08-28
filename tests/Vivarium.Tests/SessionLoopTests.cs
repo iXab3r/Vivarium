@@ -40,7 +40,7 @@ public class SessionLoopTests
     public async Task Agent_enrolls_gets_authorized_and_runs_a_build()
     {
         await using var controller = await StartControllerAsync();
-        var enrollToken = controller.Tokens.CreateEnrollToken();
+        var enrollToken = await controller.Tokens.CreateEnrollTokenAsync();
 
         var agent = new AgentRunner(new AgentOptions
         {
@@ -65,7 +65,7 @@ public class SessionLoopTests
             Assert.That(connected.Hello.SessionId, Is.Not.Empty);
 
             // The Authorize click issues a token over the live session (D7).
-            controller.AuthorizeAgent(connected.AgentId);
+            await controller.AuthorizeAgentAsync(connected.AgentId);
             await agent.WaitAuthorizedAsync(TimeSpan.FromSeconds(20));
 
             // Payload in, step run, artifacts out — the whole D3 contract.
@@ -85,13 +85,15 @@ public class SessionLoopTests
             Assert.That(result.Steps, Has.Count.EqualTo(1));
             Assert.That(result.Steps[0].ExitCode, Is.Zero);
             Assert.That(result.Steps[0].TimedOut, Is.False);
+            Assert.That(result.Outcome, Is.EqualTo(BuildOutcome.Succeeded));
 
             var artifact = result.Artifacts.Single(a => a.Path == "payload/hello.txt");
             Assert.That(artifact.Sha256, Is.EqualTo(sha).IgnoreCase);
             Assert.That(artifact.Size, Is.EqualTo(payload.Length));
             Assert.That(controller.Blobs.Contains(sha), Is.True);
 
-            Assert.That(controller.Builds.GetLog("b-0001"), Does.Contain("step-says-hello"));
+            Assert.That(controller.Builds.GetLog("b-0001"), Is.Empty,
+                "terminal build log buffers are evicted after the durable result is acknowledged");
         }
         finally
         {
@@ -131,6 +133,14 @@ public class SessionLoopTests
             Assert.That(controller.Blobs.Contains(new string('a', 64)), Is.False);
         }
 
+        // The route value itself is treated as a digest, never as a filesystem path.
+        using (var malformed = Authorized(controller, HttpMethod.Put, "/blobs/not-a-sha256"))
+        {
+            malformed.Content = new ByteArrayContent(body);
+            var response = await http.SendAsync(malformed);
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+        }
+
         // Honest upload -> stored, readable back with a bearer.
         using (var honest = Authorized(controller, HttpMethod.Put, $"/blobs/{sha}"))
         {
@@ -144,6 +154,27 @@ public class SessionLoopTests
             var response = await http.SendAsync(read);
             Assert.That(await response.Content.ReadAsByteArrayAsync(), Is.EqualTo(body));
         }
+    }
+
+    [Test]
+    public async Task Blob_store_rejects_a_mismatched_idempotent_put_and_preserves_the_blob()
+    {
+        await using var controller = await StartControllerAsync();
+        using var http = PinnedClient(controller);
+        var original = "original blob"u8.ToArray();
+        var hash = await UploadBlobAsync(controller, original);
+
+        using (var lying = Authorized(controller, HttpMethod.Put, $"/blobs/{hash}"))
+        {
+            lying.Content = new ByteArrayContent("different body"u8.ToArray());
+            var response = await http.SendAsync(lying);
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+        }
+
+        using var read = Authorized(controller, HttpMethod.Get, $"/blobs/{hash}");
+        var readResponse = await http.SendAsync(read);
+        Assert.That(readResponse.IsSuccessStatusCode, Is.True);
+        Assert.That(await readResponse.Content.ReadAsByteArrayAsync(), Is.EqualTo(original));
     }
 
     private Task<VivariumControllerHost> StartControllerAsync() =>

@@ -1,0 +1,11 @@
+# Codex project-agent thin adapter. Canonical guide: docs/roles/machine-providers-images-expert.md
+name = "machine-providers-images-expert"
+description = "Own provider hosts, images, pools, sealing, drift, and clone/revert/power/console semantics."
+developer_instructions = """
+This is only a Codex project-agent adapter.
+Adopt Machine Providers/Images Expert. Before acting, read and follow AGENTS.md,
+docs/roles/machine-providers-images-expert.md, and docs/design/machine-providers-images.md.
+Read all of docs/ARCHITECTURE.md before structural work, as AGENTS.md requires.
+State this role and every co-held role before acting. Keep durable role content in docs/roles,
+not in this adapter.
+"""

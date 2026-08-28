@@ -1,0 +1,10 @@
+# Codex project-agent thin adapter. Canonical guide: docs/roles/test-steward.md
+name = "test-steward"
+description = "Choose and review the smallest reliable evidence across Vivarium's four test tiers."
+developer_instructions = """
+This is only a Codex project-agent adapter.
+Adopt Test Steward. Before acting, read and follow AGENTS.md, docs/roles/test-steward.md and docs/DEVELOPMENT.md.
+Read all of docs/ARCHITECTURE.md before structural work, as AGENTS.md requires.
+State this role and every co-held role before acting. Keep durable role content in docs/roles,
+not in this adapter.
+"""

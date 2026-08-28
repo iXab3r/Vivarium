@@ -9,14 +9,24 @@ namespace Vivarium.Controller;
 public sealed class AgentHubService : AgentHub.AgentHubBase
 {
     private readonly AgentRegistry registry;
+    private readonly AgentStore store;
     private readonly TokenStore tokens;
+    private readonly AgentLifecycleCoordinator lifecycle;
     private readonly BuildTracker builds;
     private readonly ILogger<AgentHubService> log;
 
-    public AgentHubService(AgentRegistry registry, TokenStore tokens, BuildTracker builds, ILogger<AgentHubService> log)
+    public AgentHubService(
+        AgentRegistry registry,
+        AgentStore store,
+        TokenStore tokens,
+        AgentLifecycleCoordinator lifecycle,
+        BuildTracker builds,
+        ILogger<AgentHubService> log)
     {
         this.registry = registry;
+        this.store = store;
         this.tokens = tokens;
+        this.lifecycle = lifecycle;
         this.builds = builds;
         this.log = log;
     }
@@ -33,19 +43,33 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         }
 
         var hello = requestStream.Current.Hello;
-        var auth = Authenticate(hello);
-        var agent = registry.Register(hello, auth);
-        using var session = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
-        agent.SessionAbort = session;
-        agent.Connected = true;
-        agent.LastHeartbeat = DateTimeOffset.UtcNow;
+        if (string.IsNullOrWhiteSpace(hello.AgentId) || string.IsNullOrWhiteSpace(hello.SessionId))
+        {
+            throw new RpcException(new Status(
+                StatusCode.InvalidArgument, "Hello requires non-empty agent_id and session_id"));
+        }
+
+        AgentAdmission admission;
+        CancellationTokenSource session;
+        AgentConnectionHandle connection;
+        await using (await lifecycle.AcquireAsync(hello.AgentId, context.CancellationToken))
+        {
+            admission = await tokens.AdmitAgentAsync(hello)
+                ?? throw new RpcException(new Status(
+                    StatusCode.PermissionDenied, "valid agent or enrollment token required"));
+            await store.ObserveHelloAsync(hello);
+            session = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
+            connection = registry.Register(hello, admission.Authorization, admission.Enabled, session);
+        }
+
+        using var sessionLifetime = session;
         log.LogInformation("agent {AgentId} connected ({Auth}, session {SessionId})",
-            agent.AgentId, agent.Auth, hello.SessionId);
+            connection.AgentId, admission.Authorization, hello.SessionId);
         if (hello.RunningBuildId.Length > 0)
         {
             // Re-hello mid-build: the build is re-adopted, not double-scheduled (D4).
             log.LogInformation("agent {AgentId} re-adopted with running build {BuildId}",
-                agent.AgentId, hello.RunningBuildId);
+                connection.AgentId, hello.RunningBuildId);
         }
 
         await responseStream.WriteAsync(new ControllerMsg
@@ -53,12 +77,20 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
             Welcome = new Welcome
             {
                 ServerTimeUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                Authorized = agent.Auth == AgentAuth.Authorized,
+                Authorized = admission.Authorization == AgentAuth.Authorized,
                 ServerVersion = ServerVersion,
             },
         });
 
-        var outbox = agent.Outbox;
+        if (admission.AuthTokenToDeliver != null)
+        {
+            await responseStream.WriteAsync(new ControllerMsg
+            {
+                Authorized = new AuthorizationGranted { AuthToken = admission.AuthTokenToDeliver },
+            });
+        }
+
+        var outbox = connection.Outbox;
         var writer = Task.Run(async () =>
         {
             try
@@ -72,6 +104,10 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
             {
             }
         });
+        if (registry.IsCurrent(connection))
+        {
+            await builds.OnAgentReconnectedAsync(connection, hello.RunningBuildId);
+        }
 
         try
         {
@@ -81,16 +117,20 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                 switch (msg.MsgCase)
                 {
                     case AgentMsg.MsgOneofCase.Heartbeat:
-                        agent.LastHeartbeat = DateTimeOffset.UtcNow;
+                        registry.Heartbeat(connection);
                         break;
                     case AgentMsg.MsgOneofCase.Log:
-                        builds.OnLog(msg.Log);
+                        builds.OnLog(msg.Log, connection);
                         break;
                     case AgentMsg.MsgOneofCase.Status:
-                        builds.OnStatus(msg.Status);
+                        builds.OnStatus(msg.Status, connection);
                         break;
                     case AgentMsg.MsgOneofCase.Result:
-                        builds.OnResult(msg.Result);
+                        await builds.OnResultAsync(msg.Result, connection);
+                        break;
+                    case AgentMsg.MsgOneofCase.AssignmentAccepted:
+                        await builds.OnAssignmentAcceptedAsync(
+                            msg.AssignmentAccepted, connection);
                         break;
                 }
             }
@@ -104,34 +144,16 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         }
         finally
         {
-            agent.Connected = false;
-            if (ReferenceEquals(agent.SessionAbort, session))
+            var loss = registry.Disconnect(connection);
+            if (loss != null)
             {
-                agent.SessionAbort = null;
+                await builds.OnSessionLostAsync(loss);
             }
 
             outbox.Writer.TryComplete();
             await writer;
-            log.LogInformation("agent {AgentId} disconnected", agent.AgentId);
+            log.LogInformation("agent {AgentId} disconnected", connection.AgentId);
         }
-    }
-
-    private AgentAuth Authenticate(Hello hello)
-    {
-        if (hello.AuthToken.Length > 0 &&
-            tokens.TryGetAgentByToken(hello.AuthToken, out var byToken) &&
-            byToken == hello.AgentId)
-        {
-            return AgentAuth.Authorized;
-        }
-
-        if (hello.EnrollToken.Length > 0 && !tokens.ConsumeEnrollToken(hello.EnrollToken))
-        {
-            throw new RpcException(new Status(StatusCode.PermissionDenied, "invalid enroll token"));
-        }
-
-        // Known-but-unauthorized is the TeamCity model: visible, never scheduled (D8).
-        return AgentAuth.Unauthorized;
     }
 
     internal static readonly string ServerVersion =
