@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Security.Authentication;
 using System.Text;
 using Grpc.Core;
@@ -55,9 +56,21 @@ internal sealed class VivariumCliApplication(
 
     private int PrintVersion()
     {
-        var version = typeof(VivariumCliApplication).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+        var assembly = typeof(VivariumCliApplication).Assembly;
+        var informationalVersion = assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+        var version = FormatProductVersion(informationalVersion, assembly.GetName().Version);
         console.WriteLine($"viv-cli {version}");
         return 0;
+    }
+
+    internal static string FormatProductVersion(string? informationalVersion, Version? assemblyVersion)
+    {
+        var productVersion = informationalVersion?.Split('+', 2)[0];
+        return string.IsNullOrWhiteSpace(productVersion)
+            ? assemblyVersion?.ToString(3) ?? "0.0.0"
+            : productVersion;
     }
 
     private async Task<int> LoginAsync(LoginCommand command, CancellationToken cancellationToken)

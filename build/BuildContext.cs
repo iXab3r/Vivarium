@@ -12,7 +12,9 @@ public sealed class BuildContext : FrostingContext
         BuildConfiguration = context.Arguments.GetArgument("configuration") ?? "Release";
         RequestedRid = context.Arguments.GetArgument("rid")?.Trim().ToLowerInvariant();
         SourceSha = context.Arguments.GetArgument("source-sha")?.Trim().ToLowerInvariant();
+        SourceRef = context.Arguments.GetArgument("source-ref")?.Trim();
         BuildCounter = context.Arguments.GetArgument("build-counter")?.Trim();
+        ProductVersionOverride = NormalizeVersion(context.Arguments.GetArgument("product-version"));
         ReleaseVersion = NormalizeReleaseVersion(context.Arguments.GetArgument("release-version"));
         GitHubRepository = context.Arguments.GetArgument("github-repository")?.Trim();
         PayloadDirectory = ResolvePath(
@@ -27,7 +29,11 @@ public sealed class BuildContext : FrostingContext
 
     public string? SourceSha { get; }
 
+    public string? SourceRef { get; }
+
     public string? BuildCounter { get; }
+
+    public string? ProductVersionOverride { get; }
 
     public string? ReleaseVersion { get; }
 
@@ -37,7 +43,19 @@ public sealed class BuildContext : FrostingContext
 
     public string OutRoot => Path.Combine(Root, "out");
 
-    public string ProductVersion => ReadVersionPrefix();
+    public string ProductVersion
+    {
+        get
+        {
+            if (ProductVersionOverride is not null)
+            {
+                return RequireSemanticVersion(ProductVersionOverride, "Compile requires --product-version <SemVer>.");
+            }
+
+            var tagVersion = VersionFromSourceRef(SourceRef);
+            return tagVersion ?? ReadVersionPrefix();
+        }
+    }
 
     public string TestResultsRoot => Path.Combine(OutRoot, "test-results", HostId);
 
@@ -81,17 +99,15 @@ public sealed class BuildContext : FrostingContext
 
     public string RequireReleaseVersion()
     {
-        if (string.IsNullOrWhiteSpace(ReleaseVersion) ||
-            !System.Text.RegularExpressions.Regex.IsMatch(
-                ReleaseVersion,
-                @"^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$",
-                System.Text.RegularExpressions.RegexOptions.CultureInvariant))
+        if (string.IsNullOrWhiteSpace(ReleaseVersion))
         {
             throw new InvalidOperationException(
                 "Release targets require --release-version <SemVer>, for example 0.1.0 or 0.1.0-rc.1.");
         }
 
-        return ReleaseVersion;
+        return RequireSemanticVersion(
+            ReleaseVersion,
+            "Release targets require --release-version <SemVer>, for example 0.1.0 or 0.1.0-rc.1.");
     }
 
     public string RequireSourceSha()
@@ -185,7 +201,9 @@ public sealed class BuildContext : FrostingContext
         throw new PlatformNotSupportedException("Unsupported build host operating system.");
     }
 
-    private static string? NormalizeReleaseVersion(string? value)
+    private static string? NormalizeReleaseVersion(string? value) => NormalizeVersion(value);
+
+    private static string? NormalizeVersion(string? value)
     {
         var normalized = value?.Trim();
         const string tagPrefix = "refs/tags/";
@@ -199,4 +217,32 @@ public sealed class BuildContext : FrostingContext
         }
         return normalized;
     }
+
+    private static string? VersionFromSourceRef(string? sourceRef)
+    {
+        if (string.IsNullOrWhiteSpace(sourceRef) ||
+            !(sourceRef.StartsWith("refs/tags/", StringComparison.Ordinal) || sourceRef.StartsWith('v')))
+        {
+            return null;
+        }
+
+        var normalized = NormalizeVersion(sourceRef);
+        return normalized is not null && IsSemanticVersion(normalized) ? normalized : null;
+    }
+
+    private static string RequireSemanticVersion(string version, string error)
+    {
+        if (!IsSemanticVersion(version))
+        {
+            throw new InvalidOperationException(error);
+        }
+
+        return version;
+    }
+
+    private static bool IsSemanticVersion(string version) =>
+        System.Text.RegularExpressions.Regex.IsMatch(
+            version,
+            @"^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$",
+            System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 }

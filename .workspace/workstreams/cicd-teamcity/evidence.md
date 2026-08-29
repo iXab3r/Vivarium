@@ -92,3 +92,18 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity imported exactly the six simplified configurations. Windows Compile build `30845`
   (`0.1.0.6-5205f60f`) succeeded on `laptop-g15`: 150 passed, 1 ignored, win-x64 compilation and
   native product smoke succeeded, and TeamCity published 22 Compile files plus the TRX artifact.
+
+## Release provenance hardening — 2026-08-29
+
+- Compile now writes a deterministic `compile-manifest.json` containing the RID, product SemVer,
+  source SHA, and exact size/SHA-256 inventory for every generated file. Release verifies all four
+  manifests before deleting or writing any release output.
+- A sequential four-RID `CompileAll` using product version `0.1.0-rc.1` completed successfully, and
+  the native osx-arm64 Compile smoke proved that `viv-cli --version` preserves the prerelease identity.
+- Release rejected Compile inputs when either the requested version or source SHA differed. It also
+  rejected an osx-arm64 tree after the agent version marker was deliberately changed; recompiling that
+  RID restored the verified tree.
+- A matching prerelease Release completed deterministic packaging and automatically ran the final
+  host-native ZIP smoke: controller/static asset, exact CLI version, agent, and updater probes passed.
+- Root `dotnet build` completed with zero warnings and errors. Root `dotnet test` passed 143 tests and
+  skipped 9 platform-specific tests on macOS arm64.

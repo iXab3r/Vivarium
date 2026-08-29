@@ -7,12 +7,17 @@ using System.Text.Json;
 
 [TaskName("Release")]
 [TaskDescription("Packages platform Compile outputs into the deterministic D19 release asset set.")]
-public sealed class ReleaseTask : FrostingTask<BuildContext>
+public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context)
+    public override async Task RunAsync(BuildContext context)
     {
         var version = context.RequireReleaseVersion();
         var sourceSha = context.RequireSourceSha();
+        foreach (var rid in ReleaseLayout.SupportedRids)
+        {
+            CompileManifestVerifier.Verify(context, rid, version, sourceSha);
+        }
+
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
         var stagingRoot = Path.Combine(context.OutRoot, "release-staging");
         PayloadSmokeTask.RecreateDirectory(releaseRoot);
@@ -25,10 +30,6 @@ public sealed class ReleaseTask : FrostingTask<BuildContext>
             var compileRoot = ReleaseLayout.CompileRoot(context, rid);
             var stage = Path.Combine(stagingRoot, "agent", rid);
             CopyDirectory(Path.Combine(compileRoot, "agent"), stage);
-            File.WriteAllText(
-                Path.Combine(stage, "agent", "version"),
-                version + "\n",
-                new UTF8Encoding(false));
             var name = $"viv-agent-{rid}.zip";
             DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "agent-template", rid));
@@ -78,6 +79,7 @@ public sealed class ReleaseTask : FrostingTask<BuildContext>
         WriteChecksums(releaseRoot, orderedAssets.Select(asset => asset.Name).Append(ReleaseLayout.ManifestName));
         Directory.Delete(stagingRoot, recursive: true);
         ReleaseVerifier.Verify(context, version, sourceSha);
+        await ReleaseSmokeTask.SmokeVerifiedReleaseAsync(context, context.HostRid, version);
     }
 
     private static void EnsureFreeSpace(string path)
@@ -150,6 +152,15 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
         }
 
         ReleaseVerifier.Verify(context, version, sourceSha);
+        await SmokeVerifiedReleaseAsync(context, rid, version);
+    }
+
+    internal static async Task SmokeVerifiedReleaseAsync(
+        BuildContext context,
+        string rid,
+        string version)
+    {
+        ReleaseLayout.RequireSupportedRid(rid);
         var smokeRoot = Path.Combine(context.OutRoot, "release-smoke", rid);
         PayloadSmokeTask.RecreateDirectory(smokeRoot);
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
@@ -164,7 +175,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
 
         var cliRoot = Path.Combine(smokeRoot, "cli");
         DeterministicZip.Extract(Path.Combine(releaseRoot, $"viv-cli-{rid}.zip"), cliRoot);
-        await BuildProcess.RunAsync(Path.Combine(cliRoot, "viv-cli" + extension), ["--version"], cliRoot, timeoutSeconds: 30);
+        await SmokeCliAsync(Path.Combine(cliRoot, "viv-cli" + extension), cliRoot, version);
 
         var agentRoot = Path.Combine(smokeRoot, "agent");
         DeterministicZip.Extract(Path.Combine(releaseRoot, $"viv-agent-{rid}.zip"), agentRoot);
@@ -180,6 +191,22 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
             agentRoot,
             expectedExitCode: 2,
             timeoutSeconds: 30);
+    }
+
+    internal static async Task SmokeCliAsync(string executable, string workingDirectory, string expectedVersion)
+    {
+        Console.WriteLine($"> {executable} --version");
+        var output = await BuildProcess.CaptureAsync(
+            executable,
+            ["--version"],
+            workingDirectory,
+            timeoutSeconds: 30);
+        Console.WriteLine(output);
+        if (!string.Equals(output, $"viv-cli {expectedVersion}", StringComparison.Ordinal))
+        {
+            throw new InvalidDataException(
+                $"CLI version mismatch: expected viv-cli {expectedVersion}, got {output}.");
+        }
     }
 
     internal static async Task SmokeControllerAsync(
@@ -260,6 +287,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
 
 internal static class ReleaseLayout
 {
+    public const string CompileManifestName = "compile-manifest.json";
     public const string ManifestName = "release-manifest.json";
     public const string ChecksumsName = "SHA256SUMS";
 

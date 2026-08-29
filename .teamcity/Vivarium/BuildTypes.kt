@@ -42,7 +42,8 @@ private fun BuildType.requireDotNet() {
 
 private fun cakeArguments(target: String, extra: String = "") =
     "run --project build/Vivarium.Build.csproj -- --target $target " +
-        "--source-sha %build.vcs.number% --build-counter %build.counter%$extra"
+        "--source-sha %build.vcs.number% --source-ref %teamcity.build.branch% " +
+        "--build-counter %build.counter%$extra"
 
 private fun compileBuild(
     buildId: String,
@@ -132,7 +133,7 @@ object Release : BuildType({
     commonVcs()
     steps {
         exec {
-            name = "Package Compile artifacts"
+            name = "Package and native-smoke Compile artifacts"
             path = "dotnet"
             arguments = cakeArguments(
                 "Release",

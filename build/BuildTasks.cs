@@ -22,7 +22,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  PayloadCrossMacPublish   Cross-publish the osx-arm64 payload for artifact transfer.");
         Console.WriteLine("  PayloadCrossMacRun       Run the transferred payload on a macOS host.");
         Console.WriteLine("  PayloadNextest           Archive and run the Rust payload with pinned cargo-nextest.");
-        Console.WriteLine("  Release                  Package Compile outputs into deterministic release assets.");
+        Console.WriteLine("  Release                  Verify Compile identity, package assets, and smoke the native ZIP.");
         Console.WriteLine("  ReleaseVerify            Verify an existing release directory without rebuilding it.");
         Console.WriteLine("  ReleaseSmoke             Run controller/CLI/agent/bootstrap smokes from the final ZIP for --rid.");
         Console.WriteLine("  Publish                  Resume/create a GitHub draft, verify assets, then publish it.");
@@ -32,6 +32,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --product-version 0.1.0 --source-sha <sha>");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }
