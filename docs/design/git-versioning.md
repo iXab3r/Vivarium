@@ -1,9 +1,9 @@
 # Git-backed configuration and versioning
 
 > Status: **Accepted**
-> Implementation: **Planned**
+> Implementation: **Partial — managed-local foundation and Agent enablement implemented; remote/review modes planned**
 > Maintainer role: [Git/Versioning Expert](../roles/git-versioning-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D7, D8, D14, D17, D23-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D7, D8, D14, D17, D23-D29
 
 ## 1. Decision
 
@@ -54,15 +54,38 @@ versioned mutations and must not claim false atomicity across Git repositories.
 
 - D17 makes a submitted `vivarium.yaml` authoritative and the controller persists the exact UTF-8
   snapshot, hash, and resolved assignment with the build.
-- Agent-reported and operator-owned custom parameters are stored separately, but custom parameters,
-  names, enablement, authorization, and registration administration are mutable controller state.
+- Agent-reported and operator-owned custom parameters are stored separately. Agent enablement, User
+  declarations, and built-in RoleBindings are now desired Git state; names, custom parameters, groups,
+  custom roles, and the remaining registration/authorization policy have not yet moved through this
+  gateway.
 - Authentication tokens and credential hashes live in runtime storage, as they should.
 - The implemented ControlPlane is gRPC. The current Blazor panel calls controller services in process;
-  a general REST mutation contract does not yet exist.
+  public ordinary configuration mutation remains limited to Agent `spec.enabled`, while the bounded
+  setup REST saga owns the exceptional initial User + RoleBinding baseline mutation.
 - SQLite and the blob store contain queue, ownership, logs, artifacts, and results. This is operational
   history and remains outside Git.
-- There is no unified configuration repository, canonical writer, reconciliation status, or
-  configuration-to-audit linkage yet.
+- The controller now creates or adopts a normal non-bare managed-local repository on `main`. The D29
+  adapter invokes system Git without a shell, builds candidates through isolated index/object state,
+  validates the complete canonical tree with bounded size/path/schema and secret checks, and advances
+  the authoritative ref through expected-old compare-and-swap. Bounded process execution, stable
+  commit provenance, a private checkout recovery marker, and fail-closed human dirty-state handling
+  protect the repository boundary.
+- SQLite migration v5 durably records revision sets/members, per-scope active and last-known-good
+  pointers, idempotent mutation operations, and the Agent desired projection. Migration v6 adds bounded
+  affected-target metadata, exact conflict revision/diff replay, and retryable repository-attempt
+  evidence. Reconciliation validates committed bytes, applies projections atomically with their
+  pointers/audit, preserves the last-known-good projection when a revision is invalid, blocked, or
+  removes a currently materialized Agent document, and recovers pending committed work after restart.
+  Desired activation and scheduler admission share an Agent lifecycle lease; a bounded hosted monitor
+  converges external managed-local commits into the durable and live projections.
+- The canonical v1alpha1 tree currently supports `.vivarium/agents/{id}.yaml`,
+  `.vivarium/rbac/users/{id}.yaml`, and `.vivarium/rbac/bindings/{id}.yaml`. The authorization cut is
+  deliberately restricted to direct User bindings to product-owned built-in roles. Setup uses the
+  atomic multi-document mutation primitive so User and `SYSTEM_ADMIN` never tear; reconciliation
+  materializes both with the exact revision before the private credential activates.
+  `/api/v1/agents/{id}/settings` GET/PUT remains the only general desired-state management resource.
+- Remote authority, review workflows, repository credentials, host-trust integrations, and broader
+  desired-state schemas remain planned.
 
 ### Target state
 
@@ -614,7 +637,7 @@ The design follows existing Vivarium evidence and decisions:
   history; the Git design extends the same source-of-truth discipline to desired configuration.
 - D6 and the image recipes already require declarative files in Git.
 
-The first implementation slice is accepted only with evidence for:
+The complete design is accepted only with evidence for:
 
 - repository initialization and existing-repository attachment on Windows, Linux, and macOS;
 - deterministic managed-local/direct startup when no remote is configured, plus private HTTPS/SSH
@@ -658,9 +681,9 @@ one commit, reviewed by every affected owner.
 
 ## 21. Open questions
 
-1. Which Git implementation should the controller use: the system `git` executable, a managed
-   library, or a narrow adapter with both? The Platform Expert must prototype locking, credentials,
-   object-format support, and deployment size before selection.
+1. D29 selects a narrow system-`git` adapter for the first managed-local implementation. Platform
+   release evidence must still decide whether controller packages bundle Git or verify it as an
+   explicit prerequisite; remote credentials/host trust remain a later adapter concern.
 2. Which local secret backend is the cross-platform default, and which secret-reference URI shape can
    remain stable across later external backends?
 3. Which Git forge adapters, if any, are included for creating review requests? The core contract must

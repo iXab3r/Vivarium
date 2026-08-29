@@ -24,6 +24,8 @@
     <ProjectReference Include="..\..\src\Vivarium.Cli\Vivarium.Cli.csproj" />
     <ProjectReference Include="..\..\src\Vivarium.Controller\Vivarium.Controller.csproj" />
     <ProjectReference Include="..\..\src\Vivarium.Agent\Vivarium.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Vivarium.Bootstrap\Vivarium.Bootstrap.csproj"
+                      ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\Vivarium.Contracts\Vivarium.Contracts.csproj" />
   </ItemGroup>
 

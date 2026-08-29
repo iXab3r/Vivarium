@@ -2,7 +2,9 @@ using System.Text.Json;
 using Google.Protobuf;
 using Microsoft.Data.Sqlite;
 using Vivarium.Contracts.V1;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Rest.Events;
 
 namespace Vivarium.Controller.Builds;
 
@@ -24,14 +26,47 @@ public sealed class BuildQueueStore
         var defaultMilliseconds = TimeoutMilliseconds(defaultTimeout);
         return database.WriteAsync(connection =>
         {
-            using var command = connection.CreateCommand();
-            command.CommandText = """
-                UPDATE build_queue
-                SET queue_deadline_unix_ms = enqueued_unix_ms + $defaultMilliseconds
-                WHERE queue_deadline_unix_ms IS NULL;
-                """;
-            command.Parameters.AddWithValue("$defaultMilliseconds", defaultMilliseconds);
-            return command.ExecuteNonQuery();
+            var now = DateTimeOffset.UtcNow;
+            using var transaction = connection.BeginTransaction();
+            var buildIds = new List<string>();
+            using (var select = connection.CreateCommand())
+            {
+                select.Transaction = transaction;
+                select.CommandText = """
+                    SELECT build_id FROM build_queue
+                    WHERE queue_deadline_unix_ms IS NULL ORDER BY queue_id;
+                    """;
+                using var reader = select.ExecuteReader();
+                while (reader.Read())
+                {
+                    buildIds.Add(reader.GetString(0));
+                }
+            }
+
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandText = """
+                    UPDATE build_queue
+                    SET queue_deadline_unix_ms = enqueued_unix_ms + $defaultMilliseconds
+                    WHERE queue_deadline_unix_ms IS NULL;
+                    """;
+                command.Parameters.AddWithValue("$defaultMilliseconds", defaultMilliseconds);
+                if (command.ExecuteNonQuery() != buildIds.Count)
+                {
+                    throw new InvalidDataException(
+                        "serialized queue deadline initialization changed row count");
+                }
+            }
+
+            foreach (var buildId in buildIds)
+            {
+                BuildEventStore.AppendForChild(
+                    connection, transaction, buildId, "build.queue-deadline-initialized", now);
+            }
+
+            transaction.Commit();
+            return buildIds.Count;
         });
     }
 
@@ -195,6 +230,9 @@ public sealed class BuildQueueStore
                     throw new InvalidOperationException(
                         $"queue deadline lost its serialized build for '{buildId}'");
                 }
+
+                BuildEventStore.AppendForChild(
+                    connection, transaction, buildId, "build.finished", now);
             }
 
             transaction.Commit();
@@ -221,6 +259,99 @@ public sealed class BuildQueueStore
             return result;
         });
 
+    /// <summary>
+    /// Returns an externally consumable FIFO projection with its matrix-build relationship. Removed
+    /// rows remain history on their Build resource and are deliberately excluded from the queue.
+    /// </summary>
+    public Task<BuildQueuePage> ListPendingPageAsync(BuildQueueQuery query)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        if (query.Limit is < 1 or > 200)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(query), "limit must be between 1 and 200");
+        }
+
+        if (query.AfterQueueId is < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(query), "queue cursor cannot be negative");
+        }
+
+        return database.ReadAsync(connection =>
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT
+                    q.queue_id,
+                    q.build_id,
+                    m.matrix_build_id,
+                    m.project,
+                    m.configuration,
+                    c.cell_name,
+                    c.rid,
+                    q.agent_expression,
+                    q.state,
+                    q.claimed_agent_id,
+                    q.dispatched_session_id,
+                    q.enqueued_unix_ms,
+                    q.queue_deadline_unix_ms,
+                    q.claimed_unix_ms,
+                    b.updated_unix_ms
+                FROM build_queue q
+                JOIN builds b ON b.build_id = q.build_id
+                LEFT JOIN matrix_build_cells c ON c.build_id = q.build_id
+                LEFT JOIN matrix_builds m ON m.matrix_build_id = c.matrix_build_id
+                WHERE q.state <> 'REMOVED'
+                    AND ($afterQueueId IS NULL OR q.queue_id > $afterQueueId)
+                    AND ($state IS NULL OR q.state = $state)
+                    AND ($project IS NULL OR m.project = $project)
+                    AND ($configuration IS NULL OR m.configuration = $configuration)
+                    AND ($claimedAgentId IS NULL OR q.claimed_agent_id = $claimedAgentId)
+                ORDER BY q.queue_id
+                LIMIT $limitPlusOne;
+                """;
+            command.Parameters.AddWithValue(
+                "$afterQueueId", (object?)query.AfterQueueId ?? DBNull.Value);
+            command.Parameters.AddWithValue(
+                "$state", (object?)QueueState(query.State) ?? DBNull.Value);
+            command.Parameters.AddWithValue(
+                "$project", (object?)NormalizeFilter(query.Project) ?? DBNull.Value);
+            command.Parameters.AddWithValue(
+                "$configuration", (object?)NormalizeFilter(query.Configuration) ?? DBNull.Value);
+            command.Parameters.AddWithValue(
+                "$claimedAgentId",
+                (object?)NormalizeFilter(query.ClaimedAgentId) ?? DBNull.Value);
+            command.Parameters.AddWithValue("$limitPlusOne", query.Limit + 1);
+
+            using var reader = command.ExecuteReader();
+            var entries = new List<BuildQueueEntry>(query.Limit + 1);
+            while (reader.Read())
+            {
+                entries.Add(new BuildQueueEntry(
+                    reader.GetInt64(0),
+                    reader.GetString(1),
+                    reader.IsDBNull(2) ? null : reader.GetString(2),
+                    reader.IsDBNull(3) ? null : reader.GetString(3),
+                    reader.IsDBNull(4) ? null : reader.GetString(4),
+                    reader.IsDBNull(5) ? null : reader.GetString(5),
+                    reader.IsDBNull(6) ? null : reader.GetString(6),
+                    reader.GetString(7),
+                    ParseQueueState(reader.GetString(8)),
+                    reader.IsDBNull(9) ? null : reader.GetString(9),
+                    !reader.IsDBNull(10),
+                    FromUnixMilliseconds(reader.GetInt64(11)),
+                    reader.IsDBNull(12) ? null : FromUnixMilliseconds(reader.GetInt64(12)),
+                    reader.IsDBNull(13) ? null : FromUnixMilliseconds(reader.GetInt64(13)),
+                    FromUnixMilliseconds(reader.GetInt64(14))));
+            }
+
+            return new BuildQueuePage(
+                entries.Take(query.Limit).ToArray(),
+                entries.Count > query.Limit);
+        });
+    }
+
     public Task<BuildQueueItem?> GetAsync(string buildId) => database.ReadAsync(connection =>
     {
         using var command = connection.CreateCommand();
@@ -240,7 +371,9 @@ public sealed class BuildQueueStore
     public Task<bool> TryClaimAsync(string buildId, string agentId, DateTimeOffset now) =>
         database.WriteAsync(connection =>
     {
+        using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
+        command.Transaction = transaction;
         command.CommandText = """
             UPDATE build_queue SET
                 state = 'CLAIMED',
@@ -261,11 +394,21 @@ public sealed class BuildQueueStore
         command.Parameters.AddWithValue("$buildId", buildId);
         try
         {
-            return command.ExecuteNonQuery() == 1;
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.queue-claimed", now);
+            transaction.Commit();
+            return true;
         }
         catch (SqliteException ex) when (ex.SqliteExtendedErrorCode == SqliteConstraintUnique)
         {
             // Another build claimed this capacity-one agent first.
+            transaction.Rollback();
             return false;
         }
     });
@@ -400,6 +543,9 @@ public sealed class BuildQueueStore
                     }
                 }
 
+                BuildEventStore.AppendForChild(
+                    connection, transaction, buildId, "build.running", now);
+
                 transaction.Commit();
                 return true;
             }
@@ -478,6 +624,9 @@ public sealed class BuildQueueStore
                 }
             }
 
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.owner-adopted", now);
+
             transaction.Commit();
             return true;
         });
@@ -486,7 +635,10 @@ public sealed class BuildQueueStore
     public Task<bool> CompleteDispatchAsync(string buildId, string agentId, string sessionId) =>
         database.WriteAsync(connection =>
         {
+            var now = DateTimeOffset.UtcNow;
+            using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = """
                 UPDATE build_queue SET
                     state = 'REMOVED',
@@ -504,11 +656,20 @@ public sealed class BuildQueueStore
                             AND b.owner_session_id = $sessionId
                     );
                 """;
-            command.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            command.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
             command.Parameters.AddWithValue("$buildId", buildId);
             command.Parameters.AddWithValue("$agentId", agentId);
             command.Parameters.AddWithValue("$sessionId", sessionId);
-            return command.ExecuteNonQuery() == 1;
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.dispatch-completed", now);
+            transaction.Commit();
+            return true;
         });
 
     /// <summary>
@@ -518,6 +679,7 @@ public sealed class BuildQueueStore
     public Task<bool> TryRequeueDispatchAsync(string buildId, string agentId) =>
         database.WriteAsync(connection =>
         {
+            var now = DateTimeOffset.UtcNow;
             using var transaction = connection.BeginTransaction();
             using (var build = connection.CreateCommand())
             {
@@ -544,7 +706,7 @@ public sealed class BuildQueueStore
                                 AND q.claimed_agent_id = $agentId
                         );
                     """;
-                build.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                build.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
                 build.Parameters.AddWithValue("$buildId", buildId);
                 build.Parameters.AddWithValue("$agentId", agentId);
                 if (build.ExecuteNonQuery() != 1)
@@ -576,6 +738,9 @@ public sealed class BuildQueueStore
                 }
             }
 
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.queued", now);
+
             transaction.Commit();
             return true;
         });
@@ -590,6 +755,12 @@ public sealed class BuildQueueStore
 
     /// <summary>Cancels a build that has not entered RUNNING and removes it from the Build Queue.</summary>
     public Task<bool> TryRemoveAsync(string buildId, string reason)
+        => TryRemoveAsync(buildId, reason, auditEvent: null);
+
+    internal Task<bool> TryRemoveAsync(
+        string buildId,
+        string reason,
+        AuditEventDraft? auditEvent)
     {
         ArgumentNullException.ThrowIfNull(reason);
         var result = new BuildResult
@@ -601,7 +772,8 @@ public sealed class BuildQueueStore
 
         return database.WriteAsync(connection =>
         {
-            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var occurredAt = DateTimeOffset.UtcNow;
+            var now = occurredAt.ToUnixTimeMilliseconds();
             using var transaction = connection.BeginTransaction();
             using (var queue = connection.CreateCommand())
             {
@@ -654,6 +826,19 @@ public sealed class BuildQueueStore
                 }
             }
 
+            if (auditEvent is not null)
+            {
+                AuditEventStore.Append(connection, transaction, auditEvent);
+            }
+
+            BuildEventStore.AppendForChild(
+                connection,
+                transaction,
+                buildId,
+                "build.finished",
+                occurredAt,
+                auditEvent?.RequestContext);
+
             transaction.Commit();
             return true;
         });
@@ -661,13 +846,7 @@ public sealed class BuildQueueStore
 
     private static BuildQueueItem ReadItem(SqliteDataReader reader)
     {
-        var state = reader.GetString(4) switch
-        {
-            "QUEUED" => BuildQueueItemState.Queued,
-            "CLAIMED" => BuildQueueItemState.Claimed,
-            "REMOVED" => BuildQueueItemState.Removed,
-            var value => throw new InvalidDataException($"unknown persisted queue state '{value}'"),
-        };
+        var state = ParseQueueState(reader.GetString(4));
         return new BuildQueueItem(
             reader.GetInt64(0),
             reader.GetString(1),
@@ -686,6 +865,26 @@ public sealed class BuildQueueStore
 
     private static DateTimeOffset FromUnixMilliseconds(long value) =>
         DateTimeOffset.FromUnixTimeMilliseconds(value);
+
+    private static BuildQueueItemState ParseQueueState(string value) => value switch
+    {
+        "QUEUED" => BuildQueueItemState.Queued,
+        "CLAIMED" => BuildQueueItemState.Claimed,
+        "REMOVED" => BuildQueueItemState.Removed,
+        _ => throw new InvalidDataException($"unknown persisted queue state '{value}'"),
+    };
+
+    private static string? QueueState(BuildQueueItemState? value) => value switch
+    {
+        null => null,
+        BuildQueueItemState.Queued => "QUEUED",
+        BuildQueueItemState.Claimed => "CLAIMED",
+        BuildQueueItemState.Removed => "REMOVED",
+        _ => throw new ArgumentOutOfRangeException(nameof(value)),
+    };
+
+    private static string? NormalizeFilter(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private const string SelectColumns = """
         SELECT

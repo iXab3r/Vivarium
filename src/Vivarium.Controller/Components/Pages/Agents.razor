@@ -5,6 +5,7 @@
 @inject AgentAdministration Administration
 @inject AgentRegistry Registry
 @inject BuildTracker Builds
+@inject PanelManagementContext Management
 
 <PageTitle>Agents · Vivarium</PageTitle>
 
@@ -211,7 +212,11 @@
         StateHasChanged();
     });
 
-    private async Task ReloadAsync() => agents = await Administration.ListAsync();
+    private async Task ReloadAsync()
+    {
+        await Management.DemandAsync(ManagementPermission.AgentList);
+        agents = await Administration.ListAsync();
+    }
 
     private void Select(string agentId)
     {
@@ -241,31 +246,61 @@
         }
     }
 
-    private Task AuthorizeAsync(string id) => RunActionAsync(() => Administration.AuthorizeAsync(id), "Agent authorized.");
+    private Task AuthorizeAsync(string id) => RunActionAsync(async () =>
+    {
+        var context = await Management.DemandAsync(ManagementPermission.AgentAuthorize);
+        await Administration.AuthorizeAsync(context, id);
+    }, "Agent authorized.");
     private Task SetEnabledAsync(string id, bool enabled) => RunActionAsync(
-        () => Administration.SetEnabledAsync(id, enabled), enabled ? "Agent enabled." : "Agent disabled after its current build.");
-    private Task SetAuthorizedAsync(string id, bool authorized) => RunActionAsync(
-        () => authorized ? Administration.AuthorizeAsync(id) : Administration.UnauthorizeAsync(id),
+        async () =>
+        {
+            var context = await Management.DemandAsync(ManagementPermission.AgentManage);
+            await Administration.SetEnabledAsync(context, id, enabled);
+        }, enabled ? "Agent enabled." : "Agent disabled after its current build.");
+    private Task SetAuthorizedAsync(string id, bool authorized) => RunActionAsync(async () =>
+    {
+        var context = await Management.DemandAsync(ManagementPermission.AgentAuthorize);
+        if (authorized)
+        {
+            await Administration.AuthorizeAsync(context, id);
+        }
+        else
+        {
+            await Administration.UnauthorizeAsync(context, id);
+        }
+    },
         authorized ? "Agent authorized." : "Agent unauthorized.");
-    private Task RenameAsync(string id) => RunActionAsync(() => Administration.RenameAsync(id, renameValue), "Agent renamed.");
+    private Task RenameAsync(string id) => RunActionAsync(async () =>
+    {
+        var context = await Management.DemandAsync(ManagementPermission.AgentManage);
+        await Administration.RenameAsync(context, id, renameValue);
+    }, "Agent renamed.");
     private Task SetCustomParameterAsync(string id) => RunActionAsync(async () =>
     {
-        await Administration.SetCustomParameterAsync(id, customParameterKey, customParameterValue);
+        var context = await Management.DemandAsync(ManagementPermission.AgentManage);
+        await Administration.SetCustomParameterAsync(
+            context, id, customParameterKey, customParameterValue);
         customParameterKey = string.Empty;
         customParameterValue = string.Empty;
     }, "Custom parameter saved.");
     private Task DeleteCustomParameterAsync(string id, string key) => RunActionAsync(
-        () => Administration.DeleteCustomParameterAsync(id, key),
+        async () =>
+        {
+            var context = await Management.DemandAsync(ManagementPermission.AgentManage);
+            await Administration.DeleteCustomParameterAsync(context, id, key);
+        },
         $"Custom parameter '{key}' deleted.");
     private Task DeleteAsync(string id) => RunActionAsync(async () =>
     {
-        await Administration.DeleteAsync(id);
+        var context = await Management.DemandAsync(ManagementPermission.AgentManage);
+        await Administration.DeleteAsync(context, id);
         selectedAgentId = null;
     }, "Agent deleted. A still-running installation must enroll again before it can return.");
 
     private Task CancelBuildAsync(string buildId) => RunActionAsync(async () =>
     {
-        if (!await Builds.CancelBuildAsync(buildId, "Stopped from the Agents page"))
+        var context = await Management.DemandAsync(ManagementPermission.BuildCancel);
+        if (!await Builds.CancelBuildAsync(context, buildId, "Stopped from the Agents page"))
         {
             throw new InvalidOperationException("The build has already finished.");
         }
@@ -273,7 +308,8 @@
 
     private async Task CreateEnrollTokenAsync()
     {
-        enrollToken = await Administration.CreateEnrollTokenAsync();
+        var context = await Management.DemandAsync(ManagementPermission.EnrollmentTokenCreate);
+        enrollToken = await Administration.CreateEnrollTokenAsync(context);
         message = null;
     }
 

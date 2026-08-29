@@ -25,13 +25,45 @@ restart-safe build ownership and cancellation, durable FIFO scheduling with queu
 acknowledged assignments and terminal results, immutable assigned-agent provenance, the protected
 Agents / Queue & Builds panels, the scoped ControlPlane API, and `viv login` / `viv run` / `viv cancel`
 exist and have tier-2 coverage. Strict Phase-1 `vivarium.yaml` parsing and hardened deterministic
-payload archives are also implemented. The current Blazor panel is transitional: the accepted target
-is a React panel built on the vendored EyeAuras Workbench and the public REST management API. Typed
-AgentExplorer inventory, Git-backed desired configuration, REST management, installers, central agent
-upgrades, machine providers, and test-result adapters are not complete, so there is no end-user release
-yet. The bootstrap prototype
-remains change-controlled, but its authenticated-manifest freeze gate is not yet proven (D2, D21); do
-not modify it without the required design discussion. The docs remain authoritative
+payload archives are also implemented. The transport-independent management kernel now provides an
+ordered checksummed SQLite migration ledger, fail-closed schema validation, a minimal append-only audit
+journal, shared actor/correlation context, and one authorization evaluator beneath the
+ControlPlane, panel, and blob boundaries. The current Blazor panel is transitional: the accepted target
+is a React panel built on the vendored EyeAuras Workbench and the public REST management API. The
+read-only REST foundation now publishes system, Agent, audit, build, and queue resources plus a
+deterministic OpenAPI document. AgentHub now negotiates an additive v1 capability contract, persists
+durable credential/connection generations, and publishes bounded typed static host facts and
+capabilities through Agent REST reads while explicitly draining legacy Agents from new work. The
+managed-local system-Git foundation now validates and commits candidate trees before activation,
+durably reconciles revision sets with last-known-good recovery, and exposes Git-backed Agent
+`spec.enabled`, User declarations, and built-in RoleBindings. The Agent setting is managed through
+`/api/v1/agents/{id}/settings` GET/PUT; the first-run ceremony atomically creates its User and
+`SYSTEM_ADMIN` binding. Other Agent and controller desired settings remain future Git schemas.
+Object-scoped upload staging, idempotent REST
+build submit/cancel, durable resumable build SSE, and the live CLI build flow now use the public REST
+boundary; the gRPC ControlPlane remains only as a transitional compatibility adapter. Migration v8
+adds a bounded controller-side TRX projection with durable report/test/occurrence rows, explicit
+no-report/partial/failure states, immutable raw-artifact provenance, and restart catch-up. First-run
+administration now has a durable local claim/resume/abandon saga, setup-only REST sessions, an atomic
+managed-local Git activation, private password verifiers, named panel login, product-owned built-in
+TeamCity/fleet role floors, Git bindings, and explicit restart-safe Superuser recovery. Legacy
+admin/submit tokens remain transitional adapters; groups, service accounts, PATs, custom roles,
+project-tree inheritance, public user/role management, and the setup UI/local CLI are not complete.
+The TeamCity catalog, dynamic AgentExplorer inventory, REST/UI test-result presentation, JUnit and
+TEST/CRASH normalization, installers, fleet-wide upgrade orchestration/channels, and machine
+providers are not complete, so there is no end-user release yet. The first central Agent-upgrade
+slice is now implemented: immutable per-RID packages (including idempotent bundled-catalog import),
+authenticated Agent-scoped delivery, durable maintenance drains and operations, busy-Agent drain,
+restart-safe coordination, exact reconciled health confirmation, one-shot last-known-good rollback,
+two-sided crash-recoverable finalization, strict local integrity and prior binding, durable failure
+quarantine, supervised-bootstrap capability gating, bounded session outboxes, a skew-safe watchdog, and
+`viv agent upgrade` / `viv agent upgrade-status` (D30); new operations always resolve the matching
+Agent package from the running Server release and observed RID, while raw publication is hidden behind
+an explicit development/test option. Real
+bootstrap child-process success and rollback paths and two-Agent isolation have tier-2 evidence.
+Installers/stamped enrollment archives, signing, previous-release compatibility CI, fleet rollout
+orchestration/channels, and the remaining bootstrap bad-download/interrupted-activation evidence are
+not complete, so the bootstrap stays change-controlled and is not yet declared frozen. The docs remain authoritative
 for shape — when code and a decision disagree, fix one of them in the same
 commit, never neither.
 

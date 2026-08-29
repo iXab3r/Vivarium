@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Partial**
 > Maintainer role: [Security Expert](../roles/security-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D2, D4, D7, D8, D21-D27
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D2, D4, D7, D8, D21-D30
 
 This document distinguishes current evidence from target requirements. Numbered architecture
 decisions remain authoritative.
@@ -118,11 +118,14 @@ change the authorization basis of queued, running, or historical work.
   controller certificate fingerprint despite restored clocks, as required by D4.
 - Enrollment and setup authenticate installer bytes **before execution** as required by D21. An
   enroll token authorizes enrollment; it does not authenticate downloaded code.
-- Agent packages and manifests are hash-verified and atomically installed. Package source, version,
-  digest, and rollout actor are audited.
+- Agent packages are bounded, archive-validated, hash-verified, and activated through an atomic state
+  file. Package source/version/digest and rollout actor are audited. Post-authorization manifest and
+  bytes require the existing Agent bearer in a same-origin pinned-TLS header; the credential-derived
+  Agent may read only its active operation's exact package.
 - Certificate rotation needs an authenticated overlap/re-pin ceremony. Silently accepting a new
   certificate after pin failure is prohibited.
-- Bootstrap changes remain behind D2/D21's explicit design and freeze process.
+- Bootstrap changes remain behind D30's explicit design and freeze evidence; D21 still gates the
+  authenticity of initial installer/seed bytes before execution.
 
 ### S5. Submitted code is privileged remote execution
 
@@ -320,13 +323,14 @@ The following is evidence in the repository at the date above, not a claim about
 | TLS | Agent and CLI pin the controller certificate; the controller serves HTTPS | Safe certificate rotation/recovery and authenticated setup endpoints are not implemented |
 | Enrollment | Random enroll tokens are hashed, expire, and are claimed by one agent; persistent agent tokens are hash-checked | Pending auth token is temporarily plaintext in SQLite; installer freeze gate is unproven |
 | Session safety | Per-connect `session_id`, durable ownership, accepted assignments, reconnect adoption, and result acknowledgement are implemented/tested | Future AgentExplorer operations need the same general lease/fence contract |
-| API scopes | `agent`, `submit`, and `admin` bearer scopes protect current gRPC calls | No users, project RBAC, service-principal metadata, token expiry/rotation, or REST API |
+| Agent update | Durable per-Agent drain/operation, Agent-scoped package reads, exact-session health acceptance/confirmation, LKG rollback, restart recovery, and cross-Agent denial are implemented/tested | Initial installer trust, release signing, Windows process evidence, previous-version CI, and fleet rollout policy remain |
+| API scopes | One evaluator maps current `agent`, `submit`, and `admin` bearer principals beneath gRPC, panel, and blob handlers without widening their legacy authority | No users, project RBAC, durable service-principal metadata, token expiry/rotation, or REST API |
 | Panel | Secure/HttpOnly/SameSite-strict cookie auth and ASP.NET authorization are enabled | The permanent admin token is printed at every start; first-admin bootstrap separation and login throttling are absent |
 | CSRF | ASP.NET antiforgery middleware protects the component surface | Login/logout explicitly disable antiforgery; the future React REST surface needs a deliberate CSRF contract |
 | Blobs | SHA-256 names are validated and PUT bodies are hash-verified before atomic commit | Any valid bearer can GET/PUT any known hash; there are no body/quota/rate bounds |
 | Payloads | Extraction rejects traversal, rooted paths, duplicate/type conflicts, Windows aliases/devices, and link pivots | No archive entry/expanded-byte/compression-ratio bound; post-execution artifact link escape needs a separate guarantee |
 | Execution | Structured program/args, relative cwd checks, timeouts, cancellation, and whole-process-tree kill exist | Submitted code inherits the agent account; no physical-agent trust-class authorization exists yet |
-| Logs | Agent chunks stdout/stderr and controller checks current agent/build ownership | Current in-memory build log grows without a total bound; no durable security audit journal or systematic redaction |
+| Logs | Agent chunks stdout/stderr and controller checks current agent/build ownership; a minimal append-only SQLite audit journal atomically covers current security/caller mutations with bounded secret-free fields | Current in-memory build log grows without a total bound; audit retention/export and systematic diagnostic/build-output redaction are incomplete |
 | Private storage | Unix secret files/directories are restricted by mode and tested | Current Windows implementations write files without explicit ACL hardening; platform evidence is incomplete |
 | Git | Build definition snapshots are persisted for provenance | There is no controller Git mutation/apply service, credential model, signature policy, or audit correlation |
 | AgentExplorer | Agent enrollment, heartbeats, parameters, status axes, and cancellation foundation exist | Environment/process/network/file/exec/software inventory and their permission/policy model do not exist |
@@ -334,6 +338,8 @@ The following is evidence in the repository at the date above, not a claim about
 Primary code evidence includes:
 
 - `src/Vivarium.Controller/Security/TokenStore.cs`
+- `src/Vivarium.Controller/Security/ManagementAuthorization.cs`
+- `src/Vivarium.Controller/Auditing/AuditEventStore.cs`
 - `src/Vivarium.Controller/Management/ControlPlaneAuthorizer.cs`
 - `src/Vivarium.Controller/VivariumControllerHost.cs`
 - `src/Vivarium.Controller/Blobs/BlobStore.cs`

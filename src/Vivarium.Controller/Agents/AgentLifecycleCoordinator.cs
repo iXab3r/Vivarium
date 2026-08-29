@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 namespace Vivarium.Controller.Agents;
 
 /// <summary>
-/// Serializes identity admission and deletion for one agent so a deleted registration cannot be
-/// recreated in the runtime registry by a connection that was already admitted.
+/// Serializes lifecycle-sensitive work for one Agent: identity admission/deletion, desired-state
+/// activation, and the scheduler's claim/reservation/preparation boundary.
 /// </summary>
 public sealed class AgentLifecycleCoordinator
 {

@@ -2,13 +2,24 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Blobs;
+using Vivarium.Controller.Blobs.Access;
 using Vivarium.Controller.Builds;
 using Vivarium.Controller.Scheduling;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Management;
 
 public sealed class MatrixBuildValidationException(string message) : Exception(message);
+
+internal sealed record MatrixBuildSubmissionIdentity(
+    string OperationKind,
+    string RequestHash,
+    string? StagingId)
+{
+    public const string LegacyOperationKind = "legacy-control-plane";
+}
 
 /// <summary>Validates a complete matrix before handing one atomic write to <see cref="MatrixBuildStore"/>.</summary>
 public sealed class MatrixBuildSubmissionService
@@ -19,6 +30,7 @@ public sealed class MatrixBuildSubmissionService
     private readonly BuildQueueService queue;
     private readonly TimeProvider timeProvider;
     private readonly TimeSpan defaultQueueWaitTimeout;
+    private readonly ManagementCommandAuthorizer? authorization;
 
     public MatrixBuildSubmissionService(
         MatrixBuildStore store,
@@ -26,13 +38,15 @@ public sealed class MatrixBuildSubmissionService
         BlobStore blobs,
         BuildQueueService queue,
         TimeProvider timeProvider,
-        TimeSpan? defaultQueueWaitTimeout = null)
+        TimeSpan? defaultQueueWaitTimeout = null,
+        ManagementCommandAuthorizer? authorization = null)
     {
         this.store = store;
         this.agents = agents;
         this.blobs = blobs;
         this.queue = queue;
         this.timeProvider = timeProvider;
+        this.authorization = authorization;
         this.defaultQueueWaitTimeout =
             defaultQueueWaitTimeout ?? ControllerOptions.DefaultBuildQueueWaitTimeout;
         if (this.defaultQueueWaitTimeout <= TimeSpan.Zero)
@@ -42,11 +56,37 @@ public sealed class MatrixBuildSubmissionService
         }
     }
 
-    public async Task<BuildRef> SubmitAsync(SubmitBuildRequest request)
+    public async Task<BuildRef> SubmitAsync(
+        ManagementRequestContext context,
+        SubmitBuildRequest request) => await SubmitAsync(
+            context,
+            request,
+            identity: null,
+            attachmentParticipant: null);
+
+    internal async Task<BuildRef> SubmitAsync(
+        ManagementRequestContext context,
+        SubmitBuildRequest request,
+        MatrixBuildSubmissionIdentity? identity,
+        IBlobBuildAttachmentParticipant? attachmentParticipant)
     {
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
+        context = context.WithRequestId(request.RequestId);
+        await (authorization ?? throw new InvalidOperationException(
+                "application command authorization is not configured"))
+            .DemandAsync(
+                context,
+                ManagementPermission.BuildSubmit,
+                "matrix-build.submit",
+                "project",
+                request.Project);
         var canonical = Normalize(request);
-        var existing = await store.FindIdempotentAsync(canonical);
+        var operationKind = identity?.OperationKind ?? MatrixBuildSubmissionIdentity.LegacyOperationKind;
+        var requestHash = identity?.RequestHash ?? Hash(canonical.ToByteArray());
+        ValidateSubmissionIdentity(operationKind, requestHash, identity?.StagingId);
+        var existing = await store.FindIdempotentAsync(
+            context.Principal, canonical.RequestId, operationKind, requestHash);
         if (existing != null)
         {
             queue.NotifyChanged();
@@ -61,7 +101,8 @@ public sealed class MatrixBuildSubmissionService
         catch (MatrixBuildValidationException)
         {
             // A concurrent exact submission may have committed after the first idempotency read.
-            existing = await store.FindIdempotentAsync(canonical);
+            existing = await store.FindIdempotentAsync(
+                context.Principal, canonical.RequestId, operationKind, requestHash);
             if (existing != null)
             {
                 queue.NotifyChanged();
@@ -71,16 +112,55 @@ public sealed class MatrixBuildSubmissionService
             throw;
         }
 
-        var requestHash = Hash(canonical.ToByteArray());
         var definitionHash = Hash(canonical.DefinitionSnapshot.Span);
-        var build = await store.SubmitAsync(
+        var now = timeProvider.GetUtcNow();
+        var build = await store.SubmitScopedAsync(
+            context.Principal,
             canonical,
+            operationKind,
             requestHash,
             definitionHash,
-            timeProvider.GetUtcNow(),
-            defaultQueueWaitTimeout);
+            now,
+            defaultQueueWaitTimeout,
+            identity?.StagingId,
+            attachmentParticipant,
+            context,
+            matrixBuildId => AuditEventDraft.Create(
+                context,
+                now,
+                "matrix-build.submit",
+                "matrix-build",
+                matrixBuildId));
         queue.NotifyChanged();
         return build;
+    }
+
+    private static void ValidateSubmissionIdentity(
+        string operationKind,
+        string requestHash,
+        string? stagingId)
+    {
+        if (string.IsNullOrWhiteSpace(operationKind) || operationKind.Length > 256 ||
+            operationKind.Any(character => character is '\r' or '\n' or '\0'))
+        {
+            throw new MatrixBuildValidationException(
+                "submission operation kind must contain 1-256 safe characters");
+        }
+
+        if (requestHash.Length != 64 || requestHash.Any(character =>
+                !(character is >= '0' and <= '9' or >= 'a' and <= 'f')))
+        {
+            throw new MatrixBuildValidationException(
+                "submission request hash must be a lowercase SHA-256 value");
+        }
+
+        if (stagingId is not null && (string.IsNullOrWhiteSpace(stagingId) ||
+                stagingId.Length > 256 || stagingId.Any(character => character is '\r' or '\n' or '\0')))
+        {
+            throw new MatrixBuildValidationException(
+                "blob staging ID must contain 1-256 safe characters");
+        }
+
     }
 
     private void Validate(SubmitBuildRequest request, IReadOnlyList<StoredAgent> knownAgents)
@@ -198,10 +278,34 @@ public sealed class MatrixBuildSubmissionService
             };
             if (source.Assignment != null)
             {
-                target.Assignment = source.Assignment.Clone();
+                target.Assignment = NormalizeAssignment(source.Assignment);
             }
 
             normalized.Cells.Add(target);
+        }
+
+        return normalized;
+    }
+
+    private static BuildAssignment NormalizeAssignment(BuildAssignment source)
+    {
+        var normalized = source.Clone();
+        normalized.Parameters.Clear();
+        foreach (var pair in source.Parameters.OrderBy(
+                     pair => pair.Key, StringComparer.Ordinal))
+        {
+            normalized.Parameters.Add(pair.Key, pair.Value);
+        }
+        for (var index = 0; index < normalized.Steps.Count; index++)
+        {
+            var sourceStep = source.Steps[index];
+            var normalizedStep = normalized.Steps[index];
+            normalizedStep.Env.Clear();
+            foreach (var pair in sourceStep.Env.OrderBy(
+                         pair => pair.Key, StringComparer.Ordinal))
+            {
+                normalizedStep.Env.Add(pair.Key, pair.Value);
+            }
         }
 
         return normalized;

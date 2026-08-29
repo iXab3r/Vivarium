@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Vivarium.Agent;
 
 internal static class PrivateStorage
@@ -31,29 +29,11 @@ internal static class PrivateStorage
 
     public static void WriteSecretText(string path, string value)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            File.WriteAllText(path, value);
-            return;
-        }
-
         if (File.Exists(path))
         {
             RestrictSecretFile(path);
         }
-
-        using (var stream = new FileStream(path, new FileStreamOptions
-               {
-                   Mode = FileMode.Create,
-                   Access = FileAccess.Write,
-                   Share = FileShare.None,
-                   UnixCreateMode = SecretFileMode,
-               }))
-        using (var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
-        {
-            writer.Write(value);
-        }
-
+        DurableFile.ReplaceText(path, value, SecretFileMode);
         RestrictSecretFile(path);
     }
 }

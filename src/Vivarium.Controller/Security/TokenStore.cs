@@ -3,11 +3,44 @@ using System.Text;
 using Microsoft.Data.Sqlite;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Persistence;
 
 namespace Vivarium.Controller.Security;
 
-public sealed record AgentAdmission(AgentAuth Authorization, bool Enabled, string? AuthTokenToDeliver);
+public sealed record AgentAdmission(
+    AgentAuth Authorization,
+    bool Enabled,
+    string? AuthTokenToDeliver,
+    long CredentialGeneration,
+    bool CredentialReplaced,
+    bool MaintenanceDrain = false);
+
+internal sealed record AgentAuthorizationGrant(string? AuthToken, long CredentialGeneration);
+
+internal static class AgentSessionIdentity
+{
+    // Audit target IDs and detail values use the same upper bound. Keeping these identities within
+    // it ensures every accepted session remains addressable and auditable by the management plane.
+    public const int MaximumLength = 256;
+
+    public static void Validate(Hello hello)
+    {
+        ArgumentNullException.ThrowIfNull(hello);
+        RequireBounded(hello.AgentId, "agent_id");
+        RequireBounded(hello.SessionId, "session_id");
+    }
+
+    private static void RequireBounded(string value, string field)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Length > MaximumLength)
+        {
+            throw new ArgumentException(
+                $"{field} must be between 1 and {MaximumLength} characters",
+                field);
+        }
+    }
+}
 
 public enum BearerScope
 {
@@ -37,14 +70,21 @@ public sealed class TokenStore
 
     public static string NewToken() => Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
 
-    public async Task<string> CreateEnrollTokenAsync(TimeSpan? lifetime = null)
+    public Task<string> CreateEnrollTokenAsync(TimeSpan? lifetime = null) =>
+        CreateEnrollTokenAsync(null, lifetime);
+
+    internal async Task<string> CreateEnrollTokenAsync(
+        AuditEventDraft? auditEvent,
+        TimeSpan? lifetime = null)
     {
         var token = NewToken();
         var hash = Hash(token);
         var expires = DateTimeOffset.UtcNow.Add(lifetime ?? DefaultEnrollLifetime).ToUnixTimeMilliseconds();
         await database.WriteAsync(connection =>
         {
+            using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = """
                 INSERT INTO enroll_tokens(token_hash, expires_unix_ms, claimed_agent_id)
                 VALUES ($hash, $expires, NULL);
@@ -52,139 +92,230 @@ public sealed class TokenStore
             command.Parameters.AddWithValue("$hash", hash);
             command.Parameters.AddWithValue("$expires", expires);
             command.ExecuteNonQuery();
+            if (auditEvent is not null)
+            {
+                AuditEventStore.Append(connection, transaction, auditEvent);
+            }
+
+            transaction.Commit();
             return true;
         });
         return token;
     }
 
-    public Task<AgentAdmission?> AdmitAgentAsync(Hello hello) => database.WriteAsync(connection =>
-    {
-        using var transaction = connection.BeginTransaction();
-        var current = ReadIdentity(connection, transaction, hello.AgentId);
+    internal Task<AgentAdmission?> AdmitAgentAsync(Hello hello) =>
+        AdmitAgentAsync(hello, enrollmentAudit: null, deniedEnrollmentAudit: null);
 
-        if (current != null && hello.AuthToken.Length > 0 &&
-            FixedEquals(current.AuthTokenHash, Hash(hello.AuthToken)))
+    internal Task<AgentAdmission?> AdmitAgentAsync(
+        Hello hello,
+        AuditEventDraft? enrollmentAudit,
+        AuditEventDraft? deniedEnrollmentAudit)
+    {
+        AgentSessionIdentity.Validate(hello);
+        return database.WriteAsync(connection =>
         {
-            if (current.PendingAuthToken != null)
+            using var transaction = connection.BeginTransaction();
+            var current = ReadIdentity(connection, transaction, hello.AgentId);
+
+            if (current != null && hello.AuthToken.Length > 0 &&
+                FixedEquals(current.AuthTokenHash, Hash(hello.AuthToken)))
             {
-                ClearPendingToken(connection, transaction, hello.AgentId);
+                if (current.PendingAuthToken != null)
+                {
+                    ClearPendingToken(connection, transaction, hello.AgentId);
+                }
+
+                transaction.Commit();
+                return new AgentAdmission(current.Authorized ? AgentAuth.Authorized : AgentAuth.Unauthorized,
+                    current.Enabled, null, current.CredentialGeneration, CredentialReplaced: false,
+                    current.MaintenanceDrain);
+            }
+
+            var enrollHash = hello.EnrollToken.Length > 0 ? Hash(hello.EnrollToken) : string.Empty;
+            if (current != null && enrollHash.Length > 0 && FixedEquals(current.EnrollTokenHash, enrollHash))
+            {
+                transaction.Commit();
+                return new AgentAdmission(AgentAuth.Unauthorized,
+                    current.Enabled, current.Authorized ? current.PendingAuthToken : null,
+                    current.CredentialGeneration, CredentialReplaced: false,
+                    current.MaintenanceDrain);
+            }
+
+            if (enrollHash.Length == 0 ||
+                !TryClaimEnrollToken(connection, transaction, enrollHash, hello.AgentId))
+            {
+                if (deniedEnrollmentAudit is null)
+                {
+                    transaction.Rollback();
+                }
+                else
+                {
+                    AuditEventStore.Append(connection, transaction, deniedEnrollmentAudit);
+                    transaction.Commit();
+                }
+
+                return null;
+            }
+
+            if (current == null)
+            {
+                InsertAgent(connection, transaction, hello, enrollHash);
+                if (enrollmentAudit is not null)
+                {
+                    AuditEventStore.Append(connection, transaction, enrollmentAudit);
+                }
+            }
+            else
+            {
+                if (current.CredentialGeneration == long.MaxValue)
+                {
+                    throw new InvalidOperationException(
+                        $"agent '{hello.AgentId}' credential generation is exhausted");
+                }
+
+                using var update = connection.CreateCommand();
+                update.Transaction = transaction;
+                update.CommandText = """
+                    UPDATE agents SET
+                        enroll_token_hash = $enrollHash,
+                        authorized = 0,
+                        auth_token_hash = NULL,
+                        pending_auth_token = NULL,
+                        credential_generation = credential_generation + 1
+                    WHERE agent_id = $agentId;
+                    """;
+                update.Parameters.AddWithValue("$enrollHash", enrollHash);
+                update.Parameters.AddWithValue("$agentId", hello.AgentId);
+                update.ExecuteNonQuery();
+                if (enrollmentAudit is not null)
+                {
+                    AuditEventStore.Append(
+                        connection,
+                        transaction,
+                        enrollmentAudit with { Action = "agent.reenroll" });
+                }
             }
 
             transaction.Commit();
-            return new AgentAdmission(current.Authorized ? AgentAuth.Authorized : AgentAuth.Unauthorized,
-                current.Enabled, null);
-        }
+            return new AgentAdmission(
+                AgentAuth.Unauthorized,
+                current?.Enabled ?? true,
+                null,
+                current is null ? 0 : checked(current.CredentialGeneration + 1),
+                CredentialReplaced: current is not null);
+        });
+    }
 
-        var enrollHash = hello.EnrollToken.Length > 0 ? Hash(hello.EnrollToken) : string.Empty;
-        if (current != null && enrollHash.Length > 0 && FixedEquals(current.EnrollTokenHash, enrollHash))
-        {
-            transaction.Commit();
-            return new AgentAdmission(current.Authorized ? AgentAuth.Authorized : AgentAuth.Unauthorized,
-                current.Enabled, current.Authorized ? current.PendingAuthToken : null);
-        }
+    public async Task<string?> AuthorizeAgentAsync(string agentId) =>
+        (await AuthorizeAgentWithGenerationAsync(agentId, auditEvent: null)).AuthToken;
 
-        if (enrollHash.Length == 0 || !TryClaimEnrollToken(connection, transaction, enrollHash, hello.AgentId))
-        {
-            transaction.Rollback();
-            return null;
-        }
-
-        if (current == null)
-        {
-            InsertAgent(connection, transaction, hello, enrollHash);
-        }
-        else
-        {
-            using var update = connection.CreateCommand();
-            update.Transaction = transaction;
-            update.CommandText = """
-                UPDATE agents SET enroll_token_hash = $enrollHash, authorized = 0
-                WHERE agent_id = $agentId;
-                """;
-            update.Parameters.AddWithValue("$enrollHash", enrollHash);
-            update.Parameters.AddWithValue("$agentId", hello.AgentId);
-            update.ExecuteNonQuery();
-        }
-
-        transaction.Commit();
-        return new AgentAdmission(AgentAuth.Unauthorized, current?.Enabled ?? true, null);
-    });
-
-    public Task<string?> AuthorizeAgentAsync(string agentId)
+    internal Task<AgentAuthorizationGrant> AuthorizeAgentWithGenerationAsync(
+        string agentId,
+        AuditEventDraft? auditEvent)
     {
-        return database.WriteAsync<string?>(connection =>
+        return database.WriteAsync(connection =>
         {
             using var transaction = connection.BeginTransaction();
             using var read = connection.CreateCommand();
             read.Transaction = transaction;
-            read.CommandText = "SELECT auth_token_hash FROM agents WHERE agent_id = $agentId;";
+            read.CommandText = """
+                SELECT authorized, auth_token_hash, credential_generation
+                FROM agents WHERE agent_id = $agentId;
+                """;
             read.Parameters.AddWithValue("$agentId", agentId);
-            var existingHash = read.ExecuteScalar();
-            if (existingHash == null)
+            using var reader = read.ExecuteReader();
+            if (!reader.Read())
             {
                 throw new InvalidOperationException($"unknown agent '{agentId}'");
             }
 
-            if (existingHash != DBNull.Value)
+            var alreadyAuthorized = reader.GetInt64(0) != 0;
+            var hasExistingHash = !reader.IsDBNull(1);
+            var credentialGeneration = reader.GetInt64(2);
+            reader.Close();
+            if (alreadyAuthorized)
+            {
+                transaction.Commit();
+                return new AgentAuthorizationGrant(null, credentialGeneration);
+            }
+
+            if (hasExistingHash)
             {
                 using var reauthorize = connection.CreateCommand();
                 reauthorize.Transaction = transaction;
                 reauthorize.CommandText = "UPDATE agents SET authorized = 1 WHERE agent_id = $agentId;";
                 reauthorize.Parameters.AddWithValue("$agentId", agentId);
                 reauthorize.ExecuteNonQuery();
+                if (auditEvent is not null)
+                {
+                    AuditEventStore.Append(connection, transaction, auditEvent);
+                }
+
                 transaction.Commit();
-                return null;
+                return new AgentAuthorizationGrant(null, credentialGeneration);
             }
 
             var token = NewToken();
+            var issuedGeneration = credentialGeneration == 0 ? 1 : credentialGeneration;
             using var command = connection.CreateCommand();
             command.Transaction = transaction;
             command.CommandText = """
                 UPDATE agents SET
                     authorized = 1,
                     auth_token_hash = $tokenHash,
-                    pending_auth_token = $token
+                    pending_auth_token = $token,
+                    credential_generation = $credentialGeneration
                 WHERE agent_id = $agentId;
                 """;
             command.Parameters.AddWithValue("$tokenHash", Hash(token));
             command.Parameters.AddWithValue("$token", token);
+            command.Parameters.AddWithValue("$credentialGeneration", issuedGeneration);
             command.Parameters.AddWithValue("$agentId", agentId);
             if (command.ExecuteNonQuery() == 0)
             {
                 throw new InvalidOperationException($"unknown agent '{agentId}'");
             }
 
+            if (auditEvent is not null)
+            {
+                AuditEventStore.Append(connection, transaction, auditEvent);
+            }
+
             transaction.Commit();
-            return token;
+            return new AgentAuthorizationGrant(token, issuedGeneration);
         });
     }
 
     public async Task<BearerScope?> ResolveBearerScopeAsync(string token)
     {
+        var principal = await ResolveBearerPrincipalAsync(token);
+        return principal?.LegacyScope;
+    }
+
+    public async Task<ManagementPrincipal?> ResolveBearerPrincipalAsync(string token)
+    {
         if (FixedEquals(AdminToken, token))
         {
-            return BearerScope.Admin;
+            return ManagementPrincipal.LegacyAdmin;
         }
 
         if (FixedEquals(SubmitToken, token))
         {
-            return BearerScope.Submit;
+            return ManagementPrincipal.LegacySubmit;
         }
 
         var hash = Hash(token);
-        var agent = await database.ReadAsync(connection =>
+        var agentId = await database.ReadAsync(connection =>
         {
             using var command = connection.CreateCommand();
             command.CommandText = """
-                SELECT EXISTS(
-                    SELECT 1 FROM agents
-                    WHERE auth_token_hash = $hash
-                );
+                SELECT agent_id FROM agents
+                WHERE auth_token_hash = $hash;
                 """;
             command.Parameters.AddWithValue("$hash", hash);
-            return Convert.ToInt32(command.ExecuteScalar()) != 0;
+            return command.ExecuteScalar() as string;
         });
-        return agent ? BearerScope.Agent : null;
+        return agentId is null ? null : ManagementPrincipal.Agent(agentId);
     }
 
     public async Task<bool> IsValidBearerAsync(string token) =>
@@ -195,7 +326,10 @@ public sealed class TokenStore
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText = """
-            SELECT authorized, enabled, auth_token_hash, pending_auth_token, enroll_token_hash
+            SELECT authorized, enabled, auth_token_hash, pending_auth_token, enroll_token_hash,
+                   credential_generation,
+                   EXISTS(SELECT 1 FROM agent_maintenance_drains AS drains
+                          WHERE drains.agent_id = agents.agent_id)
             FROM agents WHERE agent_id = $agentId;
             """;
         command.Parameters.AddWithValue("$agentId", agentId);
@@ -210,7 +344,9 @@ public sealed class TokenStore
             reader.GetInt64(1) != 0,
             reader.IsDBNull(2) ? null : reader.GetString(2),
             reader.IsDBNull(3) ? null : reader.GetString(3),
-            reader.IsDBNull(4) ? null : reader.GetString(4));
+            reader.IsDBNull(4) ? null : reader.GetString(4),
+            reader.GetInt64(5),
+            reader.GetInt64(6) != 0);
     }
 
     private static bool TryClaimEnrollToken(
@@ -345,5 +481,7 @@ public sealed class TokenStore
         bool Enabled,
         string? AuthTokenHash,
         string? PendingAuthToken,
-        string? EnrollTokenHash);
+        string? EnrollTokenHash,
+        long CredentialGeneration,
+        bool MaintenanceDrain);
 }

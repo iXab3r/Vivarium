@@ -1,0 +1,58 @@
+kind	path	declaration
+proto-service	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	service ControlPlane
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	SubmitBuild
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	WatchBuild
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	CancelBuild
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	MissingBlobs
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	ListAgents
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	AuthorizeAgent
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	SubmitBuildRequest
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	MatrixBuildCell
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	BuildRef
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	CancelBuildRequest
+proto-enum	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	DurableBuildState
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	BuildSnapshot
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	BuildCellSnapshot
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	BlobHashes
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	ListAgentsRequest
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	AgentRef
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	AgentList
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto	AgentInfo
+proto-service	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	service AgentHub
+proto-rpc	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Session
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	AgentMsg
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	ControllerMsg
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	OsInfo
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Hello
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Welcome
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	AuthorizationGranted
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Blob
+proto-enum	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	StepPolicy
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Step
+proto-enum	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	OnFail
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	BuildAssignment
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	AssignmentAccepted
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	CancelBuild
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	RestartAgent
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	StepStatus
+proto-enum	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	LogStream
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	LogChunk
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	StepResult
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Artifact
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	BuildResult
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	BuildResultAccepted
+proto-enum	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	BuildOutcome
+proto-message	src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto	Heartbeat
+blazor-route	src/Vivarium.Controller/Components/Pages/Home.razor	/
+blazor-route	src/Vivarium.Controller/Components/Pages/Agents.razor	/agents
+blazor-route	src/Vivarium.Controller/Components/Pages/Builds.razor	/builds
+blazor-route	src/Vivarium.Controller/Components/Pages/BuildDetails.razor	/builds/{MatrixBuildId}
+grpc-map	src/Vivarium.Controller/VivariumControllerHost.cs	AgentHubService
+grpc-map	src/Vivarium.Controller/VivariumControllerHost.cs	ControlPlaneService
+blazor-map	src/Vivarium.Controller/VivariumControllerHost.cs	MapRazorComponents<App>
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	PUT /blobs/{sha256}
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	GET /blobs/{sha256}
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	GET /login
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	POST /login
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	POST /logout
+http-endpoint	src/Vivarium.Controller/VivariumControllerHost.cs	GET /builds/{matrixId}/cells/{cellBuildId}/artifacts/{ordinal:int}

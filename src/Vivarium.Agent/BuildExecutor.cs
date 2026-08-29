@@ -28,7 +28,7 @@ public static class BuildExecutor
         await SendStatusAsync(send, assignment.BuildId, -1, "FETCHING", ct);
         foreach (var blob in assignment.Payload)
         {
-            await FetchBlobAsync(blob, workdir, blobs, ct);
+            await FetchBlobAsync(blob, workdir, assignment.BuildId, sessionId, blobs, ct);
         }
 
         var anyFailed = false;
@@ -54,7 +54,11 @@ public static class BuildExecutor
         foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect))
         {
             var fullPath = Path.Combine(workdir, relativePath);
-            var sha = await blobs.UploadAsync(fullPath, ct);
+            var sha = await blobs.UploadAsync(
+                fullPath,
+                assignment.BuildId,
+                sessionId,
+                ct);
             result.Artifacts.Add(new Artifact
             {
                 Path = relativePath.Replace('\\', '/'),
@@ -68,12 +72,18 @@ public static class BuildExecutor
         return result;
     }
 
-    private static async Task FetchBlobAsync(Blob blob, string workdir, BlobClient blobs, CancellationToken ct)
+    private static async Task FetchBlobAsync(
+        Blob blob,
+        string workdir,
+        string buildId,
+        string sessionId,
+        BlobClient blobs,
+        CancellationToken ct)
     {
         if (blob.Archive)
         {
             var zipPath = Path.Combine(workdir, ".payload", blob.Sha256 + ".zip");
-            await blobs.DownloadAsync(blob.Sha256, zipPath, ct);
+            await blobs.DownloadAsync(blob.Sha256, zipPath, buildId, sessionId, ct);
             var destination = ResolveUnder(workdir, blob.UnpackTo);
             Directory.CreateDirectory(destination);
             PayloadArchiveExtractor.Extract(zipPath, destination);
@@ -82,7 +92,7 @@ public static class BuildExecutor
         else
         {
             var target = ResolveUnder(workdir, blob.FileName);
-            await blobs.DownloadAsync(blob.Sha256, target, ct);
+            await blobs.DownloadAsync(blob.Sha256, target, buildId, sessionId, ct);
         }
     }
 

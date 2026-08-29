@@ -2,6 +2,9 @@ using System.Collections.Concurrent;
 using System.Text;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.ResultAdapters.Trx;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Builds;
 
@@ -50,6 +53,8 @@ public sealed class BuildTracker
     private readonly BuildQueueStore? queueStore;
     private readonly TimeProvider timeProvider;
     private readonly TimeSpan reconnectGrace;
+    private readonly ManagementCommandAuthorizer? authorization;
+    private readonly IBuildResultProjectionParticipant? resultProjections;
     private readonly ConcurrentDictionary<string, PendingBuild> builds = new();
     private readonly ConcurrentDictionary<string, BuildResult> completed = new();
     private readonly object startupReconnectGate = new();
@@ -61,13 +66,17 @@ public sealed class BuildTracker
         BuildStore? store = null,
         BuildQueueStore? queueStore = null,
         TimeProvider? timeProvider = null,
-        TimeSpan? reconnectGrace = null)
+        TimeSpan? reconnectGrace = null,
+        ManagementCommandAuthorizer? authorization = null,
+        IBuildResultProjectionParticipant? resultProjections = null)
     {
         this.registry = registry;
         this.store = store;
         this.queueStore = queueStore;
         this.timeProvider = timeProvider ?? TimeProvider.System;
         this.reconnectGrace = reconnectGrace ?? TimeSpan.FromSeconds(60);
+        this.authorization = authorization;
+        this.resultProjections = resultProjections;
     }
 
     public async Task InitializeAsync()
@@ -152,17 +161,19 @@ public sealed class BuildTracker
         await SweepExpiredLeasesAsync(now);
     }
 
-    public async Task<BuildResult> RunBuildAsync(
+    internal async Task<BuildResult> RunBuildFromControllerAsync(
         string agentId,
         BuildAssignment assignment,
         CancellationToken cancellationToken)
     {
-        await DispatchBuildAsync(agentId, assignment);
+        await DispatchBuildFromControllerAsync(agentId, assignment);
         return await WaitForResultAsync(assignment.BuildId, cancellationToken);
     }
 
     /// <summary>Durably records and sends an assignment, returning once the agent owns it.</summary>
-    public async Task DispatchBuildAsync(string agentId, BuildAssignment assignment)
+    internal async Task DispatchBuildFromControllerAsync(
+        string agentId,
+        BuildAssignment assignment)
     {
         BuildAdmission.EnsureSupported(assignment);
         if (!registry.TryBeginBuild(
@@ -217,7 +228,38 @@ public sealed class BuildTracker
         }
     }
 
-    public async Task<bool> CancelBuildAsync(string buildId, string reason)
+    internal Task<bool> CancelBuildFromControllerAsync(string buildId, string reason) =>
+        CancelBuildAsync(buildId, reason, auditEvent: null);
+
+    public async Task<bool> CancelBuildAsync(
+        ManagementRequestContext context,
+        string buildId,
+        string reason)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        await (authorization ?? throw new InvalidOperationException(
+                "application command authorization is not configured"))
+            .DemandAsync(
+                context,
+                ManagementPermission.BuildCancel,
+                "build.cancel",
+                "build",
+                buildId);
+        return await CancelBuildAsync(
+            buildId,
+            reason,
+            AuditEventDraft.Create(
+                context,
+                timeProvider.GetUtcNow(),
+                "build.cancel",
+                "build",
+                buildId));
+    }
+
+    private async Task<bool> CancelBuildAsync(
+        string buildId,
+        string reason,
+        AuditEventDraft? auditEvent)
     {
         if (!builds.TryGetValue(buildId, out var build))
         {
@@ -270,7 +312,7 @@ public sealed class BuildTracker
             return true;
         }
 
-        var request = await store.TryRequestCancellationAsync(buildId, reason);
+        var request = await store.TryRequestCancellationAsync(buildId, reason, auditEvent);
         if (!request.Active)
         {
             return false;
@@ -681,6 +723,7 @@ public sealed class BuildTracker
                 result,
                 connection.AgentId,
                 connection.SessionId,
+                connection.ConnectionGeneration,
                 timeProvider.GetUtcNow())
             : completed.TryAdd(result.BuildId, result);
         if (!accepted)
@@ -707,6 +750,10 @@ public sealed class BuildTracker
         registry.EndBuild(connection.AgentId, result.BuildId);
         builds.TryRemove(result.BuildId, out _);
         build.Completion.TrySetResult(result);
+        if (resultProjections is not null)
+        {
+            await resultProjections.ProjectTerminalBuildAsync(result.BuildId);
+        }
     }
 
     private async Task<bool> IsPersistedDuplicateAsync(BuildResult result, string agentId)

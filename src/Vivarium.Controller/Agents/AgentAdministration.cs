@@ -1,5 +1,7 @@
 using Vivarium.Contracts.V1;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Builds;
+using Vivarium.Controller.Configuration.Agents;
 using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Agents;
@@ -12,19 +14,28 @@ public sealed class AgentAdministration
     private readonly BuildStore builds;
     private readonly TokenStore tokens;
     private readonly AgentLifecycleCoordinator lifecycle;
+    private readonly TimeProvider timeProvider;
+    private readonly ManagementCommandAuthorizer? authorization;
+    private readonly IAgentDesiredConfigurationService? desiredConfiguration;
 
     public AgentAdministration(
         AgentRegistry registry,
         AgentStore store,
         BuildStore builds,
         TokenStore tokens,
-        AgentLifecycleCoordinator lifecycle)
+        AgentLifecycleCoordinator lifecycle,
+        TimeProvider? timeProvider = null,
+        ManagementCommandAuthorizer? authorization = null,
+        IAgentDesiredConfigurationService? desiredConfiguration = null)
     {
         this.registry = registry;
         this.store = store;
         this.builds = builds;
         this.tokens = tokens;
         this.lifecycle = lifecycle;
+        this.timeProvider = timeProvider ?? TimeProvider.System;
+        this.authorization = authorization;
+        this.desiredConfiguration = desiredConfiguration;
     }
 
     public async Task<IReadOnlyList<AgentSnapshot>> ListAsync()
@@ -41,55 +52,107 @@ public sealed class AgentAdministration
             : agent).ToArray();
     }
 
-    public async Task AuthorizeAsync(string agentId)
+    public async Task AuthorizeAsync(ManagementRequestContext context, string agentId)
     {
-        var token = await tokens.AuthorizeAgentAsync(agentId);
-        registry.SetAuthorized(agentId, true);
-        if (token != null)
+        await DemandAsync(
+            context, ManagementPermission.AgentAuthorize, "agent.authorize", agentId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+        var grant = await tokens.AuthorizeAgentWithGenerationAsync(agentId, Audit(
+            context, "agent.authorize", agentId));
+        if (grant.AuthToken != null)
         {
+            // An enrollment-proof session is never promoted in place. It may receive the bearer,
+            // then must reconnect and prove possession before the registry admits new work.
+            registry.SetAuthorized(agentId, false);
             registry.TrySend(agentId, new ControllerMsg
             {
-                Authorized = new AuthorizationGranted { AuthToken = token },
+                Authorized = new AuthorizationGranted
+                {
+                    AuthToken = grant.AuthToken,
+                    CredentialGeneration = checked((ulong)grant.CredentialGeneration),
+                },
             });
+        }
+        else
+        {
+            registry.SetAuthorized(agentId, true);
         }
     }
 
-    public async Task UnauthorizeAsync(string agentId)
+    public async Task UnauthorizeAsync(ManagementRequestContext context, string agentId)
     {
-        await store.SetAuthorizedAsync(agentId, false);
+        await DemandAsync(
+            context, ManagementPermission.AgentManage, "agent.unauthorize", agentId);
+        await store.SetAuthorizedAsync(agentId, false, Audit(
+            context, "agent.unauthorize", agentId));
         registry.SetAuthorized(agentId, false);
     }
 
-    public async Task SetEnabledAsync(string agentId, bool enabled)
+    public async Task SetEnabledAsync(
+        ManagementRequestContext context,
+        string agentId,
+        bool enabled)
     {
-        await store.SetEnabledAsync(agentId, enabled);
-        registry.SetEnabled(agentId, enabled);
+        var action = enabled ? "agent.enable" : "agent.disable";
+        await DemandAsync(context, ManagementPermission.AgentManage, action, agentId);
+        var configuration = desiredConfiguration ?? throw new InvalidOperationException(
+            "Agent desired configuration is not configured");
+        var snapshot = await configuration.GetAsync(agentId)
+            ?? throw new AgentDesiredConfigurationNotFoundException(agentId);
+        var commandContext = context.RequestId is null
+            ? context.WithRequestId(ManagementIdentifiers.NewId())
+            : context;
+        await configuration.SetEnabledAsync(
+            commandContext,
+            agentId,
+            enabled,
+            snapshot.AuthoritativeRevision);
     }
 
-    public async Task RenameAsync(string agentId, string name)
+    public async Task RenameAsync(ManagementRequestContext context, string agentId, string name)
     {
-        await store.RenameAsync(agentId, name);
+        await DemandAsync(context, ManagementPermission.AgentManage, "agent.rename", agentId);
+        await store.RenameAsync(agentId, name, Audit(context, "agent.rename", agentId));
         registry.NotifyChanged();
     }
 
-    public Task SetCustomParameterAsync(string agentId, string key, string value)
+    public async Task SetCustomParameterAsync(
+        ManagementRequestContext context,
+        string agentId,
+        string key,
+        string value)
     {
+        await DemandAsync(
+            context, ManagementPermission.AgentManage, "agent.custom-parameter.set", agentId);
         var normalized = AgentParameterMaps.ValidateCustom(key, value);
-        return MutateCustomParametersAsync(
+        await MutateCustomParametersAsync(
             agentId,
-            () => store.SetCustomParameterAsync(agentId, normalized.Key, normalized.Value));
+            () => store.SetCustomParameterAsync(
+                agentId,
+                normalized.Key,
+                normalized.Value,
+                Audit(context, "agent.custom-parameter.set", agentId, normalized.Key)));
     }
 
-    public Task DeleteCustomParameterAsync(string agentId, string key)
+    public async Task DeleteCustomParameterAsync(
+        ManagementRequestContext context,
+        string agentId,
+        string key)
     {
+        await DemandAsync(
+            context, ManagementPermission.AgentManage, "agent.custom-parameter.delete", agentId);
         var normalizedKey = AgentParameterMaps.ValidateCustomKey(key);
-        return MutateCustomParametersAsync(
+        await MutateCustomParametersAsync(
             agentId,
-            () => store.DeleteCustomParameterAsync(agentId, normalizedKey));
+            () => store.DeleteCustomParameterAsync(
+                agentId,
+                normalizedKey,
+                Audit(context, "agent.custom-parameter.delete", agentId, normalizedKey)));
     }
 
-    public async Task DeleteAsync(string agentId)
+    public async Task DeleteAsync(ManagementRequestContext context, string agentId)
     {
+        await DemandAsync(context, ManagementPermission.AgentManage, "agent.delete", agentId);
         await using var lease = await lifecycle.AcquireAsync(agentId);
         var durableBuild = (await builds.ListAssignedActiveAsync())
             .FirstOrDefault(build => build.AgentId == agentId);
@@ -115,11 +178,57 @@ public sealed class AgentAdministration
             }
         }
 
-        await store.DeleteAsync(agentId);
+        await store.DeleteAsync(agentId, Audit(context, "agent.delete", agentId));
         registry.Remove(agentId);
     }
 
-    public Task<string> CreateEnrollTokenAsync() => tokens.CreateEnrollTokenAsync();
+    public async Task<string> CreateEnrollTokenAsync(ManagementRequestContext context)
+    {
+        var targetId = ManagementIdentifiers.NewId();
+        await DemandAsync(
+            context,
+            ManagementPermission.EnrollmentTokenCreate,
+            "enrollment-token.create",
+            targetId,
+            "enrollment-token");
+        return await tokens.CreateEnrollTokenAsync(Audit(
+            context,
+            "enrollment-token.create",
+            targetId,
+            targetType: "enrollment-token"));
+    }
+
+    internal Task AuthorizeFromControllerAsync(string agentId) => AuthorizeAsync(
+        ManagementRequestContext.System("controller-agent-lifecycle"), agentId);
+
+    internal Task<string> CreateEnrollTokenFromControllerAsync() => CreateEnrollTokenAsync(
+        ManagementRequestContext.System("controller-agent-lifecycle"));
+
+    private AuditEventDraft Audit(
+        ManagementRequestContext context,
+        string action,
+        string targetId,
+        string? detailKey = null,
+        string targetType = "agent") =>
+        AuditEventDraft.Create(
+            context,
+            timeProvider.GetUtcNow(),
+            action,
+            targetType,
+            targetId,
+            details: detailKey is null
+                ? null
+                : new Dictionary<string, string> { ["parameter_key"] = detailKey });
+
+    private Task DemandAsync(
+        ManagementRequestContext context,
+        ManagementPermission permission,
+        string action,
+        string targetId,
+        string targetType = "agent") =>
+        (authorization ?? throw new InvalidOperationException(
+            "application command authorization is not configured"))
+        .DemandAsync(context, permission, action, targetType, targetId);
 
     private async Task MutateCustomParametersAsync(string agentId, Func<Task> mutation)
     {

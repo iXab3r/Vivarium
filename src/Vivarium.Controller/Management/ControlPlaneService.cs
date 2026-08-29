@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Blobs;
 using Vivarium.Controller.Security;
 
@@ -25,7 +26,10 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         DatabaseChangeNotifier changes,
         BlobStore blobs,
         AgentAdministration agents,
-        TokenStore tokens)
+        ManagementRequestContextFactory contexts,
+        ManagementAuthorizer managementAuthorizer,
+        AuditEventStore audits,
+        TimeProvider timeProvider)
     {
         this.submissions = submissions;
         this.matrixBuilds = matrixBuilds;
@@ -33,17 +37,23 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         this.changes = changes;
         this.blobs = blobs;
         this.agents = agents;
-        authorizer = new ControlPlaneAuthorizer(tokens);
+        authorizer = new ControlPlaneAuthorizer(
+            contexts, managementAuthorizer, audits, timeProvider);
     }
 
     public override async Task<BuildRef> SubmitBuild(
         SubmitBuildRequest request,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Submit, context);
+        var requestContext = await authorizer.AuthenticateAsync(
+            context, "matrix-build.submit", "project", request.Project);
         try
         {
-            return await submissions.SubmitAsync(request);
+            return await submissions.SubmitAsync(requestContext, request);
+        }
+        catch (ManagementAuthorizationException exception)
+        {
+            throw ControlPlaneAuthorizer.PermissionDenied(exception);
         }
         catch (MatrixBuildValidationException exception)
         {
@@ -60,7 +70,7 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         IServerStreamWriter<BuildSnapshot> responseStream,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Submit, context);
+        await authorizer.DemandAsync(ManagementPermission.BuildWatch, context);
         if (string.IsNullOrWhiteSpace(request.BuildId))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "build_id is required"));
@@ -93,22 +103,29 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         CancelBuildRequest request,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Submit, context);
-        if (string.IsNullOrWhiteSpace(request.BuildId))
+        var requestContext = await authorizer.AuthenticateAsync(
+            context, "matrix-build.cancel", "matrix-build", request.BuildId);
+        try
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "build_id is required"));
+            return await cancellations.CancelAsync(requestContext, request.BuildId, request.Reason)
+                ?? throw new RpcException(new Status(
+                    StatusCode.NotFound, $"unknown matrix build '{request.BuildId}'"));
         }
-
-        return await cancellations.CancelAsync(request.BuildId, request.Reason)
-            ?? throw new RpcException(new Status(
-                StatusCode.NotFound, $"unknown matrix build '{request.BuildId}'"));
+        catch (ManagementAuthorizationException exception)
+        {
+            throw ControlPlaneAuthorizer.PermissionDenied(exception);
+        }
+        catch (ArgumentException exception)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, exception.Message));
+        }
     }
 
     public override async Task<BlobHashes> MissingBlobs(
         BlobHashes request,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Submit, context);
+        await authorizer.DemandAsync(ManagementPermission.BlobDiscover, context);
         var result = new BlobHashes();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var hash in request.Sha256)
@@ -132,7 +149,7 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         ListAgentsRequest request,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Admin, context);
+        await authorizer.DemandAsync(ManagementPermission.AgentList, context);
         var result = new AgentList();
         foreach (var snapshot in await agents.ListAsync())
         {
@@ -146,15 +163,19 @@ public sealed class ControlPlaneService : Vivarium.Contracts.V1.ControlPlane.Con
         AgentRef request,
         ServerCallContext context)
     {
-        await authorizer.DemandAsync(BearerScope.Admin, context);
-        if (string.IsNullOrWhiteSpace(request.AgentId))
-        {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "agent_id is required"));
-        }
-
+        var requestContext = await authorizer.AuthenticateAsync(
+            context, "agent.authorize", "agent", request.AgentId);
         try
         {
-            await agents.AuthorizeAsync(request.AgentId);
+            await agents.AuthorizeAsync(requestContext, request.AgentId);
+        }
+        catch (ManagementAuthorizationException exception)
+        {
+            throw ControlPlaneAuthorizer.PermissionDenied(exception);
+        }
+        catch (ArgumentException exception)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, exception.Message));
         }
         catch (InvalidOperationException)
         {

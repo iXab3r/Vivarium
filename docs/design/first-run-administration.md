@@ -24,25 +24,23 @@ one-time ceremony; emergency super-user access is an explicit, short-lived recov
 All settings produced by the ceremony are committed through Git. Authentication secrets and runtime
 security state are not settings and never enter Git. Every action is written to an audit log.
 
-## Current state
+## Current implementation status
 
-The Phase 1 implementation is a useful prototype, not the target administration model:
+The first managed-local administration path is now executable; the broader identity product remains
+incomplete:
 
-| Area | Current evidence | Limitation |
+| Area | Implemented evidence | Remaining limitation |
 |---|---|---|
-| Controller credentials | `TokenStore` creates persistent `admin.token` and `submit.token` files; private modes are applied and tested on Unix. | The plaintext admin token is the durable administrator identity and never expires; Windows currently relies on inherited ACLs rather than explicit hardening. |
-| Startup output | `Program.cs` prints the full admin, submit, and newly created enroll tokens on every start. | Ordinary process logs expose long-lived credentials and do not distinguish initial claim from recovery. |
-| Panel login | `POST /login` compares the static admin token and creates a 12-hour sliding, secure, HTTP-only, SameSite=Strict cookie. | There is no user record, role membership, credential rotation, bootstrap state, or recovery generation. |
-| Control plane | The gRPC management plane resolves `Admin`, `Submit`, and `Agent` bearer scopes. | The admin bearer is not attributable to a durable user and is valid against all admin operations. |
-| CLI | `viv login` stores a supplied submit/admin token together with pinned controller trust. | It cannot represent a user session, personal access token, or restricted setup principal. |
-| Persistence | SQLite stores agents, builds, enrollment tokens, and related durable state. | It has no durable user/RBAC/bootstrap/audit model. |
-| Git | `vivarium.yaml` is versioned in the tested repository per D17. | Controller settings and the first-run baseline are not yet backed by a controller configuration repository. |
-| REST | Authenticated blob HTTP endpoints exist; management is gRPC and the panel calls in-process services. | There is no versioned REST administration or setup surface. |
-| Audit | Normal application/build logging exists. | Admin login, configuration mutation, and token lifecycle do not have a dedicated safe audit trail. |
+| Bootstrap claim | SQLite migrations v9-v11 persist the singleton administration state, purpose-bound token generations, setup sessions, request replay records, private user credential, and Git authorization projections. Bootstrap values are hashed, single-use, rotated on unclaimed restart, and accepted only by `POST /api/v1/setup/claims`. | Background expiry delivery modes, provided/token-file modes, rate limiting, and a host-local CLI are not implemented. |
+| Resumable setup | The setup operation survives restart independently from its 30-minute session. Host-local service operations reissue access or abandon an uncommitted attempt; abandon revokes prior access and issues a new bootstrap generation. | Remote Git/review waiting and the setup UI are not implemented. |
+| Git/RBAC handoff | Completion writes the first User and `SYSTEM_ADMIN` RoleBinding in one atomic Git commit, reconciles that exact commit, then activates the copied private password verifier and revokes setup sessions in one SQLite transaction. | Groups, service accounts, PATs, custom roles, external providers, and general user/role management remain. |
+| Normal login | `POST /login` accepts the named user's password, creates the protected panel cookie, and carries a credential generation checked by the common evaluator. | Password change/reset, durable session catalog, lockout policy, MFA, and PAT-based CLI login remain. |
+| Recovery | A host-local operation explicitly issues one 15-minute recovery generation. `/api/v1/recovery/claims` consumes it into one 30-minute `Vivarium-Recovery` session; ordinary restarts neither issue nor print recovery values. Recovery survives restart and is explicitly revoked back to `ACTIVE`. | Recovery issuance/revocation still needs a supported local CLI/UI. Recovery does not yet author general corrective Git changes because general user/role mutation is not exposed. |
+| Legacy adapters | Existing admin/submit tokens retain their prior evaluator scopes and are no longer printed by `Program.cs`; startup labels them migration adapters. | Token files are still created and accepted. Removal waits for PAT/service-account replacement and upgrade guidance. |
+| Audit | Claim, identity reservation, Git validation/commit, completion, login, recovery issue/exchange/revoke, and denial paths use bounded secret-free records with revision linkage where applicable. | Retention, tamper-evident export, source-address capture, and the complete authentication anomaly/lockout model remain. |
 
-Relevant executable evidence includes `SecretStorageTests`, `PanelTests`, `CliTests`, and
-`ControlPlaneTests`. These tests should be preserved as migration baselines and expanded rather than
-silently invalidated.
+Executable evidence is concentrated in `AdministrationBootstrapTests`, `AuthorizationPolicyTests`,
+`DatabaseMigrationTests`, `PanelTests`, and the existing management-boundary suites.
 
 ## TeamCity evidence and deliberate differences
 

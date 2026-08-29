@@ -5,6 +5,7 @@
 @inject MatrixBuildStore MatrixBuilds
 @inject MatrixBuildCancellationService MatrixCancellation
 @inject DatabaseChangeNotifier Changes
+@inject PanelManagementContext Management
 
 <PageTitle>@(snapshot is null ? "Build Not Found" : $"{snapshot.Project} / {snapshot.Configuration}") · Vivarium</PageTitle>
 
@@ -202,7 +203,11 @@ else
         }
     }
 
-    private async Task ReloadAsync() => snapshot = await MatrixBuilds.GetSnapshotAsync(MatrixBuildId);
+    private async Task ReloadAsync()
+    {
+        await Management.DemandAsync(ManagementPermission.BuildWatch);
+        snapshot = await MatrixBuilds.GetSnapshotAsync(MatrixBuildId);
+    }
 
     private async Task StopMatrixAsync()
     {
@@ -210,8 +215,9 @@ else
         operationMessage = null;
         try
         {
+            var context = await Management.DemandAsync(ManagementPermission.BuildCancel);
             snapshot = await MatrixCancellation.CancelAsync(
-                MatrixBuildId, "Stopped from the matrix build details page")
+                context, MatrixBuildId, "Stopped from the matrix build details page")
                 ?? throw new InvalidOperationException("The matrix build no longer exists.");
             operationMessage = snapshot.State == DurableBuildState.Finished
                 ? "Matrix build cancelled."

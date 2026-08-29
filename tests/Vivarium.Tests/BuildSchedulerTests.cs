@@ -46,7 +46,7 @@ public class BuildSchedulerTests
             enabled: false,
             ("os.family", "windows"));
 
-        await harness.Queue.EnqueueAsync(
+        await harness.Queue.EnqueueFromControllerAsync(
             Assignment("eligibility"),
             "os.family == windows");
         await AssertRemainsQueuedAsync(harness.Store, "eligibility");
@@ -66,6 +66,58 @@ public class BuildSchedulerTests
     }
 
     [Test]
+    public async Task Desired_state_lifecycle_lease_fences_claim_reservation_and_preparation()
+    {
+        await using var database = new VivariumDatabase(rootDir);
+        var registry = new AgentRegistry();
+        var lifecycle = new AgentLifecycleCoordinator();
+        var store = new BuildQueueStore(database);
+        var queue = new BuildQueueService(store, registry);
+        var builds = new BuildTracker(registry, new BuildStore(database), store);
+        await builds.InitializeAsync();
+        var scheduler = new BuildScheduler(
+            store,
+            queue,
+            registry,
+            lifecycle,
+            builds,
+            NullLogger<BuildScheduler>.Instance);
+        Connect(
+            registry,
+            "agent-a",
+            "session-a",
+            AgentAuth.Authorized,
+            enabled: true,
+            ("os.family", "windows"));
+        await queue.EnqueueFromControllerAsync(
+            Assignment("configuration-race"),
+            "os.family == windows");
+
+        BuildQueueItem? whileConfigurationOwnsLease;
+        await using (await lifecycle.AcquireAsync("agent-a"))
+        {
+            using var dispatchCancellation = new CancellationTokenSource();
+            var blockedDispatch = scheduler.DispatchAvailableAsync(dispatchCancellation.Token);
+            dispatchCancellation.Cancel();
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await blockedDispatch);
+
+            whileConfigurationOwnsLease = await store.GetAsync("configuration-race");
+            registry.SetEnabled("agent-a", enabled: false);
+        }
+
+        await scheduler.DispatchAvailableAsync(CancellationToken.None);
+        var afterActivation = await store.GetAsync("configuration-race");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(whileConfigurationOwnsLease?.State, Is.EqualTo(BuildQueueItemState.Queued),
+                "the scheduler must not persist a claim behind the desired-state lease");
+            Assert.That(afterActivation?.State, Is.EqualTo(BuildQueueItemState.Queued));
+            Assert.That(registry.Get("agent-a")?.Activity, Is.EqualTo(AgentActivity.Idle));
+        });
+    }
+
+    [Test]
     public async Task Capacity_one_agent_dispatches_in_fifo_order()
     {
         await using var harness = await SchedulerHarness.StartAsync(rootDir);
@@ -77,8 +129,8 @@ public class BuildSchedulerTests
             enabled: true,
             ("os.family", "windows"));
 
-        await harness.Queue.EnqueueAsync(Assignment("fifo-1"), "os.family == windows");
-        await harness.Queue.EnqueueAsync(Assignment("fifo-2"), "os.family == windows");
+        await harness.Queue.EnqueueFromControllerAsync(Assignment("fifo-1"), "os.family == windows");
+        await harness.Queue.EnqueueFromControllerAsync(Assignment("fifo-2"), "os.family == windows");
 
         var first = await WaitForItemAsync(
             harness.Store,
@@ -121,8 +173,8 @@ public class BuildSchedulerTests
             enabled: true,
             ("os.family", "windows"));
 
-        await harness.Queue.EnqueueAsync(Assignment("blocked-head"), "os.family == linux");
-        await harness.Queue.EnqueueAsync(Assignment("runnable-later"), "os.family == windows");
+        await harness.Queue.EnqueueFromControllerAsync(Assignment("blocked-head"), "os.family == linux");
+        await harness.Queue.EnqueueFromControllerAsync(Assignment("runnable-later"), "os.family == windows");
 
         var dispatched = await WaitForItemAsync(
             harness.Store,
@@ -150,7 +202,7 @@ public class BuildSchedulerTests
                 AgentAuth.Authorized,
                 enabled: true,
                 ("os.family", "windows"));
-            await first.Queue.EnqueueAsync(Assignment(buildId), "os.family == windows");
+            await first.Queue.EnqueueFromControllerAsync(Assignment(buildId), "os.family == windows");
             await WaitForItemAsync(
                 first.Store,
                 buildId,
@@ -194,7 +246,7 @@ public class BuildSchedulerTests
                 AgentAuth.Authorized,
                 enabled: true,
                 ("os.family", "windows"));
-            await first.Queue.EnqueueAsync(Assignment(buildId), "os.family == windows");
+            await first.Queue.EnqueueFromControllerAsync(Assignment(buildId), "os.family == windows");
             await WaitForItemAsync(
                 first.Store,
                 buildId,
@@ -243,7 +295,13 @@ public class BuildSchedulerTests
         var builds = new BuildTracker(registry, buildStore, store, time);
         await builds.InitializeAsync();
         var scheduler = new BuildScheduler(
-            store, queue, registry, builds, NullLogger<BuildScheduler>.Instance, time);
+            store,
+            queue,
+            registry,
+            new AgentLifecycleCoordinator(),
+            builds,
+            NullLogger<BuildScheduler>.Instance,
+            time);
         Connect(
             registry,
             "agent-a",
@@ -277,7 +335,7 @@ public class BuildSchedulerTests
         await scheduler.StartAsync(CancellationToken.None);
         try
         {
-            await queue.EnqueueAsync(
+            await queue.EnqueueFromControllerAsync(
                 Assignment("send-after-prepare"),
                 "os.family == windows");
             await WaitUntilAsync(
@@ -364,7 +422,13 @@ public class BuildSchedulerTests
 
         database.Changed += ReplaceAfterRecord;
         var scheduler = new BuildScheduler(
-            store, queue, registry, builds, NullLogger<BuildScheduler>.Instance, time);
+            store,
+            queue,
+            registry,
+            new AgentLifecycleCoordinator(),
+            builds,
+            NullLogger<BuildScheduler>.Instance,
+            time);
         await scheduler.StartAsync(CancellationToken.None);
         try
         {
@@ -419,7 +483,7 @@ public class BuildSchedulerTests
             await controller.AuthorizeAgentAsync(agent.AgentId);
             await agent.WaitAuthorizedAsync(TimeSpan.FromSeconds(20));
 
-            await controller.BuildQueue.EnqueueAsync(
+            await controller.BuildQueue.EnqueueFromControllerAsync(
                 Assignment("real-agent-queue"),
                 $"os.family == {(OperatingSystem.IsWindows() ? "windows" : OperatingSystem.IsMacOS() ? "macos" : "linux")}");
             await WaitUntilAsync(
@@ -562,12 +626,18 @@ public class BuildSchedulerTests
         {
             var database = new VivariumDatabase(dataDir);
             var registry = new AgentRegistry();
+            var lifecycle = new AgentLifecycleCoordinator();
             var store = new BuildQueueStore(database);
             var queue = new BuildQueueService(store, registry);
             var builds = new BuildTracker(registry, new BuildStore(database), store);
             await builds.InitializeAsync();
             var scheduler = new BuildScheduler(
-                store, queue, registry, builds, NullLogger<BuildScheduler>.Instance);
+                store,
+                queue,
+                registry,
+                lifecycle,
+                builds,
+                NullLogger<BuildScheduler>.Instance);
             await scheduler.StartAsync(CancellationToken.None);
             return new SchedulerHarness(database, registry, store, queue, builds, scheduler);
         }

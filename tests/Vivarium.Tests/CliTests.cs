@@ -76,6 +76,36 @@ public class CliTests
     }
 
     [Test]
+    public void Agent_deployment_arguments_are_explicit_and_bounded()
+    {
+        var upgrade = (AgentUpgradeCommand)CliArguments.Parse(
+        [
+            "agent", "upgrade", "agent-1",
+            "--reason", "canary", "--timeout-seconds", "120", "--no-wait",
+        ]);
+        var cancellation = (AgentUpgradeCancellationCommand)CliArguments.Parse(
+            ["agent", "upgrade-cancel", "operation-1", "--reason", "operator stop", "--no-wait"]);
+        var rollback = (AgentUpgradeCancellationCommand)CliArguments.Parse(
+            ["agent", "upgrade-rollback", "operation-2"]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(upgrade.AgentId, Is.EqualTo("agent-1"));
+            Assert.That(upgrade.Reason, Is.EqualTo("canary"));
+            Assert.That(upgrade.TimeoutSeconds, Is.EqualTo(120));
+            Assert.That(upgrade.NoWait, Is.True);
+            Assert.That(cancellation.OperationId, Is.EqualTo("operation-1"));
+            Assert.That(cancellation.Reason, Is.EqualTo("operator stop"));
+            Assert.That(cancellation.NoWait, Is.True);
+            Assert.That(rollback.Reason, Is.EqualTo("Rollback requested by viv CLI"));
+            Assert.Throws<CliUsageException>(() => CliArguments.Parse(
+                ["agent", "upgrade", "agent-1", "--timeout-seconds", "10"]));
+            Assert.Throws<CliUsageException>(() => CliArguments.Parse(
+                ["agent", "package", "publish", "agent.zip"]));
+        });
+    }
+
+    [Test]
     public void Endpoint_settings_use_flags_then_environment_then_saved_config()
     {
         var environment = new Dictionary<string, string?>
@@ -209,7 +239,7 @@ public class CliTests
     }
 
     [Test]
-    public async Task No_wait_uploads_only_missing_payload_then_returns_after_durable_submit()
+    public async Task No_wait_stages_payloads_then_returns_after_durable_submit()
     {
         var payload = Path.Combine(root, "payload");
         Directory.CreateDirectory(payload);
@@ -232,7 +262,7 @@ public class CliTests
             """;
         await File.WriteAllTextAsync(yamlPath, yaml, new UTF8Encoding(false));
 
-        var endpoint = new RecordingEndpoint { AllBlobsMissing = true };
+        var endpoint = new RecordingEndpoint();
         var console = new RecordingConsole();
         var application = new VivariumCliApplication(
             console,
@@ -250,8 +280,8 @@ public class CliTests
         Assert.Multiple(() =>
         {
             Assert.That(exitCode, Is.Zero);
-            Assert.That(endpoint.MissingCalls, Is.EqualTo(1));
-            Assert.That(endpoint.UploadCalls, Is.EqualTo(1));
+            Assert.That(endpoint.StageCalls, Is.EqualTo(1));
+            Assert.That(endpoint.StagedArchives, Has.Count.EqualTo(1));
             Assert.That(endpoint.SubmitCalls, Is.EqualTo(1));
             Assert.That(endpoint.WatchCalls, Is.Zero);
             Assert.That(endpoint.Submitted!.DefinitionSnapshot.ToByteArray(),
@@ -290,6 +320,46 @@ public class CliTests
                 Does.Contain("Cancellation requested for matrix build matrix-build-1"));
             Assert.That(console.Output,
                 Does.Contain("Results: https://controller:8443/builds/matrix-build-1"));
+        });
+    }
+
+    [Test]
+    public async Task Agent_deployment_commands_use_saved_pinned_endpoint_and_print_operation_identity()
+    {
+        var endpoint = new RecordingEndpoint();
+        var console = new RecordingConsole();
+        var application = new VivariumCliApplication(
+            console,
+            new StaticConfigurationStore(new ClientConfiguration(
+                "https://controller:8443", Fingerprint('a'), "token")),
+            new UnusedCertificateProbe(),
+            new StaticEndpointFactory(endpoint),
+            new TemporaryPayloadArchiveFactory(),
+            _ => null);
+
+        var upgradeExit = await application.ExecuteAsync(
+        [
+            "agent", "upgrade", "agent-1",
+            "--reason", "canary", "--no-wait",
+        ], CancellationToken.None);
+        var cancellationExit = await application.ExecuteAsync(
+        [
+            "agent", "upgrade-rollback", "operation-1", "--reason", "bad canary", "--no-wait",
+        ], CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(upgradeExit, Is.Zero);
+            Assert.That(cancellationExit, Is.Zero);
+            Assert.That(endpoint.CreateUpgradeCalls, Is.EqualTo(1));
+            Assert.That(endpoint.CancelUpgradeCalls, Is.EqualTo(1));
+            Assert.That(endpoint.UpgradeReason, Is.EqualTo("canary"));
+            Assert.That(endpoint.UpgradeCancellationReason, Is.EqualTo("bad canary"));
+            Assert.That(console.Output, Has.Some.Contains("Server release: 2.0.0"));
+            Assert.That(console.Output, Has.Some.Contains("operation-1"));
+            Assert.That(console.Output, Has.Some.Contains("AWAITING-HEALTH"));
+            Assert.That(console.Output, Has.Some.Contains("ROLLBACK-REQUESTED"));
+            Assert.That(console.Output, Has.Some.Contains("Maintenance drain: HELD"));
         });
     }
 
@@ -347,6 +417,7 @@ public class CliTests
 
         var exitCode = await application.ExecuteAsync(
             ["run", "tier-2", "--file", yamlPath, "--no-wait"], CancellationToken.None);
+        Assert.That(exitCode, Is.Zero, string.Join(Environment.NewLine, console.Output));
         var buildId = console.Output.Single(line => line.StartsWith("Submitted matrix build ", StringComparison.Ordinal))
             ["Submitted matrix build ".Length..];
         var snapshot = await controller.MatrixBuildStore.GetSnapshotAsync(buildId);
@@ -430,16 +501,19 @@ public class CliTests
 
     private sealed class RecordingEndpoint : IControlPlaneEndpoint
     {
-        public bool AllBlobsMissing { get; init; }
-        public int MissingCalls { get; private set; }
+        public int StageCalls { get; private set; }
         public int ValidateCalls { get; private set; }
-        public int UploadCalls { get; private set; }
         public int SubmitCalls { get; private set; }
         public int WatchCalls { get; private set; }
         public int CancelCalls { get; private set; }
+        public int CreateUpgradeCalls { get; private set; }
+        public int CancelUpgradeCalls { get; private set; }
         public SubmitBuildRequest? Submitted { get; private set; }
+        public IReadOnlyCollection<PayloadArchiveInfo>? StagedArchives { get; private set; }
         public string? CancelledBuildId { get; private set; }
         public string? CancellationReason { get; private set; }
+        public string? UpgradeReason { get; private set; }
+        public string? UpgradeCancellationReason { get; private set; }
 
         public Task ValidateAsync(CancellationToken cancellationToken)
         {
@@ -447,30 +521,28 @@ public class CliTests
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlySet<string>> MissingBlobsAsync(
-            IReadOnlyCollection<string> hashes,
+        public Task<string> StageBlobsAsync(
+            string projectId,
+            IReadOnlyCollection<PayloadArchiveInfo> archives,
+            string idempotencyKey,
             CancellationToken cancellationToken)
         {
-            MissingCalls++;
-            IReadOnlySet<string> result = AllBlobsMissing
-                ? hashes.ToHashSet(StringComparer.Ordinal)
-                : new HashSet<string>(StringComparer.Ordinal);
-            return Task.FromResult(result);
-        }
-
-        public Task UploadBlobAsync(string hash, string path, CancellationToken cancellationToken)
-        {
-            Assert.That(File.Exists(path), Is.True);
-            UploadCalls++;
-            return Task.CompletedTask;
+            StageCalls++;
+            StagedArchives = archives;
+            Assert.That(projectId, Is.EqualTo("Vivarium"));
+            Assert.That(archives.All(archive => File.Exists(archive.Path)), Is.True);
+            Assert.That(idempotencyKey, Is.Not.Empty);
+            return Task.FromResult("stage-1");
         }
 
         public Task<BuildRef> SubmitBuildAsync(
             SubmitBuildRequest request,
+            string blobStagingId,
             CancellationToken cancellationToken)
         {
             SubmitCalls++;
             Submitted = request;
+            Assert.That(blobStagingId, Is.EqualTo("stage-1"));
             return Task.FromResult(new BuildRef { BuildId = "matrix-build-1" });
         }
 
@@ -487,6 +559,41 @@ public class CliTests
                 Build = new BuildRef { BuildId = buildId },
                 State = DurableBuildState.CancelRequested,
             });
+        }
+
+        public Task<AgentUpgradeSnapshot> CreateAgentUpgradeAsync(
+            string agentId,
+            string reason,
+            int? timeoutSeconds,
+            string idempotencyKey,
+            CancellationToken cancellationToken)
+        {
+            CreateUpgradeCalls++;
+            UpgradeReason = reason;
+            Assert.That(idempotencyKey, Is.Not.Empty);
+            return Task.FromResult(new AgentUpgradeSnapshot(
+                "operation-1", agentId, "2.0.0", "awaiting-health", 1,
+                1, DateTimeOffset.UtcNow.AddSeconds(5), null, null, null,
+                true, DateTimeOffset.UtcNow.AddMinutes(10),
+                [new AgentUpgradeEventSnapshot(
+                    1, "awaiting-health", "candidate_observed", 2, new string('a', 64),
+                    DateTimeOffset.UtcNow)]));
+        }
+
+        public Task<AgentUpgradeSnapshot> CancelAgentUpgradeAsync(
+            string operationId,
+            string reason,
+            CancellationToken cancellationToken)
+        {
+            CancelUpgradeCalls++;
+            UpgradeCancellationReason = reason;
+            return Task.FromResult(new AgentUpgradeSnapshot(
+                operationId, "agent-1", "2.0.0", "rollback-requested", 1,
+                1, DateTimeOffset.UtcNow.AddSeconds(5), reason, null, null,
+                true, DateTimeOffset.UtcNow.AddMinutes(10),
+                [new AgentUpgradeEventSnapshot(
+                    2, "rollback-requested", "operator_cancelled", 2, new string('a', 64),
+                    DateTimeOffset.UtcNow)]));
         }
 
         public async IAsyncEnumerable<BuildSnapshot> WatchBuildAsync(

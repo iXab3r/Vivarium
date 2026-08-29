@@ -7,6 +7,7 @@ using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
 using Vivarium.Controller.Builds;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Tests;
 
@@ -77,7 +78,7 @@ public class FencingTests
             assignment.Steps.Add(SleepStep(seconds: 2));
 
             using var buildCts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
-            var buildTask = controller.Builds.RunBuildAsync(connected.AgentId, assignment, buildCts.Token);
+            var buildTask = controller.Builds.RunBuildFromControllerAsync(connected.AgentId, assignment, buildCts.Token);
 
             // Let the sleep step start, then drop the connection mid-build.
             await Task.Delay(TimeSpan.FromSeconds(1));
@@ -127,7 +128,7 @@ public class FencingTests
         registry.Reconcile(connection, currentBuildId: null);
         var tracker = new BuildTracker(registry);
 
-        var task = tracker.RunBuildAsync("a-1", new BuildAssignment { BuildId = "b-dup" }, CancellationToken.None);
+        var task = tracker.RunBuildFromControllerAsync("a-1", new BuildAssignment { BuildId = "b-dup" }, CancellationToken.None);
 
         await tracker.OnResultAsync(
             new BuildResult { BuildId = "b-dup", SessionId = "s-1", StatusText = "first" },
@@ -151,11 +152,26 @@ public class FencingTests
         });
         const string agentId = "cancel-race-agent";
         const string buildId = "cancel-race-build";
+        var hello = new Hello
+        {
+            AgentId = agentId,
+            SessionId = "cancel-race-session",
+            EnrollToken = await controller.Tokens.CreateEnrollTokenAsync(),
+        };
+        Assert.That(await controller.Tokens.AdmitAgentAsync(hello), Is.Not.Null);
+        await controller.AgentStore.ObserveHelloAsync(hello);
+        Assert.That(await controller.Tokens.AuthorizeAgentAsync(agentId), Is.Not.Null);
+        var generations = await controller.AgentStore.GetGenerationStateAsync(agentId)
+            ?? throw new AssertionException("persisted Agent generations were missing");
+        var acceptedSession = await controller.AgentStore.AcceptSessionAsync(
+            agentId,
+            generations.CredentialGeneration);
         using var session = new CancellationTokenSource();
         var connection = controller.Registry.Register(
-            new Hello { AgentId = agentId, SessionId = "cancel-race-session" },
+            hello,
             AgentAuth.Authorized,
             enabled: true,
+            acceptedSession.ConnectionGeneration,
             session);
         controller.Registry.Reconcile(connection, currentBuildId: null);
         await controller.BuildStore.CreateAsync(
@@ -166,8 +182,10 @@ public class FencingTests
         await controller.Builds.InitializeAsync();
         await controller.Builds.OnAgentReconnectedAsync(connection, buildId);
 
-        var first = controller.Builds.CancelBuildAsync(buildId, "first reason");
-        var second = controller.Builds.CancelBuildAsync(buildId, "second reason");
+        var first = controller.Builds.CancelBuildAsync(
+            ManagementRequestContext.System("test"), buildId, "first reason");
+        var second = controller.Builds.CancelBuildAsync(
+            ManagementRequestContext.System("test"), buildId, "second reason");
         var results = await Task.WhenAll(first, second);
         var persisted = await controller.BuildStore.GetAsync(buildId);
 
@@ -187,7 +205,10 @@ public class FencingTests
             Outcome = BuildOutcome.Cancelled,
             StatusText = "first reason",
         }, connection);
-        Assert.That(await controller.Builds.CancelBuildAsync(buildId, "too late"), Is.False);
+        Assert.That(
+            await controller.Builds.CancelBuildAsync(
+                ManagementRequestContext.System("test"), buildId, "too late"),
+            Is.False);
     }
 
     [Test]
@@ -234,7 +255,7 @@ public class FencingTests
                 var assignment = new BuildAssignment { BuildId = "b-result-ack" };
                 assignment.Steps.Add(EchoStep("persist-before-ack"));
                 using var resultCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-                firstResult = await first.Builds.RunBuildAsync(agentId, assignment, resultCts.Token);
+                firstResult = await first.Builds.RunBuildFromControllerAsync(agentId, assignment, resultCts.Token);
                 await WaitUntilAsync(() => !File.Exists(pendingResultPath), TimeSpan.FromSeconds(10));
             }
             finally
@@ -333,7 +354,7 @@ public class FencingTests
 
             var assignment = new BuildAssignment { BuildId = "b-restart-cancel" };
             assignment.Steps.Add(SleepStep(seconds: 30));
-            firstWait = first.Builds.RunBuildAsync(agentId, assignment, firstWaitCts.Token);
+            firstWait = first.Builds.RunBuildFromControllerAsync(agentId, assignment, firstWaitCts.Token);
             await WaitUntilAsync(
                 () => first.Builds.GetLog(assignment.BuildId).Contains("RUNNING", StringComparison.Ordinal),
                 TimeSpan.FromSeconds(10));
@@ -343,7 +364,10 @@ public class FencingTests
                 () => first.Registry.Get(agentId)?.Connected == false,
                 TimeSpan.FromSeconds(10));
             Assert.That(
-                await first.Builds.CancelBuildAsync(assignment.BuildId, "survive controller restart"),
+                await first.Builds.CancelBuildAsync(
+                    ManagementRequestContext.System("test"),
+                    assignment.BuildId,
+                    "survive controller restart"),
                 Is.True);
             Assert.That(
                 (await first.BuildStore.GetAsync(assignment.BuildId))?.State,
@@ -377,7 +401,8 @@ public class FencingTests
                 Assert.That(restoredAgent.CurrentBuildId, Is.EqualTo("b-restart-cancel"));
             });
             var deleteActive = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await restarted.AgentAdministration.DeleteAsync(agentId));
+                await restarted.AgentAdministration.DeleteAsync(
+                    ManagementRequestContext.System("test"), agentId));
             Assert.That(deleteActive!.Message, Does.Contain("stop the build"));
 
             await WaitForAsync(

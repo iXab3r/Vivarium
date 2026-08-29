@@ -12,8 +12,9 @@ A vivarium is an enclosure that keeps organisms under controlled conditions for 
 > assignment/cancellation/result handshakes, protected Agents and Queue & Builds panels, a scoped
 > ControlPlane API, and working `viv login`, `viv run`, and explicit durable `viv cancel` clients with
 > hardened payload archives, immutable assigned-agent provenance, and centralized per-cell
-> results/artifact downloads. Install one-liners, central agent upgrades, TRX result adapters, and
-> provider integrations are still in
+> results/artifact downloads, bounded durable TRX projection, and the first D30 per-Agent central
+> upgrade path (immutable packages, authenticated delivery, drain/health/rollback, REST/CLI). Install
+> one-liners, fleet rollout UI/policy, broader result presentation/adapters, and provider integrations are still in
 > progress; this is not an end-user release yet.
 > The design is documented in
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the shape), [`docs/ROADMAP.md`](docs/ROADMAP.md) (the order),
@@ -51,7 +52,7 @@ flowchart LR
   explicit remote operations outside builds. REST is the public management plane; desired configuration
   is committed to Git, while runtime state, secrets, logs, and results remain durable operational data.
 - **Host drivers** — a handful of verbs per hypervisor: create pool VM, checkpoint, revert, start, stop, destroy. Everything else happens over the agent channel, which is why adding a hypervisor is cheap.
-- **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in pooled pristine VMs *and* on enrolled physical machines. The target is a tiny frozen *bootstrap* installed once (baked into images, or through authenticated setup on a physical box), with the real agent pulled and auto-upgraded centrally, TeamCity-style. The current prototype has not yet passed the authenticated-manifest freeze gate (D2, D21).
+- **Agents** — deliberately dumb, reverse-connect to the controller over gRPC; they live in pooled pristine VMs *and* on enrolled physical machines. The target is a tiny frozen *bootstrap* installed once (baked into images, or through authenticated setup on a physical box), with the real agent pulled and upgraded centrally, TeamCity-style. D30's authenticated per-Agent activation/rollback path now runs; installer trust, fleet orchestration, and the remaining cross-platform freeze evidence are still gates (D2, D21, D30).
 - **Builds** — files in → steps → exit codes + files out. NUnit (self-contained, TRX) is the default payload; anything that produces JUnit XML (e.g. `cargo nextest`) or speaks TeamCity service messages plugs into the same pipe. Guests stay pristine: no SDKs, no runtimes. *Pristine* itself is a per-configuration clean policy — revert-to-snapshot where the machine supports it, plain reboot or nothing where it doesn't.
 - **Images** — built as *base → declarative provisioning recipe → sealed disk*, versioned, with drift detection. Provisioning runs through the same build machinery; pooled VMs with per-VM memory checkpoints make revert-to-pristine a matter of seconds.
 

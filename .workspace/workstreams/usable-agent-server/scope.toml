@@ -1,0 +1,42 @@
+id = "usable-agent-server"
+title = "Usable physical-agent server and deployment system"
+status = "active"
+baseline_revision = "0999792"
+baseline_note = "Plan is based on the working tree after the management-kernel slice; that slice is not reverted or absorbed here."
+active_phase = "wave-4-build-rest-sse-cli-results"
+
+[inventory]
+purpose = "Mechanically freeze current public protocol, Blazor route, and mapped HTTP/gRPC surfaces before REST and React replacement."
+stable_id = "surface kind + repository path + declared service/RPC/message/route/endpoint text; source line is evidence, not identity"
+commands = [
+  "rg -n --no-heading '^(service|message|enum) |^[[:space:]]*rpc ' src/Vivarium.Contracts -g '*.proto'",
+  "rg -n --no-heading '^@page ' src/Vivarium.Controller/Components -g '*.razor'",
+  "rg -n --no-heading 'Map(Get|Post|Put|Delete|Patch|GrpcService|RazorComponents)|MapFallback' src/Vivarium.Controller -g '*.cs'"
+]
+
+[goal]
+statement = "A developer can start Vivarium, create a trusted per-RID Agent bundle, install and enroll a physical machine, authorize it, run work, and centrally upgrade it without singleton assumptions."
+
+[acceptance]
+real_agents_required = 1
+logical_agents_required = 2
+supported_rids = ["win-x64", "linux-x64", "linux-arm64", "osx-arm64"]
+initial_auth = "D26 first-admin claim and TeamCity/fleet RBAC; legacy credentials migrate without authority widening."
+initial_distribution = "Stamped ZIP downloaded over pinned TLS and verified against a displayed SHA-256 digest."
+initial_release_policy = "Controller-bundled current Agent only; no mutable release channel until the Git mutation gateway exists."
+
+[constraints]
+bootstrap_change = "Blocked until a new numbered D2/D21 refinement is adopted."
+ui = "New screens are React/EyeAuras Workbench only; do not create temporary Blazor deployment screens."
+configuration = "Desired mutable settings remain Git-backed; the deployment fast path must not create hidden SQLite policy."
+secrets = "Enrollment, Agent, and package credentials remain outside Git and are stored hashed or in the Agent data directory as appropriate."
+test_gate = "dotnet build and dotnet test pass at solution root after every implementation slice."
+
+[out_of_scope_for_first_usable_milestone]
+items = [
+  "Unauthenticated or curl-pipe-shell installation",
+  "Arbitrary version/channel selection",
+  "Full advanced TeamCity catalog features beyond the first Git-backed Project/Build Configuration projection",
+  "Dynamic remote commands, files, or software operations",
+  "End-user release claim before D26 first-run/RBAC and platform release evidence"
+]

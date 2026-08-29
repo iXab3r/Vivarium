@@ -1,7 +1,11 @@
+using System.Globalization;
 using Google.Protobuf;
 using Microsoft.Data.Sqlite;
 using Vivarium.Contracts.V1;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Blobs.Access;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Rest.Events;
 
 namespace Vivarium.Controller.Builds;
 
@@ -23,8 +27,15 @@ public sealed record ExpiredBuildLease(string BuildId, string AgentId, BuildResu
 public sealed class BuildStore
 {
     private readonly VivariumDatabase database;
+    private readonly IBlobArtifactAttachmentParticipant? artifactAttachments;
 
-    public BuildStore(VivariumDatabase database) => this.database = database;
+    public BuildStore(
+        VivariumDatabase database,
+        IBlobArtifactAttachmentParticipant? artifactAttachments = null)
+    {
+        this.database = database;
+        this.artifactAttachments = artifactAttachments;
+    }
 
     public Task CreateAsync(
         string agentId,
@@ -50,9 +61,18 @@ public sealed class BuildStore
     });
 
     public Task<CancellationRequestResult> TryRequestCancellationAsync(string buildId, string reason) =>
+        TryRequestCancellationAsync(buildId, reason, auditEvent: null);
+
+    internal Task<CancellationRequestResult> TryRequestCancellationAsync(
+        string buildId,
+        string reason,
+        AuditEventDraft? auditEvent) =>
         database.WriteAsync(connection =>
         {
+            var now = DateTimeOffset.UtcNow;
+            using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = """
                 UPDATE builds SET
                     state = 'CANCEL_REQUESTED',
@@ -61,49 +81,144 @@ public sealed class BuildStore
                 WHERE build_id = $buildId AND state = 'RUNNING';
                 """;
             command.Parameters.AddWithValue("$reason", reason);
-            command.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            command.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
             command.Parameters.AddWithValue("$buildId", buildId);
             if (command.ExecuteNonQuery() == 1)
             {
+                if (auditEvent is not null)
+                {
+                    AuditEventStore.Append(connection, transaction, auditEvent);
+                }
+
+                BuildEventStore.AppendForChild(
+                    connection,
+                    transaction,
+                    buildId,
+                    "build.cancellation-requested",
+                    now,
+                    auditEvent?.RequestContext);
+
+                transaction.Commit();
                 return new CancellationRequestResult(true, reason);
             }
 
             using var current = connection.CreateCommand();
+            current.Transaction = transaction;
             current.CommandText = "SELECT state, cancellation_reason FROM builds WHERE build_id = $buildId;";
             current.Parameters.AddWithValue("$buildId", buildId);
             using var reader = current.ExecuteReader();
-            return reader.Read() && reader.GetString(0) == "CANCEL_REQUESTED"
+            var result = reader.Read() && reader.GetString(0) == "CANCEL_REQUESTED"
                 ? new CancellationRequestResult(
                     true, reader.IsDBNull(1) ? reason : reader.GetString(1))
                 : new CancellationRequestResult(false, null);
+            reader.Close();
+            transaction.Commit();
+            return result;
         });
 
     public Task<bool> TryFinishAsync(
         BuildResult result,
         string agentId,
         string ownerSessionId,
+        DateTimeOffset now) => TryFinishAsync(
+            result, agentId, ownerSessionId, connectionGeneration: null, now);
+
+    public Task<bool> TryFinishAsync(
+        BuildResult result,
+        string agentId,
+        string ownerSessionId,
+        long connectionGeneration,
+        DateTimeOffset now) => TryFinishAsync(
+            result, agentId, ownerSessionId, (long?)connectionGeneration, now);
+
+    private Task<bool> TryFinishAsync(
+        BuildResult result,
+        string agentId,
+        string ownerSessionId,
+        long? connectionGeneration,
         DateTimeOffset now) => database.WriteAsync(connection =>
     {
-        using var command = connection.CreateCommand();
-        command.CommandText = """
-            UPDATE builds SET
-                state = 'FINISHED',
-                result = $result,
-                reconnect_deadline_unix_ms = NULL,
-                updated_unix_ms = $now
-            WHERE build_id = $buildId
-                AND state IN ('RUNNING', 'CANCEL_REQUESTED')
-                AND agent_id = $agentId
-                AND owner_session_id = $ownerSessionId
-                AND (reconnect_deadline_unix_ms IS NULL
-                    OR reconnect_deadline_unix_ms > $now);
-            """;
-        command.Parameters.Add("$result", SqliteType.Blob).Value = result.ToByteArray();
-        command.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
-        command.Parameters.AddWithValue("$buildId", result.BuildId);
-        command.Parameters.AddWithValue("$agentId", agentId);
-        command.Parameters.AddWithValue("$ownerSessionId", ownerSessionId);
-        return command.ExecuteNonQuery() == 1;
+        var nowUnixMs = now.ToUnixTimeMilliseconds();
+        using var transaction = connection.BeginTransaction();
+        using (var eligible = connection.CreateCommand())
+        {
+            eligible.Transaction = transaction;
+            eligible.CommandText = """
+                SELECT 1 FROM builds
+                WHERE build_id = $buildId
+                    AND state IN ('RUNNING', 'CANCEL_REQUESTED')
+                    AND agent_id = $agentId
+                    AND owner_session_id = $ownerSessionId
+                    AND (reconnect_deadline_unix_ms IS NULL
+                        OR reconnect_deadline_unix_ms > $now);
+                """;
+            eligible.Parameters.AddWithValue("$buildId", result.BuildId);
+            eligible.Parameters.AddWithValue("$agentId", agentId);
+            eligible.Parameters.AddWithValue("$ownerSessionId", ownerSessionId);
+            eligible.Parameters.AddWithValue("$now", nowUnixMs);
+            if (eligible.ExecuteScalar() is null)
+            {
+                transaction.Rollback();
+                return false;
+            }
+        }
+
+        if (artifactAttachments is not null)
+        {
+            if (connectionGeneration is null or <= 0)
+            {
+                throw new InvalidOperationException(
+                    "terminal result attachment requires the current Agent connection generation");
+            }
+
+            artifactAttachments.Attach(
+                connection,
+                transaction,
+                new BlobArtifactAttachmentRequest(
+                    result.BuildId,
+                    agentId,
+                    ownerSessionId,
+                    connectionGeneration.Value,
+                    result.Artifacts.Select((artifact, ordinal) =>
+                        new BlobArtifactAttachment(
+                            ordinal.ToString(CultureInfo.InvariantCulture),
+                            artifact.Path,
+                            artifact.Sha256,
+                            artifact.Size)).ToArray(),
+                    now));
+        }
+        using (var command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = """
+                UPDATE builds SET
+                    state = 'FINISHED',
+                    result = $result,
+                    reconnect_deadline_unix_ms = NULL,
+                    updated_unix_ms = $now
+                WHERE build_id = $buildId
+                    AND state IN ('RUNNING', 'CANCEL_REQUESTED')
+                    AND agent_id = $agentId
+                    AND owner_session_id = $ownerSessionId
+                    AND (reconnect_deadline_unix_ms IS NULL
+                        OR reconnect_deadline_unix_ms > $now);
+                """;
+            command.Parameters.Add("$result", SqliteType.Blob).Value = result.ToByteArray();
+            command.Parameters.AddWithValue("$now", nowUnixMs);
+            command.Parameters.AddWithValue("$buildId", result.BuildId);
+            command.Parameters.AddWithValue("$agentId", agentId);
+            command.Parameters.AddWithValue("$ownerSessionId", ownerSessionId);
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return false;
+            }
+        }
+
+        BuildEventStore.AppendForChild(
+            connection, transaction, result.BuildId, "build.finished", now);
+        transaction.Commit();
+        return true;
     });
 
     /// <summary>
@@ -164,6 +279,9 @@ public sealed class BuildStore
                 queue.ExecuteNonQuery();
             }
 
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.owner-adopted", now);
+
             transaction.Commit();
             return true;
         });
@@ -176,7 +294,9 @@ public sealed class BuildStore
         DateTimeOffset deadline,
         DateTimeOffset now) => database.WriteAsync(connection =>
         {
+            using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = """
                 UPDATE builds SET
                     reconnect_deadline_unix_ms = $deadline,
@@ -192,7 +312,16 @@ public sealed class BuildStore
             command.Parameters.AddWithValue("$ownerSessionId", lostOwnerSessionId);
             command.Parameters.AddWithValue("$deadline", deadline.ToUnixTimeMilliseconds());
             command.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
-            return command.ExecuteNonQuery() == 1;
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.reconnect-grace-armed", now);
+            transaction.Commit();
+            return true;
         });
 
     /// <summary>
@@ -206,7 +335,9 @@ public sealed class BuildStore
         DateTimeOffset deadline,
         DateTimeOffset now) => database.WriteAsync(connection =>
         {
+            using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = """
                 UPDATE builds SET
                     reconnect_deadline_unix_ms = $deadline,
@@ -225,7 +356,16 @@ public sealed class BuildStore
                 (object?)originalOwnerSessionId ?? DBNull.Value);
             command.Parameters.AddWithValue("$deadline", deadline.ToUnixTimeMilliseconds());
             command.Parameters.AddWithValue("$now", now.ToUnixTimeMilliseconds());
-            return command.ExecuteNonQuery() == 1;
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            BuildEventStore.AppendForChild(
+                connection, transaction, buildId, "build.reconnect-grace-armed", now);
+            transaction.Commit();
+            return true;
         });
 
     /// <summary>
@@ -307,6 +447,13 @@ public sealed class BuildStore
                     queue.Parameters.AddWithValue("$buildId", item.BuildId);
                     queue.ExecuteNonQuery();
                 }
+
+                BuildEventStore.AppendForChild(
+                    connection,
+                    transaction,
+                    item.BuildId,
+                    "build.finished",
+                    now);
 
                 expired.Add(new ExpiredBuildLease(item.BuildId, item.AgentId, result));
             }

@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Partial**
 > Maintainer role: [Persistence/Migrations Expert](../roles/persistence-migrations-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7-D9, D14, D18, D22-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7-D9, D14, D18, D22-D30
 
 Numbered architecture decisions remain authoritative; any conflict requires an architecture update in
 the same change.
@@ -130,11 +130,32 @@ Git history is later garbage-collected, force-rewritten, or temporarily unavaila
 
 The Phase 1 code already establishes several parts of this contract:
 
-- `src/Vivarium.Controller/Persistence/VivariumDatabase.cs` opens `vivarium.db`, enables WAL and
-  foreign keys, applies a five-second busy timeout, and funnels mutations through one writer channel.
-- The same file defines durable agents, enrollment tokens, builds, queue entries, matrix builds, and
-  matrix cells. Constraints and partial unique indexes enforce one active build and one queue claim per
-  agent.
+- `src/Vivarium.Controller/Persistence/VivariumDatabase.cs` opens `vivarium.db`, applies a five-second
+  busy timeout, and funnels mutations through one writer channel. `DatabaseMigrator.cs` enables WAL and
+  foreign keys and applies an ordered, checksummed migration manifest with explicit adoption of the
+  known Phase-1 schema, exact table/column checks, required-index/trigger checks, metadata consistency,
+  and refusal of drift or a newer schema.
+- The current v12 schema defines durable agents, enrollment tokens, builds, queue entries, matrix builds,
+  matrix cells, migration metadata, audit events, configuration revision sets/members, materialization
+  scopes, idempotent configuration mutations, Agent desired configuration, object-scoped blob grants
+  and references, build mutation/events, and bounded TRX report/test/occurrence projections. Constraints
+  and partial unique indexes enforce one active build and one queue claim per agent; update/delete
+  triggers make audit rows append-only. V9 adds the resumable administration claim/session saga, v10
+  adds Git User/RoleBinding projections, v11 adds the private password verifier and credential
+  generation record, and v12 adds immutable Agent-package metadata/publication receipts plus durable
+  upgrade operations, append-only phase events, and fenced maintenance drains. Upgrade rows persist
+  handoff/health/commit/rollback state, exact connection generations, bounded dispatch backoff, the
+  first cancellation reason, outcome digest, and absolute deadline. Package bytes remain
+  content-addressed files, not SQLite bodies and are rehashed at the serve/reuse boundary; upgrade
+  state, history, and drain ownership recover together after restart.
+- `ManagementAuthorization.cs` supplies stable named and legacy principals, request/correlation context,
+  product-owned built-in role floors, and one permission evaluator used by ControlPlane, REST, panel,
+  and blob endpoints without widening legacy admin/submit/agent scope.
+- `AuditEventStore.cs` writes bounded, redacted action rows. Agent administration, enrollment-token
+  issuance, matrix submit/cancel, and queued/running build cancellation insert their success audit in
+  the same SQLite transaction; exact retries do not append duplicate success rows. Panel
+  authentication/logout and denied authorization decisions also use the journal, while heartbeats and
+  automatic scheduling/build transitions do not.
 - `src/Vivarium.Controller/Management/MatrixBuildStore.cs` persists a matrix, every child build, and
   every queue row in one transaction. Its request ID plus canonical request payload implements
   idempotent submission and changed-request conflict detection.
@@ -152,18 +173,39 @@ The Phase 1 code already establishes several parts of this contract:
   legacy backfill.
 - `tests/Vivarium.Tests/SessionLoopTests.cs` covers server-side blob hash verification and preservation
   of an existing blob when an idempotent PUT body is wrong.
+- `tests/Vivarium.Tests/DatabaseMigrationTests.cs` covers fresh application, explicit rollback,
+  checksum drift, unknown tables, interrupted metadata, and newer-schema refusal.
+- `tests/Vivarium.Tests/ManagementKernelTests.cs` covers the legacy permission matrix, append-only
+  restart persistence, mutation/audit rollback, token redaction, idempotent submission audit, and
+  accepted/denied login audit.
+- `tests/Vivarium.Tests/ConfigurationReconciliationTests.cs` covers commit-before-activate,
+  revision-set materialization, invalid/blocked last-known-good retention, exact principal-scoped
+  idempotency and conflict replay, affected-target audit/revision linkage, pending-operation and
+  repository-failure recovery, no-op reconciliation, Agent-document removal rejection, bounded moving-
+  head convergence, and restart recovery from an invalid authoritative head. Migration v6 carries the
+  additional mutation evidence without changing the v1-v5 migration bytes/checksums.
+- `tests/Vivarium.Tests/AgentDesiredConfigurationTests.cs` covers the first `spec.enabled` projection,
+  stale-base and validation conflicts, idempotent replay, concurrent head movement, restart behavior,
+  and the GET/PUT REST precondition shape.
+- `tests/Vivarium.Tests/AgentConfigurationReconciliationMonitorTests.cs` covers external valid-head
+  convergence into durable/live state and LKG behavior for invalid, removal, and repository-failure
+  attempts under the shared scheduling lifecycle fence.
 
 The current gaps are equally important:
 
-- schema evolution is inline `CREATE TABLE IF NOT EXISTS`, `EnsureColumn`, and one special table
-  rebuild; there is no versioned migration ledger or supported-version check;
 - the writer channel is unbounded and has no overload contract;
 - build log text is an in-memory buffer and is evicted on terminal acknowledgement rather than stored
   as durable bounded chunks;
 - the blob directory has no reference table, retention policy, garbage collector, scrubber, or quota;
-- there is no Git configuration projection or applied revision-set record;
-- there is no general REST idempotency/CAS store or stable cursor contract;
-- there is no minimal durable audit table or structured action-journal correlation contract;
+- Git materialization currently projects Agent `spec.enabled`, User declarations, and direct built-in
+  RoleBindings; Project/Build Configuration, custom Agent properties, groups/custom roles,
+  provider/image, retention, and other desired-state projections remain;
+- configuration and build mutations have durable principal-scoped idempotency, and build SSE has a
+  durable resumable cursor/retention-gap contract; there is no general runtime-operation store for
+  AgentExplorer, deployment, provider, or other asynchronous actions;
+- the minimal audit journal has no retention/GC or tamper-evident export; configuration/setup mutation
+  audit links to exact operations/revisions, while full identity/RBAC management, runtime-operation, and
+  diagnostic/build-output streams remain;
 - backup, restore, integrity verification, and corruption response are acknowledged but unimplemented.
 
 ## Target logical schema

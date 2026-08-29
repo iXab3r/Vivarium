@@ -6,9 +6,10 @@ the check up once and run it on demand — locally or from CI.
 
 This is the normative Phase 1 target UX for persistent machines; §7 shows how the same setup grows
 into pristine snapshots at Phase 2. The durable queue, `vivarium.yaml`, `viv run`, agent lifecycle,
-explicit matrix cancellation, and raw build/artifact results exist now. Installer/Downloads flows,
-central agent upgrade, parsed test occurrences, and `viv exec` are marked below where they remain
-work.
+explicit matrix cancellation, raw build/artifact results, and the per-Agent D30 central upgrade core
+exist now. Installer/Downloads flows, fleet rollout automation/UI, public per-test result presentation,
+and `viv exec` are marked below where they remain work. The controller already persists a bounded internal TRX projection with restart catch-up;
+the walkthrough does not claim its future REST/Workbench experience exists.
 Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## 0. Install the controller — one machine, once
@@ -40,8 +41,11 @@ viv login https://192.168.1.10:8443
 ## 1. Connect three machines — five minutes each
 
 You need one Windows, one Linux, one macOS machine. Anything counts: a spare laptop, a VM you already
-have, a Mac mini in a drawer. The target installer UX is Panel → **Agents → Add Agent**, with two
-equivalent routes. The TeamCity-style route downloads a preconfigured agent zip containing
+have, a Mac mini in a drawer. The target installer UX starts at AgentExplorer → **Agents** → **Install
+Agent**, which navigates to Administration → **Deploy Agent**. The Agents collection remains a separate
+fleet page; once an Agent connects, selecting its name opens that Agent's own page with local Summary,
+Build History, Compatible Configurations, Environment, Processes, Network, Logs, and Parameters tabs.
+Deployment offers two equivalent routes. The TeamCity-style route downloads a preconfigured agent zip containing
 `bootstrap.json`; the shell route will be a generated one-liner. It must authenticate the downloaded
 installer bytes *before* executing them: use a trusted SPKI pin when the stock downloader supports it,
 or verify an independently obtained package digest first, and send the single-use enroll token as
@@ -72,9 +76,12 @@ autologon on Windows asks for credentials, and macOS TCC grants (Accessibility /
 are clicks Apple reserves for a human (D10). And a headless box needs a display (dummy plug) before
 UI results mean anything.
 
-Once D2's authenticated manifest/launcher path ships, this is the last time you touch these machines
-by hand: agents auto-upgrade centrally and everything else arrives through builds. Auto-upgrade is not
-part of the current runnable slice.
+After the still-pending installer has placed bootstrap and the seed Agent, this is the last time the
+upgrade path requires interactive access to those machines. D30's runnable slice can import/publish an
+immutable per-RID package and drive each Agent through drain → restart → authenticated download →
+exact health confirmation or one-shot rollback from the server/CLI. Fleet/group rollout policy and
+the installation UX are not complete yet, so operators currently start those per-Agent operations
+centrally rather than touching hosts.
 
 ## 2. Describe the check — `vivarium.yaml` in your repo
 
@@ -114,8 +121,10 @@ configurations:
   archive (executable bits and symlinks preserved — this matters the moment a Linux agent unpacks your
   tests), content-addressed and deduplicated — unchanged content never uploads twice.
 - Collected TRX and logs come back as immutable artifacts and are downloadable from each cell's
-  durable build-results page. The controller-side TRX adapter and per-test matrix are the next results
-  layer; TeamCity service messages then add live progress without becoming authoritative results (D14).
+  durable build-results page. The controller-side TRX adapter now durably derives bounded tests and
+  occurrences while preserving the raw report; REST/Workbench presentation and the per-test matrix are
+  the next results layer. TeamCity service messages then add live progress without becoming
+  authoritative results (D14).
 
 ## 3. Build the payloads
 
@@ -176,7 +185,8 @@ The parent results page has the same **Stop matrix build** action. Ctrl+C only d
 Under the hood, per cell: queue → compatible agent (D8) → `BuildAssignment` → agent pulls blobs by
 sha256 → steps run while status and heartbeats update centrally → artifacts are pushed → the durable
 cell/matrix result is updated. Live log/service-message streaming joins later (D14). The current
-results page exposes the raw TRX; controller-side parsing into test occurrences is the next slice.
+results page exposes the raw TRX. The controller now also parses it into durable bounded test
+occurrences, but the page still exposes only raw artifacts until the result REST/UI slice lands.
 Queue and lost-agent timeouts end as explicit `INFRASTRUCTURE_FAILED`, never as a test failure; full
 TEST/CRASH classification and automatic INFRA retry remain D9 work.
 

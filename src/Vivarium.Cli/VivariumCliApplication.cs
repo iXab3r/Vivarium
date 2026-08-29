@@ -50,6 +50,11 @@ internal sealed class VivariumCliApplication(
             LoginCommand login => await LoginAsync(login, cancellationToken),
             RunCommand run => await RunAsync(run, cancellationToken),
             CancelCommand cancel => await CancelAsync(cancel, cancellationToken),
+            AgentUpgradeCommand upgrade => await UpgradeAgentAsync(upgrade, cancellationToken),
+            AgentUpgradeStatusCommand status =>
+                await ShowAgentUpgradeAsync(status, cancellationToken),
+            AgentUpgradeCancellationCommand cancellation =>
+                await CancelAgentUpgradeAsync(cancellation, cancellationToken),
             _ => throw new InvalidOperationException("unsupported command"),
         };
 
@@ -158,27 +163,15 @@ internal sealed class VivariumCliApplication(
             resolved.Cells, cancellationToken);
         await using var endpoint = endpointFactory.Create(settings);
 
-        var distinctArchives = archives.Archives.Values
-            .GroupBy(archive => archive.Sha256, StringComparer.Ordinal)
-            .Select(group => group.First())
-            .ToArray();
-        var missing = await endpoint.MissingBlobsAsync(
-            distinctArchives.Select(archive => archive.Sha256).ToArray(), cancellationToken);
-        var knownHashes = distinctArchives.Select(archive => archive.Sha256)
-            .ToHashSet(StringComparer.Ordinal);
-        if (!missing.IsSubsetOf(knownHashes))
-        {
-            throw new InvalidOperationException("controller returned an unknown missing payload hash");
-        }
-
-        foreach (var archive in distinctArchives.Where(archive => missing.Contains(archive.Sha256)))
-        {
-            await endpoint.UploadBlobAsync(archive.Sha256, archive.Path, cancellationToken);
-        }
-
+        var requestId = Guid.NewGuid().ToString("D");
         var request = BuildRequestMapper.Create(
-            resolved, definitionBytes, archives.Archives, Guid.NewGuid().ToString("D"));
-        var submitted = await endpoint.SubmitBuildAsync(request, cancellationToken);
+            resolved, definitionBytes, archives.Archives, requestId);
+        var stagingId = await endpoint.StageBlobsAsync(
+            resolved.Project,
+            archives.Archives.Values.ToArray(),
+            requestId,
+            cancellationToken);
+        var submitted = await endpoint.SubmitBuildAsync(request, stagingId, cancellationToken);
         if (string.IsNullOrWhiteSpace(submitted.BuildId))
         {
             throw new InvalidOperationException("controller returned an empty matrix build id");
@@ -211,6 +204,126 @@ internal sealed class VivariumCliApplication(
         console.WriteLine($"Results: {settings.Url.TrimEnd('/')}/builds/{Uri.EscapeDataString(snapshot.Build.BuildId)}");
         return 0;
     }
+
+    private async Task<int> UpgradeAgentAsync(
+        AgentUpgradeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var saved = await configurationStore.LoadAsync(cancellationToken);
+        var settings = EndpointSettingsResolver.Resolve(
+            command.Url, command.Token, command.Fingerprint, environment, saved);
+        await using var endpoint = endpointFactory.Create(settings);
+        var operation = await endpoint.CreateAgentUpgradeAsync(
+            command.AgentId,
+            command.Reason,
+            command.TimeoutSeconds,
+            Guid.NewGuid().ToString("D"),
+            cancellationToken);
+        PrintAgentUpgrade(operation);
+        if (command.NoWait || operation.IsTerminal)
+        {
+            return AgentUpgradeExitCode(operation);
+        }
+
+        var lastState = operation.State;
+        while (!operation.IsTerminal)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            operation = await endpoint.GetAgentUpgradeAsync(
+                operation.OperationId, cancellationToken);
+            if (!string.Equals(operation.State, lastState, StringComparison.Ordinal))
+            {
+                PrintAgentUpgrade(operation);
+                lastState = operation.State;
+            }
+        }
+
+        return AgentUpgradeExitCode(operation);
+    }
+
+    private async Task<int> ShowAgentUpgradeAsync(
+        AgentUpgradeStatusCommand command,
+        CancellationToken cancellationToken)
+    {
+        var saved = await configurationStore.LoadAsync(cancellationToken);
+        var settings = EndpointSettingsResolver.Resolve(
+            command.Url, command.Token, command.Fingerprint, environment, saved);
+        await using var endpoint = endpointFactory.Create(settings);
+        var operation = await endpoint.GetAgentUpgradeAsync(
+            command.OperationId, cancellationToken);
+        PrintAgentUpgrade(operation);
+        return AgentUpgradeExitCode(operation);
+    }
+
+    private async Task<int> CancelAgentUpgradeAsync(
+        AgentUpgradeCancellationCommand command,
+        CancellationToken cancellationToken)
+    {
+        var saved = await configurationStore.LoadAsync(cancellationToken);
+        var settings = EndpointSettingsResolver.Resolve(
+            command.Url, command.Token, command.Fingerprint, environment, saved);
+        await using var endpoint = endpointFactory.Create(settings);
+        var operation = await endpoint.CancelAgentUpgradeAsync(
+            command.OperationId, command.Reason, cancellationToken);
+        PrintAgentUpgrade(operation);
+        if (command.NoWait || operation.IsTerminal)
+        {
+            return AgentUpgradeExitCode(operation);
+        }
+
+        var lastState = operation.State;
+        while (!operation.IsTerminal)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            operation = await endpoint.GetAgentUpgradeAsync(
+                operation.OperationId, cancellationToken);
+            if (!string.Equals(operation.State, lastState, StringComparison.Ordinal))
+            {
+                PrintAgentUpgrade(operation);
+                lastState = operation.State;
+            }
+        }
+        return AgentUpgradeExitCode(operation);
+    }
+
+    private void PrintAgentUpgrade(AgentUpgradeSnapshot operation)
+    {
+        console.WriteLine($"Agent upgrade {operation.OperationId}: {operation.State.ToUpperInvariant()}");
+        console.WriteLine($"Agent: {operation.AgentId}");
+        console.WriteLine($"Server release: {operation.PackageVersion}");
+        console.WriteLine($"Maintenance drain: {(operation.DrainHeld ? "HELD" : "released")}");
+        console.WriteLine($"Restart attempts: {operation.RestartAttempts}");
+        if (operation.LastDispatchConnectionGeneration is { } dispatchGeneration)
+        {
+            console.WriteLine($"Last restart generation: {dispatchGeneration}");
+        }
+        if (operation.NextRestartAt is { } nextRestart)
+        {
+            console.WriteLine($"Next restart retry: {nextRestart:O}");
+        }
+        if (!string.IsNullOrWhiteSpace(operation.CancellationReason))
+        {
+            console.WriteLine($"Cancellation: {operation.CancellationReason}");
+        }
+        if (!string.IsNullOrWhiteSpace(operation.FailureCode))
+        {
+            console.WriteLine($"Failure: {operation.FailureCode}");
+        }
+        if (operation.Events.Count > 0)
+        {
+            console.WriteLine("History:");
+            foreach (var value in operation.Events.OrderBy(value => value.Sequence))
+            {
+                var generation = value.ConnectionGeneration is { } observed
+                    ? $" generation={observed}"
+                    : string.Empty;
+                console.WriteLine($"  {value.Sequence}: {value.Phase} ({value.Code}){generation}");
+            }
+        }
+    }
+
+    private static int AgentUpgradeExitCode(AgentUpgradeSnapshot operation) =>
+        operation.State == "succeeded" ? 0 : operation.IsTerminal ? 1 : 0;
 
     private async Task<BuildSnapshot> WatchUntilFinishedAsync(
         IControlPlaneEndpoint endpoint,

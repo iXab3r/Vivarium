@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Tests;
 
@@ -126,7 +128,7 @@ public class PanelTests
         });
         await RegisterKnownAgentAsync(controller);
         await controller.AgentAdministration.SetCustomParameterAsync(
-            "known-windows", "pool", "hardware-lab");
+            ManagementRequestContext.System("test"), "known-windows", "pool", "hardware-lab");
 
         using var http = PinnedClient(controller);
         var anonymous = await http.GetAsync("/agents?agent=known-windows");
@@ -155,19 +157,26 @@ public class PanelTests
             Host = "127.0.0.1",
             Port = 0,
         });
-        await RegisterKnownAgentAsync(controller);
+        var knownAgent = await RegisterKnownAgentAsync(controller);
         await controller.AgentAdministration.SetCustomParameterAsync(
-            "known-windows", "pool", "hardware-lab");
+            ManagementRequestContext.System("test"), "known-windows", "pool", "hardware-lab");
         var payloadHash = await PutBlobAsync(controller, "payload"u8.ToArray());
         var artifactBytes = "exact artifact bytes"u8.ToArray();
-        var artifactHash = await PutBlobAsync(controller, artifactBytes);
+        var artifactHash = Convert.ToHexStringLower(SHA256.HashData(artifactBytes));
         var older = await controller.MatrixBuildSubmissions.SubmitAsync(
+            ManagementRequestContext.System("test"),
             Request("panel-older", "older-configuration", payloadHash));
         var newer = await controller.MatrixBuildSubmissions.SubmitAsync(
+            ManagementRequestContext.System("test"),
             Request("panel-newer", "newer-configuration", payloadHash));
         var newerSnapshot = (await controller.MatrixBuildStore.GetSnapshotAsync(newer.BuildId))!;
         var cellBuildId = newerSnapshot.Cells.Single().BuildId;
-        await FinishBuildAsync(controller, cellBuildId, artifactHash, artifactBytes.Length);
+        await FinishBuildAsync(
+            controller,
+            knownAgent,
+            cellBuildId,
+            artifactHash,
+            artifactBytes);
         await controller.Database.WriteAsync(connection =>
         {
             using var command = connection.CreateCommand();
@@ -186,11 +195,22 @@ public class PanelTests
         using var http = PinnedClient(controller);
         var artifactUrl = $"/builds/{newer.BuildId}/cells/{cellBuildId}/artifacts/0";
         var anonymousDetail = await http.GetAsync($"/builds/{newer.BuildId}");
-        var anonymousArtifact = await http.GetAsync(artifactUrl);
+        using var anonymousArtifactRequest = new HttpRequestMessage(HttpMethod.Get, artifactUrl);
+        anonymousArtifactRequest.Headers.Add(
+            ManagementRequestContextFactory.CorrelationHeader, "artifact-read-anonymous");
+        var anonymousArtifact = await http.SendAsync(anonymousArtifactRequest);
+        var anonymousArtifactAudit = (await controller.Audits.ListAsync())
+            .Single(audit => audit.CorrelationId == "artifact-read-anonymous");
         Assert.Multiple(() =>
         {
             Assert.That(anonymousDetail.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
             Assert.That(anonymousArtifact.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+            Assert.That(
+                anonymousArtifact.Headers.GetValues(ManagementRequestContextFactory.CorrelationHeader).Single(),
+                Is.EqualTo("artifact-read-anonymous"));
+            Assert.That(anonymousArtifactAudit.Action, Is.EqualTo("artifact.read"));
+            Assert.That(anonymousArtifactAudit.Outcome, Is.EqualTo(AuditOutcome.Denied));
+            Assert.That(anonymousArtifactAudit.ReasonCode, Is.EqualTo("authentication_required"));
         });
 
         await LoginAsync(http, controller.Tokens.AdminToken);
@@ -216,25 +236,70 @@ public class PanelTests
             Assert.That(detailHtml, Does.Contain($"{artifactBytes.Length} B"));
         });
 
-        var artifact = await http.GetAsync(artifactUrl);
+        using var artifactRequest = new HttpRequestMessage(HttpMethod.Get, artifactUrl);
+        artifactRequest.Headers.Add(
+            ManagementRequestContextFactory.CorrelationHeader, "artifact-read-success");
+        var artifact = await http.SendAsync(artifactRequest);
         var downloadedBytes = await artifact.Content.ReadAsByteArrayAsync();
+        var artifactAudit = (await controller.Audits.ListAsync())
+            .Single(audit => audit.CorrelationId == "artifact-read-success");
         Assert.Multiple(() =>
         {
             Assert.That(artifact.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(
+                artifact.Headers.GetValues(ManagementRequestContextFactory.CorrelationHeader).Single(),
+                Is.EqualTo("artifact-read-success"));
             Assert.That(artifact.Content.Headers.ContentDisposition?.FileNameStar ??
                 artifact.Content.Headers.ContentDisposition?.FileName,
                 Does.Contain("report.bin"));
             Assert.That(artifact.Content.Headers.ContentDisposition?.ToString(),
                 Does.Not.Contain("results/"));
             Assert.That(downloadedBytes, Is.EqualTo(artifactBytes));
+            Assert.That(artifactAudit.Action, Is.EqualTo("blob-artifact.read"));
+            Assert.That(artifactAudit.TargetId,
+                Is.EqualTo($"{cellBuildId}:0"));
+            Assert.That(artifactAudit.Outcome, Is.EqualTo(AuditOutcome.Succeeded));
         });
 
-        Assert.That(
-            (await http.GetAsync($"/builds/{older.BuildId}/cells/{cellBuildId}/artifacts/0")).StatusCode,
-            Is.EqualTo(HttpStatusCode.NotFound));
-        Assert.That(
-            (await http.GetAsync($"/builds/{newer.BuildId}/cells/{cellBuildId}/artifacts/1")).StatusCode,
-            Is.EqualTo(HttpStatusCode.NotFound));
+        using var wrongOwnerRequest = new HttpRequestMessage(
+            HttpMethod.Get, $"/builds/{older.BuildId}/cells/{cellBuildId}/artifacts/0");
+        wrongOwnerRequest.Headers.Add(
+            ManagementRequestContextFactory.CorrelationHeader, "artifact-read-wrong-owner");
+        var wrongOwner = await http.SendAsync(wrongOwnerRequest);
+        using var missingOrdinalRequest = new HttpRequestMessage(
+            HttpMethod.Get, $"/builds/{newer.BuildId}/cells/{cellBuildId}/artifacts/1");
+        missingOrdinalRequest.Headers.Add(
+            ManagementRequestContextFactory.CorrelationHeader, "artifact-read-missing-ordinal");
+        var missingOrdinal = await http.SendAsync(missingOrdinalRequest);
+
+        const string invalidMatrixId = "password-secret-matrix";
+        using var invalidTargetRequest = new HttpRequestMessage(
+            HttpMethod.Get, $"/builds/{invalidMatrixId}/cells/{cellBuildId}/artifacts/0");
+        invalidTargetRequest.Headers.Add(
+            ManagementRequestContextFactory.CorrelationHeader, "artifact-read-invalid-target");
+        var invalidTarget = await http.SendAsync(invalidTargetRequest);
+        var noChangeAudits = (await controller.Audits.ListAsync())
+            .Where(audit => audit.CorrelationId is
+                "artifact-read-wrong-owner" or
+                "artifact-read-missing-ordinal" or
+                "artifact-read-invalid-target")
+            .ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(wrongOwner.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(missingOrdinal.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(invalidTarget.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(noChangeAudits, Has.Length.EqualTo(3));
+            Assert.That(noChangeAudits.All(audit =>
+                audit.Outcome == AuditOutcome.NoChange &&
+                audit.ReasonCode == "not_found" &&
+                audit.Source == "artifact-download"), Is.True);
+            Assert.That(noChangeAudits.Single(audit =>
+                audit.CorrelationId == "artifact-read-invalid-target").TargetId,
+                Does.StartWith("invalid-artifact:"));
+            Assert.That(string.Join('|', noChangeAudits.Select(audit => audit.TargetId)),
+                Does.Not.Contain(invalidMatrixId));
+        });
 
         var notFound = await http.GetStringAsync("/builds/unknown-matrix");
         Assert.That(notFound, Does.Contain("Not Found"));
@@ -269,7 +334,8 @@ public class PanelTests
         return request;
     }
 
-    private static async Task RegisterKnownAgentAsync(VivariumControllerHost controller)
+    private static async Task<KnownAgentSession> RegisterKnownAgentAsync(
+        VivariumControllerHost controller)
     {
         var enrollToken = await controller.Tokens.CreateEnrollTokenAsync();
         var hello = new Hello
@@ -283,29 +349,66 @@ public class PanelTests
         hello.Parameters["os.family"] = "windows";
         Assert.That(await controller.Tokens.AdmitAgentAsync(hello), Is.Not.Null);
         await controller.AgentStore.ObserveHelloAsync(hello);
+        var token = await controller.Tokens.AuthorizeAgentAsync(hello.AgentId)
+            ?? throw new AssertionException("Agent authorization did not issue a token");
+        var generations = await controller.AgentStore.GetGenerationStateAsync(hello.AgentId)
+            ?? throw new AssertionException("persisted Agent generations were missing");
+        var accepted = await controller.AgentStore.AcceptSessionAsync(
+            hello.AgentId,
+            generations.CredentialGeneration);
+        return new KnownAgentSession(
+            hello.AgentId,
+            hello.SessionId,
+            accepted.ConnectionGeneration,
+            token);
     }
 
     private static async Task FinishBuildAsync(
         VivariumControllerHost controller,
+        KnownAgentSession agent,
         string buildId,
         string artifactHash,
-        int artifactSize)
+        byte[] artifactBytes)
     {
         var now = DateTimeOffset.UtcNow;
-        const string agentId = "known-windows";
-        const string sessionId = "result-session";
-        Assert.That(await controller.BuildQueueStore.TryClaimAsync(buildId, agentId, now), Is.True);
+        Assert.That(
+            await controller.BuildQueueStore.TryClaimAsync(buildId, agent.AgentId, now),
+            Is.True);
         Assert.That(
             await controller.BuildQueueStore.TryPrepareDispatchAsync(
-                buildId, agentId, sessionId, now),
+                buildId, agent.AgentId, agent.SessionId, now),
             Is.True);
         Assert.That(
-            await controller.BuildQueueStore.CompleteDispatchAsync(buildId, agentId, sessionId),
+            await controller.BuildQueueStore.CompleteDispatchAsync(
+                buildId,
+                agent.AgentId,
+                agent.SessionId),
             Is.True);
+        using (var http = PinnedClient(controller))
+        using (var upload = new HttpRequestMessage(HttpMethod.Put, $"/blobs/{artifactHash}")
+        {
+            Content = new ByteArrayContent(artifactBytes),
+        })
+        {
+            upload.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Bearer",
+                agent.Token);
+            upload.Headers.Add("X-Vivarium-Build-Id", buildId);
+            upload.Headers.Add("X-Vivarium-Session-Id", agent.SessionId);
+            upload.Headers.Add(
+                "X-Vivarium-Blob-Declared-Size",
+                artifactBytes.LongLength.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            using var uploaded = await http.SendAsync(upload);
+            Assert.That(
+                uploaded.StatusCode,
+                Is.EqualTo(HttpStatusCode.NoContent),
+                await uploaded.Content.ReadAsStringAsync());
+        }
+
         var result = new BuildResult
         {
             BuildId = buildId,
-            SessionId = sessionId,
+            SessionId = agent.SessionId,
             Outcome = BuildOutcome.Failed,
             StatusText = "one assertion failed",
         };
@@ -314,12 +417,23 @@ public class PanelTests
         {
             Path = "results/report.bin",
             Sha256 = artifactHash,
-            Size = artifactSize,
+            Size = artifactBytes.LongLength,
         });
         Assert.That(
-            await controller.BuildStore.TryFinishAsync(result, agentId, sessionId, now),
+            await controller.BuildStore.TryFinishAsync(
+                result,
+                agent.AgentId,
+                agent.SessionId,
+                agent.ConnectionGeneration,
+                now),
             Is.True);
     }
+
+    private sealed record KnownAgentSession(
+        string AgentId,
+        string SessionId,
+        long ConnectionGeneration,
+        string Token);
 
     private static async Task<string> PutBlobAsync(VivariumControllerHost controller, byte[] content)
     {

@@ -37,6 +37,13 @@ var runner = new AgentRunner(new AgentOptions
     CertFingerprintSha256 = fingerprint.Replace("SHA256:", "", StringComparison.OrdinalIgnoreCase),
     EnrollToken = enrollToken,
     DataDir = Path.GetFullPath(dataDir ?? Path.Combine(AppContext.BaseDirectory, "data")),
+    AgentPackageVersion = ArgValue(args, "--package-version"),
+    AgentPackageSha256 = ArgValue(args, "--package-sha256"),
+    UpgradeOperationId = ArgValue(args, "--upgrade-operation"),
+    UpgradeHealthMarkerPath = ArgValue(args, "--upgrade-health-marker"),
+    UpgradeFailureCode = ArgValue(args, "--upgrade-failure-code"),
+    BootstrapLeasePath = ArgValue(args, "--bootstrap-lease"),
+    BootstrapLeaseId = ArgValue(args, "--bootstrap-lease-id"),
 });
 
 Console.WriteLine($"vivarium-agent {AgentRunner.Version} (agent id {runner.AgentId})");

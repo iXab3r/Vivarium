@@ -2,8 +2,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Builds;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Tests;
 
@@ -331,7 +333,7 @@ public class BuildLeaseTests
         harness.Connect("session-1");
         var assignment = new BuildAssignment { BuildId = "direct-re-adopt" };
 
-        var dispatch = harness.Builds.DispatchBuildAsync("agent-1", assignment);
+        var dispatch = harness.Builds.DispatchBuildFromControllerAsync("agent-1", assignment);
         await WaitUntilAsync(
             async () => (await harness.BuildStore.GetAsync("direct-re-adopt"))?.State ==
                 TrackedBuildState.Running);
@@ -379,7 +381,7 @@ public class BuildLeaseTests
         {
             try
             {
-                await harness.Builds.DispatchBuildAsync(
+                await harness.Builds.DispatchBuildFromControllerAsync(
                         "agent-1", new BuildAssignment { BuildId = "direct-send-race" })
                     .WaitAsync(TimeSpan.FromSeconds(5));
             }
@@ -560,7 +562,8 @@ public class BuildLeaseTests
 
         Assert.That((await waiting).Outcome, Is.EqualTo(BuildOutcome.Succeeded),
             "an already-waiting caller must retain its completion source across eviction");
-        var lateCancellation = await harness.Builds.CancelBuildAsync(buildId, "too late");
+        var lateCancellation = await harness.Builds.CancelBuildAsync(
+            ManagementRequestContext.System("test"), buildId, "too late");
         Assert.Multiple(() =>
         {
             Assert.That(harness.Builds.GetSnapshots().Any(item => item.BuildId == buildId), Is.False);
@@ -593,11 +596,11 @@ public class BuildLeaseTests
         var queueService = new BuildQueueService(harness.Queue, harness.Registry);
 
         Assert.That(
-            async () => await queueService.EnqueueAsync(assignment, ""),
+            async () => await queueService.EnqueueFromControllerAsync(assignment, ""),
             Throws.TypeOf<NotSupportedException>()
                 .With.Message.Contains("expected_reboot"));
         Assert.That(
-            async () => await harness.Builds.DispatchBuildAsync("agent-1", assignment),
+            async () => await harness.Builds.DispatchBuildFromControllerAsync("agent-1", assignment),
             Throws.TypeOf<NotSupportedException>()
                 .With.Message.Contains("expected_reboot"));
         Assert.That(await harness.BuildStore.GetAsync("expected-reboot"), Is.Null);
@@ -667,8 +670,15 @@ public class BuildLeaseTests
             var registry = new AgentRegistry(timeProvider: time);
             var buildStore = new BuildStore(database);
             var queue = new BuildQueueStore(database);
+            var authorization = new ManagementCommandAuthorizer(
+                new ManagementAuthorizer(), new AuditEventStore(database), time);
             var builds = new BuildTracker(
-                registry, buildStore, queue, time, reconnectGrace: Grace);
+                registry,
+                buildStore,
+                queue,
+                time,
+                reconnectGrace: Grace,
+                authorization: authorization);
             await builds.InitializeAsync();
             var options = new ControllerOptions
             {

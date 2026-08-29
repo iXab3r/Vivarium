@@ -107,11 +107,15 @@ credentials. Physical machines make this non-negotiable: there is no hypervisor 
 
 Baking the agent into snapshots means every agent bugfix rebuilds every snapshot — the #1 operational
 pain of VM farms. Images carry only a tiny **bootstrap** with a frozen contract (§7); the real agent is
-downloaded from the controller at boot (manifest + sha256), so agent updates are "publish a file".
-The controller can tell a running agent to restart (`RestartAgent`), and bootstrap picks up the new version.
+downloaded from the controller at boot (manifest + sha256). Agent and Server are two components of one
+Vivarium release: publishing a Server release also publishes its exact per-RID Agent bytes. The
+controller can tell a running agent to restart (`RestartAgent`), and bootstrap picks up the Agent
+component of the running Server release.
 
-The handshake is TeamCity's: on hello the controller compares agent versions and orders a restart when
-stale. On physical machines this is the *only* update path — install once by hand, upgrade centrally
+The handshake is TeamCity-shaped but operation-driven: an administrator selects an Agent or rollout
+scope, never a package. The controller resolves the immutable package matching its own release and the
+Agent RID, drains the Agent, and only then orders a restart under D30. On physical machines this is
+the *only* update path — install once by hand, upgrade centrally
 forever — which is why bootstrap must stay boring. Pool checkpoints may carry yesterday's agent; the
 post-revert upgrade costs one small LAN download **and an agent process restart, not a reboot** —
 pool VMs never reboot between builds (D5). Periodic maintenance re-checkpoints pool VMs with the
@@ -138,7 +142,9 @@ and links whose resolved target leaves the workdir before writing anything outsi
 The durable terminal result owns its ordered artifact manifest; the matrix and build-results page
 project that manifest and provide build-scoped downloads without copying child artifacts into the
 composite build. Format adapters such as TRX remain a separate controller-side projection over those
-immutable raw artifacts.
+immutable raw artifacts. The first bounded TRX projection now persists adapter/schema provenance,
+report state, stable/fallback test definitions, and occurrences while retaining the raw artifact as
+the authority; REST/UI presentation and broader adapter support remain separate work.
 
 - **Default payload — NUnit on .NET**, published **self-contained** per RID, executed as a plain exe
   producing TRX (Microsoft.Testing.Platform route; NUnitLite is the classic fallback). No SDK or runtime
@@ -353,9 +359,10 @@ bounded-retry infra errors.
 
 Phase 1 currently persists distinct `INFRASTRUCTURE_FAILED` and `CANCELLED` terminal outcomes and uses
 `INFRASTRUCTURE_FAILED` for queue and reconnect expiry. A nonzero process exit is still the generic
-`FAILED` outcome. TRX/JUnit normalization into `TEST`, no-result normalization into `CRASH`, dump
-collection, and bounded automatic INFRA retry await the result adapters and machine providers; until
-then the complete taxonomy above is a target contract, not an implemented classifier.
+`FAILED` outcome. The bounded TRX adapter now creates durable test definitions/occurrences and explicit
+projection states without changing raw evidence, but it does not yet normalize the Build outcome to
+`TEST`. JUnit, no-result normalization into `CRASH`, dump collection, and bounded automatic INFRA retry
+remain; until those land the complete taxonomy above is a target classifier contract.
 
 ### D10. Guests run an interactive desktop by default
 
@@ -579,12 +586,15 @@ stores per-user client trust and credentials under the platform application-data
 release publish flags, per-RID zips, and `SHA256SUMS` workflow remain Phase 1 delivery work
 ([`DEVELOPMENT.md`](DEVELOPMENT.md)); code signing is deferred and recorded (§13).
 
-The target release runtime depends only on itself: the controller **bundles the agent + bootstrap packages
-for every supported RID** and serves them from its own store — `/bootstrap/manifest` (D2), the
+The target release runtime depends only on itself: the controller **bundles the matching agent + bootstrap
+packages for every supported RID** and serves them from its own store — `/bootstrap/manifest` (D2), the
 panel's Downloads page, and the enroll scripts all read from that store, so an air-gapped farm never
-phones GitHub. The store also accepts side-loaded builds: `viv agent push out/agent/win-x64` (admin
-scope) publishes a dev build, and every agent picks it up at its next restart — the core dev loop for
-agent work is build → push → watch the farm swap in seconds.
+phones GitHub. The catalog contains exactly one Agent package for every supported RID, and every entry's
+version equals the Server version; an incomplete or mismatched configured catalog fails Server startup.
+Old package rows remain only as immutable operation history and rollback evidence. They cannot be
+selected for a new upgrade. Agent development therefore produces and starts a new Server release bundle,
+then rolls that release's Agent component to a canary; arbitrary side-loading is not a production
+management contract.
 
 Agent downloads are **preconfigured, TeamCity-style**: the panel's Downloads page stamps the zip at
 request time with a ready `bootstrap.json` — controller URL, certificate fingerprint, enroll token —
@@ -744,6 +754,15 @@ The browser uses REST for reads/mutations and SSE for live projections. Configur
 base/applied Git revision and reviewable diff and submit through the D23 mutation path. Information
 architecture begins with TeamCity-shaped Projects/Builds/Queue/Results and AgentExplorer Agents/Agent Details;
 Files and Commands may appear as clearly disabled planned surfaces before their agent capabilities ship.
+The Workbench shell has a compact top application bar, a narrow activity rail that switches TeamCity,
+AgentExplorer, and Administration, one adjacent resizable/expandable/auto-hide context pane for the
+selected workspace, and one canonical routed page.
+AgentExplorer's Agents collection is a dedicated page; selecting a name navigates to a separate stable
+Agent page whose Summary, Build History, Compatible Configurations, Environment, Processes, Network,
+Metrics, Logs, and Parameters are Agent-local tabs/deep links rather than global pane entries. Entity
+routes use immutable IDs rather than mutable names. Main pages follow
+modern TeamCity's compact breadcrumbs, object headers, actions, tabs, and operational tables rather than
+decorative dashboard cards.
 Every UI change routes through UI Expert. Detailed contract: [`design/ui.md`](design/ui.md).
 
 ### D26. Authorization follows TeamCity roles; first run is a one-time local claim
@@ -823,6 +842,91 @@ connects, but it must attach to the intended `agent_id` through provider-authent
 the Agent becomes ready. Physical and hand-managed Agents normally have no ProviderInstance. Public
 provider resources use `providerInstanceId`; provider implementation terminology does not create a
 second fleet identity or change Agent-facing REST paths.
+
+### D29. Managed-local configuration uses a narrow system-Git adapter first
+
+The first managed-local D23 implementation invokes a compatible system `git` executable through a
+narrow controller adapter; it does not add a managed Git library/native package to the controller.
+Candidate changes use an isolated index and Git object plumbing, validate the complete candidate tree,
+and advance `refs/heads/main` with `update-ref <new> <expected>` compare-and-swap. The authoritative
+repository remains a normal non-bare human-usable checkout. A private expected/result synchronization
+marker makes a ref-update/checkout crash recoverable; automatic checkout repair is permitted only when
+the index and worktree exactly match the recorded expected or result tree. Human dirty state blocks
+writes and is never reset or overwritten.
+
+Git is a local runtime tool, not an external service or configuration authority. The adapter passes
+arguments without a shell, supplies bounded secret-free commit identity/metadata, does not put
+credentials in command arguments, and treats a missing/incompatible executable as an explicit
+configuration-repository failure. Remote Git, credentials, and host trust remain gated. Packaging must
+either bundle a proven compatible Git or declare and verify the prerequisite on every supported
+controller platform before an end-user release; the adapter boundary permits a future managed
+implementation without changing D23's revision/mutation contract.
+
+### D30. Agent updates are authenticated, operation-driven, and health-gated
+
+A controller release bundles its immutable Agent packages, but starting that controller never silently
+restarts the whole fleet. An administrator starts a central canary or rolling rollout; no interactive
+access to an Agent host is required. A new operation always targets the package owned by the running
+Server release for the Agent's observed RID; neither REST, UI, nor CLI accepts an arbitrary package ID.
+Package identity is `(version, RID, SHA-256, size)`, the digest is authoritative, bytes are
+content-addressed outside Git, and importing the same identity is idempotent while conflicting bytes
+are rejected. A missing current-release package fails the operation closed without draining the Agent.
+
+Initial enrollment starts a seed package whose bytes were authenticated before execution under D21.
+Before authorization, bootstrap never requests a manifest. After authorization, bootstrap and Agent
+share one protected data directory and native principal, so bootstrap reuses the existing Agent bearer
+credential for same-origin manifest/package GETs over pinned TLS. The server derives `agent_id` from
+that credential, authorizes only the package targeted by that Agent's current upgrade operation, and
+never puts a credential in a URL or a package manifest. A second local package secret is forbidden
+until a real OS-principal isolation boundary justifies its lifecycle.
+Agent identity, bearer, and credential-generation files use durable replace semantics; an initialized
+installation with missing, empty, or malformed identity evidence fails closed. Enrollment proof is not
+consumed until a fresh Hello proves the durably stored bearer.
+
+An upgrade is a durable runtime operation, not a Git configuration mutation. Creating it atomically
+persists the exact target package and an Agent maintenance drain before new Build admission. Existing
+work finishes. Only after the controller has proved that no Build owns the Agent does it durably enter
+`HANDOFF_READY`; this is the update commit point and the earliest state in which bootstrap may read an
+activation manifest. Before that point cancellation is terminal and may release the drain. At or after
+that point cancellation becomes `ROLLBACK_REQUESTED`; it never makes an ambiguous process schedulable.
+
+Bootstrap is a singleton supervisor of exactly one identified child. It independently polls the
+authenticated handoff channel while the child runs, so a lost `RestartAgent` notification does not
+require host access. It never activates a package in `DRAINING`, never launches the last-known-good
+child until candidate death is positively observed, and preserves an operation identity across its own
+restart. Verified content is staged in a content-addressed directory before a durable atomic active-
+state change; activation is permitted only when the manifest's exact prior digest still equals the
+local active slot, and the second post-download manifest must be byte-for-byte equivalent in all
+directive fields. An expired operation never returns `activate`. The previous authenticated slot
+remains last-known-good. Initial installers stamp a digest for the seed executable so the first
+rollback has exact evidence too. An Agent must advertise the negotiated
+`vivarium.bootstrap-supervisor.v1` capability from a live launcher lease before an upgrade operation
+can be created.
+
+Success requires the same stable `agent_id`, current credential generation, a newer accepted
+connection generation, operation ID, exact target digest/RID, compatible protocol, completed controller
+reconciliation, no ghost Build, and a bounded probation. Health is a crash-recoverable handshake:
+controller acceptance lets the Agent durably publish candidate readiness; bootstrap durably records
+promotion and acknowledges it locally; the Agent confirms that launcher receipt; the controller
+records commit-pending and asks the Agent for a durable commit marker; only the matching final
+confirmation commits `SUCCEEDED` and releases the drain. Every message is exact-session and safely
+repeatable. Deadline, early exit, explicit rollback, or cancellation after the commit point kills the
+candidate, activates the retained prior slot once, and holds the drain until that exact slot reconciles.
+A repeatedly bad or unkillable candidate remains `FAILED`/quarantined and visibly drained. Failure to
+terminate is durably queued by bootstrap and retried before any manifest processing or child launch;
+the matching Hello is independent failure evidence, and the controller acknowledgment is idempotent.
+
+Controller restart resumes the operation from SQLite and may repeat manifest reads, package reads, or
+health messages. Restart dispatch is persisted before send, bounded, and at most once per connection
+generation unless its durable retry deadline passes; it cannot create an unbounded outbox or audit
+storm. Each session outbox is bounded; overflow fences the stalled session and lets normal reconnect
+recovery run without affecting peers. At most one nonterminal or quarantined maintenance operation owns an Agent drain, and another
+Agent remains independently schedulable. A failed operation does not silently restore eligibility.
+Explicit retry creates a newly fenced attempt, rollback/cancel preserve the original outcome and first
+reason, and force release (if later exposed) leaves the Agent `UNKNOWN` rather than idle. Bounded status
+includes the held-drain flag, current phase, observed generation/package, failure and transition
+history. Release-channel and staged-rollout policy may later be Git-backed, but it must use this same
+operation path rather than bypass it.
 
 ## 5. Protocol sketch
 
@@ -906,11 +1010,14 @@ enum BuildOutcome {
 ```
 
 Implemented blob endpoints are `GET/PUT /blobs/{sha256}`; both are bearer-authenticated and every PUT
-body is verified against its hash (D4). Target bootstrap/setup endpoints are
-`GET /bootstrap/manifest?os=&arch=`, `GET /setup.ps1`, and `GET /setup.sh`, but none is mapped yet.
-Before they ship, D2 must resolve authenticated manifest token handoff and D21 must prove
-pre-execution installer authentication. The short-lived, single-use enroll token authenticates the
-setup/enrollment flow; it does not make an unpinned initial script fetch safe (§8.4).
+body is verified against its hash (D4). D30 also implements Agent-bearer-authenticated
+`GET /bootstrap/manifest?os=&arch=`, `GET /bootstrap/packages/{sha256}`, and the bounded
+`POST /bootstrap/upgrade-failure` safety report. The credential-derived Agent may read only its active
+operation's exact package and may fail only that operation with the fixed launcher-failure code;
+manifest and URL contain no credential.
+`GET /setup.ps1` and `GET /setup.sh` remain target installer endpoints. The short-lived, single-use
+enroll token authenticates setup/enrollment; it does not make an unpinned initial script fetch safe
+(D21, §8.4).
 
 The implemented Phase-1 management plane is a second gRPC service on the same host. It is now a
 transitional adapter while `/api/v1` reaches parity (D24):
@@ -945,8 +1052,9 @@ service downloads authorize through Project/Build ownership rather than knowledg
 Complete target build flow: the queue holds builds awaiting compatible agents → a provider supplies one (an idle
 enrolled agent, or a reverted pool VM) → assignment → payload pull (sha-verified) → steps run
 (log stream + service messages + heartbeats) → artifact push → result → adapters parse TRX/JUnit →
-epilogue per clean policy (D5/D6). The current slice reaches durable raw result/artifact presentation;
-live service-message projection, adapters, and provider epilogues remain roadmap work.
+epilogue per clean policy (D5/D6). The current slice reaches object-authorized raw artifact retention
+plus a durable bounded TRX projection with restart catch-up. REST/UI test presentation, JUnit, live
+service-message projection, outcome classification, and provider epilogues remain roadmap work.
 
 ## 6. Data model
 
@@ -986,23 +1094,45 @@ blob store as chunked files. The Phase 1 build core stores the serialized assign
 lifecycle state, cancellation reason, and terminal result; in-memory waiters are projections, never
 the source of truth. No external services.
 
-## 7. Bootstrap contract (candidate; freeze gate pending)
+## 7. Bootstrap contract (D30 target; freeze after process evidence)
 
 The only code baked into images — and installed on physical machines by authenticated setup. In role
-it is exactly TeamCity's agent launcher: the version handshake and the swap live here. The contract
-freezes only after it is proven end-to-end — freezing before the first consumer exists is how a bug
-gets frozen. The current prototype does not authenticate `GET /bootstrap/manifest`, does not receive
-the enrolled agent token, and the controller does not map that endpoint; therefore the D2 freeze gate
-has not been met. Its source remains change-controlled under AGENTS.md, and D2 implementation requires
-an explicit numbered refinement before modifying it. Intended behavior:
+it is exactly TeamCity's agent launcher: the version handshake and the swap live here. D30 resolves
+the authenticated manifest handoff and authorizes the first bounded implementation change; the
+contract freezes only after bad-digest, interrupted-activation, health-timeout, rollback, restart, and
+real child-process evidence pass. Intended behavior:
 
 1. Read `bootstrap.json` next to itself: `{ controllerUrl, certFingerprint, machineKind, imageId? }` —
    `certFingerprint` pins the controller's self-signed TLS certificate (D4); `imageId` exists only in
    baked images. The agent's own persistent identity (GUID + authorization token, D7) lives in the
    agent's data directory, never in `bootstrap.json`.
-2. Loop: `GET /bootstrap/manifest?os=…&arch=…` (pinned TLS) → `{version, sha256, url}`; if the local
-   agent differs, download, verify sha256, swap atomically (temp + rename); launch the agent with the
-   config; wait for exit; repeat with jittered backoff.
+2. Without `data/auth.token`, launch the authenticated seed package and never request a manifest.
+   After authorization, send that token only as a Bearer header to same-origin
+   `GET /bootstrap/manifest?os=…&arch=…`; the server derives the Agent and exact active operation.
+3. Only after the manifest says `activate` for a `HANDOFF_READY` operation, download its
+   content-addressed URL with the same header, verify version/RID/digest/size and a bounded portable
+   regular-file archive, stage outside the active package, atomically replace `active.json`, and launch
+   with package/operation identity. Rehash cached bytes before reuse.
+4. Hold a singleton installation lock, durably identify the child process, and refresh a launcher lease
+   that makes an unadopted Agent stop. On bootstrap restart, re-adopt only the exact PID/start-time/
+   executable/slot record; otherwise wait one complete local monotonic orphan window, independent of
+   persisted wall time, before launching another child.
+5. Retain the prior authenticated slot through probation and the full
+   ready/promoted/committed/server-confirmed handshake. `committed` proves that the Agent received the
+   controller's commit acceptance; the controller then durably enters `FINALIZING`, sends its recorded
+   receipt, and releases the drain only after the Agent durably writes and confirms `server-confirmed`.
+   Bootstrap clears pending state only from that final marker. Continue polling for explicit `rollback`
+   while the child runs. An authenticated remaining-duration watchdog is also measured monotonically,
+   so guest clock skew cannot extend probation. Deadline, launch failure, or early exit positively
+   terminates the candidate and launches the prior slot with the same operation ID; do not activate that
+   operation again while reporting its rollback result. Child termination is bounded; failure becomes a
+   durable controller-visible `FAILED` operation whose exact drain stays held. The outstanding failure
+   report survives bootstrap restart and blocks both directive processing and child launch until the
+   controller acknowledges it.
+6. Schema-2 slots require their original package receipt and full file hashes on every bootstrap start;
+   missing evidence is never synthesized. Missing launcher state in an installation with package/child
+   evidence fails closed instead of silently reseeding. Startup removes only package directories not
+   referenced by active/fallback/pending state and activation preserves a disk-space reserve.
 
 Self-contained single-file .NET; size is irrelevant inside a 40 GB image. Rebuilding images is required
 only when the scenario's software set changes (legitimate) or bootstrap itself changes (should not happen).
@@ -1119,13 +1249,18 @@ orchestrator — is the reference for that driver.
 
 React + EyeAuras Workbench, built to static assets and served by the controller (D25). The browser is
 an ordinary `/api/v1` client and uses SSE for live projections; it does not call controller services or
-SQLite directly. Initial navigation has two explicit product areas:
+SQLite directly. A narrow activity rail switches the three explicit workspaces; one expandable context
+pane shows the selected workspace's tree/navigation and the main area contains a canonical routed page
+with breadcrumbs, object header/actions, and local tabs. Initial product navigation includes:
 
 - **TeamCity:** Projects, Build Configurations, Queue & Builds, Build Results, Matrix.
-- **AgentExplorer:** Agents, Agent Details (Overview, Environment, Processes, Network, Metrics), Operations;
-  Files, Commands, and Software may be visible as disabled planned pages until capabilities ship.
+- **AgentExplorer:** a dedicated Agents collection and separate stable Agent Details pages. Agent Summary,
+  Build History, Compatible Configurations, Environment, Processes, Network, Metrics, Logs, and Parameters are
+  Agent-specific tabs/deep links; Operations is a collection-level destination. Files, Commands, and
+  Software may be visible as disabled planned tabs only when their capability boundary is explained.
 
-Shared administration includes Agents/enrollment, Images/providers, Downloads, Users/Roles, Git
+**Administration** includes Agent deployment/enrollment and pending authorization, Images/providers,
+Downloads, Users/Roles, Git
 configuration/reconciliation, and Audit. Every desired-setting form shows its base/applied Git revision,
 diff, validation, and direct-commit or review status. Authentication follows D26; the browser's one-time
 self-signed-certificate warning remains expected and documented.
@@ -1145,11 +1280,14 @@ project invites strangers.
   mechanism, not values-in-yaml.
 - **Agent self-protection** — an elevated test can kill or replace the agent and bootstrap mid-build.
   Accepted for now (the machine is reverted or disposable); revisit for physical machines.
-- **Controller operations** — backup/restore of SQLite + blob store, schema migrations on upgrade, and
-  the honest caveat that a dev machine doubling as controller sleeps, reboots, and hibernates.
-- **Authorization rollout** — D26 is the accepted target, but the current implementation still has
-  coarse admin/submit tokens and must migrate without accidentally granting AgentExplorer or Git approval
-  rights to legacy credentials.
+- **Controller operations** — backup/restore of SQLite + blob store, migration backup policy and
+  operator recovery procedures, and the honest caveat that a dev machine doubling as controller
+  sleeps, reboots, and hibernates. Ordered checksummed startup migrations and newer-schema refusal now
+  exist; operational backup/restore remains unresolved.
+- **Authorization rollout** — D26's first local claim, named first administrator, built-in role floor,
+  Git User/RoleBinding projection, and explicit recovery session are implemented. Legacy admin/submit
+  credentials remain migration adapters, and groups, service accounts, PATs, custom roles, project-tree
+  inheritance, and general user/role management must land without widening those legacy scopes.
 - **Git bootstrap and credentials** — D23 accepts a managed-local repository as the deterministic
   first-run default; remote authority still needs proven SSH/HTTPS host trust, private credential
   references, branch protection/review behavior, and failure recovery.

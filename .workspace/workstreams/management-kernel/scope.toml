@@ -1,0 +1,20 @@
+workstream = "management-kernel"
+status = "complete"
+baseline_revision = "09997927c45344ee8512655e6998a80dccf4a818"
+baseline_inventory_count = 20
+current_inventory_count = 25
+source_roots = [
+  "src/Vivarium.Controller/Management",
+  "src/Vivarium.Controller/Components/Pages",
+  "src/Vivarium.Controller/VivariumControllerHost.cs",
+  "src/Vivarium.Controller/Program.cs",
+]
+target_roots = [
+  "src/Vivarium.Controller/Persistence",
+  "src/Vivarium.Controller/Security",
+  "src/Vivarium.Controller/Auditing",
+  "tests/Vivarium.Tests",
+]
+discovery_command = "rg -n 'public override async Task|app\\.Map(Get|Post|Put|Delete)|Management\\.DemandAsync|CreateEnrollTokenAsync\\(' src/Vivarium.Controller/Management src/Vivarium.Controller/Components/Pages src/Vivarium.Controller/VivariumControllerHost.cs src/Vivarium.Controller/Program.cs"
+stable_id_rule = "<transport>:<declared operation or route>"
+exclusions = ["unauthenticated presentation-only GET /login", "live component callbacks that only refresh an already inventoried panel read"]

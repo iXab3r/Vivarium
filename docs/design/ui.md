@@ -63,6 +63,14 @@ unused dependencies are removed in one reviewable migration. New screens are not
    time and reconnecting/stale state. A cached snapshot is never made to look live.
 10. **TeamCity vocabulary is preserved.** Visual simplification cannot rename the domain or collapse
     independent status axes.
+11. **The shell has four layers.** A compact top application bar holds global identity/search/health/help/
+    session actions; a narrow activity rail switches TeamCity, AgentExplorer, and Administration; one
+    adjacent context pane resizes, expands, collapses, or auto-hides and shows the selected workspace's
+    navigation; the remaining area is one canonical routed page. Tabs within that page never become
+    global navigation destinations.
+12. **Collections and objects do not collapse into one screen.** Agents is a dedicated fleet collection.
+    Selecting an Agent navigates to that Agent's stable detail route, where all Agent-specific tabs and
+    actions remain scoped to that identity.
 
 ## State-authority table
 
@@ -187,10 +195,64 @@ continuous; the next REST response remains authoritative. Reconnecting never ove
 draft. Browser console output, telemetry, and error reporting must follow the Logs Expert's redaction and
 volume rules.
 
+## Shell and navigation contract
+
+The accepted shell combines EyeAuras Workbench mechanics with modern TeamCity information density. It is
+not an IDE clone and does not use freely dockable editor groups for application navigation.
+
+1. **Application bar.** A compact global bar contains Vivarium/controller identity, global search,
+   controller health, help, notifications where justified, and user/session actions. Object and
+   workspace actions do not leak into this bar.
+2. **Activity rail.** A narrow always-available rail contains explicit switches for
+   TeamCity, AgentExplorer, and Administration, plus truly global account/help controls. Selecting a
+   workspace changes the context pane and navigates to that workspace's last valid or default route; it
+   does not render the other workspaces as tabs in the content page.
+3. **Expandable context pane.** Exactly one adjacent pane holds the active workspace's navigation. For
+   TeamCity it contains the project/build-configuration tree and dedicated queue entry. For
+   AgentExplorer it contains collection/saved-view/operation entry points, not a duplicate list of Agent
+   instances. For Administration it contains deployment, packages/rollouts, identity, Git, audit, and
+   diagnostics destinations as permissions allow. Resize/collapse/width/auto-hide are local Workbench/browser
+   preferences.
+4. **Routed page.** Breadcrumbs, object identity and status, primary actions, and page-local tabs live in
+   the main content header. The body favors dense tables, lists, definition rows, logs, and progressive
+   detail. Decorative KPI/card dashboards are not the default composition.
+5. **Canonical deep links.** The URL identifies the workspace, collection/object, and selected local tab
+   when that tab is meaningful to share. Refreshing or opening the link in a new window restores the same
+   page without relying on Workbench memory history. Cross-workspace links are explicit navigations, not
+   hidden pane state.
+6. **Responsive behavior.** The context pane auto-hides before content becomes unusable; on narrow
+   viewports it becomes an accessible overlay that closes after navigation. The workspace rail and
+   current-route identity remain available. Narrow layouts may reduce secondary columns and move local
+   tabs into an accessible overflow control, but collection/detail separation and primary actions remain
+   intact.
+
+Canonical browser route grammar:
+
+- `/teamcity/projects`, `/teamcity/projects/{projectId}`
+- `/teamcity/build-configurations/{configurationId}/{tab?}`
+- `/teamcity/queue`
+- `/teamcity/builds/{buildId}/{tab?}` and `/teamcity/builds/{matrixBuildId}/matrix`
+- `/agent-explorer/agents`
+- `/agent-explorer/agents/{agentId}/{tab?}`
+- `/agent-explorer/operations`
+- `/administration/enrollment`, `/administration/packages`, `/administration/rollouts`
+- `/administration/users`, `/administration/git`, `/administration/audit`, and
+  `/administration/diagnostics`
+
+Entity routes use immutable identifiers. Mutable Agent names appear in titles and breadcrumbs, never as
+route identity. Collection filters, sorting, and cursors use shareable URL state where practical; local
+pane geometry does not.
+
+Modern TeamCity is the presentation reference for breadcrumbs, compact page headers, dedicated Agents and
+Queue pages, object-local tabs, and operational tables. Workbench supplies the rail, expandable pane,
+commands, context keys, notifications, and layout persistence. Vivarium owns the exact routes, terms,
+permissions, data, and workflows.
+
 ## Information architecture
 
-The application has three top-level workspaces. Routes below describe stable concepts; exact URL spelling
-is finalized with the REST and UI implementations.
+The application has three top-level workspaces. Their canonical browser route grammar is fixed above;
+implementations may add tab values or subordinate routes without creating alternate collection/object
+identities.
 
 ### TeamCity workspace
 
@@ -216,20 +278,31 @@ or infer test results from exit codes.
 
 - **Agents:** searchable, pageable table of all registered Agents, including offline records. Default
   columns cover name, connection/authorization/enablement/activity axes, OS, agent version, capabilities,
-  current lease/build, last seen, and inventory age.
-- **Host detail / Overview:** identity, status axes, host facts, capability availability/policy, health,
-  current activity, and immutable links to builds that ran there.
-- **Environment:** on-demand effective environment with observation time, redaction, partial-access
+  current lease/build, last seen, and inventory age. This is a dedicated collection route; the context
+  pane never substitutes a tree of Agent instances for this page.
+- **Agent detail / Agent Summary:** every Agent name links to a separate stable identity route. Its header
+  owns connection, authorization, enablement, activity, and upgrade-health status plus Agent-scoped
+  actions. The summary tab shows identity, host facts, capability availability/policy, health, current
+  activity, and immutable links to builds that ran there.
+- **Build History:** builds that ran on this Agent, with immutable provenance links.
+- **Compatible Configurations:** compatible and incompatible build configurations with exact reasons.
+- **Environment:** Agent-local, on-demand effective environment with observation time, redaction, partial-access
   indicators, and no implicit durable persistence of secret-bearing values.
-- **Processes:** on-demand process snapshot with process identity, parent, executable/arguments when
+- **Processes:** Agent-local, on-demand process snapshot with process identity, parent, executable/arguments when
   permitted, owner/session, start time, and resource columns.
-- **Network:** TCP/UDP endpoints, local/remote addresses, state, owning process, observation time, and
+- **Network:** Agent-local TCP/UDP endpoints, local/remote addresses, state, owning process, observation time, and
   platform/permission limitations.
+- **Metrics:** bounded Agent-local operational metrics with units, observation windows, collection cost,
+  and freshness.
+- **Logs:** bounded/redacted Agent and operation logs under the Logs Expert contract.
+- **Parameters:** reported facts and Git-backed desired/custom parameters with source, observation or
+  revision, and desired/effective separation.
 - **Files — Planned**, **Commands — Planned**, and **Software — Planned:** honest placeholders that explain
   the future capability and permission boundary. They do not expose dead buttons or reserve fake REST or
   AgentHub contracts.
 
-The detail page distinguishes `unsupported`, `disabled by host policy`, `forbidden to this user`,
+All Agent-specific destinations above are local tabs/deep links beneath the selected Agent route; none is
+a global context-pane destination. The detail page distinguishes `unsupported`, `disabled by host policy`, `forbidden to this user`,
 `temporarily unavailable`, and `stale`. OS family alone is never used as proof of capability.
 
 ### Administration workspace
@@ -314,6 +387,9 @@ using its last durable facts with an obvious timestamp.
   into an ARIA live region.
 - Dense tables remain usable at laptop widths. Narrow screens may collapse secondary columns into details,
   but destructive or primary actions remain discoverable.
+- The context pane auto-hides at narrow widths and becomes an accessible overlay when opened, while the
+  activity rail continues to expose workspace switching. Expanding or collapsing it does not change the
+  canonical route or discard page state.
 - Virtualized datasets retain accessible names, row counts where known, and stable keyboard navigation.
 
 ## Testing strategy
@@ -325,9 +401,10 @@ using its last durable facts with an obvious timestamp.
 - **REST contract tests:** generated or validated against the committed OpenAPI contract; fixtures include
   every documented error and partial-data shape.
 - **Browser tests:** Playwright against the production React build served by a real Kestrel test host.
-  Cover login, direct deep links, Projects -> Build Configuration -> Build, queue cancellation, Agents ->
-  Process/Network snapshots, Git edit/diff/conflict/revision, audit linkage, reconnect/event-gap recovery,
-  and forbidden actions.
+  Cover login, workspace switching, context-pane expand/collapse, direct deep links, Projects -> Build
+  Configuration -> Build, queue cancellation, Agents collection -> selected Agent -> local
+  Process/Network tabs, Git edit/diff/conflict/revision, audit linkage, reconnect/event-gap recovery, and
+  forbidden actions.
 - **Accessibility checks:** automated axe-style checks plus explicit keyboard/focus/forced-colors coverage
   for critical workflows.
 - **Migration parity:** the Reconciliation Lead maintains the finite Blazor route/action/state inventory.
@@ -345,12 +422,13 @@ failures retain enough trace/screenshot evidence to diagnose the UI.
    domain pages.
 3. Choose a clean Workbench commit; add the reproducible vendoring script, provenance, licenses, exact
    dependencies, lockfile, and production frontend build.
-4. Build the shell, canonical URL routing, login, permission handling, global search/navigation, and audit
+4. Build the activity rail, workspace switches, expandable context pane, canonical URL routing, compact
+   TeamCity-style page header/local tabs, login, permission handling, global search/navigation, and audit
    entry point.
 5. Port the current Agents and Queue/Builds flows while the parity ledger proves statuses, actions, and
    failure states.
-6. Add the TeamCity project/configuration IA and AgentExplorer Agents/detail surfaces through their REST
-   contracts.
+6. Add the TeamCity project/configuration IA and the separate AgentExplorer Agents collection and
+   Agent-detail routes/local tabs through their REST contracts.
 7. Run production-host browser, accessibility, security, and publish/package checks; remove Blazor cleanly.
 
 This sequence is a dependency order, not permission to implement placeholder backends in the UI.

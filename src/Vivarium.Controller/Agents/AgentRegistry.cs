@@ -67,13 +67,19 @@ public sealed class ConnectedAgent
     public long ConnectionGeneration { get; set; }
     public long ParameterGeneration { get; set; }
     public bool ParametersChanging { get; set; }
+    public bool MaintenanceDrain { get; set; }
     public DateTimeOffset LastHeartbeat { get; set; }
     public CancellationTokenSource? SessionAbort { get; set; }
     public Channel<ControllerMsg> Outbox { get; set; } = NewOutbox();
     public TaskCompletionSource<long> SessionChanged { get; set; } = NewSessionSignal();
 
-    internal static Channel<ControllerMsg> NewOutbox() => Channel.CreateUnbounded<ControllerMsg>(
-        new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+    internal static Channel<ControllerMsg> NewOutbox() => Channel.CreateBounded<ControllerMsg>(
+        new BoundedChannelOptions(128)
+        {
+            SingleReader = true,
+            SingleWriter = false,
+            FullMode = BoundedChannelFullMode.Wait,
+        });
 
     internal static TaskCompletionSource<long> NewSessionSignal() =>
         new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -103,8 +109,44 @@ public sealed class AgentRegistry
         Hello hello,
         AgentAuth auth,
         bool enabled,
+        CancellationTokenSource sessionAbort) =>
+        RegisterCore(hello, auth, enabled, maintenanceDrain: false, connectionGeneration: null, sessionAbort);
+
+    public AgentConnectionHandle Register(
+        Hello hello,
+        AgentAuth auth,
+        bool enabled,
+        long connectionGeneration,
+        CancellationTokenSource sessionAbort)
+        => Register(hello, auth, enabled, maintenanceDrain: false, connectionGeneration, sessionAbort);
+
+    public AgentConnectionHandle Register(
+        Hello hello,
+        AgentAuth auth,
+        bool enabled,
+        bool maintenanceDrain,
+        long connectionGeneration,
         CancellationTokenSource sessionAbort)
     {
+        if (connectionGeneration <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(connectionGeneration),
+                "connection generation must be positive");
+        }
+
+        return RegisterCore(hello, auth, enabled, maintenanceDrain, connectionGeneration, sessionAbort);
+    }
+
+    private AgentConnectionHandle RegisterCore(
+        Hello hello,
+        AgentAuth auth,
+        bool enabled,
+        bool maintenanceDrain,
+        long? connectionGeneration,
+        CancellationTokenSource sessionAbort)
+    {
+
         CancellationTokenSource? previousAbort;
         Channel<ControllerMsg> previousOutbox;
         TaskCompletionSource<long> previousSignal;
@@ -120,6 +162,14 @@ public sealed class AgentRegistry
 
         lock (agent.Gate)
         {
+            var acceptedGeneration = connectionGeneration ?? checked(agent.ConnectionGeneration + 1);
+            if (acceptedGeneration <= agent.ConnectionGeneration)
+            {
+                throw new InvalidOperationException(
+                    $"connection generation {acceptedGeneration} does not advance agent " +
+                    $"'{hello.AgentId}' from {agent.ConnectionGeneration}");
+            }
+
             previousAbort = agent.SessionAbort;
             previousOutbox = agent.Outbox;
             previousSignal = agent.SessionChanged;
@@ -127,10 +177,11 @@ public sealed class AgentRegistry
             agent.Hello = hello;
             agent.Auth = auth;
             agent.Enabled = enabled;
+            agent.MaintenanceDrain = maintenanceDrain;
             agent.Connected = true;
             agent.Reconciled = false;
             agent.SessionId = hello.SessionId;
-            agent.ConnectionGeneration++;
+            agent.ConnectionGeneration = acceptedGeneration;
             agent.ParameterGeneration++;
             agent.LastHeartbeat = timeProvider.GetUtcNow();
             agent.SessionAbort = sessionAbort;
@@ -237,7 +288,9 @@ public sealed class AgentRegistry
             }
 
             agent.CurrentBuildId = currentBuildId;
-            agent.Activity = currentBuildId == null ? AgentActivity.Idle : AgentActivity.Building;
+            agent.Activity = currentBuildId != null
+                ? AgentActivity.Building
+                : agent.MaintenanceDrain ? AgentActivity.Upgrading : AgentActivity.Idle;
             agent.Reconciled = true;
             previousSignal = agent.SessionChanged;
             agent.SessionChanged = ConnectedAgent.NewSessionSignal();
@@ -262,7 +315,7 @@ public sealed class AgentRegistry
         OnChanged();
     }
 
-    public void SetEnabled(string agentId, bool enabled)
+    internal void SetEnabled(string agentId, bool enabled)
     {
         var agent = Get(agentId);
         if (agent != null)
@@ -270,6 +323,24 @@ public sealed class AgentRegistry
             lock (agent.Gate)
             {
                 agent.Enabled = enabled;
+            }
+        }
+
+        OnChanged();
+    }
+
+    public void SetMaintenanceDrain(string agentId, bool drained)
+    {
+        var agent = Get(agentId);
+        if (agent != null)
+        {
+            lock (agent.Gate)
+            {
+                agent.MaintenanceDrain = drained;
+                if (agent.CurrentBuildId is null)
+                {
+                    agent.Activity = drained ? AgentActivity.Upgrading : AgentActivity.Idle;
+                }
             }
         }
 
@@ -367,6 +438,13 @@ public sealed class AgentRegistry
                 return false;
             }
 
+            if (agent.MaintenanceDrain)
+            {
+                connection = null;
+                reason = $"agent '{agentId}' is drained for maintenance";
+                return false;
+            }
+
             if (agent.Activity != AgentActivity.Idle)
             {
                 connection = null;
@@ -426,7 +504,7 @@ public sealed class AgentRegistry
             }
 
             agent.CurrentBuildId = null;
-            agent.Activity = AgentActivity.Idle;
+            agent.Activity = agent.MaintenanceDrain ? AgentActivity.Upgrading : AgentActivity.Idle;
         }
 
         OnChanged();
@@ -449,7 +527,7 @@ public sealed class AgentRegistry
             }
 
             agent.CurrentBuildId = null;
-            agent.Activity = AgentActivity.Idle;
+            agent.Activity = agent.MaintenanceDrain ? AgentActivity.Upgrading : AgentActivity.Idle;
             changed = true;
         }
 
@@ -467,10 +545,23 @@ public sealed class AgentRegistry
             return false;
         }
 
+        CancellationTokenSource? overflowAbort = null;
         lock (agent.Gate)
         {
-            return agent.Connected && agent.Outbox.Writer.TryWrite(message);
+            if (!agent.Connected)
+            {
+                return false;
+            }
+            if (agent.Outbox.Writer.TryWrite(message))
+            {
+                return true;
+            }
+            agent.Outbox.Writer.TryComplete();
+            overflowAbort = agent.SessionAbort;
         }
+        overflowAbort?.Cancel();
+        OnChanged();
+        return false;
     }
 
     public bool TrySend(AgentConnectionHandle connection, ControllerMsg message)
@@ -481,9 +572,78 @@ public sealed class AgentRegistry
             return false;
         }
 
+        CancellationTokenSource? overflowAbort = null;
         lock (agent.Gate)
         {
-            return IsCurrentLocked(agent, connection) && connection.Outbox.Writer.TryWrite(message);
+            if (!IsCurrentLocked(agent, connection))
+            {
+                return false;
+            }
+            if (connection.Outbox.Writer.TryWrite(message))
+            {
+                return true;
+            }
+            connection.Outbox.Writer.TryComplete();
+            overflowAbort = agent.SessionAbort;
+        }
+        overflowAbort?.Cancel();
+        OnChanged();
+        return false;
+    }
+
+    public bool TryGetMaintenanceConnection(
+        string agentId,
+        out AgentConnectionHandle? connection,
+        out Hello? hello,
+        out string? reason)
+    {
+        var agent = Get(agentId);
+        if (agent == null)
+        {
+            connection = null;
+            hello = null;
+            reason = "agent_unknown";
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            if (!agent.Connected)
+            {
+                connection = null;
+                hello = null;
+                reason = "agent_disconnected";
+                return false;
+            }
+
+            if (!agent.Reconciled)
+            {
+                connection = null;
+                hello = null;
+                reason = "agent_reconciling";
+                return false;
+            }
+
+            if (agent.Auth != AgentAuth.Authorized)
+            {
+                connection = null;
+                hello = null;
+                reason = "agent_unauthorized";
+                return false;
+            }
+
+            if (agent.CurrentBuildId is not null)
+            {
+                connection = null;
+                hello = agent.Hello.Clone();
+                reason = "agent_build_active";
+                return false;
+            }
+
+            connection = ConnectionFor(agent);
+            hello = agent.Hello.Clone();
+            reason = null;
+            return true;
         }
     }
 

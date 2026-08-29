@@ -1,5 +1,6 @@
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Builds;
 using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Scheduling;
@@ -46,10 +47,12 @@ public class AgentCustomParameterTests
                 ("os.family", "windows")));
             var beforeEdit = (await controller.Administration.ListAsync()).Single();
 
-            await controller.Administration.SetCustomParameterAsync(agentId, "pool", "lab");
             await controller.Administration.SetCustomParameterAsync(
-                agentId, "software.browser", "chrome");
-            await controller.Administration.SetCustomParameterAsync(agentId, "pool", "secure-lab");
+                ManagementRequestContext.System("test"), agentId, "pool", "lab");
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "software.browser", "chrome");
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "pool", "secure-lab");
 
             Assert.That(controller.Registry.TryBeginBuild(
                 agentId,
@@ -81,7 +84,8 @@ public class AgentCustomParameterTests
                 ("hostname", "custom-agent"),
                 ("os.family", "linux"),
                 ("kernel", "6.8")));
-            await controller.Administration.DeleteCustomParameterAsync(agentId, "software.browser");
+            await controller.Administration.DeleteCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "software.browser");
 
             var reconnected = (await controller.Administration.ListAsync()).Single();
             Assert.Multiple(() =>
@@ -119,10 +123,12 @@ public class AgentCustomParameterTests
             ("os.family", "windows")));
 
         var reportedConflict = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await controller.Administration.SetCustomParameterAsync(agentId, "os.family", "linux"));
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "os.family", "linux"));
         Assert.That(reportedConflict!.Message, Does.Contain("conflicts with a reported parameter"));
 
-        await controller.Administration.SetCustomParameterAsync(agentId, "software.channel", "beta");
+        await controller.Administration.SetCustomParameterAsync(
+            ManagementRequestContext.System("test"), agentId, "software.channel", "beta");
         var helloConflict = Assert.ThrowsAsync<InvalidDataException>(async () =>
             await controller.Store.ObserveHelloAsync(HelloFor(
                 agentId,
@@ -141,9 +147,11 @@ public class AgentCustomParameterTests
         });
 
         Assert.ThrowsAsync<ArgumentException>(async () =>
-            await controller.Administration.SetCustomParameterAsync(agentId, "name", "spoof"));
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "name", "spoof"));
         Assert.ThrowsAsync<ArgumentException>(async () =>
-            await controller.Administration.SetCustomParameterAsync(agentId, "bad key", "value"));
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "bad key", "value"));
     }
 
     [Test]
@@ -163,7 +171,8 @@ public class AgentCustomParameterTests
             DateTimeOffset.UtcNow);
 
         var error = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await controller.Administration.SetCustomParameterAsync(agentId, "pool", "lab"));
+            await controller.Administration.SetCustomParameterAsync(
+                ManagementRequestContext.System("test"), agentId, "pool", "lab"));
         var snapshot = (await controller.Administration.ListAsync()).Single();
         Assert.Multiple(() =>
         {
@@ -223,12 +232,15 @@ public class AgentCustomParameterTests
             var store = new AgentStore(database);
             var registry = new AgentRegistry(store);
             var builds = new BuildStore(database);
+            var authorization = new ManagementCommandAuthorizer(
+                new ManagementAuthorizer(), new AuditEventStore(database), TimeProvider.System);
             var administration = new AgentAdministration(
                 registry,
                 store,
                 builds,
                 tokens,
-                new AgentLifecycleCoordinator());
+                new AgentLifecycleCoordinator(),
+                authorization: authorization);
             return Task.FromResult(new CoreHarness(
                 database, tokens, store, registry, builds, administration));
         }

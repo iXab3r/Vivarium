@@ -6,6 +6,7 @@
 @inject BuildStore Store
 @inject BuildTracker Tracker
 @inject MatrixBuildStore MatrixBuilds
+@inject PanelManagementContext Management
 
 <PageTitle>Queue &amp; Builds · Vivarium</PageTitle>
 
@@ -193,6 +194,7 @@
 
     private async Task ReloadAsync()
     {
+        await Management.DemandAsync(ManagementPermission.BuildWatch);
         var queueTask = Queue.ListPendingAsync();
         var activeTask = Store.ListAssignedActiveAsync();
         var recentTask = MatrixBuilds.ListRecentAsync();
@@ -229,12 +231,22 @@
 
     private Task RemoveAsync(string buildId) => RunActionAsync(
         buildId,
-        () => Queue.RemoveAsync(buildId, "Removed from the Queue & Builds page"),
+        async () =>
+        {
+            var context = await Management.DemandAsync(ManagementPermission.BuildCancel);
+            return await Queue.RemoveAsync(
+                context, buildId, "Removed from the Queue & Builds page");
+        },
         "Build removed from the queue.");
 
     private Task StopAsync(string buildId) => RunActionAsync(
         buildId,
-        () => Tracker.CancelBuildAsync(buildId, "Stopped from the Queue & Builds page"),
+        async () =>
+        {
+            var context = await Management.DemandAsync(ManagementPermission.BuildCancel);
+            return await Tracker.CancelBuildAsync(
+                context, buildId, "Stopped from the Queue & Builds page");
+        },
         "Stop requested. The agent will report a terminal cancelled result.");
 
     private static string WaitState(BuildQueueItem item) => item switch

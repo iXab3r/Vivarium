@@ -19,14 +19,24 @@ internal static class PanelLogin
                 <section class="login-copy">
                     <p class="eyebrow">Controller access</p>
                     <h1>Enter the farm.</h1>
-                    <p>Use the administrator token printed when this controller first started.</p>
+                    <p>Sign in with your Vivarium administrator account.</p>
                 </section>
                 <form class="login-form" method="post" action="/login">
-                    <label for="token">Administrator token</label>
-                    <input id="token" name="token" type="password" autocomplete="current-password" autofocus required>
-                    {{(invalid ? "<p class=\"login-error\" role=\"alert\">That token was not accepted.</p>" : string.Empty)}}
+                    <label for="login">Login</label>
+                    <input id="login" name="login" autocomplete="username" autofocus required>
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                    {{(invalid ? "<p class=\"login-error\" role=\"alert\">Those credentials were not accepted.</p>" : string.Empty)}}
                     <button class="primary-button" type="submit">Sign in</button>
                 </form>
+                <details class="login-form">
+                    <summary>Legacy administrator token</summary>
+                    <form method="post" action="/login">
+                        <label for="token">Administrator token</label>
+                        <input id="token" name="token" type="password" autocomplete="off" required>
+                        <button class="primary-button" type="submit">Use legacy token</button>
+                    </form>
+                </details>
             </main>
         </body>
         </html>

@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D28) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D29) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Phase 0 — Design & skeleton *(complete)*
@@ -82,51 +82,79 @@ Foundation now implemented:
       the protected parent build page: queued children and claims finish together, running children
       retain durable ownership as `CANCEL_REQUESTED`, and the first reason survives retries/restarts
       (D4, D14).
+- [x] The first public read-only `/api/v1` slice: authenticated system discovery, searchable and
+      cursor-paged Agent and audit resources, matrix-build detail/history, durable FIFO queue reads,
+      RFC 9457 Problem Details, conditional ETags, principal/filter/sort-bound cursors, and a
+      deterministic OpenAPI document that excludes transitional panel/blob/gRPC surfaces (D24, D28).
+- [x] Additive AgentHub v1 negotiation, independent capability advertisement, durable credential and
+      connection generations, bounded cross-platform static host facts, restart-safe observation
+      provenance, and typed `/api/v1/agents/{id}/facts` reads. Legacy Agents remain visible and may
+      finish adopted work but are drained from new assignments (D22, D28).
 
-Still to complete in Phase 1:
+Phase 1 delivery sequence (completed and remaining):
 
-The accepted immediate delivery sequence is:
-
-1. Establish the transport-independent management kernel: versioned SQLite migrations, the minimal
+1. [x] Establish the transport-independent management kernel: versioned SQLite migrations, the minimal
    append-only `audit_events` journal, request actor/correlation context, and one authorization
    evaluator beneath the existing ControlPlane, panel, and blob boundaries. Preserve legacy token
-   scope without widening it (D26, D27).
-2. Add the read-only `/api/v1` and deterministic OpenAPI surface for system health, Agents, builds,
+   scope without widening it (D26, D27). The kernel now records legacy login/logout, enrollment,
+   Agent administration, build submission, and cancellation while keeping automatic lifecycle work
+   out of the journal.
+2. [x] Add the read-only `/api/v1` and deterministic OpenAPI surface for system health, Agents, builds,
    and queue state, with shared Problem Details, authorization filtering, and cursor semantics (D24,
    D28).
-3. Add capability/version negotiation and canonical typed connect-time `system.*` host facts, then
+3. [x] Add capability/version negotiation and canonical typed connect-time `system.*` host facts, then
    expose them through Agent REST reads with explicit freshness and legacy-agent behavior (D22, D28).
-4. Initialize the managed-local Git control repository and last-known-good reconciler, then move one
-   Agent desired-setting mutation through commit-before-activate, optimistic concurrency, and the
-   same audit path (D23).
-5. Move object-scoped blob staging and build submit/watch/cancel to REST/SSE, migrate the CLI, and add
-   TRX result projection. Retire the transitional ControlPlane only after parity (D3, D24).
+4. [x] Initialize the managed-local Git control repository and last-known-good reconciler, then move
+   one Agent desired-setting mutation through commit-before-activate, optimistic concurrency, and the
+   same audit path (D23, D29). The first schema is intentionally narrow:
+   `.vivarium/agents/{id}.yaml` owns only `spec.enabled`, exposed through
+   `/api/v1/agents/{id}/settings` GET/PUT; other desired settings remain later work.
+5. [x] Move object-scoped blob staging and build submit/watch/cancel to REST/SSE, migrate the live CLI
+   build flow, and add the first durable bounded TRX result projection. The transitional ControlPlane
+   remains frozen as a compatibility adapter until its removal gate (D3, D24).
 6. Complete first-run administration and TeamCity/fleet RBAC, then expand the TeamCity catalog and
-   durable AgentExplorer operations. Dynamic process/network/environment refresh waits for policy,
-   fleet authorization, operation persistence, and observation fencing (D22, D26-D28).
-7. Port the proven flows to React/EyeAuras Workbench, then complete installers, central Agent upgrades,
-   and release security/compatibility gates (D2, D19-D21, D25).
+   durable AgentExplorer operations (D22, D26-D28).
+   - [x] Durable local claim/resume/abandon, setup-only REST, atomic managed-local User +
+     `SYSTEM_ADMIN` activation, private password credential, named panel login, built-in role floors,
+     Git RoleBindings, and explicit restart-safe Superuser recovery.
+   - [ ] Groups, service accounts, PATs, custom roles, project-tree inheritance, general user/role REST,
+     setup/recovery UI and local CLI, and removal of legacy credential adapters.
+   Dynamic process/network/environment refresh waits for policy, fleet authorization, operation
+   persistence, and observation fencing.
+7. **Partial:** complete deployment and release UX, then port the proven flows to React/EyeAuras Workbench.
+   The D30 per-Agent central upgrade core is implemented: exact Server-release package import, authenticated
+   delivery, pre/post-handoff cancellation semantics, durable drain/restart/probation/two-sided
+   commit/rollback history, bounded singleton child supervision, strict local package evidence,
+   exact prior/deadline binding, durable failure quarantine, bounded session outboxes, supervised-
+   bootstrap capability gating, skew-safe watchdogs, CLI, restart recovery, two-Agent isolation, and real bootstrap success/rollback
+   process evidence. Remaining work is installer/stamped archives,
+   fleet rollout/channels, release signing/packaging, previous-version/Windows gates, and the React UI
+   (D2, D19-D21, D25, D30).
 
 Static typed facts deliberately precede the first Git-backed mutation because they are observed state,
 not desired configuration. Remote commands and file operations do not move forward with the read-only
 inventory slice; they require the later durable-operation, lease, cancellation, RBAC, output, and audit
 contracts. The checklist below records the remaining acceptance scope; it does not override this order.
 
-- Git control repository and one mutation/reconciliation gateway for all desired settings and
-  properties, with validated commit-before-activate, last-known-good projection, optimistic
-  concurrency, audit linkage, and no secret values in Git (D23).
-- Canonical `/api/v1` REST management with `/agents` as the stable fleet collection, OpenAPI, RBAC,
-  idempotency, configuration/observation
-  revisions, cursor pagination, async operations/cancellation, SSE, object-scoped blob access, and
-  REST equivalents of the existing build/blob-discovery flows. The gRPC ControlPlane remains
-  transitional while the CLI migrates (D24, D28).
+- Extend the implemented managed-local Git mutation/reconciliation gateway beyond Agent
+  `spec.enabled` to the remaining desired settings and properties. The existing foundation already
+  provides validated commit-before-activate, last-known-good projection, optimistic concurrency,
+  audit linkage, and secret rejection; remote/review repository modes remain planned (D23, D29).
+- Extend the canonical `/api/v1` management surface beyond its implemented Agent/build/queue/audit
+  reads, Agent enablement mutation, object-scoped blob staging, build submit/cancel, and resumable build
+  SSE. Setup/recovery REST and the initial Git-backed User/built-in RoleBinding evaluator are also
+  implemented. General identity/RBAC management, runtime operations, remaining configuration mutations,
+  and detailed result resources remain. The live CLI build flow now consumes REST/SSE; the gRPC ControlPlane is frozen
+  transitional compatibility only (D24, D28).
 - React + EyeAuras Workbench panel as a clean replacement for the current Blazor prototype. Vendor the
   reviewed core/React/router built packages with exact source commit, license, notice, and reproducible
-  sync metadata; serve static assets from Kestrel and consume REST/SSE only (D25).
-- Agent capability/version negotiation and AgentExplorer read-only inventory: searchable Agents,
-  platform-accurate host facts, safe on-demand environment, processes, TCP/UDP endpoints with owning
-  process, freshness/partial-error semantics, and shared lease visibility. Files and Commands remain
-  explicit placeholders until their capabilities ship (D22, D28).
+  sync metadata; serve static assets from Kestrel and consume REST/SSE only. The shell uses a narrow
+  TeamCity/AgentExplorer/Administration switch rail plus one expandable context pane; Agents is a
+  dedicated collection route and every Agent has a separate detail route with Agent-local tabs (D25).
+- Extend the negotiated capability and typed static-facts foundation with AgentExplorer dynamic
+  inventory: safe on-demand environment, processes, TCP/UDP endpoints with owning process,
+  freshness/partial-error semantics, and shared lease visibility. Files and Commands remain explicit
+  placeholders until their capabilities ship (D22, D28).
 - TeamCity Project and Build Configuration catalog over Git-backed definitions, including ordered
   steps, requirements, parameters, VCS bindings, immutable definition/source revisions, and compatible/
   incompatible-agent explanations (D14, D17, D23).
@@ -137,7 +165,14 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   correlation/idempotency/Git revision linkage (D27).
 - Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
   **unauthorized** → authorize (§8.4, D4).
-- Central launcher-driven auto-upgrade (D2).
+- [x] Per-Agent central launcher-driven upgrade core: immutable/rehash-verified packages,
+  authenticated delivery, durable busy-Agent drain and handoff fence, multi-phase health/two-sided
+  commit confirmation, post-handoff rollback with exact-prior proof, bounded status history, REST/CLI,
+  restart recovery, bounded singleton child supervision, and peer isolation (D2, D30). Fleet rollout policy/channels
+  remain below.
+- Fleet/group canary and rolling orchestration over the same D30 operations; controller startup may
+  import its exact release catalog but must never silently restart the fleet. Rollout policy selects
+  scope and pace; it does not select arbitrary package bytes independently from the Server release.
 - `viv exec --agent <name>` as a durable AgentExplorer operation over REST plus AgentHub, with authorization,
   lease/fencing, cancellation, bounded output, and audit. It is not a Build or `ControlPlane.Exec`
   extension (D22, D24, §9).
@@ -146,32 +181,35 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   authenticates the fetch. The rejected `curl -k ... | sh` shape cannot be repaired by validation
   inside an already replaced script (§8.4, D21).
 - Complete persistent-machine clean-policy execution (`clean-workdir` / `none`, `on_fail: keep`) and
-  build-end result adapters from self-contained NUnit TRX. Reconnect and queue expiry already produce
+  expand the implemented bounded NUnit/MTP TRX projection with REST/UI result presentation, JUnit,
+  build problems, and cross-platform golden evidence. Reconnect and queue expiry already produce
   durable `INFRASTRUCTURE_FAILED`; TEST/CRASH normalization, dumps, and automatic INFRA retries remain
   to implement (D3, D4, D9).
 - Distinguish step `always` from `even-if-failed` during cancellation so post-stop diagnostics can run;
   `on_fail: keep` is parsed and transported but still needs controller/provider cleanup semantics.
-- Resolve the frozen-bootstrap upgrade contract before D2 implementation: the current bootstrap has
-  no authenticated manifest request and the controller maps no manifest endpoint. This requires an
-  explicit numbered design refinement before changing the frozen component.
+- Close the remaining D30 bootstrap freeze evidence: bad/truncated download, interrupted activation,
+  Windows real-process success/rollback, and D21 authenticated installer bytes. The numbered design
+  and authenticated post-authorization manifest/package path are implemented.
 - Add a capability/version handshake and real previous-release compatibility suite before promising
   rolling upgrades. Current protobuf evolution is additive, but old outcomes, cancellation/assignment
   ACKs, and terminal-result ACKs are not operationally bidirectional across arbitrary versions (D2,
   D4, D20).
-- Move custom-parameter desired state behind the Git/REST mutation path and collect platform-accurate
-  reported inventory (Windows
-  build + UBR, Linux distro + kernel, macOS product version) for exact configuration matching (D8,
-  D16). Persistence, matching, central panel editing, and immutable build snapshots already exist.
+- Move Agent names and custom-parameter desired state behind the Git/REST mutation path. Platform-
+  accurate typed static inventory is implemented, while persistence, matching, central panel editing,
+  and immutable build snapshots for the earlier parameter model already exist (D8, D16, D23).
 - Live service-message parsing/streaming remains deferred; step status + heartbeats suffice for the
   Phase-1 core (D14).
-- React panel: port the implemented agent/build/result views, then add live log tail and TRX-derived
-  per-test results (plain durable build/cell details and artifact downloads exist in the transitional
-  Blazor panel; the full test × scenario view with history comes later).
+- React panel: port the implemented agent/build/result views, then expose the durable TRX-derived
+  per-test projection through public REST and add live log tail (plain durable build/cell details and
+  artifact downloads exist in the transitional Blazor panel; the full test × scenario view with
+  history comes later).
 - Finish the normative UX in [`walkthrough.md`](walkthrough.md) §0–§6: install/enroll one-liners and
-  parsed TRX presentation remain; `vivarium.yaml`, `viv run`, and raw result/artifact presentation are
-  implemented (D17).
+  public TRX presentation remain; `vivarium.yaml`, the REST/SSE-backed `viv run`, raw result/artifact
+  presentation, and durable internal TRX projection are implemented (D17).
 - Panel Downloads page (portable agent/CLI zips from the controller's bundled store), `vivarium-agent
-  enroll`, and the `viv agent push` dev flow (D19).
+  enroll`, and fleet rollout UI. `viv agent upgrade <agent-id>` always deploys the Agent component of
+  the running Server release; there is no production package-publication or package-selection command
+  (D19, D30).
 - Tagged releases via GitHub Actions: self-contained per-RID zips + SHA256SUMS (D19, DEVELOPMENT.md).
 
 Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,

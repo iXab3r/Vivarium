@@ -4,6 +4,7 @@ using Vivarium.Agent;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Tests;
 
@@ -51,7 +52,7 @@ public class AgentLifecycleTests
 
             var assignment = new BuildAssignment { BuildId = "b-cancel" };
             assignment.Steps.Add(SleepStep(30));
-            var buildTask = controller.Builds.RunBuildAsync(
+            var buildTask = controller.Builds.RunBuildFromControllerAsync(
                 connected.AgentId, assignment, CancellationToken.None);
 
             await WaitForAsync(
@@ -62,11 +63,12 @@ public class AgentLifecycleTests
 
             var second = new BuildAssignment { BuildId = "b-overlap" };
             var overlap = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await controller.Builds.RunBuildAsync(connected.AgentId, second, CancellationToken.None));
+                await controller.Builds.RunBuildFromControllerAsync(connected.AgentId, second, CancellationToken.None));
             Assert.That(overlap!.Message, Does.Contain("already building"));
 
             // TeamCity semantics: disabling prevents future assignment; it does not stop current work.
-            await controller.AgentAdministration.SetEnabledAsync(connected.AgentId, false);
+            await controller.AgentAdministration.SetEnabledAsync(
+                ManagementRequestContext.System("test"), connected.AgentId, false);
             await Task.Delay(250);
             Assert.Multiple(() =>
             {
@@ -74,11 +76,15 @@ public class AgentLifecycleTests
                 Assert.That(controller.Registry.Get(connected.AgentId)?.CurrentBuildId, Is.EqualTo("b-cancel"));
             });
             var busyDelete = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await controller.AgentAdministration.DeleteAsync(connected.AgentId));
+                await controller.AgentAdministration.DeleteAsync(
+                    ManagementRequestContext.System("test"), connected.AgentId));
             Assert.That(busyDelete!.Message, Does.Contain("stop the build"));
 
             Assert.That(
-                await controller.Builds.CancelBuildAsync("b-cancel", "operator requested stop"),
+                await controller.Builds.CancelBuildAsync(
+                    ManagementRequestContext.System("test"),
+                    "b-cancel",
+                    "operator requested stop"),
                 Is.True);
             var result = await buildTask.WaitAsync(TimeSpan.FromSeconds(20));
 
@@ -87,7 +93,7 @@ public class AgentLifecycleTests
             Assert.That(controller.Registry.Get(connected.AgentId)!.Activity, Is.EqualTo(AgentActivity.Idle));
 
             var disabled = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await controller.Builds.RunBuildAsync(connected.AgentId, second, CancellationToken.None));
+                await controller.Builds.RunBuildFromControllerAsync(connected.AgentId, second, CancellationToken.None));
             Assert.That(disabled!.Message, Does.Contain("disabled"));
         }
         finally
@@ -130,7 +136,8 @@ public class AgentLifecycleTests
                 TimeSpan.FromSeconds(20));
             await controller.AuthorizeAgentAsync(agentId);
             await agent.WaitAuthorizedAsync(TimeSpan.FromSeconds(20));
-            await controller.AgentAdministration.SetEnabledAsync(agentId, false);
+            await controller.AgentAdministration.SetEnabledAsync(
+                ManagementRequestContext.System("test"), agentId, false);
             cts.Cancel();
             await IgnoreCancellationAsync(run);
         }
@@ -167,6 +174,17 @@ public class AgentLifecycleTests
 
         var credential = await controller.Tokens.AuthorizeAgentAsync(agentId);
         Assert.That(credential, Is.Not.Null.And.Not.Empty);
+        var deliveryReplay = await controller.Tokens.AdmitAgentAsync(new Hello
+        {
+            AgentId = agentId,
+            SessionId = "session-delivery-replay",
+            EnrollToken = enrollmentToken,
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(deliveryReplay?.Authorization, Is.EqualTo(AgentAuth.Unauthorized));
+            Assert.That(deliveryReplay?.AuthTokenToDeliver, Is.EqualTo(credential));
+        });
         var confirmed = await controller.Tokens.AdmitAgentAsync(new Hello
         {
             AgentId = agentId,
@@ -183,11 +201,13 @@ public class AgentLifecycleTests
         });
         Assert.That(replay, Is.Null);
 
-        await controller.AgentAdministration.UnauthorizeAsync(agentId);
+        await controller.AgentAdministration.UnauthorizeAsync(
+            ManagementRequestContext.System("test"), agentId);
         Assert.That(await controller.Tokens.IsValidBearerAsync(credential!), Is.True,
             "authorization controls scheduling; the credential still identifies the agent");
 
-        await controller.AgentAdministration.DeleteAsync(agentId);
+        await controller.AgentAdministration.DeleteAsync(
+            ManagementRequestContext.System("test"), agentId);
         Assert.That(await controller.Tokens.IsValidBearerAsync(credential!), Is.False,
             "deleting the registration revokes its credential");
     }
@@ -295,7 +315,8 @@ public class AgentLifecycleTests
         });
 
         await admitted.Task;
-        var delete = controller.AgentAdministration.DeleteAsync(agentId);
+        var delete = controller.AgentAdministration.DeleteAsync(
+            ManagementRequestContext.System("test"), agentId);
         Assert.That(delete.IsCompleted, Is.False,
             "delete must wait until the admitted connection is registered under the same guard");
         continueRegistration.TrySetResult();
@@ -372,6 +393,89 @@ public class AgentLifecycleTests
             Assert.That(expired.Select(loss => loss.AgentId), Is.EqualTo(new[] { "a-1" }));
             Assert.That(registry.Get("a-1")!.Connected, Is.False);
             Assert.That(session.IsCancellationRequested, Is.True);
+        });
+    }
+
+    [Test]
+    public void Stalled_agent_outbox_is_bounded_and_fenced_without_affecting_a_peer()
+    {
+        var registry = new AgentRegistry();
+        using var stalledSession = new CancellationTokenSource();
+        var stalled = registry.Register(
+            new Hello { AgentId = "stalled", SessionId = "stalled-session" },
+            AgentAuth.Authorized,
+            enabled: true,
+            stalledSession);
+        using var healthySession = new CancellationTokenSource();
+        var healthy = registry.Register(
+            new Hello { AgentId = "healthy", SessionId = "healthy-session" },
+            AgentAuth.Authorized,
+            enabled: true,
+            healthySession);
+
+        for (var index = 0; index < 128; index++)
+        {
+            Assert.That(registry.TrySend(stalled, new ControllerMsg
+            {
+                Restart = new RestartAgent { Reason = $"retry-{index}" },
+            }), Is.True);
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(registry.TrySend(stalled, new ControllerMsg
+            {
+                Restart = new RestartAgent { Reason = "overflow" },
+            }), Is.False);
+            Assert.That(stalledSession.IsCancellationRequested, Is.True);
+            Assert.That(registry.TrySend(healthy, new ControllerMsg
+            {
+                Restart = new RestartAgent { Reason = "peer-progress" },
+            }), Is.True);
+            Assert.That(healthySession.IsCancellationRequested, Is.False);
+        });
+    }
+
+    [Test]
+    public void Agent_fails_closed_on_partial_or_truncated_local_identity()
+    {
+        AgentOptions Options(string dataDir) => new()
+        {
+            ControllerUrl = "https://127.0.0.1:1",
+            CertFingerprintSha256 = new string('0', 64),
+            DataDir = dataDir,
+        };
+
+        var missingId = Path.Combine(rootDir, "missing-id");
+        Directory.CreateDirectory(missingId);
+        File.WriteAllText(Path.Combine(missingId, "auth.token"), new string('A', 32));
+
+        var emptyToken = Path.Combine(rootDir, "empty-token");
+        Directory.CreateDirectory(emptyToken);
+        File.WriteAllText(Path.Combine(emptyToken, "agent-id"), new string('a', 32));
+        File.WriteAllText(Path.Combine(emptyToken, "auth.token"), string.Empty);
+
+        var badGeneration = Path.Combine(rootDir, "bad-generation");
+        Directory.CreateDirectory(badGeneration);
+        File.WriteAllText(Path.Combine(badGeneration, "agent-id"), new string('b', 32));
+        File.WriteAllText(Path.Combine(badGeneration, "auth.token"), new string('B', 32));
+        File.WriteAllText(Path.Combine(badGeneration, "auth.generation"), "truncated");
+
+        var missingToken = Path.Combine(rootDir, "missing-token");
+        Directory.CreateDirectory(missingToken);
+        File.WriteAllText(Path.Combine(missingToken, "agent-id"), new string('c', 32));
+        File.WriteAllText(Path.Combine(missingToken, "auth.generation"), "1");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(() => new AgentRunner(Options(missingId)),
+                Throws.TypeOf<InvalidDataException>());
+            Assert.That(() => new AgentRunner(Options(emptyToken)),
+                Throws.TypeOf<InvalidDataException>());
+            Assert.That(() => new AgentRunner(Options(badGeneration)),
+                Throws.TypeOf<InvalidDataException>());
+            Assert.That(() => new AgentRunner(Options(missingToken)),
+                Throws.TypeOf<InvalidDataException>());
         });
     }
 

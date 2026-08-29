@@ -40,14 +40,16 @@ Phase 1 already has:
 - acknowledged assignment, restart-safe ownership, immutable assigned-agent provenance, and
   idempotent terminal results;
 - durable parent/child cancellation with reconnect delivery;
-- streamed logs, raw artifacts, step outcomes, build-result pages, CLI submission/watch/cancel, and a
-  scoped management gRPC API.
+- streamed logs, object-authorized raw artifacts, step outcomes, build-result pages, REST/SSE-backed
+  CLI submission/watch/cancel, and a transitional scoped management gRPC adapter;
+- durable bounded TRX report/test/occurrence projections with raw-artifact provenance and restart
+  catch-up.
 
 The current submission identifies a build configuration by project/name strings carried in a
 submitted YAML snapshot. There is not yet a durable, Git-reconciled catalog of projects, build
 configurations, VCS roots, templates, triggers, or dependencies. Configuration edits are not yet a
-Git-first REST workflow. Parsed test-result adapters and live TeamCity service messages remain target
-work.
+Git-first REST workflow. Detailed test-result REST/UI, JUnit, TEST/CRASH classification, and live
+TeamCity service messages remain target work.
 
 ## Goals
 

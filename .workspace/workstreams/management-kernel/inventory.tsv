@@ -1,0 +1,26 @@
+id	transport	operation	mutation
+grpc:SubmitBuild	grpc	SubmitBuild	yes
+grpc:WatchBuild	grpc	WatchBuild	no
+grpc:CancelBuild	grpc	CancelBuild	yes
+grpc:MissingBlobs	grpc	MissingBlobs	no
+grpc:ListAgents	grpc	ListAgents	no
+grpc:AuthorizeAgent	grpc	AuthorizeAgent	yes
+http:PUT-/blobs/{sha256}	http	Upload blob	yes
+http:GET-/blobs/{sha256}	http	Download blob	no
+http:GET-/builds/{matrixId}/cells/{cellBuildId}/artifacts/{ordinal}	http	Download build artifact	no
+http:POST-/login	http	Panel login	yes
+http:POST-/logout	http	Panel logout	yes
+startup:enrollment-token-create	startup	Create initial enrollment token	yes
+panel:agent-list	panel	List agents	no
+panel:build-list	panel	List queue, active builds, and recent matrices	no
+panel:build-details	panel	Read matrix build details	no
+panel:agent-authorize	panel	Authorize agent	yes
+panel:agent-unauthorize	panel	Unauthorize agent	yes
+panel:agent-enable	panel	Enable or disable agent	yes
+panel:agent-rename	panel	Rename agent	yes
+panel:agent-custom-set	panel	Set custom parameter	yes
+panel:agent-custom-delete	panel	Delete custom parameter	yes
+panel:agent-delete	panel	Delete agent	yes
+panel:enrollment-token-create	panel	Create enrollment token	yes
+panel:child-build-cancel	panel	Cancel queued or running child build	yes
+panel:matrix-build-cancel	panel	Cancel matrix build	yes

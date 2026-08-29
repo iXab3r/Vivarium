@@ -40,18 +40,22 @@ Phase 1 already implements:
 - an ordered `Artifact { path, sha256, size }` list inside the stored protobuf result;
 - durable matrix/child snapshots that project child outcomes, steps, assigned-agent provenance, and
   artifact metadata;
-- authenticated blob endpoints plus a protected build-scoped panel download that checks
-  matrix/child ownership before resolving the blob;
-- a protected build-results page listing child outcomes, step results, and artifact downloads.
+- project/principal-owned upload plans, assignment-scoped payload reads, owned-build artifact writes,
+  immutable build artifact references, and protected build-scoped downloads;
+- a protected build-results page listing child outcomes, step results, and artifact downloads;
+- migration v8 durable TRX projection state (`PENDING`, `NO_REPORT`, `SUCCEEDED`, `PARTIAL`, `FAILED`),
+  versioned report rows, stable/fallback test definitions, and occurrences linked to immutable raw
+  artifact identity/hash/path;
+- a bounded deterministic TRX parser with typed safe failures and sequential restart catch-up for
+  terminal Builds whose projection was absent or interrupted.
 
 Important limitations remain:
 
-- artifact rows and retention references are not normalized independently from the serialized
-  terminal result;
+- artifact/reference rows exist for object authorization, but retention references, policies, and
+  garbage collection are not complete;
 - result finalization does not yet define a complete manifest-validation and blob-pinning contract;
-- raw blob authorization is broader than the desired build/project-scoped download model;
-- there is no result-adapter pipeline, TRX normalization, stable test identity, or `TestOccurrence`
-  store;
+- only the first TRX adapter/store exists; there is no general configured adapter pipeline, JUnit,
+  reprocessing/generation workflow, or cross-producer/cross-platform golden corpus yet;
 - generic `FAILED` is not yet normalized into `TEST` versus `CRASH`;
 - there is no durable `BuildProblem` model, test history, repeated-cell pass rate, or full test ×
   scenario projection;
@@ -60,7 +64,7 @@ Important limitations remain:
   behavior;
 - current submitted definition bytes are durable, but complete Git remote/ref/commit verification is
   not yet part of result provenance;
-- public REST resources for detailed results and artifacts do not yet exist.
+- public REST resources for detailed projected tests/problems/history do not yet exist;
 - terminal results do not carry final per-step/stdout/stderr log watermarks, so result acceptance is
   not yet a proof that every preceding log byte is durably queryable;
 - controller result commit, ACK consumption by a persistent agent, and provider epilogue/reuse are
@@ -708,8 +712,9 @@ model additively.
 ### Stage 2 — TRX and build problems
 
 - Add Git-configured result-adapter/failure rules and complete Git provenance.
-- Implement bounded TRX adapter with cross-platform golden fixtures.
-- Persist `Test`, `TestOccurrence`, `ResultProjection`, and `BuildProblem`.
+- **Partially implemented:** bounded TRX adapter plus durable report, test-definition, occurrence, and
+  build projection-state rows with restart catch-up. Cross-platform producer fixtures remain.
+- Persist the remaining general `ResultProjection` generation model and `BuildProblem`.
 - Establish stable/fallback test identity, full projection-key/generation identity, and adapter
   algorithm versioning; link every derived occurrence/problem to its generation.
 - Normalize `TEST` versus `CRASH` without regressing existing `INFRA`/cancel semantics.

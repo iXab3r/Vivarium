@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Blobs;
 using Vivarium.Controller.Builds;
 using Vivarium.Controller.Management;
@@ -49,7 +50,8 @@ public class BuildQueueTimeoutTests
             rootDir, time, defaultTimeout);
         var request = Request("deadline-request", 0, 45);
 
-        var build = await fixture.Submissions.SubmitAsync(request);
+        var build = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), request);
         var pending = await fixture.QueueStore.ListPendingAsync();
         var snapshot = await fixture.MatrixBuilds.GetSnapshotAsync(build.BuildId);
 
@@ -66,7 +68,7 @@ public class BuildQueueTimeoutTests
 
         var invalid = Request("negative-deadline", -1);
         var exception = Assert.ThrowsAsync<MatrixBuildValidationException>(async () =>
-            await fixture.Submissions.SubmitAsync(invalid));
+            await fixture.Submissions.SubmitAsync(ManagementRequestContext.System("test"), invalid));
         Assert.That(exception!.Message, Does.Contain("queue_timeout_sec cannot be negative"));
         Assert.That(await fixture.QueueStore.ListPendingAsync(), Has.Count.EqualTo(2));
     }
@@ -238,7 +240,8 @@ public class BuildQueueTimeoutTests
         await using var fixture = await MatrixFixture.CreateAsync(
             rootDir, time, TimeSpan.FromSeconds(10));
         using var changes = new DatabaseChangeNotifier(fixture.Database);
-        var submitted = await fixture.Submissions.SubmitAsync(Request("watch-timeout", 1));
+        var submitted = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), Request("watch-timeout", 1));
         var queued = await fixture.MatrixBuilds.GetSnapshotAsync(submitted.BuildId);
         var observedVersion = changes.Version;
         Assert.That(queued!.State, Is.EqualTo(DurableBuildState.Queued));
@@ -321,6 +324,8 @@ public class BuildQueueTimeoutTests
             var agents = new AgentStore(database);
             var registry = new AgentRegistry(agents, timeProvider);
             var queueStore = new BuildQueueStore(database);
+            var authorization = new ManagementCommandAuthorizer(
+                new ManagementAuthorizer(), new AuditEventStore(database), timeProvider);
             var queue = new BuildQueueService(
                 queueStore, registry, timeProvider, defaultQueueWaitTimeout);
             var blobs = new BlobStore(Path.Combine(dataDir, "blobs"));
@@ -331,7 +336,8 @@ public class BuildQueueTimeoutTests
                 blobs,
                 queue,
                 timeProvider,
-                defaultQueueWaitTimeout);
+                defaultQueueWaitTimeout,
+                authorization);
 
             var enrollToken = await tokens.CreateEnrollTokenAsync();
             var hello = new Hello

@@ -24,3 +24,32 @@ public sealed record BuildQueueItem(
     DateTimeOffset? ClaimedAt,
     DateTimeOffset? RemovedAt,
     string? RemovalReason);
+
+public sealed record BuildQueueQuery(
+    int Limit,
+    long? AfterQueueId = null,
+    BuildQueueItemState? State = null,
+    string? Project = null,
+    string? Configuration = null,
+    string? ClaimedAgentId = null);
+
+public sealed record BuildQueueEntry(
+    long QueueId,
+    string BuildId,
+    string? MatrixBuildId,
+    string? Project,
+    string? Configuration,
+    string? CellName,
+    string? Rid,
+    string AgentExpression,
+    BuildQueueItemState State,
+    string? ClaimedAgentId,
+    bool DispatchPrepared,
+    DateTimeOffset EnqueuedAt,
+    DateTimeOffset? QueueDeadline,
+    DateTimeOffset? ClaimedAt,
+    DateTimeOffset BuildUpdatedAt);
+
+public sealed record BuildQueuePage(
+    IReadOnlyList<BuildQueueEntry> Items,
+    bool HasMore);

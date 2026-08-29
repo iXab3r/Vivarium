@@ -1,5 +1,7 @@
 using Vivarium.Contracts.V1;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Builds;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Management;
 
@@ -16,24 +18,49 @@ public sealed class MatrixBuildCancellationService
     private readonly BuildTracker builds;
     private readonly BuildQueueService queue;
     private readonly TimeProvider timeProvider;
+    private readonly ManagementCommandAuthorizer? authorization;
 
     public MatrixBuildCancellationService(
         MatrixBuildStore matrixBuilds,
         BuildTracker builds,
         BuildQueueService queue,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        ManagementCommandAuthorizer? authorization = null)
     {
         this.matrixBuilds = matrixBuilds;
         this.builds = builds;
         this.queue = queue;
         this.timeProvider = timeProvider ?? TimeProvider.System;
+        this.authorization = authorization;
     }
 
-    public async Task<BuildSnapshot?> CancelAsync(string matrixBuildId, string? reason = null)
+    public async Task<BuildSnapshot?> CancelAsync(
+        ManagementRequestContext context,
+        string matrixBuildId,
+        string? reason = null)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        await (authorization ?? throw new InvalidOperationException(
+                "application command authorization is not configured"))
+            .DemandAsync(
+                context,
+                ManagementPermission.BuildCancel,
+                "matrix-build.cancel",
+                "matrix-build",
+                matrixBuildId);
         var effectiveReason = string.IsNullOrWhiteSpace(reason) ? DefaultReason : reason.Trim();
+        var now = timeProvider.GetUtcNow();
         var committed = await matrixBuilds.CancelAsync(
-            matrixBuildId, effectiveReason, timeProvider.GetUtcNow());
+            matrixBuildId,
+            effectiveReason,
+            now,
+            AuditEventDraft.Create(
+                context,
+                now,
+                "matrix-build.cancel",
+                "matrix-build",
+                matrixBuildId),
+            context);
         if (committed is null)
         {
             return null;
@@ -41,7 +68,7 @@ public sealed class MatrixBuildCancellationService
 
         foreach (var child in committed.ActiveChildren)
         {
-            await builds.CancelBuildAsync(child.BuildId, child.Reason);
+            await builds.CancelBuildFromControllerAsync(child.BuildId, child.Reason);
         }
 
         queue.NotifyChanged();

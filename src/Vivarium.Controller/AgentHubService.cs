@@ -1,7 +1,10 @@
 using Grpc.Core;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Agents.Compatibility;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Builds;
+using Vivarium.Controller.Deployment;
 using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller;
@@ -13,6 +16,8 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
     private readonly TokenStore tokens;
     private readonly AgentLifecycleCoordinator lifecycle;
     private readonly BuildTracker builds;
+    private readonly TimeProvider timeProvider;
+    private readonly AgentUpgradeService upgrades;
     private readonly ILogger<AgentHubService> log;
 
     public AgentHubService(
@@ -21,6 +26,8 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         TokenStore tokens,
         AgentLifecycleCoordinator lifecycle,
         BuildTracker builds,
+        AgentUpgradeService upgrades,
+        TimeProvider timeProvider,
         ILogger<AgentHubService> log)
     {
         this.registry = registry;
@@ -28,6 +35,8 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         this.tokens = tokens;
         this.lifecycle = lifecycle;
         this.builds = builds;
+        this.upgrades = upgrades;
+        this.timeProvider = timeProvider;
         this.log = log;
     }
 
@@ -43,23 +52,130 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         }
 
         var hello = requestStream.Current.Hello;
-        if (string.IsNullOrWhiteSpace(hello.AgentId) || string.IsNullOrWhiteSpace(hello.SessionId))
+        try
+        {
+            AgentSessionIdentity.Validate(hello);
+        }
+        catch (ArgumentException exception)
         {
             throw new RpcException(new Status(
-                StatusCode.InvalidArgument, "Hello requires non-empty agent_id and session_id"));
+                StatusCode.InvalidArgument, exception.Message));
         }
 
+        AgentProtocolNegotiation negotiation;
+        try
+        {
+            negotiation = AgentProtocolCompatibility.Negotiate(hello);
+        }
+        catch (AgentProtocolException exception)
+        {
+            // Compatibility is evaluated before token admission or Agent observation. An
+            // incompatible or malformed Hello therefore cannot claim an enrollment token or
+            // mutate the stable Agent projection.
+            throw new RpcException(new Status(exception.StatusCode, exception.Message));
+        }
+
+        var correlationId = ManagementIdentifiers.NewId();
+        var receivedAt = timeProvider.GetUtcNow();
+        var enrollmentContext = new ManagementRequestContext(
+            new ManagementPrincipal(
+                "agent",
+                hello.AgentId,
+                "enrollment-token",
+                LegacyScope: null),
+            correlationId,
+            RequestId: null,
+            Source: "agent-hub");
+        var enrollmentAudit = AuditEventDraft.Create(
+            enrollmentContext,
+            receivedAt,
+            "agent.enroll",
+            "agent",
+            hello.AgentId,
+            details: new Dictionary<string, string> { ["session_id"] = hello.SessionId });
+        var deniedEnrollmentAudit = AuditEventDraft.Create(
+            new ManagementRequestContext(
+                ManagementPrincipal.Anonymous,
+                correlationId,
+                RequestId: null,
+                Source: "agent-hub"),
+            receivedAt,
+            "agent.enroll",
+            "agent",
+            hello.AgentId,
+            AuditOutcome.Denied,
+            "invalid_enrollment_proof",
+            new Dictionary<string, string> { ["session_id"] = hello.SessionId });
+
         AgentAdmission admission;
+        AgentGenerationState generations;
         CancellationTokenSource session;
         AgentConnectionHandle connection;
         await using (await lifecycle.AcquireAsync(hello.AgentId, context.CancellationToken))
         {
-            admission = await tokens.AdmitAgentAsync(hello)
+            admission = await tokens.AdmitAgentAsync(
+                    hello,
+                    enrollmentAudit,
+                    deniedEnrollmentAudit)
                 ?? throw new RpcException(new Status(
                     StatusCode.PermissionDenied, "valid agent or enrollment token required"));
+            if (admission.CredentialReplaced)
+            {
+                // Credential revocation committed with admission. Fence the old live session from
+                // new assignments before any later observation/session-acceptance await can fail.
+                // Existing owned work retains its authenticated completion lane until replacement.
+                registry.SetAuthorized(hello.AgentId, authorized: false);
+            }
+
             await store.ObserveHelloAsync(hello);
+            generations = await store.AcceptSessionAsync(
+                hello.AgentId,
+                admission.CredentialGeneration);
             session = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
-            connection = registry.Register(hello, admission.Authorization, admission.Enabled, session);
+            try
+            {
+                connection = registry.Register(
+                    hello,
+                    admission.Authorization,
+                    admission.Enabled,
+                    admission.MaintenanceDrain,
+                    generations.ConnectionGeneration,
+                    session);
+            }
+            catch
+            {
+                session.Dispose();
+                throw;
+            }
+
+            try
+            {
+                await store.ObserveCapabilitiesAsync(
+                    hello.AgentId,
+                    generations.CredentialGeneration,
+                    generations.ConnectionGeneration,
+                    AgentProtocolCompatibility.CreateCapabilityObservation(negotiation));
+                var observation = AgentProtocolCompatibility.CreateStaticObservation(
+                    hello,
+                    negotiation,
+                    receivedAt,
+                    generations.CredentialGeneration,
+                    generations.ConnectionGeneration);
+                if (observation is not null)
+                {
+                    await store.ObserveStaticFactsAsync(observation);
+                }
+            }
+            catch
+            {
+                // The accepted generation is intentionally never reused. If the typed observation
+                // cannot commit, tear down this runtime registration before exposing Welcome; the
+                // next authenticated reconnect advances to a fresh durable generation.
+                registry.Disconnect(connection);
+                session.Cancel();
+                session.Dispose();
+                throw;
+            }
         }
 
         using var sessionLifetime = session;
@@ -72,21 +188,30 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                 connection.AgentId, hello.RunningBuildId);
         }
 
-        await responseStream.WriteAsync(new ControllerMsg
+        var welcome = new Welcome
         {
-            Welcome = new Welcome
-            {
-                ServerTimeUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                Authorized = admission.Authorization == AgentAuth.Authorized,
-                ServerVersion = ServerVersion,
-            },
-        });
+            ServerTimeUnixMs = timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+            Authorized = admission.Authorization == AgentAuth.Authorized,
+            ServerVersion = ServerVersion,
+            ProtocolMode = negotiation.Mode,
+            SelectedProtocolVersion = negotiation.SelectedVersion,
+            MinimumProtocolVersion = AgentProtocolCompatibility.MinimumSupportedVersion,
+            CurrentProtocolVersion = AgentProtocolCompatibility.CurrentVersion,
+            CredentialGeneration = checked((ulong)generations.CredentialGeneration),
+            ConnectionGeneration = checked((ulong)connection.ConnectionGeneration),
+        };
+        welcome.NegotiatedCapabilities.Add(negotiation.NegotiatedCapabilities);
+        await responseStream.WriteAsync(new ControllerMsg { Welcome = welcome });
 
         if (admission.AuthTokenToDeliver != null)
         {
             await responseStream.WriteAsync(new ControllerMsg
             {
-                Authorized = new AuthorizationGranted { AuthToken = admission.AuthTokenToDeliver },
+                Authorized = new AuthorizationGranted
+                {
+                    AuthToken = admission.AuthTokenToDeliver,
+                    CredentialGeneration = checked((ulong)generations.CredentialGeneration),
+                },
             });
         }
 
@@ -104,9 +229,19 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
             {
             }
         });
-        if (registry.IsCurrent(connection))
+        if (registry.IsCurrent(connection) &&
+            (negotiation.SupportsBuildRunner ||
+             negotiation.IsLegacy && hello.RunningBuildId.Length > 0))
         {
             await builds.OnAgentReconnectedAsync(connection, hello.RunningBuildId);
+            var healthAcceptance = await upgrades.OnAgentReconciledAsync(connection, session.Token);
+            if (healthAcceptance is not null)
+            {
+                registry.TrySend(connection, new ControllerMsg
+                {
+                    UpgradeHealthAccepted = healthAcceptance,
+                });
+            }
         }
 
         try
@@ -131,6 +266,18 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                     case AgentMsg.MsgOneofCase.AssignmentAccepted:
                         await builds.OnAssignmentAcceptedAsync(
                             msg.AssignmentAccepted, connection);
+                        break;
+                    case AgentMsg.MsgOneofCase.UpgradeHealthConfirmed:
+                        await upgrades.ConfirmHealthAsync(
+                            connection, msg.UpgradeHealthConfirmed, session.Token);
+                        break;
+                    case AgentMsg.MsgOneofCase.UpgradeCommitConfirmed:
+                        await upgrades.ConfirmCommitAsync(
+                            connection, msg.UpgradeCommitConfirmed, session.Token);
+                        break;
+                    case AgentMsg.MsgOneofCase.UpgradeFinalizationConfirmed:
+                        await upgrades.ConfirmFinalizationAsync(
+                            connection, msg.UpgradeFinalizationConfirmed, session.Token);
                         break;
                 }
             }

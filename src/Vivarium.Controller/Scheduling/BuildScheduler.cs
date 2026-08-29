@@ -16,6 +16,7 @@ public sealed class BuildScheduler : BackgroundService
     private readonly BuildQueueStore store;
     private readonly BuildQueueService queue;
     private readonly AgentRegistry agents;
+    private readonly AgentLifecycleCoordinator lifecycle;
     private readonly BuildTracker builds;
     private readonly ILogger<BuildScheduler> log;
     private readonly TimeProvider timeProvider;
@@ -24,6 +25,7 @@ public sealed class BuildScheduler : BackgroundService
         BuildQueueStore store,
         BuildQueueService queue,
         AgentRegistry agents,
+        AgentLifecycleCoordinator lifecycle,
         BuildTracker builds,
         ILogger<BuildScheduler> log,
         TimeProvider? timeProvider = null)
@@ -31,6 +33,7 @@ public sealed class BuildScheduler : BackgroundService
         this.store = store;
         this.queue = queue;
         this.agents = agents;
+        this.lifecycle = lifecycle;
         this.builds = builds;
         this.log = log;
         this.timeProvider = timeProvider ?? TimeProvider.System;
@@ -47,7 +50,7 @@ public sealed class BuildScheduler : BackgroundService
             {
                 try
                 {
-                    await DispatchAvailableAsync();
+                    await DispatchAvailableAsync(stoppingToken);
                 }
                 catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
                 {
@@ -67,7 +70,7 @@ public sealed class BuildScheduler : BackgroundService
         }
     }
 
-    private async Task DispatchAvailableAsync()
+    internal async Task DispatchAvailableAsync(CancellationToken cancellationToken)
     {
         var pending = await store.ListPendingAsync();
 
@@ -110,39 +113,46 @@ public sealed class BuildScheduler : BackgroundService
                 continue;
             }
 
-            await TryStartDispatchAsync(item, candidate);
+            await TryStartDispatchAsync(item, candidate, cancellationToken);
         }
     }
 
-    private async Task TryStartDispatchAsync(BuildQueueItem item, AgentSnapshot candidate)
+    private async Task TryStartDispatchAsync(
+        BuildQueueItem item,
+        AgentSnapshot candidate,
+        CancellationToken cancellationToken)
     {
         var agentId = candidate.AgentId;
-        if (!await store.TryClaimAsync(item.BuildId, agentId, timeProvider.GetUtcNow()))
+        AgentConnectionHandle? connection;
+        await using (await lifecycle.AcquireAsync(agentId, cancellationToken))
         {
-            return;
-        }
+            if (!await store.TryClaimAsync(item.BuildId, agentId, timeProvider.GetUtcNow()))
+            {
+                return;
+            }
 
-        if (!agents.TryBeginBuild(
-                agentId, item.BuildId, candidate.ParameterGeneration,
-                out var connection, out var reason))
-        {
-            await store.TryRequeueDispatchAsync(item.BuildId, agentId);
-            log.LogDebug("dispatch of build {BuildId} lost capacity: {Reason}", item.BuildId, reason);
-            return;
-        }
+            if (!agents.TryBeginBuild(
+                    agentId, item.BuildId, candidate.ParameterGeneration,
+                    out connection, out var reason))
+            {
+                await store.TryRequeueDispatchAsync(item.BuildId, agentId);
+                log.LogDebug("dispatch of build {BuildId} lost capacity: {Reason}", item.BuildId, reason);
+                return;
+            }
 
-        if (!await store.TryPrepareDispatchAsync(
-                item.BuildId,
-                agentId,
-                connection!.SessionId,
-                timeProvider.GetUtcNow(),
-                candidate.Name,
-                candidate.ReportedParameters,
-                candidate.CustomParameters))
-        {
-            agents.EndBuild(connection!, item.BuildId);
-            await store.TryRequeueDispatchAsync(item.BuildId, agentId);
-            return;
+            if (!await store.TryPrepareDispatchAsync(
+                    item.BuildId,
+                    agentId,
+                    connection!.SessionId,
+                    timeProvider.GetUtcNow(),
+                    candidate.Name,
+                    candidate.ReportedParameters,
+                    candidate.CustomParameters))
+            {
+                agents.EndBuild(connection, item.BuildId);
+                await store.TryRequeueDispatchAsync(item.BuildId, agentId);
+                return;
+            }
         }
 
         if (!builds.AttachPreparedBuild(agentId, item.Assignment))

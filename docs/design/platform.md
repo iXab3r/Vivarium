@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Partial**
 > Maintainer role: [Platform Expert](../roles/platform-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D5, D8-D12, D16, D19-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D5, D8-D12, D16, D19-D30
 
 ## Purpose
 
@@ -35,9 +35,13 @@ honor.
 The repository has useful cross-platform foundations, but does not yet have a complete platform
 contract:
 
-- `Vivarium.Agent` reports `windows | linux | macos`, process architecture, hostname, and
-  `Environment.OSVersion.Version`. D8 already records that this is insufficient for exact Windows
-  patch levels, Linux distribution identity, and macOS product versions.
+- `Vivarium.Agent` now collects bounded typed connect-time facts on Windows, Linux, and macOS: product
+  name/version/build, kernel, native OS and process architecture, hostname, Agent/package identity,
+  observation time, outcome/completeness, and redacted structured issues. Windows build+UBR, Linux
+  `os-release` plus `uname`, and macOS `sw_vers` plus `uname` remain distinct semantic fields.
+- `agent-explorer.host-facts.v1` capability support is advertised independently from the latest
+  collection outcome and persisted with credential/connection-generation provenance. Fixture coverage
+  exists for all three platforms and native macOS; native Windows/Linux release evidence remains.
 - `BuildExecutor` launches an executable with `ProcessStartInfo.ArgumentList`, no implicit shell,
   inherited environment plus explicit overrides, and a bounded timeout. It currently hard-kills with
   `.Kill(entireProcessTree: true)` for timeout and cancellation; a proven graceful phase and native
@@ -50,8 +54,12 @@ contract:
 - Supported definition RIDs are currently `win-x64`, `linux-x64`, `linux-arm64`, and `osx-arm64`.
 - Unix secret files are restricted to the user. Agent-side Windows secret files currently rely on
   inherited directory ACLs; an explicit private ACL contract is still missing.
-- Installers, service-manager integration, package signing, central upgrades, AgentExplorer process and
-  network inventory, and on-platform release evidence are not complete.
+- The first central upgrade path is implemented across the common RID contract: bounded immutable ZIPs,
+  exact digest/RID checks, content-addressed activation, retained prior package, health-gated success,
+  and one-shot rollback. Linux/macOS run the real bootstrap/Agent process evidence; Windows process
+  evidence remains. Installers, service-manager integration, package signing, fleet rollout policy,
+  dynamic AgentExplorer process/network/environment inventory, and complete on-platform release
+  evidence are not complete.
 
 The current code is evidence only for the behavior it tests. It is not evidence that every advertised
 platform behaves identically.
@@ -369,8 +377,9 @@ bootstrap contract.
 - The controller serves exact package bytes and an authenticated manifest; D21 governs trust before
   installer execution.
 - Archive formats preserve executable bits and symlinks where the target needs them.
-- Upgrade uses verified temporary content and an atomic same-filesystem swap, then reports the running
-  version after reconnect. A failed swap leaves one known-good executable available.
+- Upgrade uses verified temporary content, content-addressed extraction, and an atomic small state-file
+  switch. Exact operation/digest/session reconciliation and a durable marker-confirmation handshake
+  gate success; early exit or health timeout launches the retained prior package once.
 - Windows release packages need an Authenticode/MOTW strategy; macOS needs signing/notarization and
   quarantine handling; Linux packages need verified modes and service-unit permissions. D19 currently
   defers public code signing, so UI/install docs must state the resulting warnings honestly.

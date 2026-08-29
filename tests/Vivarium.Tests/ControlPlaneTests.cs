@@ -6,6 +6,7 @@ using Grpc.Net.Client;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Blobs;
 using Vivarium.Controller.Builds;
 using Vivarium.Controller.Management;
@@ -49,7 +50,7 @@ public class ControlPlaneTests
         request.Cells[1].Assignment.Payload[0].Sha256 = new string('a', 64);
 
         var exception = Assert.ThrowsAsync<MatrixBuildValidationException>(async () =>
-            await fixture.Submissions.SubmitAsync(request));
+            await fixture.Submissions.SubmitAsync(ManagementRequestContext.System("test"), request));
         Assert.That(exception!.Message, Does.Contain("references missing payload"));
 
         var counts = await fixture.Database.ReadAsync(connection =>
@@ -77,16 +78,18 @@ public class ControlPlaneTests
         var firstRequest = Request("same-request", hash, reverseParameterOrder: false);
         var retryRequest = Request("same-request", hash, reverseParameterOrder: true);
 
-        var first = await fixture.Submissions.SubmitAsync(firstRequest);
+        var first = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), firstRequest);
         await fixture.Agents.DeleteAsync("known-windows");
-        var retry = await fixture.Submissions.SubmitAsync(retryRequest);
+        var retry = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), retryRequest);
         Assert.That(retry.BuildId, Is.EqualTo(first.BuildId),
             "a retry must not revalidate mutable agent capacity, and map order is not identity");
 
         var changed = retryRequest.Clone();
         changed.Configuration = "different";
         Assert.ThrowsAsync<MatrixRequestConflictException>(async () =>
-            await fixture.Submissions.SubmitAsync(changed));
+            await fixture.Submissions.SubmitAsync(ManagementRequestContext.System("test"), changed));
 
         var pending = await fixture.QueueStore.ListPendingAsync();
         Assert.That(pending, Has.Count.EqualTo(1));
@@ -119,7 +122,8 @@ public class ControlPlaneTests
         await using (var fixture = await MatrixFixture.CreateAsync(rootDir))
         {
             var hash = await fixture.PutBlobAsync("restart payload"u8.ToArray());
-            var submitted = await fixture.Submissions.SubmitAsync(Request("restart-request", hash));
+            var submitted = await fixture.Submissions.SubmitAsync(
+                ManagementRequestContext.System("test"), Request("restart-request", hash));
             matrixBuildId = submitted.BuildId;
             childBuildId = (await fixture.MatrixBuilds.GetSnapshotAsync(matrixBuildId))!.Cells[0].BuildId;
             result.BuildId = childBuildId;
@@ -176,6 +180,7 @@ public class ControlPlaneTests
         {
             var hash = await fixture.PutBlobAsync("cancellation payload"u8.ToArray());
             var submitted = await fixture.Submissions.SubmitAsync(
+                ManagementRequestContext.System("test"),
                 Request("cancel-matrix", hash, cellCount: 3));
             matrixBuildId = submitted.BuildId;
             var initial = (await fixture.MatrixBuilds.GetSnapshotAsync(matrixBuildId))!;
@@ -236,10 +241,13 @@ public class ControlPlaneTests
                 return true;
             });
 
-            var first = await fixture.Cancellations.CancelAsync(matrixBuildId, firstReason);
+            var first = await fixture.Cancellations.CancelAsync(
+                ManagementRequestContext.System("test"), matrixBuildId, firstReason);
             var firstUpdated = first!.UpdatedUnixMs;
             var retry = await fixture.Cancellations.CancelAsync(
-                matrixBuildId, "a later reason must not replace the first");
+                ManagementRequestContext.System("test"),
+                matrixBuildId,
+                "a later reason must not replace the first");
             var queued = await fixture.QueueStore.GetAsync(queuedBuildId);
             var running = await fixture.BuildStore.GetAsync(runningBuildId);
 
@@ -302,6 +310,7 @@ public class ControlPlaneTests
 
             var hash = await fixture.PutBlobAsync("provenance payload"u8.ToArray());
             var submitted = await fixture.Submissions.SubmitAsync(
+                ManagementRequestContext.System("test"),
                 Request("provenance-request", hash));
             matrixBuildId = submitted.BuildId;
             childBuildId = (await fixture.MatrixBuilds.GetSnapshotAsync(matrixBuildId))!
@@ -379,8 +388,10 @@ public class ControlPlaneTests
     {
         await using var fixture = await MatrixFixture.CreateAsync(rootDir);
         var hash = await fixture.PutBlobAsync("recent payload"u8.ToArray());
-        var older = await fixture.Submissions.SubmitAsync(Request("recent-older", hash));
-        var newer = await fixture.Submissions.SubmitAsync(Request("recent-newer", hash));
+        var older = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), Request("recent-older", hash));
+        var newer = await fixture.Submissions.SubmitAsync(
+            ManagementRequestContext.System("test"), Request("recent-newer", hash));
         await fixture.Database.WriteAsync(connection =>
         {
             using var command = connection.CreateCommand();
@@ -418,6 +429,24 @@ public class ControlPlaneTests
         var client = new Vivarium.Contracts.V1.ControlPlane.ControlPlaneClient(channel);
         var emptyHashes = new BlobHashes();
 
+        AssertRpcCode(
+            () => client.SubmitBuildAsync(
+                new SubmitBuildRequest(),
+                Headers(agentToken, "grpc-submit-denied")).ResponseAsync,
+            StatusCode.PermissionDenied);
+        var unauthenticated = Assert.ThrowsAsync<RpcException>(async () =>
+            await client.SubmitBuildAsync(
+                new SubmitBuildRequest(),
+                Headers("invalid", "grpc-submit-unauthenticated")));
+        Assert.Multiple(() =>
+        {
+            Assert.That(unauthenticated!.StatusCode, Is.EqualTo(StatusCode.Unauthenticated));
+            Assert.That(
+                unauthenticated.Trailers.Single(entry =>
+                    entry.Key == "x-correlation-id").Value,
+                Is.EqualTo("grpc-submit-unauthenticated"));
+        });
+
         await client.MissingBlobsAsync(emptyHashes, Headers(controller.Tokens.SubmitToken));
         await client.MissingBlobsAsync(emptyHashes, Headers(controller.Tokens.AdminToken));
         AssertRpcCode(
@@ -450,7 +479,7 @@ public class ControlPlaneTests
         AssertRpcCode(
             () => client.AuthorizeAgentAsync(
                 new AgentRef { AgentId = "pending-agent" },
-                Headers(controller.Tokens.SubmitToken)).ResponseAsync,
+                Headers(controller.Tokens.SubmitToken, "grpc-authorize-denied")).ResponseAsync,
             StatusCode.PermissionDenied);
         var authorized = await client.AuthorizeAgentAsync(
             new AgentRef { AgentId = "pending-agent" },
@@ -466,7 +495,8 @@ public class ControlPlaneTests
             Reason = "scope test stop",
         };
         AssertRpcCode(
-            () => client.CancelBuildAsync(cancelRequest, Headers(agentToken)).ResponseAsync,
+            () => client.CancelBuildAsync(
+                cancelRequest, Headers(agentToken, "grpc-cancel-denied")).ResponseAsync,
             StatusCode.PermissionDenied);
         var cancelled = await client.CancelBuildAsync(
             cancelRequest, Headers(controller.Tokens.SubmitToken));
@@ -483,6 +513,28 @@ public class ControlPlaneTests
             Assert.That(cancelled.Outcome, Is.EqualTo(BuildOutcome.Cancelled));
             Assert.That(adminRetry.Cells.Single().StatusText, Is.EqualTo("scope test stop"));
         });
+        var commandDenials = (await controller.Audits.ListAsync())
+            .Where(audit => audit.CorrelationId is
+                "grpc-submit-denied" or
+                "grpc-submit-unauthenticated" or
+                "grpc-authorize-denied" or
+                "grpc-cancel-denied")
+            .ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(commandDenials, Has.Length.EqualTo(4));
+            Assert.That(commandDenials.All(audit => audit.Outcome == AuditOutcome.Denied), Is.True);
+            Assert.That(commandDenials.Single(audit => audit.CorrelationId == "grpc-submit-denied").Action,
+                Is.EqualTo("matrix-build.submit"));
+            Assert.That(commandDenials.Single(audit => audit.CorrelationId == "grpc-authorize-denied").TargetId,
+                Is.EqualTo("pending-agent"));
+            Assert.That(commandDenials.Single(audit => audit.CorrelationId == "grpc-cancel-denied").TargetId,
+                Is.EqualTo(submitted.BuildId));
+            Assert.That(commandDenials.Single(audit =>
+                audit.CorrelationId == "grpc-submit-unauthenticated").ActorType,
+                Is.EqualTo("anonymous"));
+            Assert.That(commandDenials.Any(audit => audit.TargetType == "permission"), Is.False);
+        });
         AssertRpcCode(
             () => client.CancelBuildAsync(
                 new CancelBuildRequest { BuildId = "unknown-matrix" },
@@ -491,12 +543,23 @@ public class ControlPlaneTests
 
         var missingHash = new string('b', 64);
         using var http = PinnedHttpClient(controller);
-        foreach (var token in new[] { agentToken, controller.Tokens.SubmitToken, controller.Tokens.AdminToken })
+        using (var agentRequest = new HttpRequestMessage(HttpMethod.Get, $"/blobs/{missingHash}"))
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"/blobs/{missingHash}");
-            request.Headers.Authorization = new("Bearer", token);
-            using var response = await http.SendAsync(request);
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            agentRequest.Headers.Authorization = new("Bearer", agentToken);
+            using var response = await http.SendAsync(agentRequest);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+                "an Agent payload read requires exact Build and session identity headers");
+        }
+
+        foreach (var token in new[] { controller.Tokens.SubmitToken, controller.Tokens.AdminToken })
+        {
+            using var managementRequest = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"/blobs/{missingHash}");
+            managementRequest.Headers.Authorization = new("Bearer", token);
+            using var response = await http.SendAsync(managementRequest);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden),
+                "management credentials cannot read the Agent object data plane by digest");
         }
     }
 
@@ -524,7 +587,10 @@ public class ControlPlaneTests
         });
 
         Assert.That(
-            await controller.BuildQueue.RemoveAsync(initial.Cells[0].BuildId, "cancelled from test"),
+            await controller.BuildQueue.RemoveAsync(
+                ManagementRequestContext.System("test"),
+                initial.Cells[0].BuildId,
+                "cancelled from test"),
             Is.True);
         Assert.That(await watch.ResponseStream.MoveNext(timeout.Token), Is.True);
         var terminal = watch.ResponseStream.Current;
@@ -612,8 +678,16 @@ public class ControlPlaneTests
             ?? throw new AssertionException("newly registered agent did not receive a token");
     }
 
-    private static Metadata Headers(string token) =>
-        new() { { "authorization", $"Bearer {token}" } };
+    private static Metadata Headers(string token, string? correlationId = null)
+    {
+        var metadata = new Metadata { { "authorization", $"Bearer {token}" } };
+        if (correlationId is not null)
+        {
+            metadata.Add("x-correlation-id", correlationId);
+        }
+
+        return metadata;
+    }
 
     private static void AssertRpcCode(Func<Task> call, StatusCode expected)
     {
@@ -664,6 +738,8 @@ public class ControlPlaneTests
             var agents = new AgentStore(database);
             var registry = new AgentRegistry(agents);
             var queueStore = new BuildQueueStore(database);
+            var authorization = new ManagementCommandAuthorizer(
+                new ManagementAuthorizer(), new AuditEventStore(database), TimeProvider.System);
             var queue = new BuildQueueService(queueStore, registry);
             var buildStore = new BuildStore(database);
             var buildTracker = new BuildTracker(registry, buildStore, queueStore);
@@ -671,9 +747,14 @@ public class ControlPlaneTests
             var blobs = new BlobStore(Path.Combine(dataDir, "blobs"));
             var matrixBuilds = new MatrixBuildStore(database);
             var submissions = new MatrixBuildSubmissionService(
-                matrixBuilds, agents, blobs, queue, TimeProvider.System);
+                matrixBuilds,
+                agents,
+                blobs,
+                queue,
+                TimeProvider.System,
+                authorization: authorization);
             var cancellations = new MatrixBuildCancellationService(
-                matrixBuilds, buildTracker, queue);
+                matrixBuilds, buildTracker, queue, authorization: authorization);
 
             var enrollToken = await tokens.CreateEnrollTokenAsync();
             var hello = new Hello

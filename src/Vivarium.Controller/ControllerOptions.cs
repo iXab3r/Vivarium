@@ -21,6 +21,17 @@ public sealed class ControllerOptions
     /// <summary>How long a build may wait in the queue before any payload starts.</summary>
     public TimeSpan BuildQueueWaitTimeout { get; init; } = DefaultBuildQueueWaitTimeout;
 
+    /// <summary>
+    /// Optional release-bundled schema-v1 Agent package catalog imported before the server listens.
+    /// </summary>
+    public string? AgentPackageCatalogPath { get; init; }
+
+    /// <summary>
+    /// Enables the hidden package publication surface used by deployment tests and local Agent
+    /// development. Production upgrades always use packages bundled with this Server release.
+    /// </summary>
+    public bool EnableDevelopmentAgentPackageApi { get; init; }
+
     /// <summary>Clock used by heartbeat and reconnect-lease logic; replaceable for tier-1 tests.</summary>
     public TimeProvider TimeProvider { get; init; } = System.TimeProvider.System;
 }

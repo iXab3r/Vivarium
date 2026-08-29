@@ -1,8 +1,14 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Google.Protobuf;
 using Microsoft.Data.Sqlite;
 using Vivarium.Contracts.V1;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Blobs.Access;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Rest.Events;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Management;
 
@@ -20,6 +26,19 @@ public sealed record MatrixBuildSummary(
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt);
 
+public sealed record MatrixBuildQuery(
+    int Limit,
+    string? Project = null,
+    string? Configuration = null,
+    DurableBuildState? State = null,
+    BuildOutcome? Outcome = null,
+    DateTimeOffset? BeforeCreatedAt = null,
+    string? BeforeMatrixBuildId = null);
+
+public sealed record MatrixBuildPage(
+    IReadOnlyList<MatrixBuildSummary> Items,
+    bool HasMore);
+
 public sealed record MatrixBuildArtifact(
     int Ordinal,
     string Path,
@@ -32,6 +51,11 @@ internal sealed record MatrixCancellationCommit(
     BuildSnapshot Snapshot,
     IReadOnlyList<MatrixChildCancellation> ActiveChildren);
 
+internal sealed record MatrixBuildResponseReceipt(
+    int Status,
+    string Json,
+    string ETag);
+
 /// <summary>
 /// Durable matrix aggregates. A matrix submission and all of its ordinary FIFO cell builds are one
 /// serialized SQLite transaction; the aggregate is a projection over those child build rows.
@@ -42,57 +66,110 @@ public sealed class MatrixBuildStore
 
     public MatrixBuildStore(VivariumDatabase database) => this.database = database;
 
-    public Task<BuildRef?> FindIdempotentAsync(SubmitBuildRequest canonicalRequest) =>
-        database.ReadAsync(connection =>
+    internal Task<BuildRef?> FindIdempotentAsync(
+        ManagementPrincipal principal,
+        string requestId,
+        string operationKind,
+        string requestHash)
+    {
+        ValidatePrincipal(principal);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationKind);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestHash);
+        return database.ReadAsync(connection =>
         {
             using var command = connection.CreateCommand();
             command.CommandText = """
-                SELECT matrix_build_id, request_payload
-                FROM matrix_builds
-                WHERE request_id = $requestId;
+                SELECT m.matrix_build_id, i.request_hash
+                FROM matrix_build_idempotency i
+                JOIN matrix_builds m ON m.matrix_build_id = i.matrix_build_id
+                WHERE i.actor_type = $actorType
+                    AND i.actor_id = $actorId
+                    AND i.operation_kind = $operationKind
+                    AND i.request_id = $requestId;
                 """;
-            command.Parameters.AddWithValue("$requestId", canonicalRequest.RequestId);
+            command.Parameters.AddWithValue("$actorType", principal.ActorType);
+            command.Parameters.AddWithValue("$actorId", principal.ActorId);
+            command.Parameters.AddWithValue("$operationKind", operationKind);
+            command.Parameters.AddWithValue("$requestId", requestId);
             using var reader = command.ExecuteReader();
             if (!reader.Read())
             {
                 return null;
             }
 
-            var previous = SubmitBuildRequest.Parser.ParseFrom((byte[])reader[1]);
-            if (!previous.Equals(canonicalRequest))
+            if (!string.Equals(reader.GetString(1), requestHash, StringComparison.Ordinal))
             {
-                throw new MatrixRequestConflictException(canonicalRequest.RequestId);
+                throw new MatrixRequestConflictException(requestId);
             }
 
             return new BuildRef { BuildId = reader.GetString(0) };
         });
+    }
 
-    public Task<BuildRef> SubmitAsync(
+    internal Task<BuildRef> SubmitAsync(
+        ManagementPrincipal principal,
         SubmitBuildRequest canonicalRequest,
         string requestHash,
         string definitionHash,
         DateTimeOffset now,
-        TimeSpan defaultQueueWaitTimeout) => database.WriteAsync(connection =>
+        TimeSpan defaultQueueWaitTimeout,
+        Func<string, AuditEventDraft>? auditEventFactory) => SubmitScopedAsync(
+            principal,
+            canonicalRequest,
+            MatrixBuildSubmissionIdentity.LegacyOperationKind,
+            requestHash,
+            definitionHash,
+            now,
+            defaultQueueWaitTimeout,
+            stagingId: null,
+            attachmentParticipant: null,
+            ManagementRequestContext.System(
+                "legacy-matrix-build-store", canonicalRequest.RequestId),
+            auditEventFactory);
+
+    internal Task<BuildRef> SubmitScopedAsync(
+        ManagementPrincipal principal,
+        SubmitBuildRequest canonicalRequest,
+        string operationKind,
+        string requestHash,
+        string definitionHash,
+        DateTimeOffset now,
+        TimeSpan defaultQueueWaitTimeout,
+        string? stagingId,
+        IBlobBuildAttachmentParticipant? attachmentParticipant,
+        ManagementRequestContext requestContext,
+        Func<string, AuditEventDraft>? auditEventFactory)
     {
-        var nowUnixMs = now.ToUnixTimeMilliseconds();
-        var defaultQueueWaitMilliseconds = TimeoutMilliseconds(defaultQueueWaitTimeout);
-        using var transaction = connection.BeginTransaction();
+        ValidatePrincipal(principal);
+        ArgumentNullException.ThrowIfNull(canonicalRequest);
+        return database.WriteAsync(connection =>
+        {
+            var nowUnixMs = now.ToUnixTimeMilliseconds();
+            var defaultQueueWaitMilliseconds = TimeoutMilliseconds(defaultQueueWaitTimeout);
+            using var transaction = connection.BeginTransaction();
 
         using (var existing = connection.CreateCommand())
         {
             existing.Transaction = transaction;
             existing.CommandText = """
-                SELECT matrix_build_id, request_payload
-                FROM matrix_builds
-                WHERE request_id = $requestId;
+                SELECT m.matrix_build_id, i.request_hash
+                FROM matrix_build_idempotency i
+                JOIN matrix_builds m ON m.matrix_build_id = i.matrix_build_id
+                WHERE i.actor_type = $actorType
+                    AND i.actor_id = $actorId
+                    AND i.operation_kind = $operationKind
+                    AND i.request_id = $requestId;
                 """;
+            existing.Parameters.AddWithValue("$actorType", principal.ActorType);
+            existing.Parameters.AddWithValue("$actorId", principal.ActorId);
+            existing.Parameters.AddWithValue("$operationKind", operationKind);
             existing.Parameters.AddWithValue("$requestId", canonicalRequest.RequestId);
             using var reader = existing.ExecuteReader();
             if (reader.Read())
             {
                 var existingMatrixBuildId = reader.GetString(0);
-                var previous = SubmitBuildRequest.Parser.ParseFrom((byte[])reader[1]);
-                if (!previous.Equals(canonicalRequest))
+                if (!string.Equals(reader.GetString(1), requestHash, StringComparison.Ordinal))
                 {
                     throw new MatrixRequestConflictException(canonicalRequest.RequestId);
                 }
@@ -103,6 +180,8 @@ public sealed class MatrixBuildStore
         }
 
         var matrixBuildId = Guid.NewGuid().ToString("N");
+        var storageRequestId = StorageRequestId(
+            principal, operationKind, canonicalRequest.RequestId);
         using (var matrix = connection.CreateCommand())
         {
             matrix.Transaction = transaction;
@@ -117,7 +196,7 @@ public sealed class MatrixBuildStore
                     $now, $now);
                 """;
             matrix.Parameters.AddWithValue("$matrixBuildId", matrixBuildId);
-            matrix.Parameters.AddWithValue("$requestId", canonicalRequest.RequestId);
+            matrix.Parameters.AddWithValue("$requestId", storageRequestId);
             matrix.Parameters.AddWithValue("$requestHash", requestHash);
             matrix.Parameters.Add("$requestPayload", SqliteType.Blob).Value =
                 canonicalRequest.ToByteArray();
@@ -128,6 +207,27 @@ public sealed class MatrixBuildStore
             matrix.Parameters.AddWithValue("$definitionHash", definitionHash);
             matrix.Parameters.AddWithValue("$now", nowUnixMs);
             matrix.ExecuteNonQuery();
+        }
+
+        using (var idempotency = connection.CreateCommand())
+        {
+            idempotency.Transaction = transaction;
+            idempotency.CommandText = """
+                INSERT INTO matrix_build_idempotency(
+                    actor_type, actor_id, operation_kind, request_id, request_hash,
+                    matrix_build_id, response_status, response_json, response_etag, created_unix_ms)
+                VALUES (
+                    $actorType, $actorId, $operationKind, $requestId, $requestHash,
+                    $matrixBuildId, NULL, NULL, NULL, $created);
+                """;
+            idempotency.Parameters.AddWithValue("$actorType", principal.ActorType);
+            idempotency.Parameters.AddWithValue("$actorId", principal.ActorId);
+            idempotency.Parameters.AddWithValue("$operationKind", operationKind);
+            idempotency.Parameters.AddWithValue("$requestId", canonicalRequest.RequestId);
+            idempotency.Parameters.AddWithValue("$requestHash", requestHash);
+            idempotency.Parameters.AddWithValue("$matrixBuildId", matrixBuildId);
+            idempotency.Parameters.AddWithValue("$created", nowUnixMs);
+            idempotency.ExecuteNonQuery();
         }
 
         for (var ordinal = 0; ordinal < canonicalRequest.Cells.Count; ordinal++)
@@ -192,12 +292,148 @@ public sealed class MatrixBuildStore
             cell.ExecuteNonQuery();
         }
 
-        transaction.Commit();
-        return new BuildRef { BuildId = matrixBuildId };
-    });
+        if (stagingId is not null)
+        {
+            var participant = attachmentParticipant ?? throw new InvalidOperationException(
+                "REST matrix submission requires the blob staging attachment participant");
+            participant.Attach(
+                connection,
+                transaction,
+                new BlobBuildAttachmentRequest(
+                    principal,
+                    operationKind,
+                    canonicalRequest.RequestId,
+                    stagingId,
+                    canonicalRequest.Project,
+                    matrixBuildId,
+                    canonicalRequest.Cells
+                        .SelectMany(cell => cell.Assignment.Payload)
+                        .Select(payload => payload.Sha256)
+                        .Distinct(StringComparer.Ordinal)
+                        .Order(StringComparer.Ordinal)
+                        .ToArray(),
+                    now));
+        }
+
+        BuildEventStore.AppendForMatrix(
+            connection,
+            transaction,
+            matrixBuildId,
+            "build.created",
+            now,
+            requestContext);
+
+        if (auditEventFactory is not null)
+        {
+            AuditEventStore.Append(connection, transaction, auditEventFactory(matrixBuildId));
+        }
+
+            transaction.Commit();
+            return new BuildRef { BuildId = matrixBuildId };
+        });
+    }
 
     public Task<BuildSnapshot?> GetSnapshotAsync(string matrixBuildId) =>
         database.ReadAsync(connection => ReadSnapshot(connection, matrixBuildId));
+
+    internal Task<MatrixBuildResponseReceipt?> FindResponseReceiptAsync(
+        ManagementPrincipal principal,
+        string operationKind,
+        string requestId,
+        string requestHash)
+    {
+        ValidatePrincipal(principal);
+        return database.ReadAsync(connection => ReadResponseReceipt(
+            connection,
+            transaction: null,
+            principal,
+            operationKind,
+            requestId,
+            requestHash));
+    }
+
+    internal Task<MatrixBuildResponseReceipt> FinalizeResponseReceiptAsync(
+        ManagementPrincipal principal,
+        string operationKind,
+        string requestId,
+        string requestHash,
+        MatrixBuildResponseReceipt proposed)
+    {
+        ValidatePrincipal(principal);
+        ArgumentNullException.ThrowIfNull(proposed);
+        if (proposed.Status is < 100 or > 599 || proposed.Json.Length is < 2 or > 1_048_576 ||
+            string.IsNullOrWhiteSpace(proposed.ETag) || proposed.ETag.Length > 256)
+        {
+            throw new ArgumentException("the Build response receipt is not bounded", nameof(proposed));
+        }
+
+        return database.WriteAsync(connection =>
+        {
+            using var transaction = connection.BeginTransaction();
+            var existing = ReadResponseReceipt(
+                connection,
+                transaction,
+                principal,
+                operationKind,
+                requestId,
+                requestHash,
+                requireRecord: true);
+            if (existing is not null)
+            {
+                transaction.Commit();
+                return existing;
+            }
+
+            using var update = connection.CreateCommand();
+            update.Transaction = transaction;
+            update.CommandText = """
+                UPDATE matrix_build_idempotency SET
+                    response_status = $status,
+                    response_json = $json,
+                    response_etag = $etag
+                WHERE actor_type = $actorType
+                    AND actor_id = $actorId
+                    AND operation_kind = $operationKind
+                    AND request_id = $requestId
+                    AND request_hash = $requestHash
+                    AND response_status IS NULL
+                    AND response_json IS NULL
+                    AND response_etag IS NULL;
+                """;
+            update.Parameters.AddWithValue("$status", proposed.Status);
+            update.Parameters.AddWithValue("$json", proposed.Json);
+            update.Parameters.AddWithValue("$etag", proposed.ETag);
+            update.Parameters.AddWithValue("$actorType", principal.ActorType);
+            update.Parameters.AddWithValue("$actorId", principal.ActorId);
+            update.Parameters.AddWithValue("$operationKind", operationKind);
+            update.Parameters.AddWithValue("$requestId", requestId);
+            update.Parameters.AddWithValue("$requestHash", requestHash);
+            if (update.ExecuteNonQuery() != 1)
+            {
+                throw new InvalidDataException(
+                    "the Build idempotency response receipt changed during serialized finalization");
+            }
+
+            transaction.Commit();
+            return proposed;
+        });
+    }
+
+    public Task<string?> FindMatrixBuildIdForChildAsync(string buildId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(buildId);
+        return database.ReadAsync(connection =>
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT matrix_build_id
+                FROM matrix_build_cells
+                WHERE build_id = $buildId;
+                """;
+            command.Parameters.AddWithValue("$buildId", buildId);
+            return command.ExecuteScalar() as string;
+        });
+    }
 
     /// <summary>
     /// Atomically stops every non-terminal child of a matrix. Queued children become terminal in
@@ -207,7 +443,15 @@ public sealed class MatrixBuildStore
     internal Task<MatrixCancellationCommit?> CancelAsync(
         string matrixBuildId,
         string reason,
-        DateTimeOffset now)
+        DateTimeOffset now) => CancelAsync(
+            matrixBuildId, reason, now, auditEvent: null, requestContext: null);
+
+    internal Task<MatrixCancellationCommit?> CancelAsync(
+        string matrixBuildId,
+        string reason,
+        DateTimeOffset now,
+        AuditEventDraft? auditEvent,
+        ManagementRequestContext? requestContext = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(matrixBuildId);
         ArgumentException.ThrowIfNullOrWhiteSpace(reason);
@@ -343,6 +587,19 @@ public sealed class MatrixBuildStore
                 matrix.Parameters.AddWithValue("$now", nowUnixMs);
                 matrix.Parameters.AddWithValue("$matrixBuildId", matrixBuildId);
                 matrix.ExecuteNonQuery();
+
+                if (auditEvent is not null)
+                {
+                    AuditEventStore.Append(connection, transaction, auditEvent);
+                }
+
+                BuildEventStore.AppendForMatrix(
+                    connection,
+                    transaction,
+                    matrixBuildId,
+                    "build.cancellation-requested",
+                    now,
+                    requestContext);
             }
 
             transaction.Commit();
@@ -423,6 +680,107 @@ public sealed class MatrixBuildStore
         });
     }
 
+    /// <summary>
+    /// Reads matrix aggregates in a deterministic newest-first order. State and outcome are derived
+    /// from child builds, so filtered reads scan bounded database windows until they fill one page.
+    /// </summary>
+    public Task<MatrixBuildPage> ListPageAsync(MatrixBuildQuery query)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        if (query.Limit is < 1 or > 200)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(query), "limit must be between 1 and 200");
+        }
+
+        if (query.BeforeCreatedAt.HasValue !=
+            !string.IsNullOrWhiteSpace(query.BeforeMatrixBuildId))
+        {
+            throw new ArgumentException(
+                "both cursor creation time and matrix build id are required", nameof(query));
+        }
+
+        return database.ReadAsync(connection =>
+        {
+            const int scanWindow = 200;
+            var matches = new List<MatrixBuildSummary>(query.Limit + 1);
+            var beforeCreatedUnixMs = query.BeforeCreatedAt?.ToUnixTimeMilliseconds();
+            var beforeMatrixBuildId = query.BeforeMatrixBuildId;
+
+            while (matches.Count <= query.Limit)
+            {
+                var candidates = new List<(string Id, long CreatedUnixMs)>(scanWindow);
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = """
+                        SELECT matrix_build_id, created_unix_ms
+                        FROM matrix_builds
+                        WHERE ($project IS NULL OR project = $project)
+                            AND ($configuration IS NULL OR configuration = $configuration)
+                            AND (
+                                $beforeCreatedUnixMs IS NULL
+                                OR created_unix_ms < $beforeCreatedUnixMs
+                                OR (created_unix_ms = $beforeCreatedUnixMs
+                                    AND matrix_build_id < $beforeMatrixBuildId)
+                            )
+                        ORDER BY created_unix_ms DESC, matrix_build_id DESC
+                        LIMIT $scanWindow;
+                        """;
+                    command.Parameters.AddWithValue(
+                        "$project", (object?)NormalizeFilter(query.Project) ?? DBNull.Value);
+                    command.Parameters.AddWithValue(
+                        "$configuration",
+                        (object?)NormalizeFilter(query.Configuration) ?? DBNull.Value);
+                    command.Parameters.AddWithValue(
+                        "$beforeCreatedUnixMs", (object?)beforeCreatedUnixMs ?? DBNull.Value);
+                    command.Parameters.AddWithValue(
+                        "$beforeMatrixBuildId", (object?)beforeMatrixBuildId ?? DBNull.Value);
+                    command.Parameters.AddWithValue("$scanWindow", scanWindow);
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        candidates.Add((reader.GetString(0), reader.GetInt64(1)));
+                    }
+                }
+
+                if (candidates.Count == 0)
+                {
+                    break;
+                }
+
+                foreach (var candidate in candidates)
+                {
+                    var snapshot = ReadSnapshot(connection, candidate.Id)
+                        ?? throw new InvalidDataException(
+                            $"matrix build '{candidate.Id}' disappeared during a durable read");
+                    if ((query.State is not null && snapshot.State != query.State) ||
+                        (query.Outcome is not null && snapshot.Outcome != query.Outcome))
+                    {
+                        continue;
+                    }
+
+                    matches.Add(ToSummary(snapshot));
+                    if (matches.Count > query.Limit)
+                    {
+                        break;
+                    }
+                }
+
+                var last = candidates[^1];
+                beforeCreatedUnixMs = last.CreatedUnixMs;
+                beforeMatrixBuildId = last.Id;
+                if (candidates.Count < scanWindow)
+                {
+                    break;
+                }
+            }
+
+            return new MatrixBuildPage(
+                matches.Take(query.Limit).ToArray(),
+                matches.Count > query.Limit);
+        });
+    }
+
     public Task<MatrixBuildArtifact?> FindArtifactAsync(
         string matrixBuildId,
         string cellBuildId,
@@ -499,7 +857,8 @@ public sealed class MatrixBuildStore
                     b.state, b.agent_id, b.result, b.updated_unix_ms, c.rid,
                     q.queue_deadline_unix_ms, b.agent_name_snapshot,
                     b.agent_parameters_snapshot_json,
-                    b.agent_custom_parameters_snapshot_json
+                    b.agent_custom_parameters_snapshot_json,
+                    b.cancellation_reason
                 FROM matrix_build_cells c
                 JOIN builds b ON b.build_id = c.build_id
                 JOIN build_queue q ON q.build_id = c.build_id
@@ -521,7 +880,8 @@ public sealed class MatrixBuildStore
                     State = ParseState(reader.GetString(3)),
                     AgentId = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
                     Outcome = result?.Outcome ?? BuildOutcome.Unspecified,
-                    StatusText = result?.StatusText ?? string.Empty,
+                    StatusText = result?.StatusText ??
+                        (reader.IsDBNull(12) ? string.Empty : reader.GetString(12)),
                     Rid = reader.GetString(7),
                     QueueDeadlineUnixMs = reader.IsDBNull(8) ? 0 : reader.GetInt64(8),
                     AgentName = reader.GetString(9),
@@ -559,6 +919,20 @@ public sealed class MatrixBuildStore
         snapshot.Cells.Add(cells);
         return snapshot;
     }
+
+    private static MatrixBuildSummary ToSummary(BuildSnapshot snapshot) => new(
+        snapshot.Build.BuildId,
+        snapshot.Project,
+        snapshot.Configuration,
+        snapshot.State,
+        snapshot.Outcome,
+        snapshot.Cells.Count,
+        snapshot.Cells.Count(cell => cell.State == DurableBuildState.Finished),
+        DateTimeOffset.FromUnixTimeMilliseconds(snapshot.CreatedUnixMs),
+        DateTimeOffset.FromUnixTimeMilliseconds(snapshot.UpdatedUnixMs));
+
+    private static string? NormalizeFilter(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private static DurableBuildState ParseState(string state) => state switch
     {
@@ -618,4 +992,83 @@ public sealed class MatrixBuildStore
 
         return checked((long)Math.Ceiling(timeout.TotalMilliseconds));
     }
+
+    private static void ValidatePrincipal(ManagementPrincipal principal)
+    {
+        ArgumentNullException.ThrowIfNull(principal);
+        ArgumentException.ThrowIfNullOrWhiteSpace(principal.ActorType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(principal.ActorId);
+    }
+
+    private static MatrixBuildResponseReceipt? ReadResponseReceipt(
+        SqliteConnection connection,
+        SqliteTransaction? transaction,
+        ManagementPrincipal principal,
+        string operationKind,
+        string requestId,
+        string requestHash,
+        bool requireRecord = false)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationKind);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestHash);
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            SELECT request_hash, response_status, response_json, response_etag
+            FROM matrix_build_idempotency
+            WHERE actor_type = $actorType
+                AND actor_id = $actorId
+                AND operation_kind = $operationKind
+                AND request_id = $requestId;
+            """;
+        command.Parameters.AddWithValue("$actorType", principal.ActorType);
+        command.Parameters.AddWithValue("$actorId", principal.ActorId);
+        command.Parameters.AddWithValue("$operationKind", operationKind);
+        command.Parameters.AddWithValue("$requestId", requestId);
+        using var reader = command.ExecuteReader();
+        if (!reader.Read())
+        {
+            if (requireRecord)
+            {
+                throw new InvalidDataException("the Build idempotency record is missing");
+            }
+
+            return null;
+        }
+
+        if (!string.Equals(reader.GetString(0), requestHash, StringComparison.Ordinal))
+        {
+            throw new MatrixRequestConflictException(requestId);
+        }
+
+        var valuesPresent = !reader.IsDBNull(1) && !reader.IsDBNull(2) && !reader.IsDBNull(3);
+        var valuesAbsent = reader.IsDBNull(1) && reader.IsDBNull(2) && reader.IsDBNull(3);
+        if (!valuesPresent && !valuesAbsent)
+        {
+            throw new InvalidDataException("the Build idempotency response receipt is incomplete");
+        }
+
+        return valuesPresent
+            ? new MatrixBuildResponseReceipt(
+                reader.GetInt32(1), reader.GetString(2), reader.GetString(3))
+            : null;
+    }
+
+    private static string StorageRequestId(
+        ManagementPrincipal principal,
+        string operationKind,
+        string clientRequestId)
+    {
+        var identity = JsonSerializer.Serialize(new[]
+        {
+            principal.ActorType,
+            principal.ActorId,
+            operationKind,
+            clientRequestId,
+        });
+        return "principal:" + Convert.ToHexString(
+            SHA256.HashData(Encoding.UTF8.GetBytes(identity))).ToLowerInvariant();
+    }
+
 }

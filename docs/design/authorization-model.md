@@ -484,24 +484,30 @@ backpressure, and export while preserving these fields.
 
 ## Current state and migration
 
-Today D4 implements three coarse credential classes: agent, submit, and admin. The panel exchanges the
-admin token for a cookie; the CLI uses scoped bearer tokens. There is no user/group/service-account
-catalog, project RBAC, fleet RBAC, Git-backed role policy, or shared fine-grained evaluator. The
-implemented API must therefore be treated as a single-admin transitional surface, not evidence that
-the target model exists.
+The initial D26 slice now implements product-owned minimum bundles for the five built-in role IDs,
+canonical Git `User` and built-in `RoleBinding` documents, v10 materialized projections with exact
+revision provenance, and one evaluator shared with the legacy boundaries. It proves that project and
+fleet scopes do not cross and that Agent Manager lacks the high-risk command permission. First-run
+activation creates one named User and global `SYSTEM_ADMIN` binding; password material remains private
+under v11 and panel cookies carry a checked credential generation.
+
+This is not the complete target model. Groups, service accounts, PATs, custom roles/inclusion, additive
+built-in customization, project ancestry, shared-pool association checks, suspension overlays, general
+user/role REST, and permission introspection remain. The current schema accepts direct User bindings to
+built-in roles only. Legacy admin/submit tokens remain explicitly bounded migration adapters.
 
 Migration sequence:
 
-1. Introduce stable principal, permission, role, role-binding, service-account, and token metadata
-   models plus one authorization service; preserve agent credentials separately.
-2. Map the legacy admin credential to a temporary System Administrator migration principal and the
-   submit credential to a temporary build-only service principal. Emit deprecation/audit events.
-3. Enforce the shared evaluator at existing ControlPlane, blob, and panel boundaries before adding new
-   REST endpoints.
-4. Add Git-backed policy/configuration reconciliation and require an applied revision for settings
-   mutation. Remove direct SQLite settings edits.
-5. Add private credential generations/outbox/tombstones plus persisted drain/suspension overlays before
-   Git becomes authoritative for identity and agent authorization.
+1. **Partial:** stable User, built-in role, RoleBinding, credential-generation, and permission models
+   plus one evaluator exist; groups, service accounts, PAT metadata, and custom roles remain.
+2. **Mapped:** legacy admin resolves as the temporary System Administrator migration principal and
+   submit remains build/blob-only. Removal/deprecation audit policy remains.
+3. **Implemented for existing boundaries:** ControlPlane, REST, panel, blob, and application-command
+   services share the evaluator; resource-specific project/pool calls expand with their domains.
+4. **Implemented for the initial authorization schema:** User and RoleBinding desired state activates
+   only from a reconciled Git revision. General policy mutation is not exposed yet.
+5. **Partial:** private password verifiers and checked credential generations exist. Token outbox,
+   tombstones, PAT/session catalogs, and suspension overlays remain.
 6. Add fleet scopes and the sensitive AgentExplorer permission split before shipping process, environment,
    file, command, or software APIs.
 7. Remove legacy credentials after administrators create named users/service accounts and verify the

@@ -4,7 +4,7 @@
 > Implementation: **Partial**
 > Maintainer role: [Agent API/SDK Expert](../roles/agent-api-sdk-expert.md)
 > Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1, D2, D4, D7, D8, D14, D16,
-> D19-D22, D24, D26, D27
+> D19-D24, D26, D27, D29, D30
 
 Numbered architecture decisions remain authoritative. This document specializes their Agent API/SDK
 boundary; a contradiction requires an architecture update in the same change.
@@ -24,34 +24,62 @@ The Phase 1 implementation already provides:
 
 - One bidirectional proto3 `AgentHub.Session` stream per agent over pinned TLS.
 - Persistent `agent_id`, pending enrollment, explicit authorization, and durable token storage with
-  restrictive file permissions. The implemented identity already matches the target stable Agent
-  resource; credential-generation metadata is not yet explicit.
+  restrictive file permissions. Durable credential and connection generations fence replacement and
+  reconnect, survive controller restart, and are returned authoritatively in the handshake.
 - A per-connect `session_id`, application heartbeats, reconnect, newer-session replacement, and
   restart-safe controller ownership recovery.
+- Additive protocol-range negotiation and bounded versioned capability IDs. Current Agents negotiate
+  `teamcity.build-runner.v1` and `agent-explorer.host-facts.v1`; pre-negotiation Agents remain visible
+  and may finish adopted work but are drained from new assignments.
+- Bounded typed connect-time host observations for Windows, Linux, and macOS, including distinct
+  product/build/kernel identity, OS/process architecture, hostname, Agent/package identity, collection
+  outcome/issues, and observation provenance. Capabilities persist independently from observation
+  success and are available through Agent REST reads.
 - Build assignment acknowledgement, duplicate-assignment suppression, idempotent cancellation,
   process-tree termination, durable terminal-result retry, and controller acknowledgement.
 - Basic reported parameters plus operator-owned custom parameters stored separately.
-- Agent version reporting and a controller `RestartAgent` message.
-- A bootstrap prototype that reads `bootstrap.json`, pins the controller certificate, fetches a
-  manifest, verifies the package SHA-256, replaces the agent directory, and relaunches the agent.
+- Agent desired enablement now has one canonical Git document and a durable desired/applied
+  projection. `/api/v1/agents/{id}/settings` GET/PUT commits `spec.enabled` before activation, and the
+  resulting applied state feeds the existing scheduler-visible enabled axis across restart.
+- Agent version/package/upgrade-operation reporting and a controller `RestartAgent` message.
+- Immutable content-addressed per-RID package storage, exact Server-release catalog import, and
+  Agent-scoped authenticated manifest/package reads over pinned TLS. New operations resolve the target
+  solely from the running Server release and observed Agent RID.
+- Durable per-Agent upgrade operations with an atomic maintenance drain, a distinct `HANDOFF_READY`
+  commit point, bounded restart dispatch, exact newer-generation/RID/digest reconciliation, durable
+  phase history, first cancellation reason, and restart recovery. Cancellation releases a drain only
+  before handoff; afterward it is an audited rollback request and the drain remains held.
+- Content-addressed bootstrap activation with portable archive validation, cached-content rehashing,
+  an exact seed digest, strict persisted receipts, a singleton supervisor/child lease, a monotonic
+  skew-safe deadline, bounded termination reporting, and retained LKG. Candidate acceptance uses a
+  crash-recoverable ready → promoted → commit-accepted → committed → server-confirmed handshake;
+  eligibility returns only after the Agent confirms the controller's durable receipt. Linux/macOS
+  tier-2 evidence launches real bootstrap/Agent processes for success and failed-candidate rollback;
+  another tier-2 scenario proves one busy Agent does not block its peer.
+- `viv agent upgrade`, `viv agent upgrade-status`, and the synonymous phase-aware
+  `viv agent upgrade-cancel` / `upgrade-rollback` recovery commands use the public REST
+  resources. Status prints the held-drain flag, retry generation/deadline, failure/cancellation reason,
+  and bounded transition history. Starting a packaged Server imports its release `catalog.json`
+  idempotently but never silently restarts the fleet. The raw publication endpoint exists only behind an
+  explicit hidden development/test option and is not a product or CLI contract.
 
 The current state is not yet an end-user agent platform:
 
-- There is no typed capability advertisement or registry. `Hello.parameters` currently carries a
-  small, partly overloaded set of strings.
 - There is no signed `AgentPolicyBundle`, apply acknowledgement, or exact-policy dispatch gate.
-- Host inventory is limited to coarse `Environment.OSVersion`, architecture, hostname, interactive
-  state, and machine kind. Exact Windows UBR, Linux distribution, macOS build, processes, network
-  endpoints, environment inspection, and metrics are not implemented.
+- Dynamic processes, network endpoints, environment inspection, metrics, and refresh operations are
+  not implemented; the current typed observation is deliberately static and connect-time only.
 - The only executable workload is `BuildAssignment`; there is no generic operation envelope or
   AgentExplorer operation lifecycle.
-- Setup/manifest endpoints, preconfigured archives, installers, and controller-side release storage
-  are not complete. The prototype manifest path is not authenticated and the D2/D21 bootstrap freeze
-  gate is not proven.
-- Central rollout, drain, health acknowledgement, rollback, release channels, and previous-release
-  compatibility CI are not implemented.
-- Public REST and Git-backed desired configuration are separate design streams and are not yet wired
-  into agent lifecycle management.
+- Preconfigured archives, installers/setup endpoints, signing/notarization, and the release workflow
+  that produces embedded catalogs are not complete. The D30 manifest path and post-authorization
+  handoff are implemented; the D21 initial installer-authenticity gate remains open.
+- Per-Agent central rollout, drain, health acknowledgement, and rollback are implemented. Fleet/group
+  rollout orchestration, release channels/pins, automatic canary policy, and previous-release
+  compatibility CI remain future work.
+- Public Agent REST reads consume the typed observation/capability projection, and the first
+  Git-backed REST mutation now controls only Agent `spec.enabled`. Display name, custom parameters,
+  authorization policy, maintenance/drain policy, capability policy, and release/rollout settings are
+  not yet wired through the desired-configuration lifecycle.
 
 ## Target model
 
@@ -413,26 +441,52 @@ every supported RID. A release manifest identifies immutable package bytes by ve
 size, and URL. Release/channel policy is declarative Git-backed configuration; package bytes live in
 the authenticated controller store and are referenced by digest rather than committed to Git.
 
-Target upgrade lifecycle:
+Implemented per-Agent upgrade lifecycle (fleet pacing/channel policy remains future work):
 
-1. Controller policy selects a release/channel for an agent or group at an applied Git revision.
+1. An authorized request selects an Agent or rollout scope. The controller resolves the only valid
+   target: the Agent package for the observed RID from the currently running Server release. Future
+   channel policy decides when and in what order Agents move, not which arbitrary package bytes to run.
 2. The controller drains the agent: no new exclusive work is assigned. An active build is allowed to
    finish unless an explicit, separately authorized stop action says otherwise.
 3. `RestartAgent` asks the agent process to exit. Bootstrap fetches the authenticated manifest over
-   pinned TLS and downloads the matching RID package.
+   pinned TLS and downloads the matching RID package. Creation is rejected unless the Agent's current
+   Hello negotiates `vivarium.bootstrap-supervisor.v1` from a live launcher lease.
 4. Bootstrap verifies digest and package structure, stages it outside `current`, and activates it
-   atomically while retaining a last-known-good package.
-5. The new agent connects with a new session ID, reports its version/protocol/capabilities, applies
-   current desired configuration, and acknowledges health.
-6. Only then does the controller leave `upgrading` and restore eligibility. Failure before health
-   acknowledgement rolls back or remains visibly failed according to the still-open rollout policy.
+   atomically while retaining a last-known-good package. It binds both manifest reads to the exact
+   local prior digest and rejects an expired or changed directive before changing active state.
+5. The new agent connects with a new session ID and exact operation/RID/digest, negotiates protocol and
+   capabilities, completes reconciliation, and remains under a bounded probation interval.
+6. The controller accepts that exact session; the Agent durably writes `ready`; bootstrap durably
+   replies `promoted`; the Agent confirms health; the controller durably enters `COMMIT_PENDING`; the
+   Agent durably writes `committed` and confirms it. The controller then durably enters `FINALIZING`,
+   returns a recorded receipt, and the Agent durably writes and confirms `server-confirmed`. Only that
+   final receipt releases the drain; a crash or reconnect in either commit phase resumes the exact
+   phase rather than guessing that the other side persisted it.
+7. Deadline, candidate exit, invalid candidate identity, or post-handoff cancellation requests an LKG
+   rollback. Bootstrap positively terminates the candidate and launches the exact prior digest with the
+   same operation ID; only controller observation of that prior generation records `ROLLED_BACK` and
+   releases the drain. The prior digest and starting generation are rebound atomically from the exact
+   live reconciled Hello at handoff. A retry is a new fenced operation after this terminal result.
 
-Dev side-loading (`viv agent push`) is an admin action: it stores immutable bytes by digest, creates an
-audited release reference, and follows the same drain/verification/health path. It is not an
-untracked copy directly into an agent directory.
+Bootstrap converts the authenticated manifest's bounded remaining duration into a local deadline and
+also measures it with a monotonic watchdog. It verifies every persisted schema-2 package against its
+original receipt, fails closed on lost initialized state, keeps only active/fallback/pending package
+directories, and reserves disk space before download/extraction. A child that cannot be positively
+terminated within the bounded escalation window is reported through the Agent-scoped bootstrap failure
+endpoint; that report is durable across bootstrap restart and blocks relaunch until an idempotent
+controller acknowledgment. The same operation/failure in a candidate Hello independently prevents
+health progression. The operation becomes visibly `FAILED` while its maintenance drain remains held.
+Controller session outboxes are bounded; a non-reading Agent is fenced on overflow instead of
+accumulating retry messages without limit.
 
-The current bootstrap prototype must not be edited to implement this target until the D2/D21 design
-discussion resolves authenticated manifest handoff and the freeze gate is proven.
+Agent development rebuilds a complete Server release bundle and rolls its Agent component to a canary.
+This preserves the Server/Agent release contract in development and production. A hidden, explicitly
+enabled raw publication surface is reserved for integration fixtures; it is not exposed by `viv`, REST
+OpenAPI, or the panel.
+
+The D30 implementation remains change-controlled. Do not declare it frozen until the remaining
+bad-download/interrupted-activation and Windows process evidence, plus D21 authenticated installer
+evidence, pass.
 
 ## Git-backed desired configuration
 
@@ -532,7 +586,9 @@ handoffs for every new mutating capability.
 - Deleting an Agent revokes its credential. Unauthorizing it changes scheduling permission but
   does not break an in-flight authenticated artifact upload.
 - Enrollment tokens are hashed server-side, short-lived, single-use, and insufficient to authenticate
-  downloaded installer bytes.
+  downloaded installer bytes. An enrollment-proof session stays unauthorized and may only receive its
+  new bearer; the Agent durably stores it and immediately reconnects, and only that bearer Hello
+  consumes the proof and enables scheduling.
 - Agent secret files use restrictive platform permissions. Package digests and controller pins are
   compared in constant, canonical representations.
 - Agent operations run with the minimum privilege consistent with their declared capability. Elevated
@@ -590,19 +646,22 @@ handoffs for every new mutating capability.
 - Multi-agent capacity on one physical host; baseline capacity is one exclusive work item.
 - Silent autologon, security-control changes, or privilege escalation during enrollment.
 - Storing package binaries, credentials, runtime state, or high-frequency observations in Git.
-- Modifying or freezing the bootstrap before D2/D21 evidence exists.
+- Treating the D30 bootstrap as frozen before its remaining cross-platform and installer evidence exists.
 
 ## Open questions
 
-1. How does the single-use enrollment proof authenticate the first manifest request without placing a
-   reusable secret in `bootstrap.json`, and what exact evidence closes the bootstrap freeze gate?
+1. **Resolved by D30 for post-authorization updates:** bootstrap launches the authenticated seed and
+   makes no manifest request before `data/auth.token` exists; thereafter it reuses the Agent bearer
+   only in same-origin pinned-TLS headers. D21 installer-byte authentication and the remaining
+   cross-platform failure evidence still close the final freeze gate.
 2. What controller/agent compatibility window will releases promise: current plus N-1, or a longer
    window for rarely connected physical machines?
 3. Should capability negotiation use one general typed operation envelope or separate observation and
    mutation envelopes with different durability guarantees?
 4. Which inventory is cached durably, for how long, and which sensitive fields remain live-only?
-5. What constitutes successful post-upgrade health, how long is its deadline, and when is automatic
-   rollback safer than leaving the agent in a visible failed-upgrade state?
+5. **Resolved for the first per-Agent operation by D30:** exact newer-generation reconciliation plus
+   controller acceptance, atomic marker write, and Agent confirmation within the bounded operation
+   deadline. Early exit/health timeout rolls back once; unexpected state fails closed and stays drained.
 6. Can release pins be permanent, or must unsupported pins automatically disable scheduling after an
    announced compatibility horizon?
 7. Which service/logon installation modes are supported on stock Windows, systemd Linux, and macOS,

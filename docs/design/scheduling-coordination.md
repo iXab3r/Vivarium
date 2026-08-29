@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Partial**
 > Maintainer role: [Scheduling/Coordination Expert](../roles/scheduling-coordination-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4-D9, D13-D16, D18, D22-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4-D9, D13-D16, D18, D22-D30
 
 ## Purpose
 
@@ -58,12 +58,13 @@ The Phase 1 build path already provides substantial TeamCity-style coordination:
 | Cancellation | Running cancellation is durable and redelivered; matrix cancellation is serialized and first reason wins | `BuildTracker`, `MatrixBuildCancellationService`, cancellation tests |
 | Results | The first valid terminal result is durable; identical retries and lease-expired late results are acknowledged without rewriting history | `BuildStore`, `BuildTracker`, result/reconnect tests |
 | Persistence | Queue, assignment, cancellation intent, ownership, provenance, and result live in SQLite; in-memory waiters are projections | `VivariumDatabase`, build stores |
+| Agent upgrade | Durable operation and fenced maintenance drain precede restart; active Builds finish; exact new health or observed rollback releases the drain; restart resumes coordination | `AgentUpgradeStore`, `AgentUpgradeService`, `AgentDeploymentTests` |
 
 The following are target work, not implemented capabilities:
 
 - A generic per-Agent lease shared by TeamCity, AgentExplorer, providers, and maintenance.
-- Explicit credential and connection generations, Agent-scoped fences, and observation epochs; current
-  build ownership is already Agent/session-oriented.
+- A general Agent-scoped fence/observation epoch shared by every future operation. Credential and
+  connection generations and the upgrade maintenance fence are implemented for their current paths.
 - Caller/Project/Build Configuration authorization to target pools/trust classes before compatibility,
   with durable authorization-policy provenance.
 - AgentExplorer operation records and agent operation envelopes.
@@ -75,9 +76,11 @@ The following are target work, not implemented capabilities:
   agent result as the Build's terminal result.
 - Agent-side durable journaling for operations beyond the current build terminal-result retry.
 - Git-controlled fleet/scheduling policy reconciliation and policy provenance on every operation.
-- A public REST management surface and generic async `Operation` resource.
-- The minimal SQLite audit/outbox required below; current logs and domain rows are not yet a complete
-  action journal.
+- A generic async `Operation` resource. Public REST exists, and Agent upgrades currently expose a
+  specialized durable operation resource.
+- A general durable outbox and audit coverage for future leases/operations; the minimal SQLite audit
+  journal now covers existing caller-requested build submission/cancellation and security mutations,
+  but current logs and domain rows are not yet a complete operation journal.
 
 This distinction must remain visible in plans and UI. Design prose is not evidence that a target path
 runs.
@@ -506,11 +509,13 @@ controller restart.
 
 Maintenance is coordinated work, not an out-of-band flag flip:
 
-1. Desired long-lived maintenance/upgrade policy arrives from Git.
+1. A caller creates an authorized durable per-Agent upgrade operation. Desired long-lived
+   maintenance/channel policy may later select and create these operations from Git.
 2. The Agent enters `draining`; no new mutation is assigned, but current work is not cancelled.
 3. After idle, a maintenance operation acquires the shared Agent lease.
 4. Agent upgrade sends the restart instruction only after the lease is durable.
-5. The lease remains held until a newer session reports the required agent version and no workload.
+5. The drain remains held until a newer reconciled session reports the exact operation/package and
+   confirms its durable health marker, or until the retained prior digest reconnects after rollback.
 6. A checkpoint-restored stale agent is upgraded again before readiness; this does not rebuild the
    image.
 7. Deadline failure marks the Agent maintenance or bad and prevents scheduling.

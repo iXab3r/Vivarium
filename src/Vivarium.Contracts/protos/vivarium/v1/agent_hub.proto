@@ -18,6 +18,9 @@ message AgentMsg {
     BuildResult result = 4;
     Heartbeat heartbeat = 5;
     AssignmentAccepted assignment_accepted = 6; // ownership accepted by this exact session (D4/D14)
+    UpgradeHealthConfirmed upgrade_health_confirmed = 8; // tag 7 remains reserved for TeamCity service messages (D14)
+    UpgradeCommitConfirmed upgrade_commit_confirmed = 9; // durable launcher commit marker written (D30)
+    UpgradeFinalizationConfirmed upgrade_finalization_confirmed = 10; // server-recorded marker persisted locally (D30)
   }
 }
 
@@ -29,6 +32,9 @@ message ControllerMsg {
     CancelBuild cancel = 4;
     RestartAgent restart = 5;             // exit; bootstrap fetches the current agent version (D2)
     BuildResultAccepted result_accepted = 6; // durable terminal-result acknowledgement (D4)
+    UpgradeHealthAccepted upgrade_health_accepted = 7; // controller reconciled the candidate; persist health before confirming (D30)
+    UpgradeCommitAccepted upgrade_commit_accepted = 8; // controller durably entered commit-pending (D30)
+    UpgradeCommitRecorded upgrade_commit_recorded = 9; // controller durably recorded the committed marker (D30)
   }
 }
 
@@ -36,6 +42,56 @@ message OsInfo {
   string family = 1;   // windows | linux | macos
   string version = 2;  // actual reported version/build — drift detection (D11)
   string arch = 3;     // x64 | arm64
+}
+
+// Agent support is independent of policy, caller authorization, runtime eligibility, and the
+// outcome of the most recent observation (D22). The stable ID includes the contract major suffix;
+// contract_major is repeated as a bounded numeric value so consumers never parse policy from text.
+message CapabilitySupport {
+  string capability_id = 1;  // e.g. agent-explorer.host-facts.v1
+  uint32 contract_major = 2;
+}
+
+enum HostFactsOutcome {
+  HOST_FACTS_OUTCOME_UNSPECIFIED = 0;
+  HOST_FACTS_OUTCOME_SUCCEEDED = 1;
+  HOST_FACTS_OUTCOME_PARTIAL = 2;
+  HOST_FACTS_OUTCOME_DEGRADED = 3;
+  HOST_FACTS_OUTCOME_PERMISSION_DENIED = 4;
+  HOST_FACTS_OUTCOME_TEMPORARILY_UNAVAILABLE = 5;
+  HOST_FACTS_OUTCOME_FAILED = 6;
+}
+
+message HostFactIssue {
+  string code = 1;         // stable, non-secret semantic code
+  string field = 2;        // affected HostFacts field or values key
+  string native_code = 3;  // bounded native error code when available
+  string message = 4;      // bounded redacted diagnostic, never a raw exception dump
+}
+
+// Safe connect-time facts. Dynamic process, endpoint, environment, and metric inventories use
+// explicit bounded refresh operations later; they never ride on Hello or Heartbeat.
+message HostFacts {
+  string family = 1;                // windows | linux | macos
+  string product_name = 2;          // stable product/distribution name
+  string product_version = 3;       // user-facing product/distribution version
+  string product_build = 4;         // exact Windows build+UBR / macOS build when available
+  string kernel_version = 5;        // kernel version kept separate from product version
+  string os_architecture = 6;       // x64 | arm64
+  string process_architecture = 7;  // x64 | arm64, including translated processes
+  string hostname = 8;
+  string agent_package_version = 9;
+  int64 observed_at_unix_ms = 10;   // agent clock is evidence; controller receipt time is freshness authority
+  string collector_version = 11;
+  HostFactsOutcome outcome = 12;
+  bool complete = 13;
+  repeated HostFactIssue issues = 14;
+  map<string, string> values = 15;  // bounded safe platform extensions only
+}
+
+enum AgentProtocolVersion {
+  AGENT_PROTOCOL_VERSION_UNSPECIFIED = 0;
+  AGENT_PROTOCOL_VERSION_V1 = 1;
 }
 
 message Hello {
@@ -51,16 +107,38 @@ message Hello {
   bool interactive = 10;         // live desktop present
   string running_build_id = 11;  // non-empty on re-hello: ghost re-adoption (D4)
   string pool_nonce = 12;        // injected at CreatePoolVm (KVP / fw_cfg) — host-verified identity (D7)
+  HostFacts host_facts = 13;
+  repeated CapabilitySupport capabilities = 14;
+  uint32 minimum_protocol_version = 15;
+  uint32 current_protocol_version = 16;
+  uint64 credential_generation = 17;  // agent belief; controller authentication remains authoritative
+  string agent_package_sha256 = 18;   // lowercase SHA-256 of the running package; empty when unavailable
+  string upgrade_operation_id = 19;  // launcher-supplied durable operation whose package is running
+  string upgrade_failure_code = 20;  // bounded launcher failure/rollback evidence for this operation
+}
+
+enum AgentProtocolMode {
+  AGENT_PROTOCOL_MODE_UNSPECIFIED = 0;
+  AGENT_PROTOCOL_MODE_LEGACY = 1;
+  AGENT_PROTOCOL_MODE_NEGOTIATED = 2;
 }
 
 message Welcome {
   int64 server_time_unix_ms = 1;
   bool authorized = 2;
   string server_version = 3;
+  uint32 selected_protocol_version = 4;
+  uint32 minimum_protocol_version = 5;
+  uint32 current_protocol_version = 6;
+  AgentProtocolMode protocol_mode = 7;
+  repeated CapabilitySupport negotiated_capabilities = 8;
+  uint64 credential_generation = 9;  // controller-authoritative accepted credential generation
+  uint64 connection_generation = 10; // controller-authoritative accepted Session generation
 }
 
 message AuthorizationGranted {
   string auth_token = 1;
+  uint64 credential_generation = 2;
 }
 
 message Blob {
@@ -113,6 +191,48 @@ message CancelBuild {
 
 message RestartAgent {
   string reason = 1;
+}
+
+message UpgradeHealthAccepted {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
+}
+
+message UpgradeHealthConfirmed {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
+}
+
+message UpgradeCommitAccepted {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
+}
+
+message UpgradeCommitConfirmed {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
+}
+
+message UpgradeCommitRecorded {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
+}
+
+message UpgradeFinalizationConfirmed {
+  string operation_id = 1;
+  string package_sha256 = 2;
+  string session_id = 3;
+  uint64 connection_generation = 4;
 }
 
 message StepStatus {

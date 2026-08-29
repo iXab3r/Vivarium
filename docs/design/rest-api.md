@@ -1,9 +1,9 @@
 # Vivarium REST Management API
 
 > Status: **Accepted**
-> Implementation: **Planned**
+> Implementation: **Partial — reads, Agent enablement/deployment, build/blob mutations, build SSE, and CLI flows implemented**
 > Maintainer role: [Vivarium REST Expert](../roles/vivarium-rest-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D30
 
 ## 1. Purpose
 
@@ -48,17 +48,56 @@ ambiguous behavior.
 - Agents use one bidirectional gRPC `AgentHub.Session` stream for hello, heartbeat, assignment,
   cancellation, log chunks, and terminal result handshakes.
 - Payload and artifact bytes use authenticated `GET/PUT /blobs/{sha256}` with server-side hash
-  verification.
-- The CLI uses the gRPC `ControlPlane` service. The implemented surface submits, watches, and cancels
-  builds, finds missing blobs, lists agents, and authorizes an agent.
+  verification and staging/assignment/artifact-reference authorization.
+- The live `viv login` / `viv run` / `viv cancel` build flow uses REST/SSE: it creates a project-owned
+  upload plan, uploads only required blobs, submits idempotently, resumes build events by event ID, and
+  reads the authoritative build resource. The gRPC `ControlPlane` remains a frozen compatibility
+  adapter and still carries legacy list/authorize methods pending their REST equivalents.
 - Build submission already has a client request ID and durable idempotency behavior.
+- A transport-independent kernel now supplies stable named/legacy principals, correlation/request
+  context, one built-in-role permission evaluator, versioned SQLite migrations, and an append-only
+  audit journal beneath ControlPlane, REST, panel, and blob handlers.
 - The Blazor panel calls in-process services and therefore does not prove that external clients can
   perform the same management operations.
-- Scoped tokens currently distinguish agent, submit, and admin concerns. Full TeamCity-like users,
-  groups, projects, and roles are not implemented.
-- Build definitions are submitted as exact `vivarium.yaml` snapshots from the tested repository, but
-  controller-owned fleet and administration settings are not yet governed by one Git desired-state
-  workflow.
+- Scoped legacy tokens still distinguish agent, submit, and admin concerns. The initial Git-backed User
+  and direct built-in RoleBinding schema is implemented for first-run activation; groups, service
+  accounts, PATs, custom roles, project hierarchy, and general administration resources are not.
+- `/api/v1/system`, `/agents`, `/agents/{id}`, `/audit-events`, `/builds`, `/builds/{id}`, and
+  `/queue` are implemented with shared authentication, Problem Details, bounded keyset cursors,
+  conditional ETags, explicit filters, and deterministic OpenAPI at `/openapi/v1.json`.
+- Agent collection/detail reads now project current negotiated capabilities, typed static operating
+  system/package facts, observation quality/freshness, and distinct current-versus-observation
+  credential/connection generations. `/api/v1/agents/{id}/facts` preserves legacy Agents as explicit
+  unknown observations rather than fabricating typed values.
+- `/api/v1/agents/{id}/settings` GET/PUT implements the first desired-configuration subresource for
+  `spec.enabled`. Reads return desired/applied state and a strong configuration ETag. Writes require
+  `If-Match`, an `Idempotency-Key`, and an explicit boolean; they commit validated Git bytes before
+  activation and distinguish missing preconditions, stale bases, validation/reconciliation conflicts,
+  and repository unavailability. Exact idempotent replay returns the original semantic result without
+  restoring superseded live state.
+- `/api/v1/setup/status`, setup claim/operation/administrator/repository/changes/completion resources,
+  and `/api/v1/recovery/claims` implement purpose-separated first-run and break-glass exchanges. Setup
+  sessions cannot authenticate normal resources, and unexchanged recovery values cannot either.
+  Completion atomically commits User + `SYSTEM_ADMIN`, reconciles that exact revision, and activates
+  the private credential. A `Vivarium-Recovery` session authenticates normal APIs only while the
+  host-explicit recovery state remains active.
+- `POST /api/v1/blob-upload-plans`, staged blob PUT, `POST /api/v1/builds`, idempotent cancellation, and
+  `/api/v1/events` now implement object-scoped upload authority and resumable durable build events with
+  explicit retention-gap recovery. Build definitions continue to arrive as exact `vivarium.yaml`
+  snapshots from the tested repository.
+- Agent deployment now exposes immutable package collection/detail/publication resources and durable
+  per-Agent upgrade operation create/list/detail/cancel resources. Operation reads include the durable
+  phase history, drain ownership, dispatch generation/backoff, first cancellation reason, failure, and
+  exact result digest. Cancellation means cancel-and-release only in `draining`; from `handoff-ready`
+  onward the same idempotent resource requests rollback and retains the drain. A retry is a new POST
+  after `rolled-back`, with a new fence and idempotency key. Publication requires exact digest plus
+  principal-scoped idempotency and rehashes cached content before serving/reusing it. Bootstrap
+  manifest/package routes are deliberately outside OpenAPI and accept only the matching Agent
+  credential and operation; a manifest exposes no package during drain and returns an explicit
+  `activate` or `rollback` directive after handoff. `viv` consumes the public management resources for
+  package publication and upgrade/status commands.
+- General identity/RBAC management, all other desired-configuration mutations, generic AgentExplorer
+  runtime operations, detailed result resources, and the React client remain planned.
 
 ### Target
 
@@ -73,10 +112,10 @@ ambiguous behavior.
 - Every mutating endpoint has defined authorization, idempotency, concurrency, audit, and cancellation
   behavior.
 - OpenAPI is published and treated as a reviewed compatibility artifact.
-- The existing gRPC ControlPlane is a transitional implementation-era adapter for the current CLI,
-  not a supported public target. It is frozen except for compatibility fixes, calls the same
-  application services, gains no new management methods, and is removed after the current CLI is
-  migrated to REST, before the first supported public release. AgentHub gRPC remains.
+- The existing gRPC ControlPlane is a transitional implementation-era adapter, not a supported public
+  target. The CLI build flow has migrated; the adapter remains frozen except for compatibility fixes
+  until its remaining legacy consumers have REST parity, then is removed before the first supported
+  public release. AgentHub gRPC remains.
 
 This target specializes the REST-first management plane adopted in D24. Numbered architecture
 decisions remain authoritative.
@@ -403,11 +442,10 @@ streaming the underlying blob; it carries no credential in its URL and uses the 
 or bearer authentication. Raw management-principal `GET /blobs/{sha256}` by guessed hash is not
 supported.
 
-The current broad agent-token blob behavior recorded in Architecture Section 13 is an implementation
-limitation, not the target. The REST/CLI migration must introduce these logical grants before claiming
-multi-user or object-isolated blob access. Blob-plan, staging, build-reference, assignment, and
-artifact-reference changes use the controller's serialized durable writer so submission, cancellation,
-result acceptance, and garbage collection cannot race authority.
+The implemented data plane now uses these logical staging, build-reference, assignment, and artifact
+grants. Their changes use the controller's serialized durable writer so submission, cancellation, and
+result acceptance cannot race authority. Retention reference counting and garbage collection remain
+future work; current object isolation does not claim multi-user/RBAC completion.
 
 ## 5. Git-backed desired-state mutations
 
@@ -666,8 +704,8 @@ share infrastructure but are distinct records with different retention and acces
 - External integrations may use plain HTTP without the Vivarium CLI. `curl` examples remain a design
   acceptance test for non-streaming operations.
 
-The React/Workbench UI uses REST for data and mutations and SSE for live projections. The current CLI
-migrates as one coherent flow:
+The React/Workbench UI uses REST for data and mutations and SSE for live projections. The CLI build
+flow now implements the following coherent path:
 
 1. `viv login` stores REST trust/credentials using the same pinned-controller identity rules; no CLI
    command needs a management gRPC channel afterward.
@@ -680,8 +718,8 @@ migrates as one coherent flow:
 4. `viv cancel <build-id>` sends `PUT /api/v1/builds/{id}/cancellation`. Success means the first
    cancellation intent is durably recorded, matching current semantics; terminal cancellation is
    observed through the build resource/events rather than inferred from the HTTP connection.
-5. Agent list/authorization and every remaining CLI management call move to their REST equivalent.
-   Only then is the gRPC ControlPlane removed.
+5. Agent list/authorization and every remaining legacy management call still move to their REST
+   equivalent. Only then is the gRPC ControlPlane removed.
 
 During migration, gRPC and REST adapters call the same application commands, but idempotency replay
 does not cross their separately scoped request IDs. The transitional gRPC ControlPlane is frozen and
@@ -788,11 +826,11 @@ Before declaring the first REST slice complete, provide:
 3. Add capability/version negotiation and typed static connect-time host facts, then expose
    `/agents/{agentId}/facts` with canonical `system.*` fields, freshness metadata, and explicit
    legacy-agent behavior.
-4. Implement managed-local Git plus last-known-good reconciliation and one Git-backed Agent-settings
-   mutation end to end, preferably custom settings, including `If-Match`, commit/change response,
-   audit, conflicts, and commit-before-activate behavior.
-5. Add object-scoped blob discovery/staging and move the complete CLI build submit/watch/cancel flow
-   onto REST/SSE; preserve local Ctrl+C versus remote cancellation semantics.
+4. **Completed:** managed-local Git plus last-known-good reconciliation and the first Git-backed Agent
+   setting, `spec.enabled`, including `If-Match`, idempotency, commit/change response, audit, conflicts,
+   and commit-before-activate behavior.
+5. **Completed:** object-scoped blob discovery/staging and the complete CLI build
+   submit/watch/cancel flow over REST/SSE, preserving local Ctrl+C versus remote cancellation.
 6. Complete first-run administration and RBAC, then implement restart-safe runtime actions such as
    Agent inventory refresh with idempotency, durable operation state, AgentHub dispatch, fencing, and
    audit. Dynamic sensitive inventory does not ride on the static-facts shortcut.

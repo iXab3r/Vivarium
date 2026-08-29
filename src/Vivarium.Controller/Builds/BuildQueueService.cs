@@ -1,7 +1,9 @@
 using System.Threading.Channels;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Scheduling;
+using Vivarium.Controller.Security;
 
 namespace Vivarium.Controller.Builds;
 
@@ -12,6 +14,7 @@ public sealed class BuildQueueService
     private readonly AgentRegistry agents;
     private readonly TimeProvider timeProvider;
     private readonly TimeSpan defaultQueueWaitTimeout;
+    private readonly ManagementCommandAuthorizer? authorization;
     private readonly Channel<bool> wakeups = Channel.CreateBounded<bool>(new BoundedChannelOptions(1)
     {
         FullMode = BoundedChannelFullMode.DropWrite,
@@ -23,13 +26,15 @@ public sealed class BuildQueueService
         BuildQueueStore store,
         AgentRegistry agents,
         TimeProvider? timeProvider = null,
-        TimeSpan? defaultQueueWaitTimeout = null)
+        TimeSpan? defaultQueueWaitTimeout = null,
+        ManagementCommandAuthorizer? authorization = null)
     {
         this.store = store;
         this.agents = agents;
         this.timeProvider = timeProvider ?? TimeProvider.System;
         this.defaultQueueWaitTimeout =
             defaultQueueWaitTimeout ?? ControllerOptions.DefaultBuildQueueWaitTimeout;
+        this.authorization = authorization;
         if (this.defaultQueueWaitTimeout <= TimeSpan.Zero)
         {
             throw new ArgumentOutOfRangeException(
@@ -39,7 +44,7 @@ public sealed class BuildQueueService
 
     public event Action? Changed;
 
-    public async Task<BuildQueueItem> EnqueueAsync(
+    internal async Task<BuildQueueItem> EnqueueFromControllerAsync(
         BuildAssignment assignment,
         string agentExpression)
     {
@@ -72,9 +77,29 @@ public sealed class BuildQueueService
 
     public Task<BuildQueueItem?> GetAsync(string buildId) => store.GetAsync(buildId);
 
-    public async Task<bool> RemoveAsync(string buildId, string reason)
+    public async Task<bool> RemoveAsync(
+        ManagementRequestContext context,
+        string buildId,
+        string reason)
     {
-        var removed = await store.TryRemoveAsync(buildId, reason);
+        ArgumentNullException.ThrowIfNull(context);
+        await (authorization ?? throw new InvalidOperationException(
+                "application command authorization is not configured"))
+            .DemandAsync(
+                context,
+                ManagementPermission.BuildCancel,
+                "build.cancel",
+                "build",
+                buildId);
+        var removed = await store.TryRemoveAsync(
+            buildId,
+            reason,
+            AuditEventDraft.Create(
+                context,
+                timeProvider.GetUtcNow(),
+                "build.cancel",
+                "build",
+                buildId));
         if (removed)
         {
             NotifyChanged();
