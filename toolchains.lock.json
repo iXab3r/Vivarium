@@ -3,7 +3,7 @@
   "integrityPolicy": "Every downloaded build tool must match its declared digest before extraction or execution.",
   "tools": {
     "dotnetSdk": {
-      "version": "10.0.301"
+      "version": "10.0.303"
     },
     "cakeFrosting": {
       "version": "6.2.0"
