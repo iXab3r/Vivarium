@@ -10,7 +10,7 @@ object VivariumVcs : GitVcsRoot({
     branch = "refs/heads/main"
     branchSpec = """
         +:refs/heads/main
-        +:refs/heads/feature/*
-        +:refs/tags/v*
+        +:refs/heads/(feature/*)
+        +:refs/tags/(v*)
     """.trimIndent()
 })
