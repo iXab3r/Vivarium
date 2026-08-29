@@ -34,7 +34,7 @@ The Phase 1 implementation is a useful prototype, not the target administration 
 | Startup output | `Program.cs` prints the full admin, submit, and newly created enroll tokens on every start. | Ordinary process logs expose long-lived credentials and do not distinguish initial claim from recovery. |
 | Panel login | `POST /login` compares the static admin token and creates a 12-hour sliding, secure, HTTP-only, SameSite=Strict cookie. | There is no user record, role membership, credential rotation, bootstrap state, or recovery generation. |
 | Control plane | The gRPC management plane resolves `Admin`, `Submit`, and `Agent` bearer scopes. | The admin bearer is not attributable to a durable user and is valid against all admin operations. |
-| CLI | `viv login` stores a supplied submit/admin token together with pinned controller trust. | It cannot represent a user session, personal access token, or restricted setup principal. |
+| CLI | `viv-cli login` stores a supplied submit/admin token together with pinned controller trust. | It cannot represent a user session, personal access token, or restricted setup principal. |
 | Persistence | SQLite stores agents, builds, enrollment tokens, and related durable state. | It has no durable user/RBAC/bootstrap/audit model. |
 | Git | `vivarium.yaml` is versioned in the tested repository per D17. | Controller settings and the first-run baseline are not yet backed by a controller configuration repository. |
 | REST | Authenticated blob HTTP endpoints exist; management is gRPC and the panel calls in-process services. | There is no versioned REST administration or setup surface. |

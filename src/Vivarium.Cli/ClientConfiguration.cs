@@ -135,17 +135,17 @@ internal static class EndpointSettingsResolver
     {
         var url = First(flagUrl, environment("VIVARIUM_URL"), saved?.Url)
             ?? throw new InvalidOperationException(
-                "controller URL is required (--url, VIVARIUM_URL, or 'viv login')");
+                "controller URL is required (--url, VIVARIUM_URL, or 'viv-cli login')");
         var token = First(flagToken, environment("VIVARIUM_TOKEN"), saved?.Token)
             ?? throw new InvalidOperationException(
-                "controller token is required (--token, VIVARIUM_TOKEN, or 'viv login')");
+                "controller token is required (--token, VIVARIUM_TOKEN, or 'viv-cli login')");
         var fingerprint = First(
                 flagFingerprint,
                 environment("VIVARIUM_CERT_FINGERPRINT"),
                 saved?.Fingerprint)
             ?? throw new InvalidOperationException(
                 "controller certificate fingerprint is required (--fingerprint, " +
-                "VIVARIUM_CERT_FINGERPRINT, or 'viv login')");
+                "VIVARIUM_CERT_FINGERPRINT, or 'viv-cli login')");
 
         return new EndpointSettings(
             PinnedTls.NormalizeControllerUrl(url),

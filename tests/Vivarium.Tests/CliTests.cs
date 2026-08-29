@@ -67,7 +67,7 @@ public class CliTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(defaults.Reason, Is.EqualTo("Cancelled by viv CLI"));
+            Assert.That(defaults.Reason, Is.EqualTo("Cancelled by viv-cli"));
             Assert.That(overridden.BuildId, Is.EqualTo("matrix-2"));
             Assert.That(overridden.Reason, Is.EqualTo("operator stop"));
             Assert.That(overridden.Url, Is.EqualTo("https://ctrl:8443"));

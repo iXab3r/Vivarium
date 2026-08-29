@@ -6,9 +6,60 @@ the practical companion.
 
 ## Building
 
-.NET 10 solution; `dotnet build` / `dotnet test` at the root are the whole story (AGENTS.md →
-Verification). The release target is a matrix of self-contained single-file builds; explicit
-`PublishSingleFile` is required because the project files do not set it globally:
+.NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline (AGENTS.md →
+Verification). `global.json`, committed NuGet lock files, and `toolchains.lock.json` pin the SDK,
+packages, Cake.Frosting, cargo-nextest, and GitHub CLI bytes used by CI/CD.
+
+The provider-neutral build entry point is the Cake.Frosting application under `build/`:
+
+```text
+dotnet run --project build/Vivarium.Build.csproj -- --target Help
+dotnet run --project build/Vivarium.Build.csproj -- --target CI
+dotnet run --project build/Vivarium.Build.csproj -- --target PayloadSmoke
+```
+
+`CI` builds Release and writes deterministic TRX under `out/test-results/<os>`. The payload targets
+cover native NUnit/MTP execution, Linux-to-macOS artifact transfer, and checksum-verified pinned
+cargo-nextest archive/remap execution. TeamCity invokes these targets rather than duplicating build
+commands in Kotlin DSL. Cake bounds every `dotnet build`, `dotnet test`, and `dotnet publish` invocation
+to one MSBuild worker to avoid memory spikes on the free self-hosted agents; independent TeamCity
+configurations can still run concurrently when compatible agents are available.
+
+For runnable local builds, use `Publish` with an optional target RID. With no `--rid`, it publishes for
+the current host; `PublishAll` cross-publishes the complete supported matrix sequentially:
+
+```text
+dotnet run --project build/Vivarium.Build.csproj -- --target Publish
+dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid win-x64
+dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid linux-x64
+dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid linux-arm64
+dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid osx-arm64
+dotnet run --project build/Vivarium.Build.csproj -- --target PublishAll
+dotnet run --project build/Vivarium.Build.csproj -- --target Test
+```
+
+Each self-contained single-file tree is written to `out/build/<rid>/` with these runnable paths:
+
+```text
+server/viv-server[.exe]
+server/appsettings*.json
+server/Vivarium.Controller.staticwebassets.endpoints.json
+server/web.config                             # Windows only
+server/wwwroot/**
+agent/viv-agent-update[.exe]
+agent/bootstrap.json.sample
+agent/agent/current/viv-agent[.exe]
+agent/agent/version
+cli/viv-cli[.exe]
+```
+
+Cross-publishing does not execute foreign binaries. `Test` always runs for the native host and rejects
+an explicit non-host RID; target-native execution evidence must be collected on that target OS and
+architecture.
+
+The release target is a matrix of self-contained single-file builds. The four shipped executable
+projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained mode, version,
+source identity, and deterministic debug settings:
 
 ```
 dotnet publish src/Vivarium.Controller -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/controller/win-x64
@@ -25,20 +76,24 @@ never a requirement.
 
 | Tier | What | Runs where |
 |---|---|---|
-| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | every push, GitHub Actions, all three OSes |
-| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | every push, GitHub Actions, all three OSes |
-| 3. FakeMachineProvider | simulated pool VMs backed by local agent processes (revert = process restart + workdir reset): full D8 conveyor, pool grow/drain, INFRA recycling, canaries — deterministic, zero hypervisors | every push, GitHub Actions |
+| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | manual/local Cake `CI`; TeamCity matrix activation pending |
+| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | manual/local Cake `CI`; TeamCity matrix activation pending |
+| 3. FakeMachineProvider | simulated pool VMs backed by local agent processes (revert = process restart + workdir reset): full D8 conveyor, pool grow/drain, INFRA recycling, canaries — deterministic, zero hypervisors | no automatic CI until TeamCity activation |
 | 4. Real hypervisor E2E | QEMU/KVM smoke once that driver exists — GitHub's hosted **Linux** runners expose `/dev/kvm` (Windows runners cannot do Hyper-V); Hyper-V E2E on a **self-hosted** runner: the dev machine first, later the farm itself | KVM: CI, later; Hyper-V: self-hosted, scheduled/manual |
 
-Today CI runs the solution and payload portability jobs on all three hosted OSes. Tier 2 contains the
+GitHub Actions is intentionally disabled: the remote `ci` workflow is manually disabled and this
+change removes its YAML from `.github/workflows`. A validated TeamCity Kotlin DSL defines Windows x64,
+Linux x64, and macOS arm64 verification plus one composite `CI gate`, but it is not yet active until the
+project is uploaded and native server builds close every row in
+`.workspace/workstreams/cicd-teamcity/inventory.tsv`. Until then, pushes and pull requests have no
+automatic CI and the root/Cake gates must be run manually. Tier 2 contains the
 implemented session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build
 cross-process cases are not complete; tiers 3 and 4 await providers.
 
-Payload portability smoke tests (ROADMAP Phase 0) run in the same hosted matrix: NUnit/MTP
-self-contained + TRX on all three OSes, macOS ad-hoc signing of cross-published binaries, nextest
-archive + `--workspace-remap`. Until the farm exists, GitHub Actions *is* our matrix — it bootstraps
-the farm that will replace it for everything hosted runners cannot do (exact patch levels,
-preinstalled software, interactive desktops, pristine reverts).
+The retained payload targets cover the Phase-0 portability contract: NUnit/MTP self-contained + TRX on
+all three OSes, macOS ad-hoc signing of cross-published binaries, and nextest archive +
+`--workspace-remap`. Automatic TeamCity execution will be limited to the default branch; fork pull
+requests must not execute repository-controlled code on persistent agents.
 
 **Protocol compatibility must be a CI job, not just a promise**: after the first release exists, the
 tier-2 suite will also run against the *previous release's* agent binaries cached from GitHub
@@ -56,27 +111,66 @@ or touching machines:
 
 ```
 dotnet publish src/Vivarium.Agent -c Release -r win-x64 --self-contained -o out/agent/win-x64
-viv agent push out/agent/win-x64          # admin scope: publish to the controller's store
+viv-cli agent push out/agent/win-x64      # admin scope: publish to the controller's store
 ```
 
 The target is for every connected agent to pick the build up on its next restart, with
-`RestartAgent` broadcasting it immediately. Neither `viv agent push` nor the manifest endpoint exists
+`RestartAgent` broadcasting it immediately. Neither `viv-cli agent push` nor the manifest endpoint exists
 in the current binaries, and the bootstrap freeze gate remains pending (§7/D21).
 
 ## Releases (D19)
 
-Planned: tag `vX.Y.Z` → GitHub Actions release workflow:
+The Cake release candidate workflow accepts a full source SHA and a `vX.Y.Z`/SemVer identity:
+
+```text
+dotnet run --project build/Vivarium.Build.csproj -- --target ReleasePackage \
+  --release-version 0.1.0 --source-sha <full-commit-sha>
+dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
+  --rid <native-rid> --release-version 0.1.0 --source-sha <full-commit-sha>
+```
+
+It performs the following work:
 
 1. Build + test the full matrix.
-2. Publish per-RID zips: `vivarium-controller-<rid>.zip` (the controller zip **embeds the agent +
-   bootstrap packages for every RID** — an air-gapped farm never phones GitHub), `vivarium-agent-<rid>.zip`
-   (bootstrap + current agent + `bootstrap.json.sample`), `viv-<rid>.zip`.
-3. Attach `SHA256SUMS` and create the GitHub Release; the version flows from the tag (MinVer).
+2. Publish per-RID zips: `viv-server-<rid>.zip` (the server zip **embeds the agent +
+   updater packages for every RID** — an air-gapped farm never phones GitHub), `viv-agent-<rid>.zip`
+   (`viv-agent-update` + current `viv-agent` + `bootstrap.json.sample`), `viv-cli-<rid>.zip`.
+3. Write canonical `release-manifest.json` and `SHA256SUMS`, fix ZIP timestamps and entry order, preserve
+   native executable modes, then verify every size, digest, tree, and embedded agent-package byte.
+4. Run `ReleaseSmoke` from the final native ZIP: controller startup plus static-asset HTTP probe,
+   `viv-cli --version`, fail-closed agent usage, and missing-config updater behavior.
 
-There is no release workflow yet. The portable controller/agent/bootstrap target keeps state in an
-explicit data/install directory so uninstall is removal of that directory; `viv login` intentionally
-keeps per-user trust and credentials in AppData/XDG config. Binaries are unsigned for now —
-SmartScreen/MOTW friction on Windows and Gatekeeper prompts on macOS are known and documented (§13).
+The exact agent-template tree is:
+
+```text
+viv-agent-update[.exe]
+bootstrap.json.sample
+agent/current/viv-agent[.exe]
+agent/version
+```
+
+Each controller ZIP contains its static web assets and settings beside the single-file executable,
+plus `packages/manifest.json` and the exact four public
+`packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
+store and authenticated manifest endpoint are still not implemented.
+
+The versioned TeamCity pipeline assembles candidates only after the tri-OS `CI gate`, transfers the
+same candidate artifact into four native release-smoke builds, and exposes a downstream GitHub
+deployment. GitHub publication is committed paused and has no trigger. Its Cake target resolves a
+checksum-pinned GitHub CLI, requires immutable releases to be enabled, proves the protected tag resolves
+to the manifest source SHA, creates or safely resumes a compatible draft, verifies GitHub's remote
+`sha256:` asset digests, and publishes last. An already-published exact immutable release is an
+idempotent success; mismatched or extra assets are never clobbered.
+
+There is still no public end-user release. Stable activation is blocked until native evidence exists for
+all four RIDs (especially Linux arm64), a macOS TeamCity agent exists, the controller's system-Git
+prerequisite from the desired-configuration work is proven on every controller RID, protected tags and
+the publish-only TeamCity secret are configured, and the paused deployment passes draft-resume failure
+tests. GitHub Actions is intentionally disabled by project-owner decision; GitHub publication remains a
+paused TeamCity deployment and must not be used to bypass these release gates. The portable target keeps
+state in an explicit data/install directory so uninstall is removal of that directory; `viv-cli login`
+intentionally keeps per-user trust and credentials in AppData/XDG config. Binaries are unsigned for now
+— SmartScreen/MOTW friction on Windows and Gatekeeper prompts on macOS are known and documented (§13).
 
 ## Upgrading a farm
 
@@ -105,7 +199,7 @@ The planned installer slice provides two equivalent doors (§8.4, D19), both con
 For automation there is also the scriptable form:
 
 ```
-vivarium-agent enroll --url https://ctrl:8443 --fp SHA256:9F3A... --token <enroll-token>
+viv-agent enroll --url https://ctrl:8443 --fp SHA256:9F3A... --token <enroll-token>
 ```
 
 These Downloads, setup-script, and explicit `enroll` entry points are target UX, not commands exposed

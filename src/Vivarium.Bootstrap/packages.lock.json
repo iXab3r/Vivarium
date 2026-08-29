@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[10.0.9, )",
+        "resolved": "10.0.9",
+        "contentHash": "/zs/o28l6Hq8G9XgEfeYC8VkiSfv98zpNdWnZu4Y3pwoStzI0MNRO8xjFuSF6aI/fMdKf3+sVDRZGlxyBc88jA=="
+      }
+    },
+    "net10.0/linux-arm64": {},
+    "net10.0/linux-x64": {},
+    "net10.0/osx-arm64": {},
+    "net10.0/win-x64": {}
+  }
+}

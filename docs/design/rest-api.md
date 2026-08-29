@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-Vivarium needs one automation-grade management surface from day one. The React panel, `viv` CLI,
+Vivarium needs one automation-grade management surface from day one. The React panel, `viv-cli`,
 CI integrations, operators, and third-party clients should manage both product domains through the
 same REST API:
 
@@ -18,7 +18,7 @@ same REST API:
 REST is not a replacement for the existing execution and bulk-data transports:
 
 ```text
-Browser / viv / CI / integrations
+Browser / viv-cli / CI / integrations
              |
              v
          REST /api/v1
@@ -669,15 +669,15 @@ share infrastructure but are distinct records with different retention and acces
 The React/Workbench UI uses REST for data and mutations and SSE for live projections. The current CLI
 migrates as one coherent flow:
 
-1. `viv login` stores REST trust/credentials using the same pinned-controller identity rules; no CLI
+1. `viv-cli login` stores REST trust/credentials using the same pinned-controller identity rules; no CLI
    command needs a management gRPC channel afterward.
-2. `viv run` creates a principal/project-scoped blob upload plan, uploads required bytes through the
+2. `viv-cli run` creates a principal/project-scoped blob upload plan, uploads required bytes through the
    staged `/blobs/{sha256}` data plane, then submits `POST /api/v1/builds` with one
    principal-scoped `Idempotency-Key`.
 3. The default wait follows build SSE from its last event ID and periodically/finally reads
    `GET /api/v1/builds/{id}` as authoritative state. `--no-wait` returns after durable submission.
    Ctrl+C closes only the local SSE/poll watch and never changes the remote build.
-4. `viv cancel <build-id>` sends `PUT /api/v1/builds/{id}/cancellation`. Success means the first
+4. `viv-cli cancel <build-id>` sends `PUT /api/v1/builds/{id}/cancellation`. Success means the first
    cancellation intent is durably recorded, matching current semantics; terminal cancellation is
    observed through the build resource/events rather than inferred from the HTTP connection.
 5. Agent list/authorization and every remaining CLI management call move to their REST equivalent.
@@ -754,7 +754,7 @@ Before declaring the first REST slice complete, provide:
 11. Audit tests correlating HTTP request, Git change or runtime operation, agent dispatch, and terminal
     outcome while proving secret redaction and bounded log volume.
 12. CLI and React smoke tests that use REST rather than database or private in-process shortcuts,
-    including `viv run` upload/submit/watch, local Ctrl+C, and explicit `viv cancel` semantics.
+    including `viv-cli run` upload/submit/watch, local Ctrl+C, and explicit `viv-cli cancel` semantics.
 13. Blob discovery/staging tests proving cross-principal non-disclosure, hash verification, immutable
     build references, fenced assignment download, owned artifact upload, reconnect, cancellation
     result grace, and unauthorized hash denial.

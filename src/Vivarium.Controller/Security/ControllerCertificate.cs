@@ -37,7 +37,7 @@ public sealed class ControllerCertificate
     private static byte[] CreateSelfSigned()
     {
         using var rsa = RSA.Create(2048);
-        var request = new CertificateRequest("CN=vivarium-controller", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        var request = new CertificateRequest("CN=viv-server", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
         request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, false));
 
         var san = new SubjectAlternativeNameBuilder();

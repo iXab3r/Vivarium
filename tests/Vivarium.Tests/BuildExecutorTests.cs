@@ -91,14 +91,17 @@ public sealed class BuildExecutorTests
         var assignment = new BuildAssignment { BuildId = "build-local-program" };
         var workdir = Path.Combine(root, assignment.BuildId);
         Directory.CreateDirectory(workdir);
-        var sourceProgram = OperatingSystem.IsWindows()
-            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe")
-            : "/bin/sh";
         var localProgram = Path.Combine(
             workdir, OperatingSystem.IsWindows() ? "payload-tool.exe" : "payload-tool");
-        File.Copy(sourceProgram, localProgram);
-        if (!OperatingSystem.IsWindows())
+        if (OperatingSystem.IsWindows())
         {
+            var sourceProgram = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe");
+            File.Copy(sourceProgram, localProgram);
+        }
+        else
+        {
+            await File.WriteAllTextAsync(localProgram, "#!/bin/sh\necho PAYLOAD_LOCAL_PROGRAM\n");
             File.SetUnixFileMode(localProgram,
                 UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         }
@@ -108,12 +111,8 @@ public sealed class BuildExecutorTests
         {
             step.Args.Add("/d");
             step.Args.Add("/c");
+            step.Args.Add("echo PAYLOAD_LOCAL_PROGRAM");
         }
-        else
-        {
-            step.Args.Add("-c");
-        }
-        step.Args.Add("echo PAYLOAD_LOCAL_PROGRAM");
         assignment.Steps.Add(step);
 
         var log = new StringBuilder();

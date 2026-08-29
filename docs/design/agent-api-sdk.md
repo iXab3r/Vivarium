@@ -413,6 +413,24 @@ every supported RID. A release manifest identifies immutable package bytes by ve
 size, and URL. Release/channel policy is declarative Git-backed configuration; package bytes live in
 the authenticated controller store and are referenced by digest rather than committed to Git.
 
+The D19 public agent-template candidate has one portable tree, with `.exe` suffixes on Windows:
+
+```text
+viv-agent-update[.exe]
+bootstrap.json.sample
+agent/current/viv-agent[.exe]
+agent/version
+```
+
+`bootstrap.json.sample` contains placeholders only; enrollment stamps a separate `bootstrap.json` and
+never modifies release bytes. `agent/version` is UTF-8 SemVer plus one newline. The layout intentionally
+matches the frozen prototype's existing `agent/current` and `agent/version` reads without changing its
+source. ZIP entries are sorted, carry one canonical timestamp, reject ambiguous/traversal paths, and set
+0755 only on Unix executables. Each controller release candidate embeds the exact four public
+agent-template ZIP bytes beneath `packages/agents/`, plus a `packages/manifest.json` containing version,
+RID, size, and SHA-256 identity. The controller import/serve implementation remains pending; CI packaging
+does not claim the prototype unauthenticated manifest path satisfies D2/D21.
+
 Target upgrade lifecycle:
 
 1. Controller policy selects a release/channel for an agent or group at an applied Git revision.
@@ -427,7 +445,7 @@ Target upgrade lifecycle:
 6. Only then does the controller leave `upgrading` and restore eligibility. Failure before health
    acknowledgement rolls back or remains visibly failed according to the still-open rollout policy.
 
-Dev side-loading (`viv agent push`) is an admin action: it stores immutable bytes by digest, creates an
+Dev side-loading (`viv-cli agent push`) is an admin action: it stores immutable bytes by digest, creates an
 audited release reference, and follows the same drain/verification/health path. It is not an
 untracked copy directly into an agent directory.
 

@@ -135,7 +135,7 @@ internal static class CliArguments
             throw new CliUsageException("cancel requires a matrix build id");
         }
 
-        var reason = "Cancelled by viv CLI";
+        var reason = "Cancelled by viv-cli";
         var reasonSet = false;
         string? url = null;
         string? token = null;
@@ -191,11 +191,11 @@ internal static class CliArguments
 
     private const string Usage = """
         Usage:
-          viv --version
-          viv login <url> [--token <token>] [--fingerprint SHA256:...]
-          viv run <configuration> [--file vivarium.yaml] [--only <cell>]... [--no-wait]
+          viv-cli --version
+          viv-cli login <url> [--token <token>] [--fingerprint SHA256:...]
+          viv-cli run <configuration> [--file vivarium.yaml] [--only <cell>]... [--no-wait]
                   [--url <url>] [--token <token>] [--fingerprint SHA256:...]
-          viv cancel <matrix-build-id> [--reason <text>]
+          viv-cli cancel <matrix-build-id> [--reason <text>]
                   [--url <url>] [--token <token>] [--fingerprint SHA256:...]
         """;
 }

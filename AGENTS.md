@@ -23,7 +23,7 @@ Phase 1 in progress; the Phase 0 pinned-TLS session loop is complete. Persistent
 registrations and status axes, heartbeats, separately managed reported/custom parameters,
 restart-safe build ownership and cancellation, durable FIFO scheduling with queue-wait deadlines,
 acknowledged assignments and terminal results, immutable assigned-agent provenance, the protected
-Agents / Queue & Builds panels, the scoped ControlPlane API, and `viv login` / `viv run` / `viv cancel`
+Agents / Queue & Builds panels, the scoped ControlPlane API, and `viv-cli login` / `viv-cli run` / `viv-cli cancel`
 exist and have tier-2 coverage. Strict Phase-1 `vivarium.yaml` parsing and hardened deterministic
 payload archives are also implemented. The current Blazor panel is transitional: the accepted target
 is a React panel built on the vendored EyeAuras Workbench and the public REST management API. Typed

@@ -56,7 +56,7 @@ internal sealed class VivariumCliApplication(
     private int PrintVersion()
     {
         var version = typeof(VivariumCliApplication).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
-        console.WriteLine($"viv {version}");
+        console.WriteLine($"viv-cli {version}");
         return 0;
     }
 

@@ -4,9 +4,12 @@
 [Bb]in/
 [Oo]bj/
 artifacts/
+out/
+.teamcity/target/
 *.binlog
 
 # .NET / IDE
+.DS_Store
 *.user
 *.suo
 .vs/

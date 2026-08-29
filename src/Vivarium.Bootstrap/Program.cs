@@ -10,7 +10,7 @@ var baseDir = AppContext.BaseDirectory;
 var configPath = Path.Combine(baseDir, "bootstrap.json");
 if (!File.Exists(configPath))
 {
-    Console.Error.WriteLine($"bootstrap: missing {configPath}");
+    Console.Error.WriteLine($"viv-agent-update: missing {configPath}");
     return 2;
 }
 
@@ -22,7 +22,7 @@ var fingerprint = configDoc.RootElement.GetProperty("certFingerprint").GetString
 var agentDir = Path.Combine(baseDir, "agent");
 var currentDir = Path.Combine(agentDir, "current");
 var versionFile = Path.Combine(agentDir, "version");
-var exeName = OperatingSystem.IsWindows() ? "vivarium-agent.exe" : "vivarium-agent";
+var exeName = OperatingSystem.IsWindows() ? "viv-agent.exe" : "viv-agent";
 
 var handler = new SocketsHttpHandler();
 handler.SslOptions.RemoteCertificateValidationCallback = (_, cert, _, _) =>
@@ -31,7 +31,7 @@ handler.SslOptions.RemoteCertificateValidationCallback = (_, cert, _, _) =>
         .Equals(fingerprint, StringComparison.OrdinalIgnoreCase);
 using var http = new HttpClient(handler) { BaseAddress = new Uri(controllerUrl) };
 
-Console.WriteLine($"vivarium-bootstrap: controller {controllerUrl}");
+Console.WriteLine($"viv-agent-update: controller {controllerUrl}");
 var random = new Random();
 while (true)
 {
@@ -41,7 +41,7 @@ while (true)
     }
     catch (Exception ex)
     {
-        Console.Error.WriteLine($"bootstrap: manifest/update failed ({ex.Message}); using current agent if present");
+        Console.Error.WriteLine($"viv-agent-update: manifest/update failed ({ex.Message}); using current agent if present");
     }
 
     var exe = Path.Combine(currentDir, exeName);
@@ -60,16 +60,16 @@ while (true)
             psi.ArgumentList.Add(Path.Combine(baseDir, "data"));
             using var process = Process.Start(psi)!;
             await process.WaitForExitAsync();
-            Console.WriteLine($"bootstrap: agent exited with {process.ExitCode}");
+            Console.WriteLine($"viv-agent-update: agent exited with {process.ExitCode}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"bootstrap: failed to run agent ({ex.Message})");
+            Console.Error.WriteLine($"viv-agent-update: failed to run agent ({ex.Message})");
         }
     }
     else
     {
-        Console.Error.WriteLine("bootstrap: no agent available yet");
+        Console.Error.WriteLine("viv-agent-update: no agent available yet");
     }
 
     await Task.Delay(TimeSpan.FromSeconds(5 + random.Next(0, 10)));
@@ -96,7 +96,7 @@ async Task UpdateAgentIfNeededAsync()
         return;
     }
 
-    Console.WriteLine($"bootstrap: updating agent {currentVersion} -> {version}");
+    Console.WriteLine($"viv-agent-update: updating agent {currentVersion} -> {version}");
     var zipPath = Path.Combine(agentDir, "download.zip.tmp");
     Directory.CreateDirectory(agentDir);
     await using (var file = File.Create(zipPath))

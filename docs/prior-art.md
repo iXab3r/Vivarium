@@ -148,7 +148,7 @@ values) ≈ our recipe object; auto-shutdown/quota/expiry policies as fleet-main
 `platforms × suites` matrix files and the create/**converge**/**verify**/destroy lifecycle.
 **Borrowed:** keeping *converge* (provision) separate from *verify* (test) so verify can re-run without
 re-provisioning — Vivarium gets this structurally from image sealing (D6); `kitchen login` (drop into a
-live instance) as beloved debug UX ≈ `viv exec --agent` + console (§9).
+live instance) as beloved debug UX ≈ `viv-cli exec --agent` + console (§9).
 
 ### DetectionLab / GOAD
 [DetectionLab](https://github.com/clong/DetectionLab/issues/885) (archived): one maintainer × N

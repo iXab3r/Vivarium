@@ -64,7 +64,7 @@ One controller process, thin drivers, deliberately dumb guests.
 
 ```mermaid
 flowchart LR
-    CLI["viv CLI / automation"] -- "REST /api/v1" --> C
+    CLI["viv-cli / automation"] -- "REST /api/v1" --> C
     UI["React + EyeAuras Workbench"] -- "REST + SSE" --> C
     C["Controller<br/>ASP.NET Core: REST + gRPC AgentHub + HTTP blobs + scheduler + Git projection + SQLite"]
     C -- "create pool VM / checkpoint / revert / destroy" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
@@ -85,7 +85,7 @@ flowchart LR
 - **Agent** (`Vivarium.Agent`): pulled by bootstrap at boot; advertises typed capabilities and facts,
   executes TeamCity builds and separately fenced AgentExplorer requests, streams logs, and uploads results.
   Policy and scheduling decisions live in the controller.
-- **CLI** (`Vivarium.Cli`, binary `viv`): a client of the public REST API for projects, builds,
+- **CLI** (`Vivarium.Cli`, binary `viv-cli`): a client of the public REST API for projects, builds,
   AgentExplorer, administration, and status. The implemented gRPC `ControlPlane` remains a transitional
   adapter until REST parity (D24).
 - **Contracts** (`Vivarium.Contracts`): the `.proto` files and generated types shared by all of the above.
@@ -526,7 +526,7 @@ snapshot in place of an `ImageVersion` (§6).
 
 ### D17. Repository build configurations are code
 
-`vivarium.yaml` lives next to the code it tests; `viv run` submits it together with payload blobs
+`vivarium.yaml` lives next to the code it tests; `viv-cli run` submits it together with payload blobs
 (sha256-deduped upload). Automation-first means a repository-owned run definition versions with the
 product, GitHub-Actions-style, rather than living in hidden server-side state. The controller may also
 catalog Projects and Build Configurations and the UI may author them, but every such edit is a Git
@@ -535,7 +535,7 @@ agents via requirement expressions (`system.os.family == windows`) or, from Phas
 (`image: win10-19044-clean`); template variables (`{rid}`, `{os}`, `{arch}`, `{exe}`, `{results}`)
 specialize payload paths and steps per cell so one definition covers every OS — with one rule: `{rid}`
 used in `payload:` must resolve at upload time, so cells shipping RID-specific payloads declare `rid:`
-explicitly instead of hoping the matched agent implies it. `viv run` waits by default and exits
+explicitly instead of hoping the matched agent implies it. `viv-cli run` waits by default and exits
 nonzero on any red cell — CI integration is an exit code, not a plugin (`--no-wait` opts out).
 [`walkthrough.md`](walkthrough.md) is the normative UX for all of this.
 
@@ -552,7 +552,7 @@ Each cell build records its scenario name, resolved parameters, and iteration in
 ran on" (§6).
 
 `repeat: N` is first-class (flake hunting, stress): every iteration is an ordinary build; the matrix
-cell aggregates them into a pass rate (47/50), and `viv run --repeat N` overrides ad hoc. Repeats on
+cell aggregates them into a pass rate (47/50), and `viv-cli run --repeat N` overrides ad hoc. Repeats on
 pristine cells are truly independent runs — that combination is the honest flakiness detector. Several
 scenarios matching the same persistent agent serialize on its queue (TeamCity semantics); image-backed
 scenarios fan out across the image's pool instead. Guardrails are part of the design: per-configuration
@@ -571,18 +571,23 @@ silently blend — the matrix badges it (§6).
 
 ### D19. Everything ships portable; the controller is the distribution point
 
-All four binaries — controller, agent, bootstrap, `viv` — target self-contained single-file .NET
-publishes per RID: no installers or registry state, and admin rights are needed only for
-elevated/autologon *duties* (D10), never just to run. Controller, bootstrap, and agent state live in
-their explicitly selected data/install directories; `viv login` is the intentional exception and
+All four shipped binaries — `viv-server`, `viv-agent`, `viv-agent-update`, and `viv-cli` — target
+self-contained single-file .NET publishes per RID: no installers or registry state, and admin rights
+are needed only for elevated/autologon *duties* (D10), never just to run. Controller, bootstrap, and agent state live in
+their explicitly selected data/install directories; `viv-cli login` is the intentional exception and
 stores per-user client trust and credentials under the platform application-data directory. The
 release publish flags, per-RID zips, and `SHA256SUMS` workflow remain Phase 1 delivery work
 ([`DEVELOPMENT.md`](DEVELOPMENT.md)); code signing is deferred and recorded (§13).
 
+These names are the public distribution contract; C# project, assembly, and namespace names remain
+`Vivarium.*`. Before the D2 freeze gate, the bootstrap prototype is renamed to `viv-agent-update` and
+its child lookup to `viv-agent`. This naming-only source change does not alter its update, trust, or
+restart behavior. There are no legacy executable aliases because Vivarium has no public release yet.
+
 The target release runtime depends only on itself: the controller **bundles the agent + bootstrap packages
 for every supported RID** and serves them from its own store — `/bootstrap/manifest` (D2), the
 panel's Downloads page, and the enroll scripts all read from that store, so an air-gapped farm never
-phones GitHub. The store also accepts side-loaded builds: `viv agent push out/agent/win-x64` (admin
+phones GitHub. The store also accepts side-loaded builds: `viv-cli agent push out/agent/win-x64` (admin
 scope) publishes a dev build, and every agent picks it up at its next restart — the core dev loop for
 agent work is build → push → watch the farm swap in seconds.
 
@@ -593,7 +598,7 @@ Authorize*. No flags, no config editing; works from a USB stick and in air-gappe
 GitHub-Releases agent zips are the unstamped templates this is built from — the controller is the
 place to download agents.) A stamped enroll token gets a lenient TTL: it only gates appearing in the
 unauthorized list, while authorization remains the real gate — exactly TeamCity's model. For
-automation and hand-rolled setups the scriptable form still exists (`vivarium-agent enroll --url …
+automation and hand-rolled setups the scriptable form still exists (`viv-agent enroll --url …
 --fp … --token …` — an *agent* verb; bootstrap stays the frozen dumb loop, §7), and running the agent
 interactively in a console is a first-class mode for debugging.
 
@@ -710,7 +715,7 @@ existing surfaces: versioned storage migrations, D27's minimal durable audit jou
 and correlation context, and D26's common authorization evaluator. This foundation is transport-
 independent and does not create a competing management API.
 
-`/api/v1` is the public management contract for both TeamCity and AgentExplorer. The React panel, `viv`
+`/api/v1` is the public management contract for both TeamCity and AgentExplorer. The React panel, `viv-cli`
 CLI, automation, and external integrations call the same application services through REST; no client
 gets an in-process or direct-database mutation path. Resource representations expose stable IDs,
 separate configuration/observation/runtime revisions, optimistic concurrency, cursor pagination,
@@ -930,7 +935,7 @@ The implemented Phase 1 gRPC surface is `SubmitBuild`, `WatchBuild`, `CancelBuil
 `ListAgents`, and `AuthorizeAgent`. Submission is atomic across all matrix cells and idempotent by a client request id;
 the controller persists the exact UTF-8 yaml snapshot, resolved assignments, cell order, RID, and
 queue deadline before returning. `WatchBuild` is a resumable durable snapshot stream. Submit tokens can upload payloads and submit, watch,
-or cancel; agent and admin credentials retain their separate scopes. `viv cancel <matrix-build-id>`
+or cancel; agent and admin credentials retain their separate scopes. `viv-cli cancel <matrix-build-id>`
 and the protected parent build page call the same durable stop operation. Ctrl+C deliberately stops
 only the local watch and never changes remote build state.
 
@@ -988,8 +993,9 @@ the source of truth. No external services.
 
 ## 7. Bootstrap contract (candidate; freeze gate pending)
 
-The only code baked into images — and installed on physical machines by authenticated setup. In role
-it is exactly TeamCity's agent launcher: the version handshake and the swap live here. The contract
+The only code baked into images — and installed on physical machines by authenticated setup. It ships
+as `viv-agent-update` and starts `agent/current/viv-agent`. In role it is exactly TeamCity's agent
+launcher: the version handshake and the swap live here. The contract
 freezes only after it is proven end-to-end — freezing before the first consumer exists is how a bug
 gets frozen. The current prototype does not authenticate `GET /bootstrap/manifest`, does not receive
 the enrolled agent token, and the controller does not map that endpoint; therefore the D2 freeze gate
@@ -1093,9 +1099,9 @@ their setup (D16).
 
 Ad-hoc execution is a durable, audited AgentExplorer operation (D22), not a TeamCity Build:
 
-- `viv exec --image win10-19044-avx -- powershell -c "..."` — an AgentExplorer operation acquires a pool
+- `viv-cli exec --image win10-19044-avx -- powershell -c "..."` — an AgentExplorer operation acquires a pool
   Agent under the shared Agent lease, reverts its ProviderInstance, runs, streams bounded output, and releases it.
-- `viv exec --agent <name> -- ...` — the same operation targets a *live* Agent (a physical box, a quarantined clone, a
+- `viv-cli exec --agent <name> -- ...` — the same operation targets a *live* Agent (a physical box, a quarantined clone, a
   machine mid-provisioning), no revert. Line-based streaming first; a real interactive terminal
   (ConPTY + stdin channel over the same gRPC session) is a later feature — until then, the console
   button covers interactivity.

@@ -12,8 +12,8 @@ Ordered so that every phase ends with something usable. Decision references (D1�
 - [x] The `Session` loop alive end-to-end with an agent running on the same machine — enroll →
       authorize → payload → step → logs → artifacts → result, as the first members of the tier-2
       in-process protocol suite (D20).
-- [x] GitHub Actions CI: build + tests on ubuntu/windows/macos — hosted runners bootstrap the farm
-      that will replace them (DEVELOPMENT.md).
+- [x] Hosted GitHub Actions originally proved build + tests on ubuntu/windows/macos; the workflow was
+      later intentionally disabled while TeamCity CI is activated (DEVELOPMENT.md).
 - [x] Pinned-TLS + `Welcome` handshake proven in the local loop (D4, §5); blob endpoints reject
       anonymous callers and lying hashes.
 - [x] Reconnect / re-adoption and result-fencing scenarios exercised by tier-2 tests (D4): a build
@@ -63,7 +63,7 @@ Foundation now implemented:
 - [x] Strict Phase-1 `vivarium.yaml` parsing with named cells, per-cell RID and queue timeout,
       deterministic template expansion, selection via `--only`, and fail-fast payload and static
       compatibility validation (D14, D17).
-- [x] `viv login` with TOFU confirmation followed by exact certificate pinning, and `viv run` with
+- [x] `viv-cli login` with TOFU confirmation followed by exact certificate pinning, and `viv-cli run` with
       deterministic payload dedup/upload, atomic matrix submission, reconnecting transition-only
       status watching, `--no-wait`, and CI-friendly exit codes (D3, D4, D17).
 - [x] Durable queue-wait deadlines: a 30-minute controller default or per-configuration override is
@@ -78,7 +78,7 @@ Foundation now implemented:
 - [x] Centralized durable result details: recent matrix builds link to per-cell outcomes, step results,
       and ordered artifact manifests; protected build-scoped downloads verify matrix/cell ownership,
       and the same artifact metadata is exposed additively through `WatchBuild` (D3, D14).
-- [x] Atomic, idempotent matrix cancellation through `ControlPlane.CancelBuild`, `viv cancel`, and
+- [x] Atomic, idempotent matrix cancellation through `ControlPlane.CancelBuild`, `viv-cli cancel`, and
       the protected parent build page: queued children and claims finish together, running children
       retain durable ownership as `CANCEL_REQUESTED`, and the first reason survives retries/restarts
       (D4, D14).
@@ -138,7 +138,7 @@ contracts. The checklist below records the remaining acceptance scope; it does n
 - Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
   **unauthorized** → authorize (§8.4, D4).
 - Central launcher-driven auto-upgrade (D2).
-- `viv exec --agent <name>` as a durable AgentExplorer operation over REST plus AgentHub, with authorization,
+- `viv-cli exec --agent <name>` as a durable AgentExplorer operation over REST plus AgentHub, with authorization,
   lease/fencing, cancellation, bounded output, and audit. It is not a Build or `ControlPlane.Exec`
   extension (D22, D24, §9).
 - An enroll one-liner that actually runs on stock machines and authenticates installer bytes *before*
@@ -168,11 +168,12 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   per-test results (plain durable build/cell details and artifact downloads exist in the transitional
   Blazor panel; the full test × scenario view with history comes later).
 - Finish the normative UX in [`walkthrough.md`](walkthrough.md) §0–§6: install/enroll one-liners and
-  parsed TRX presentation remain; `vivarium.yaml`, `viv run`, and raw result/artifact presentation are
+  parsed TRX presentation remain; `vivarium.yaml`, `viv-cli run`, and raw result/artifact presentation are
   implemented (D17).
-- Panel Downloads page (portable agent/CLI zips from the controller's bundled store), `vivarium-agent
-  enroll`, and the `viv agent push` dev flow (D19).
-- Tagged releases via GitHub Actions: self-contained per-RID zips + SHA256SUMS (D19, DEVELOPMENT.md).
+- Panel Downloads page (portable agent/CLI zips from the controller's bundled store), `viv-agent
+  enroll`, and the `viv-cli agent push` dev flow (D19).
+- Tagged releases published from guarded TeamCity deployment to GitHub Releases: self-contained per-RID
+  zips + SHA256SUMS (D19, DEVELOPMENT.md).
 
 Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,
 scenario lists, `repeat`/pass-rate cells, live service messages, `clean: reboot` (drags in autologon
@@ -182,7 +183,7 @@ credentials), provisioning `expected-reboot` resume (requires a durable step cur
 
 - Hyper-V driver: pool-VM create / own checkpoint / revert / destroy / console endpoint (D5, D7).
 - Pool provider with auto-authorized agents — TeamCity cloud-profile logic (D15); AgentExplorer
-  `viv exec --image` under the same Agent lease (D22, D28).
+  `viv-cli exec --image` under the same Agent lease (D22, D28).
 - Image adoption of enrolled VMs (§8.4); the `pristine` clean policy end-to-end.
 - Crash dumps, screenshot-on-fail, keep-on-fail / snapshot-the-corpse (D12).
 - Hyper-V implementation references: AutomatedLab, fdcastel/Hyper-V-Automation (see prior-art).
