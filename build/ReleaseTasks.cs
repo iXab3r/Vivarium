@@ -15,36 +15,36 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
         var sourceSha = context.RequireSourceSha();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
-            CompileManifestVerifier.Verify(context, rid, version, sourceSha);
+            CompileBuildInfoFile.Verify(context, rid, version, sourceSha);
         }
 
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
         var stagingRoot = Path.Combine(context.OutRoot, "release-staging");
-        PayloadSmokeTask.RecreateDirectory(releaseRoot);
-        PayloadSmokeTask.RecreateDirectory(stagingRoot);
+        BuildDirectory.Recreate(releaseRoot);
+        BuildDirectory.Recreate(stagingRoot);
         EnsureFreeSpace(context.OutRoot);
 
         var assets = new List<ReleaseAsset>();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
             var compileRoot = ReleaseLayout.CompileRoot(context, rid);
-            var stage = Path.Combine(stagingRoot, "agent", rid);
-            CopyDirectory(Path.Combine(compileRoot, "agent"), stage);
             var name = $"viv-agent-{rid}.zip";
-            DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
+            DeterministicZip.Create(
+                Path.Combine(compileRoot, "agent"),
+                Path.Combine(releaseRoot, name),
+                rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "agent-template", rid));
-            Directory.Delete(stage, recursive: true);
         }
 
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
             var compileRoot = ReleaseLayout.CompileRoot(context, rid);
-            var stage = Path.Combine(stagingRoot, "cli", rid);
-            CopyDirectory(Path.Combine(compileRoot, "cli"), stage);
             var name = $"viv-cli-{rid}.zip";
-            DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
+            DeterministicZip.Create(
+                Path.Combine(compileRoot, "cli"),
+                Path.Combine(releaseRoot, name),
+                rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "cli", rid));
-            Directory.Delete(stage, recursive: true);
         }
 
         var agentAssets = assets.Where(asset => asset.Component == "agent-template").ToArray();
@@ -129,7 +129,7 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
 }
 
 [TaskName("ReleaseVerify")]
-[TaskDescription("Verifies release manifest, checksums, layouts, and nested package identity.")]
+[TaskDescription("Verifies release manifest, checksums, and ZIP integrity.")]
 public sealed class ReleaseVerifyTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context) =>
@@ -162,7 +162,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
     {
         ReleaseLayout.RequireSupportedRid(rid);
         var smokeRoot = Path.Combine(context.OutRoot, "release-smoke", rid);
-        PayloadSmokeTask.RecreateDirectory(smokeRoot);
+        BuildDirectory.Recreate(smokeRoot);
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
         var extension = OperatingSystem.IsWindows() ? ".exe" : string.Empty;
 
@@ -287,7 +287,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
 
 internal static class ReleaseLayout
 {
-    public const string CompileManifestName = "compile-manifest.json";
+    public const string BuildInfoName = "build-info.json";
     public const string ManifestName = "release-manifest.json";
     public const string ChecksumsName = "SHA256SUMS";
 
@@ -302,25 +302,6 @@ internal static class ReleaseLayout
     public static readonly ReleaseComponent Cli =
         new("cli", Path.Combine("src", "Vivarium.Cli"), "Vivarium.Cli");
     public static readonly ReleaseComponent[] Components = [Controller, Agent, Bootstrap, Cli];
-    public static readonly string[] ControllerContentFiles =
-    [
-        "appsettings.Development.json",
-        "appsettings.json",
-        "Vivarium.Controller.staticwebassets.endpoints.json",
-        "wwwroot/_framework/blazor.server.js",
-        "wwwroot/_framework/blazor.server.js.br",
-        "wwwroot/_framework/blazor.server.js.gz",
-        "wwwroot/_framework/blazor.web.js",
-        "wwwroot/_framework/blazor.web.js.br",
-        "wwwroot/_framework/blazor.web.js.gz",
-        "wwwroot/app.css",
-        "wwwroot/app.css.br",
-        "wwwroot/app.css.gz",
-        "wwwroot/Vivarium.Controller.styles.css",
-        "wwwroot/Vivarium.Controller.styles.css.br",
-        "wwwroot/Vivarium.Controller.styles.css.gz",
-    ];
-
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -383,7 +364,6 @@ internal static class ReleaseVerifier
                 throw new InvalidDataException($"Release asset identity mismatch: {asset.Name}");
             }
             DeterministicZip.Verify(path);
-            VerifyAssetLayout(releaseRoot, asset, expectedVersion);
         }
 
         var checksumPath = Path.Combine(releaseRoot, ReleaseLayout.ChecksumsName);
@@ -398,91 +378,6 @@ internal static class ReleaseVerifier
         }
     }
 
-    private static void VerifyAssetLayout(string releaseRoot, ReleaseAsset asset, string version)
-    {
-        using var archive = ZipFile.OpenRead(Path.Combine(releaseRoot, asset.Name));
-        var names = archive.Entries.Select(entry => entry.FullName).ToHashSet(StringComparer.Ordinal);
-        var extension = asset.Rid.StartsWith("win-", StringComparison.Ordinal) ? ".exe" : string.Empty;
-        switch (asset.Component)
-        {
-            case "cli":
-                RequireExact(names, ["viv-cli" + extension], asset.Name);
-                break;
-            case "agent-template":
-                RequireExact(
-                    names,
-                    [
-                        "viv-agent-update" + extension,
-                        "bootstrap.json.sample",
-                        "agent/current/viv-agent" + extension,
-                        "agent/version",
-                    ],
-                    asset.Name);
-                var versionEntry = archive.GetEntry("agent/version")!;
-                using (var reader = new StreamReader(versionEntry.Open(), Encoding.UTF8))
-                {
-                    if (!string.Equals(reader.ReadToEnd(), version + "\n", StringComparison.Ordinal))
-                    {
-                        throw new InvalidDataException($"Agent version marker mismatch in {asset.Name}.");
-                    }
-                }
-                break;
-            case "server":
-                var expected = new List<string> { "viv-server" + extension, "packages/manifest.json" };
-                expected.AddRange(ReleaseLayout.ControllerContentFiles);
-                if (asset.Rid.StartsWith("win-", StringComparison.Ordinal))
-                {
-                    expected.Add("web.config");
-                }
-                expected.AddRange(ReleaseLayout.SupportedRids.Select(rid => $"packages/agents/viv-agent-{rid}.zip"));
-                RequireExact(names, expected, asset.Name);
-                VerifyEmbeddedPackages(releaseRoot, archive, version);
-                break;
-            default:
-                throw new InvalidDataException($"Unknown release component: {asset.Component}");
-        }
-    }
-
-    private static void VerifyEmbeddedPackages(string releaseRoot, ZipArchive archive, string version)
-    {
-        var manifestEntry = archive.GetEntry("packages/manifest.json")!;
-        EmbeddedPackageManifest embedded;
-        using (var stream = manifestEntry.Open())
-        {
-            embedded = JsonSerializer.Deserialize<EmbeddedPackageManifest>(stream, ReleaseLayout.JsonOptions)
-                ?? throw new InvalidDataException("Embedded package manifest is empty.");
-        }
-        if (embedded.SchemaVersion != 1 || embedded.Version != version)
-        {
-            throw new InvalidDataException("Embedded package manifest identity mismatch.");
-        }
-
-        foreach (var package in embedded.Packages)
-        {
-            var entry = archive.GetEntry("packages/agents/" + package.Name)
-                ?? throw new InvalidDataException($"Embedded package is missing: {package.Name}");
-            using var nested = entry.Open();
-            var nestedDigest = Convert.ToHexString(SHA256.HashData(nested)).ToLowerInvariant();
-            if (entry.Length != package.Size ||
-                !string.Equals(nestedDigest, package.Sha256, StringComparison.Ordinal) ||
-                !string.Equals(
-                    ReleaseAsset.HashFile(Path.Combine(releaseRoot, package.Name)),
-                    package.Sha256,
-                    StringComparison.Ordinal))
-            {
-                throw new InvalidDataException($"Embedded package bytes differ from the release asset: {package.Name}");
-            }
-        }
-    }
-
-    private static void RequireExact(HashSet<string> actual, IEnumerable<string> expected, string asset)
-    {
-        var expectedSet = expected.ToHashSet(StringComparer.Ordinal);
-        if (!actual.SetEquals(expectedSet))
-        {
-            throw new InvalidDataException($"Unexpected archive layout in {asset}.");
-        }
-    }
 }
 
 internal static class DeterministicZip

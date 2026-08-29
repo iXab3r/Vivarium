@@ -18,21 +18,23 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  Compile                  Compile runnable binaries for --rid or the host RID.");
         Console.WriteLine("  CompileAll               Compile runnable binaries for every supported RID.");
         Console.WriteLine("  CompileSmoke             Run native product probes from one Compile output.");
+        Console.WriteLine("  Release                  Check Compile identity, package assets, and smoke the native ZIP.");
+        Console.WriteLine("  Publish                  Publish the ready Release artifact to GitHub.");
+        Console.WriteLine("  Clean                    Remove only the repository out/ directory.");
+        Console.WriteLine();
+        Console.WriteLine("Diagnostics retained from the previous CI:");
         Console.WriteLine("  PayloadSmoke             Publish and run the NUnit payload for --rid or the host RID.");
         Console.WriteLine("  PayloadCrossMacPublish   Cross-publish the osx-arm64 payload for artifact transfer.");
         Console.WriteLine("  PayloadCrossMacRun       Run the transferred payload on a macOS host.");
         Console.WriteLine("  PayloadNextest           Archive and run the Rust payload with pinned cargo-nextest.");
-        Console.WriteLine("  Release                  Verify Compile identity, package assets, and smoke the native ZIP.");
         Console.WriteLine("  ReleaseVerify            Verify an existing release directory without rebuilding it.");
         Console.WriteLine("  ReleaseSmoke             Run controller/CLI/agent/bootstrap smokes from the final ZIP for --rid.");
-        Console.WriteLine("  Publish                  Resume/create a GitHub draft, verify assets, then publish it.");
-        Console.WriteLine("  Clean                    Remove only the repository out/ directory.");
         Console.WriteLine();
         Console.WriteLine("Examples:");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --product-version 0.1.0 --source-sha <sha>");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.0 --source-sha <sha>");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }
@@ -89,7 +91,7 @@ public sealed class TestTask : AsyncFrostingTask<BuildContext>
                 $"Test can run only for the native host RID; requested {context.RequestedRid}, host {context.HostRid}.");
         }
 
-        RecreateDirectory(context.TestResultsRoot);
+        BuildDirectory.Recreate(context.TestResultsRoot);
         const string fileName = "vivarium-tests.trx";
         await BuildProcess.RunAsync(
             "dotnet",
@@ -134,12 +136,6 @@ public sealed class TestTask : AsyncFrostingTask<BuildContext>
             throw new InvalidDataException(
                 $"TRX file contains {failures.Length} unsuccessful test results: {string.Join(", ", failures.Distinct())}");
         }
-    }
-
-    private static void RecreateDirectory(string path)
-    {
-        if (Directory.Exists(path)) Directory.Delete(path, recursive: true);
-        Directory.CreateDirectory(path);
     }
 }
 

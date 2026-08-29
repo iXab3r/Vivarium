@@ -297,7 +297,7 @@ internal static class GitHubCli
         }
 
         var extractionRoot = Path.Combine(context.OutRoot, "tools", "github-cli", version, "extracting");
-        PayloadSmokeTask.RecreateDirectory(extractionRoot);
+        BuildDirectory.Recreate(extractionRoot);
         await using (var input = File.OpenRead(download))
         using (var gzip = new GZipStream(input, CompressionMode.Decompress))
         {

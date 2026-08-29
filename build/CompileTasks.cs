@@ -49,7 +49,7 @@ public sealed class CompileSmokeTask : AsyncFrostingTask<BuildContext>
 
         var extension = OperatingSystem.IsWindows() ? ".exe" : string.Empty;
         var smokeRoot = Path.Combine(context.OutRoot, "compile-smoke", rid);
-        PayloadSmokeTask.RecreateDirectory(smokeRoot);
+        BuildDirectory.Recreate(smokeRoot);
         var serverRoot = Path.Combine(root, "server");
         await ReleaseSmokeTask.SmokeControllerAsync(
             Path.Combine(serverRoot, "viv-server" + extension),
@@ -88,8 +88,8 @@ internal static class PlatformCompiler
         var sourceSha = context.SourceSha is null ? null : context.RequireSourceSha();
         var target = Path.Combine(context.OutRoot, "build", rid);
         var publishRoot = Path.Combine(context.OutRoot, "build-publish", rid);
-        PayloadSmokeTask.RecreateDirectory(target);
-        PayloadSmokeTask.RecreateDirectory(publishRoot);
+        BuildDirectory.Recreate(target);
+        BuildDirectory.Recreate(publishRoot);
 
         try
         {
@@ -111,7 +111,7 @@ internal static class PlatformCompiler
                 Path.Combine(agentRoot, "agent", "version"),
                 version + "\n",
                 new UTF8Encoding(false));
-            CompileManifestWriter.Write(target, rid, version, sourceSha);
+            CompileBuildInfoFile.Write(target, rid, version, sourceSha);
         }
         catch
         {
@@ -152,34 +152,19 @@ internal static class PlatformCompiler
     }
 }
 
-internal static class CompileManifestWriter
+internal static class CompileBuildInfoFile
 {
     public static void Write(string root, string rid, string version, string? sourceSha)
     {
-        var manifest = new CompileManifest(1, rid, version, sourceSha, DescribeFiles(root));
-        var json = JsonSerializer.Serialize(manifest, ReleaseLayout.JsonOptions) + "\n";
+        var json = JsonSerializer.Serialize(
+            new CompileBuildInfo(rid, version, sourceSha),
+            ReleaseLayout.JsonOptions) + "\n";
         File.WriteAllText(
-            Path.Combine(root, ReleaseLayout.CompileManifestName),
+            Path.Combine(root, ReleaseLayout.BuildInfoName),
             json,
             new UTF8Encoding(false));
     }
 
-    internal static CompileFile[] DescribeFiles(string root) =>
-        Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
-            .Where(path => !string.Equals(
-                Path.GetRelativePath(root, path).Replace('\\', '/'),
-                ReleaseLayout.CompileManifestName,
-                StringComparison.Ordinal))
-            .Select(path => new CompileFile(
-                Path.GetRelativePath(root, path).Replace('\\', '/'),
-                new FileInfo(path).Length,
-                ReleaseAsset.HashFile(path)))
-            .OrderBy(file => file.Path, StringComparer.Ordinal)
-            .ToArray();
-}
-
-internal static class CompileManifestVerifier
-{
     public static void Verify(
         BuildContext context,
         string rid,
@@ -187,29 +172,20 @@ internal static class CompileManifestVerifier
         string expectedSourceSha)
     {
         var root = ReleaseLayout.CompileRoot(context, rid);
-        var manifestPath = Path.Combine(root, ReleaseLayout.CompileManifestName);
-        if (!File.Exists(manifestPath))
+        var buildInfoPath = Path.Combine(root, ReleaseLayout.BuildInfoName);
+        if (!File.Exists(buildInfoPath))
         {
-            throw new FileNotFoundException($"Compile manifest is missing for {rid}.", manifestPath);
+            throw new FileNotFoundException($"Compile build info is missing for {rid}.", buildInfoPath);
         }
 
-        var manifest = JsonSerializer.Deserialize<CompileManifest>(
-            File.ReadAllText(manifestPath),
-            ReleaseLayout.JsonOptions) ?? throw new InvalidDataException($"Compile manifest is empty for {rid}.");
-        if (manifest.SchemaVersion != 1 ||
-            !string.Equals(manifest.Rid, rid, StringComparison.Ordinal) ||
-            !string.Equals(manifest.Version, expectedVersion, StringComparison.Ordinal) ||
-            !string.Equals(manifest.SourceSha, expectedSourceSha, StringComparison.OrdinalIgnoreCase))
+        var buildInfo = JsonSerializer.Deserialize<CompileBuildInfo>(
+            File.ReadAllText(buildInfoPath),
+            ReleaseLayout.JsonOptions) ?? throw new InvalidDataException($"Compile build info is empty for {rid}.");
+        if (!string.Equals(buildInfo.Rid, rid, StringComparison.Ordinal) ||
+            !string.Equals(buildInfo.Version, expectedVersion, StringComparison.Ordinal) ||
+            !string.Equals(buildInfo.SourceSha, expectedSourceSha, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidDataException(
-                $"Compile manifest identity does not match Release for {rid}.");
-        }
-
-        var actualFiles = CompileManifestWriter.DescribeFiles(root);
-        if (manifest.Files is null || manifest.Files.Length == 0 ||
-            !manifest.Files.SequenceEqual(actualFiles))
-        {
-            throw new InvalidDataException($"Compile files do not match the verified manifest for {rid}.");
+            throw new InvalidDataException($"Compile build info does not match Release for {rid}.");
         }
 
         var versionMarker = Path.Combine(root, "agent", "agent", "version");
@@ -220,14 +196,7 @@ internal static class CompileManifestVerifier
     }
 }
 
-internal sealed record CompileManifest(
-    int SchemaVersion,
-    string Rid,
-    string Version,
-    string? SourceSha,
-    CompileFile[] Files);
-
-internal sealed record CompileFile(string Path, long Size, string Sha256);
+internal sealed record CompileBuildInfo(string Rid, string Version, string? SourceSha);
 
 internal static class DotNetPublisher
 {

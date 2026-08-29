@@ -7,8 +7,8 @@ the practical companion.
 ## Building
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline (AGENTS.md →
-Verification). `global.json`, committed NuGet lock files, and `toolchains.lock.json` pin the SDK,
-packages, Cake.Frosting, cargo-nextest, and GitHub CLI bytes used by CI/CD.
+Verification). `global.json` pins the SDK, package references pin Cake.Frosting and application
+dependencies, and `toolchains.lock.json` pins downloaded cargo-nextest and GitHub CLI bytes.
 
 The provider-neutral build entry point is the Cake.Frosting application under `build/`:
 
@@ -21,8 +21,9 @@ dotnet run --project build/Vivarium.Build.csproj -- --target PayloadSmoke
 `CI` builds the solution in Release configuration and writes deterministic TRX under
 `out/test-results/<os>`. The payload targets
 cover native NUnit/MTP execution, Linux-to-macOS artifact transfer, and checksum-verified pinned
-cargo-nextest archive/remap execution. TeamCity invokes these targets rather than duplicating build
-commands in Kotlin DSL. Cake bounds every `dotnet build`, `dotnet test`, and `dotnet publish` invocation
+cargo-nextest archive/remap execution. TeamCity invokes the core Cake targets rather than duplicating
+build commands in Kotlin DSL; the payload targets remain explicit diagnostics. Cake bounds every
+`dotnet build`, `dotnet test`, and `dotnet publish` invocation
 to one MSBuild worker to avoid memory spikes on the free self-hosted agents; independent TeamCity
 configurations can still run concurrently when compatible agents are available.
 
@@ -52,14 +53,14 @@ agent/bootstrap.json.sample
 agent/agent/current/viv-agent[.exe]
 agent/agent/version
 cli/viv-cli[.exe]
-compile-manifest.json
+build-info.json
 ```
 
 Cross-publishing does not execute foreign binaries. `Test` always runs for the native host and rejects
 an explicit non-host RID; target-native execution evidence must be collected on that target OS and
-architecture. Each Compile tree carries a checksummed manifest with its RID, product version, source
-SHA, and exact file inventory. A normal developer Compile may omit `--source-sha`, but such an output
-is intentionally not eligible for Release.
+architecture. Each Compile tree carries a small identity file with its RID, product version, and source
+SHA. A normal developer Compile may omit `--source-sha`, but such an output is intentionally not
+eligible for Release.
 
 The Compile targets produce the matrix of self-contained single-file builds. The four shipped
 executable projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained
@@ -129,22 +130,22 @@ and a `vX.Y.Z`/SemVer identity:
 
 ```text
 dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll \
-  --product-version 0.1.0 --source-sha <full-commit-sha>
+  --build-version 0.1.0 --source-sha <full-commit-sha>
 dotnet run --project build/Vivarium.Build.csproj -- --target Release \
-  --release-version 0.1.0 --source-sha <full-commit-sha>
+  --build-version 0.1.0 --source-sha <full-commit-sha>
 dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
-  --rid <native-rid> --release-version 0.1.0 --source-sha <full-commit-sha>
+  --rid <native-rid> --build-version 0.1.0 --source-sha <full-commit-sha>
 ```
 
 It performs the following work:
 
-1. Require the four existing `out/build/<rid>/` Compile outputs and prove every manifest has the exact
-   requested source SHA, SemVer, RID, file set, sizes, and digests. Release does not compile or test code.
+1. Require the four existing `out/build/<rid>/` Compile outputs and check that every `build-info.json`
+   has the requested source SHA, SemVer, and RID. Release does not compile or test code.
 2. Package per-RID zips: `viv-server-<rid>.zip` (the server zip **embeds the agent +
    updater packages for every RID** — an air-gapped farm never phones GitHub), `viv-agent-<rid>.zip`
    (`viv-agent-update` + current `viv-agent` + `bootstrap.json.sample`), `viv-cli-<rid>.zip`.
 3. Write canonical `release-manifest.json` and `SHA256SUMS`, fix ZIP timestamps and entry order, preserve
-   native executable modes, then verify every size, digest, tree, and embedded agent-package byte.
+   native executable modes, then verify the top-level release asset sizes, digests, and ZIP integrity.
 4. Run one host-native smoke from the final ZIP inside Release: controller startup plus static-asset
    HTTP probe, exact `viv-cli --version`, fail-closed agent usage, and missing-config updater behavior.
    `ReleaseSmoke` remains available to repeat that check explicitly; the full test suite is not repeated.
@@ -166,7 +167,7 @@ store and authenticated manifest endpoint are still not implemented.
 The versioned TeamCity chain is `Compile / <RID> -> Release -> Publish`. Release has snapshot and
 artifact dependencies on all four Compile configurations and only packages their exact outputs.
 For protected `v*` tags, Compile derives the product SemVer from the tag before publishing binaries;
-Release refuses any artifact whose embedded manifest disagrees with that tag or source revision.
+Release refuses any artifact whose build identity disagrees with that tag or source revision.
 Publish has an artifact dependency on Release and only uploads that ready candidate to GitHub. GitHub
 publication is committed paused and has no trigger. Its Cake target resolves a checksum-pinned GitHub
 CLI, requires immutable releases to be enabled, proves the protected tag resolves to the manifest

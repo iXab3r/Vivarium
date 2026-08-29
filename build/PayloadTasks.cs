@@ -15,8 +15,8 @@ public sealed class PayloadSmokeTask : AsyncFrostingTask<BuildContext>
         EnsureNativeRid(rid);
         var output = Path.Combine(context.OutRoot, "payload", rid);
         var results = Path.Combine(context.OutRoot, "payload-results", rid);
-        RecreateDirectory(output);
-        RecreateDirectory(results);
+        BuildDirectory.Recreate(output);
+        BuildDirectory.Recreate(results);
 
         var publish = new List<string>
         {
@@ -60,11 +60,6 @@ public sealed class PayloadSmokeTask : AsyncFrostingTask<BuildContext>
         }
     }
 
-    internal static void RecreateDirectory(string path)
-    {
-        if (Directory.Exists(path)) Directory.Delete(path, recursive: true);
-        Directory.CreateDirectory(path);
-    }
 }
 
 [TaskName("PayloadCrossMacPublish")]
@@ -73,7 +68,7 @@ public sealed class PayloadCrossMacPublishTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
     {
-        PayloadSmokeTask.RecreateDirectory(context.PayloadDirectory);
+        BuildDirectory.Recreate(context.PayloadDirectory);
         var publish = new List<string>
         {
             "publish",
@@ -111,7 +106,7 @@ public sealed class PayloadCrossMacRunTask : AsyncFrostingTask<BuildContext>
             UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
             UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
         var results = Path.Combine(context.OutRoot, "payload-cross-macos-results");
-        PayloadSmokeTask.RecreateDirectory(results);
+        BuildDirectory.Recreate(results);
         await BuildProcess.RunAsync(
             executable,
             ["--report-trx", "--report-trx-filename", "results.trx", "--results-directory", results],
@@ -138,7 +133,7 @@ public sealed class PayloadNextestTask : AsyncFrostingTask<BuildContext>
         var simulatedTarget = Path.Combine(output, "target-machine");
         var remappedRoot = Path.Combine(simulatedTarget, "payload-rust");
         var archive = Path.Combine(output, "payload.tar.zst");
-        PayloadSmokeTask.RecreateDirectory(output);
+        BuildDirectory.Recreate(output);
 
         await BuildProcess.RunAsync(
             nextest,
@@ -211,7 +206,7 @@ internal static class LockedTool
             }
         }
 
-        PayloadSmokeTask.RecreateDirectory(toolRoot);
+        BuildDirectory.Recreate(toolRoot);
         await using (var input = File.OpenRead(download))
         using (var gzip = new GZipStream(input, CompressionMode.Decompress))
         {

@@ -14,8 +14,7 @@ public sealed class BuildContext : FrostingContext
         SourceSha = context.Arguments.GetArgument("source-sha")?.Trim().ToLowerInvariant();
         SourceRef = context.Arguments.GetArgument("source-ref")?.Trim();
         BuildCounter = context.Arguments.GetArgument("build-counter")?.Trim();
-        ProductVersionOverride = NormalizeVersion(context.Arguments.GetArgument("product-version"));
-        ReleaseVersion = NormalizeReleaseVersion(context.Arguments.GetArgument("release-version"));
+        VersionOverride = NormalizeVersion(context.Arguments.GetArgument("build-version"));
         GitHubRepository = context.Arguments.GetArgument("github-repository")?.Trim();
         PayloadDirectory = ResolvePath(
             context.Arguments.GetArgument("payload-directory") ?? Path.Combine("out", "payload-cross-macos"));
@@ -33,9 +32,7 @@ public sealed class BuildContext : FrostingContext
 
     public string? BuildCounter { get; }
 
-    public string? ProductVersionOverride { get; }
-
-    public string? ReleaseVersion { get; }
+    public string? VersionOverride { get; }
 
     public string? GitHubRepository { get; }
 
@@ -47,9 +44,9 @@ public sealed class BuildContext : FrostingContext
     {
         get
         {
-            if (ProductVersionOverride is not null)
+            if (VersionOverride is not null)
             {
-                return RequireSemanticVersion(ProductVersionOverride, "Compile requires --product-version <SemVer>.");
+                return RequireSemanticVersion(VersionOverride, "--build-version must be SemVer.");
             }
 
             var tagVersion = VersionFromSourceRef(SourceRef);
@@ -99,15 +96,14 @@ public sealed class BuildContext : FrostingContext
 
     public string RequireReleaseVersion()
     {
-        if (string.IsNullOrWhiteSpace(ReleaseVersion))
+        var version = VersionOverride ?? VersionFromSourceRef(SourceRef);
+        if (version is null)
         {
             throw new InvalidOperationException(
-                "Release targets require --release-version <SemVer>, for example 0.1.0 or 0.1.0-rc.1.");
+                "Release targets require --build-version <SemVer> or a v<SemVer> source ref.");
         }
 
-        return RequireSemanticVersion(
-            ReleaseVersion,
-            "Release targets require --release-version <SemVer>, for example 0.1.0 or 0.1.0-rc.1.");
+        return RequireSemanticVersion(version, "Release version must be SemVer.");
     }
 
     public string RequireSourceSha()
@@ -201,8 +197,6 @@ public sealed class BuildContext : FrostingContext
         throw new PlatformNotSupportedException("Unsupported build host operating system.");
     }
 
-    private static string? NormalizeReleaseVersion(string? value) => NormalizeVersion(value);
-
     private static string? NormalizeVersion(string? value)
     {
         var normalized = value?.Trim();
@@ -245,4 +239,13 @@ public sealed class BuildContext : FrostingContext
             version,
             @"^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$",
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+}
+
+internal static class BuildDirectory
+{
+    public static void Recreate(string path)
+    {
+        if (Directory.Exists(path)) Directory.Delete(path, recursive: true);
+        Directory.CreateDirectory(path);
+    }
 }

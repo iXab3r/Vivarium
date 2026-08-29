@@ -4,11 +4,10 @@ Status: active; simplified TeamCity pipeline imported, Windows Compile evidence 
 
 ## Current contract
 
-Cake is the provider-neutral build driver. `Compile`/`CompileAll` produce runnable local trees and
-checksummed provenance manifests for the four supported RIDs. `Release` accepts only trees whose RID,
-version, source SHA, file inventory, and digests match the candidate, then packages them and runs one
-host-native final-ZIP smoke. `Publish` only uploads the ready Release artifact to GitHub. All Cake
-build, test, and publish subprocesses use one MSBuild worker.
+Cake is the provider-neutral build driver. `Compile`/`CompileAll` produce runnable local trees and a
+small `build-info.json` containing RID, version, and source SHA. `Release` checks that identity, then
+packages the trees and runs one host-native final-ZIP smoke. `Publish` only uploads the ready Release
+artifact to GitHub. All Cake build, test, and publish subprocesses use one MSBuild worker.
 
 The versioned TeamCity project contains exactly six configurations:
 
@@ -26,13 +25,16 @@ build. GitHub Actions remains explicitly disabled by the project owner.
 ## Evidence and blockers
 
 - TeamCity Windows Compile build `30846` succeeded on `laptop-g15` with SDK 10.0.303 at revision
-  `ce7090f`: 151 passed, 1 ignored, isolated native product smoke green, and 23 Compile files including
-  `compile-manifest.json` plus TRX published.
+  `ce7090f`: 151 passed, 1 ignored, and the isolated native product smoke was green. That build predates
+  the simplification from the checksummed Compile manifest to `build-info.json`.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
-- The hardened prerelease matrix passed for all four RIDs; wrong version, wrong source SHA, and a
-  deliberately modified Compile file were all rejected before packaging. Root tests now pass 143 with
-  9 platform skips, and the matching final osx-arm64 release ZIP smoke is green.
+- The prerelease matrix passed for all four RIDs, and wrong version or wrong source SHA was rejected
+  before packaging. Root tests pass 143 with 9 platform skips, and the matching final osx-arm64 release
+  ZIP smoke is green. Current simplified TeamCity evidence is pending.
+- The simplification pass removed per-file Compile hashes, deep duplicate archive-layout verification,
+  duplicate agent/CLI staging copies, and global NuGet locked mode while retaining top-level release
+  checksums, deterministic ZIPs, final native smoke, prior D3 diagnostics, and guarded Publish behavior.
 - No compatible Linux x64, Linux arm64, or macOS arm64 TeamCity agent is currently available.
 - D29 still requires the controller Git prerequisite to be proven on every controller RID.
 - GitHub publication stays paused until protected tags, immutable releases, and a publish-only secret

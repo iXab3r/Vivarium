@@ -135,9 +135,7 @@ object Release : BuildType({
         exec {
             name = "Package and native-smoke Compile artifacts"
             path = "dotnet"
-            arguments = cakeArguments(
-                "Release",
-                " --release-version %teamcity.build.branch%")
+            arguments = cakeArguments("Release")
         }
     }
     requireDotNet()
@@ -178,7 +176,7 @@ object Publish : BuildType({
             path = "dotnet"
             arguments = cakeArguments(
                 "Publish",
-                " --release-version %teamcity.build.branch% --github-repository iXab3r/Vivarium")
+                " --github-repository iXab3r/Vivarium")
         }
     }
     requireOs("Linux", "amd64")

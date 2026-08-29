@@ -93,16 +93,15 @@ Do not convert a pending platform or release gate into a passing claim based on 
   (`0.1.0.6-5205f60f`) succeeded on `laptop-g15`: 150 passed, 1 ignored, win-x64 compilation and
   native product smoke succeeded, and TeamCity published 22 Compile files plus the TRX artifact.
 
-## Release provenance hardening — 2026-08-29
+## Release identity hardening — 2026-08-29
 
-- Compile now writes a deterministic `compile-manifest.json` containing the RID, product SemVer,
-  source SHA, and exact size/SHA-256 inventory for every generated file. Release verifies all four
-  manifests before deleting or writing any release output.
+- Compile initially wrote a checksummed file inventory. The simplification pass replaced it with a
+  small `build-info.json` containing only RID, product SemVer, and source SHA; Release checks all four
+  identities before deleting or writing any release output.
 - A sequential four-RID `CompileAll` using product version `0.1.0-rc.1` completed successfully, and
   the native osx-arm64 Compile smoke proved that `viv-cli --version` preserves the prerelease identity.
-- Release rejected Compile inputs when either the requested version or source SHA differed. It also
-  rejected an osx-arm64 tree after the agent version marker was deliberately changed; recompiling that
-  RID restored the verified tree.
+- Release rejected Compile inputs when either the requested version or source SHA differed. The earlier
+  per-file tamper check was deliberately removed as duplicate integrity bookkeeping.
 - A matching prerelease Release completed deterministic packaging and automatically ran the final
   host-native ZIP smoke: controller/static asset, exact CLI version, agent, and updater probes passed.
 - Root `dotnet build` completed with zero warnings and errors. Root `dotnet test` passed 143 tests and
@@ -110,4 +109,17 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity Windows Compile build `30846` (`0.1.0.7-ce7090f7`) succeeded on `laptop-g15` from source and
   settings revision `ce7090f7949a44379621019e805b1d214f28c209`: 151 tests passed, 1 was ignored,
   Compile and the isolated native product smoke passed, and TeamCity published 23 Compile files plus
-  TRX. The `win-x64/compile-manifest.json` artifact is present and records the new provenance contract.
+  TRX. This build records the superseded checksummed Compile manifest; simplified evidence follows.
+
+## Simplification pass — 2026-08-29
+
+- Removed the per-file Compile inventory and hashes, deep re-validation of package trees created by the
+  same Release process, duplicate Compile staging copies, and global RuntimeIdentifier/NuGet locked-mode
+  settings. Eight generated NuGet lock files and unused duplicate tool-version entries were removed.
+- Compile now writes only `build-info.json` with RID, product SemVer, and source SHA. The four files in
+  the `0.1.0-rc.2` matrix were 109–113 bytes; sequential `CompileAll` completed for all four RIDs.
+- Release rejected a mismatched version and a mismatched source SHA from build identity alone. A matching
+  Release completed, verified the top-level assets/checksums, and passed the final osx-arm64 ZIP smoke.
+- Root `dotnet build` succeeded with zero warnings and errors; root `dotnet test` passed 143 tests and
+  skipped 9 platform-specific tests. TeamCity DSL validation still reports one project, six build
+  configurations, and one VCS root.

@@ -2,12 +2,6 @@
   "schemaVersion": 1,
   "integrityPolicy": "Every downloaded build tool must match its declared digest before extraction or execution.",
   "tools": {
-    "dotnetSdk": {
-      "version": "10.0.303"
-    },
-    "cakeFrosting": {
-      "version": "6.2.0"
-    },
     "cargoNextest": {
       "version": "0.9.143",
       "artifacts": {
