@@ -26,11 +26,17 @@ private fun BuildType.importTrx() {
     }
 }
 
-private fun BuildType.requireOs(osName: String, architecture: String? = null) {
+private fun BuildType.requireOs(osName: String, architecture: String) {
     requirements {
         contains("teamcity.agent.jvm.os.name", osName)
+        contains("teamcity.agent.jvm.os.arch", architecture)
         exists(DotNet10Parameter)
-        if (architecture != null) contains("teamcity.agent.jvm.os.arch", architecture)
+    }
+}
+
+private fun BuildType.requireDotNet() {
+    requirements {
+        exists(DotNet10Parameter)
     }
 }
 
@@ -38,235 +44,126 @@ private fun cakeArguments(target: String, extra: String = "") =
     "run --project build/Vivarium.Build.csproj -- --target $target " +
         "--source-sha %build.vcs.number% --build-counter %build.counter%$extra"
 
-object VerifyWindows : BuildType({
-    id("Vivarium_VerifyWindows")
-    name = "Verify / Windows x64"
-    artifactRules = "out/test-results/** => test-results"
-    commonVcs()
-    steps {
-        exec {
-            name = "Cake CI"
-            path = "dotnet"
-            arguments = cakeArguments("CI")
-        }
-        exec {
-            name = "Native payload smoke"
-            path = "dotnet"
-            arguments = cakeArguments("PayloadSmoke", " --rid win-x64")
-        }
-    }
-    importTrx()
-    requireOs("Windows", "amd64")
-})
-
-object VerifyLinux : BuildType({
-    id("Vivarium_VerifyLinux")
-    name = "Verify / Linux x64"
-    artifactRules = """
-        out/test-results/** => test-results
-        out/payload-cross-macos/** => payload-cross-macos
-    """.trimIndent()
-    commonVcs()
-    steps {
-        exec {
-            name = "Cake CI"
-            path = "dotnet"
-            arguments = cakeArguments("CI")
-        }
-        exec {
-            name = "Native payload smoke"
-            path = "dotnet"
-            arguments = cakeArguments("PayloadSmoke", " --rid linux-x64")
-        }
-        exec {
-            name = "Cross-publish macOS payload"
-            path = "dotnet"
-            arguments = cakeArguments("PayloadCrossMacPublish")
-        }
-        exec {
-            name = "Pinned nextest archive smoke"
-            path = "dotnet"
-            arguments = cakeArguments("PayloadNextest")
-        }
-    }
-    importTrx()
-    requireOs("Linux", "amd64")
-})
-
-object VerifyMacos : BuildType({
-    id("Vivarium_VerifyMacos")
-    name = "Verify / macOS arm64"
-    artifactRules = "out/test-results/** => test-results"
-    commonVcs()
-    steps {
-        exec {
-            name = "Cake CI"
-            path = "dotnet"
-            arguments = cakeArguments("CI")
-        }
-        exec {
-            name = "Native payload smoke"
-            path = "dotnet"
-            arguments = cakeArguments("PayloadSmoke", " --rid osx-arm64")
-        }
-        exec {
-            name = "Run Linux-produced macOS payload"
-            path = "dotnet"
-            arguments = cakeArguments(
-                "PayloadCrossMacRun",
-                " --payload-directory %teamcity.build.checkoutDir%/out/payload-cross-macos")
-        }
-    }
-    importTrx()
-    requireOs("Mac", "aarch64")
-    dependencies {
-        dependency(VerifyLinux) {
-            snapshot {
-                reuseBuilds = ReuseBuilds.NO
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-            artifacts {
-                cleanDestination = true
-                artifactRules = "payload-cross-macos/** => out/payload-cross-macos"
-            }
-        }
-    }
-})
-
-object CiGate : BuildType({
-    id("Vivarium_CiGate")
-    name = "CI gate"
-    type = BuildTypeSettings.Type.COMPOSITE
-    vcs {
-        showDependenciesChanges = true
-    }
-    triggers {
-        vcs {
-            branchFilter = "+:<default>"
-        }
-    }
-    dependencies {
-        for (dependency in listOf(VerifyWindows, VerifyLinux, VerifyMacos)) {
-            snapshot(dependency) {
-                reuseBuilds = ReuseBuilds.NO
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-        }
-    }
-})
-
-object ReleasePackage : BuildType({
-    id("Vivarium_ReleasePackage")
-    name = "Release / Assemble candidate"
-    type = BuildTypeSettings.Type.DEPLOYMENT
-    maxRunningBuilds = 1
-    artifactRules = "out/release/** => release"
-    commonVcs()
-    steps {
-        exec {
-            name = "Assemble and verify release"
-            path = "dotnet"
-            arguments = cakeArguments(
-                "ReleasePackage",
-                " --release-version %teamcity.build.branch%")
-        }
-    }
-    requireOs("Linux", "amd64")
-    dependencies {
-        snapshot(CiGate) {
-            reuseBuilds = ReuseBuilds.NO
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-    }
-})
-
-private fun releaseSmoke(
+private fun compileBuild(
     buildId: String,
     displayName: String,
     rid: String,
     osName: String,
     architecture: String,
+    runTests: Boolean = false,
+    triggerOnDefault: Boolean = false,
 ) = BuildType({
     id(buildId)
     name = displayName
+    artifactRules = if (runTests) {
+        """
+            out/build/$rid/** => $rid
+            out/test-results/** => test-results
+        """.trimIndent()
+    } else {
+        "out/build/$rid/** => $rid"
+    }
     commonVcs()
     steps {
+        if (runTests) {
+            exec {
+                name = "Build and test"
+                path = "dotnet"
+                arguments = cakeArguments("CI")
+            }
+        }
         exec {
-            name = "Verify exact candidate ZIPs"
+            name = "Compile $rid"
             path = "dotnet"
-            arguments = cakeArguments(
-                "ReleaseSmoke",
-                " --rid $rid --release-version %teamcity.build.branch%")
+            arguments = cakeArguments("Compile", " --rid $rid")
+        }
+        exec {
+            name = "Native product smoke"
+            path = "dotnet"
+            arguments = cakeArguments("CompileSmoke", " --rid $rid")
+        }
+    }
+    if (runTests) importTrx()
+    if (triggerOnDefault) {
+        triggers {
+            vcs {
+                branchFilter = "+:<default>"
+            }
         }
     }
     requireOs(osName, architecture)
-    dependencies {
-        dependency(ReleasePackage) {
-            snapshot {
-                reuseBuilds = ReuseBuilds.SUCCESSFUL
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-            artifacts {
-                cleanDestination = true
-                artifactRules = "release/** => out/release"
-            }
-        }
-    }
 })
 
-val ReleaseSmokeWindows = releaseSmoke(
-    "Vivarium_ReleaseSmokeWindows",
-    "Release smoke / Windows x64",
+val CompileWindowsX64 = compileBuild(
+    "Vivarium_CompileWindowsX64",
+    "Compile / Windows x64",
     "win-x64",
     "Windows",
-    "amd64")
+    "amd64",
+    runTests = true,
+    triggerOnDefault = true)
 
-val ReleaseSmokeLinux = releaseSmoke(
-    "Vivarium_ReleaseSmokeLinux",
-    "Release smoke / Linux x64",
+val CompileLinuxX64 = compileBuild(
+    "Vivarium_CompileLinuxX64",
+    "Compile / Linux x64",
     "linux-x64",
     "Linux",
     "amd64")
 
-val ReleaseSmokeLinuxArm64 = releaseSmoke(
-    "Vivarium_ReleaseSmokeLinuxArm64",
-    "Release smoke / Linux arm64",
+val CompileLinuxArm64 = compileBuild(
+    "Vivarium_CompileLinuxArm64",
+    "Compile / Linux arm64",
     "linux-arm64",
     "Linux",
     "aarch64")
 
-val ReleaseSmokeMacos = releaseSmoke(
-    "Vivarium_ReleaseSmokeMacos",
-    "Release smoke / macOS arm64",
+val CompileMacosArm64 = compileBuild(
+    "Vivarium_CompileMacosArm64",
+    "Compile / macOS arm64",
     "osx-arm64",
     "Mac",
     "aarch64")
 
-object ReleaseGate : BuildType({
-    id("Vivarium_ReleaseGate")
-    name = "Release gate"
-    type = BuildTypeSettings.Type.COMPOSITE
-    vcs {
-        showDependenciesChanges = true
+object Release : BuildType({
+    id("Vivarium_Release")
+    name = "Release"
+    maxRunningBuilds = 1
+    artifactRules = "out/release/** => release"
+    commonVcs()
+    steps {
+        exec {
+            name = "Package Compile artifacts"
+            path = "dotnet"
+            arguments = cakeArguments(
+                "Release",
+                " --release-version %teamcity.build.branch%")
+        }
     }
+    requireDotNet()
     dependencies {
-        for (dependency in listOf(
-            ReleaseSmokeWindows,
-            ReleaseSmokeLinux,
-            ReleaseSmokeLinuxArm64,
-            ReleaseSmokeMacos,
+        for ((compile, rid) in listOf(
+            CompileWindowsX64 to "win-x64",
+            CompileLinuxX64 to "linux-x64",
+            CompileLinuxArm64 to "linux-arm64",
+            CompileMacosArm64 to "osx-arm64",
         )) {
-            snapshot(dependency) {
-                reuseBuilds = ReuseBuilds.NO
-                onDependencyFailure = FailureAction.FAIL_TO_START
+            dependency(compile) {
+                snapshot {
+                    reuseBuilds = ReuseBuilds.SUCCESSFUL
+                    onDependencyFailure = FailureAction.FAIL_TO_START
+                }
+                artifacts {
+                    cleanDestination = true
+                    artifactRules = "$rid/** => out/build/$rid"
+                }
             }
         }
     }
 })
 
-object PublishGitHub : BuildType({
-    id("Vivarium_PublishGitHub")
-    name = "Release / Publish GitHub"
+object Publish : BuildType({
+    id("Vivarium_Publish")
+    name = "Publish"
     type = BuildTypeSettings.Type.DEPLOYMENT
     paused = true
     maxRunningBuilds = 1
@@ -276,20 +173,16 @@ object PublishGitHub : BuildType({
     }
     steps {
         exec {
-            name = "Draft, verify, and publish immutable release"
+            name = "Publish GitHub release"
             path = "dotnet"
             arguments = cakeArguments(
-                "ReleasePublish",
+                "Publish",
                 " --release-version %teamcity.build.branch% --github-repository iXab3r/Vivarium")
         }
     }
     requireOs("Linux", "amd64")
     dependencies {
-        snapshot(ReleaseGate) {
-            reuseBuilds = ReuseBuilds.NO
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        dependency(ReleasePackage) {
+        dependency(Release) {
             snapshot {
                 reuseBuilds = ReuseBuilds.SUCCESSFUL
                 onDependencyFailure = FailureAction.FAIL_TO_START

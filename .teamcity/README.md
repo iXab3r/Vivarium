@@ -15,24 +15,35 @@ Run validation with JDK 21 active. The current TeamCity DSL security agent does 
 and fails before compiling the Kotlin configuration.
 
 Create the TeamCity project from `https://github.com/iXab3r/Vivarium.git`, then enable versioned settings
-from `.teamcity` with **use settings from the default branch**. Do not enable fork pull requests. Configure
-the GitHub App and commit-status publisher only after the server connection exists and the `CI gate`
-status is proven on all three operating systems.
+from `.teamcity` with **use settings from the default branch**. Do not enable fork pull requests.
+
+The project deliberately contains only six configurations:
+
+- `Compile / Windows x64` builds, runs the complete test suite once, compiles win-x64 products, and
+  runs their native product smoke;
+- the Linux x64, Linux arm64, and macOS arm64 Compile configurations compile only their RID and run
+  the same short native product smoke without repeating the full test suite;
+- `Release` downloads all four Compile artifacts and packages them without compiling or testing;
+- `Publish` downloads the Release artifact and uploads it to GitHub.
+
+Only Windows Compile is automatically triggered on the default branch while it is the only compatible
+active agent. The other Compile configurations and the downstream chain become runnable as matching
+agents are added. Configure commit-status publication after the Compile matrix is proven.
 
 Agent activation requirements:
 
 - Windows x64 with the exact SDK from `global.json`;
-- Linux x64 with that SDK, Cargo, and at least 4 GiB free for self-contained publishes;
+- Linux x64 with that SDK;
 - macOS arm64 with that SDK;
-- Linux arm64 with that SDK before the stable `Release gate` can complete.
+- Linux arm64 with that SDK before Release can complete.
 
 The current three-agent license has no macOS agent and no Linux arm64 agent. Capacity must therefore be
-rotated or the license/capacity changed before stable release activation. `Release / Assemble candidate`
-has no trigger, is serialized, accepts only a SemVer `v*` tag through the Cake validation, and publishes
-candidate artifacts without GitHub credentials. GitHub publication remains disabled until draft/resume,
+rotated or the license/capacity changed before stable release activation. `Release` has no trigger, is
+serialized, accepts only a SemVer `v*` tag through the Cake validation, and packages candidate artifacts
+without GitHub credentials. GitHub publication remains disabled until draft/resume,
 remote-digest, protected-tag, D29 Git-prerequisite, and native four-RID evidence are all closed.
 
-`Release / Publish GitHub` is committed paused. Before enabling it, create a TeamCity password parameter
+`Publish` is committed paused. Before enabling it, create a TeamCity password parameter
 named `github.release.token` whose fine-grained GitHub credential is restricted to this repository and to
 release publication plus the read-only administration permission needed to verify immutable-release policy.
 Enable GitHub release immutability and protected `v*` tag rules first. The publisher never clobbers an asset:

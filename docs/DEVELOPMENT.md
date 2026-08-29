@@ -25,16 +25,16 @@ commands in Kotlin DSL. Cake bounds every `dotnet build`, `dotnet test`, and `do
 to one MSBuild worker to avoid memory spikes on the free self-hosted agents; independent TeamCity
 configurations can still run concurrently when compatible agents are available.
 
-For runnable local builds, use `Publish` with an optional target RID. With no `--rid`, it publishes for
-the current host; `PublishAll` cross-publishes the complete supported matrix sequentially:
+For runnable local builds, use `Compile` with an optional target RID. With no `--rid`, it compiles for
+the current host; `CompileAll` cross-compiles the complete supported matrix sequentially:
 
 ```text
-dotnet run --project build/Vivarium.Build.csproj -- --target Publish
-dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid win-x64
-dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid linux-x64
-dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid linux-arm64
-dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid osx-arm64
-dotnet run --project build/Vivarium.Build.csproj -- --target PublishAll
+dotnet run --project build/Vivarium.Build.csproj -- --target Compile
+dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid win-x64
+dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-x64
+dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64
+dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid osx-arm64
+dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll
 dotnet run --project build/Vivarium.Build.csproj -- --target Test
 ```
 
@@ -57,9 +57,9 @@ Cross-publishing does not execute foreign binaries. `Test` always runs for the n
 an explicit non-host RID; target-native execution evidence must be collected on that target OS and
 architecture.
 
-The release target is a matrix of self-contained single-file builds. The four shipped executable
-projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained mode, version,
-source identity, and deterministic debug settings:
+The Compile targets produce the matrix of self-contained single-file builds. The four shipped
+executable projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained
+mode, source identity, and deterministic debug settings:
 
 ```
 dotnet publish src/Vivarium.Controller -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/controller/win-x64
@@ -76,19 +76,19 @@ never a requirement.
 
 | Tier | What | Runs where |
 |---|---|---|
-| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | manual/local Cake `CI`; TeamCity matrix activation pending |
-| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | manual/local Cake `CI`; TeamCity matrix activation pending |
+| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | manual/local Cake `CI`; TeamCity `Compile / Windows x64` |
+| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | manual/local Cake `CI`; TeamCity `Compile / Windows x64` |
 | 3. FakeMachineProvider | simulated pool VMs backed by local agent processes (revert = process restart + workdir reset): full D8 conveyor, pool grow/drain, INFRA recycling, canaries — deterministic, zero hypervisors | no automatic CI until TeamCity activation |
 | 4. Real hypervisor E2E | QEMU/KVM smoke once that driver exists — GitHub's hosted **Linux** runners expose `/dev/kvm` (Windows runners cannot do Hyper-V); Hyper-V E2E on a **self-hosted** runner: the dev machine first, later the farm itself | KVM: CI, later; Hyper-V: self-hosted, scheduled/manual |
 
-GitHub Actions is intentionally disabled: the remote `ci` workflow is manually disabled and this
-change removes its YAML from `.github/workflows`. A validated TeamCity Kotlin DSL defines Windows x64,
-Linux x64, and macOS arm64 verification plus one composite `CI gate`, but it is not yet active until the
-project is uploaded and native server builds close every row in
-`.workspace/workstreams/cicd-teamcity/inventory.tsv`. Until then, pushes and pull requests have no
-automatic CI and the root/Cake gates must be run manually. Tier 2 contains the
-implemented session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build
-cross-process cases are not complete; tiers 3 and 4 await providers.
+GitHub Actions is intentionally disabled: the remote `ci` workflow is manually disabled and its YAML
+is absent from `.github/workflows`. TeamCity owns CI/CD through four platform Compile configurations,
+one Release configuration, and one paused Publish deployment. The complete test suite runs exactly
+once, in `Compile / Windows x64`; every Compile configuration also runs a short native product smoke
+for its own RID. This avoids repeating the same test suite four times while still proving that each
+platform's produced executables start natively. Tier 2 contains the implemented
+session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build cross-process
+cases are not complete; tiers 3 and 4 await providers.
 
 The retained payload targets cover the Phase-0 portability contract: NUnit/MTP self-contained + TRX on
 all three OSes, macOS ad-hoc signing of cross-published binaries, and nextest archive +
@@ -120,10 +120,13 @@ in the current binaries, and the bootstrap freeze gate remains pending (§7/D21)
 
 ## Releases (D19)
 
-The Cake release candidate workflow accepts a full source SHA and a `vX.Y.Z`/SemVer identity:
+The Cake release candidate workflow consumes previously compiled trees and accepts a full source SHA
+and a `vX.Y.Z`/SemVer identity:
 
 ```text
-dotnet run --project build/Vivarium.Build.csproj -- --target ReleasePackage \
+dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll \
+  --source-sha <full-commit-sha>
+dotnet run --project build/Vivarium.Build.csproj -- --target Release \
   --release-version 0.1.0 --source-sha <full-commit-sha>
 dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
   --rid <native-rid> --release-version 0.1.0 --source-sha <full-commit-sha>
@@ -131,14 +134,15 @@ dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
 
 It performs the following work:
 
-1. Build + test the full matrix.
-2. Publish per-RID zips: `viv-server-<rid>.zip` (the server zip **embeds the agent +
+1. Require the four existing `out/build/<rid>/` Compile outputs; Release does not build or test code.
+2. Package per-RID zips: `viv-server-<rid>.zip` (the server zip **embeds the agent +
    updater packages for every RID** — an air-gapped farm never phones GitHub), `viv-agent-<rid>.zip`
    (`viv-agent-update` + current `viv-agent` + `bootstrap.json.sample`), `viv-cli-<rid>.zip`.
 3. Write canonical `release-manifest.json` and `SHA256SUMS`, fix ZIP timestamps and entry order, preserve
    native executable modes, then verify every size, digest, tree, and embedded agent-package byte.
-4. Run `ReleaseSmoke` from the final native ZIP: controller startup plus static-asset HTTP probe,
-   `viv-cli --version`, fail-closed agent usage, and missing-config updater behavior.
+4. Optionally run local `ReleaseSmoke` from the final native ZIP: controller startup plus static-asset
+   HTTP probe, `viv-cli --version`, fail-closed agent usage, and missing-config updater behavior. In
+   TeamCity, equivalent native execution already happened in each producing Compile configuration.
 
 The exact agent-template tree is:
 
@@ -154,13 +158,14 @@ plus `packages/manifest.json` and the exact four public
 `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
-The versioned TeamCity pipeline assembles candidates only after the tri-OS `CI gate`, transfers the
-same candidate artifact into four native release-smoke builds, and exposes a downstream GitHub
-deployment. GitHub publication is committed paused and has no trigger. Its Cake target resolves a
-checksum-pinned GitHub CLI, requires immutable releases to be enabled, proves the protected tag resolves
-to the manifest source SHA, creates or safely resumes a compatible draft, verifies GitHub's remote
-`sha256:` asset digests, and publishes last. An already-published exact immutable release is an
-idempotent success; mismatched or extra assets are never clobbered.
+The versioned TeamCity chain is `Compile / <RID> -> Release -> Publish`. Release has snapshot and
+artifact dependencies on all four Compile configurations and only packages their exact outputs.
+Publish has an artifact dependency on Release and only uploads that ready candidate to GitHub. GitHub
+publication is committed paused and has no trigger. Its Cake target resolves a checksum-pinned GitHub
+CLI, requires immutable releases to be enabled, proves the protected tag resolves to the manifest
+source SHA, creates or safely resumes a compatible draft, verifies GitHub's remote `sha256:` asset
+digests, and publishes last. An already-published exact immutable release is an idempotent success;
+mismatched or extra assets are never clobbered.
 
 There is still no public end-user release. Stable activation is blocked until native evidence exists for
 all four RIDs (especially Linux arm64), a macOS TeamCity agent exists, the controller's system-Git

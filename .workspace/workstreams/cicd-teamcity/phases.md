@@ -11,17 +11,18 @@ preflight where the host supports them.
 
 ## Phase 2 — TeamCity parity
 
-Add versioned Kotlin DSL that invokes only Cake targets, imports TRX, transfers the exact cross-macOS
-artifact, and exposes one downstream CI gate. Settings remain trusted-default-branch configuration;
-fork pull requests are not automatic on persistent agents.
+Add versioned Kotlin DSL that invokes only Cake targets. Define one Compile configuration per RID,
+import the complete test suite's TRX only from Windows x64, and run a native product smoke in every
+Compile configuration. Settings remain trusted-default-branch configuration; fork pull requests are
+not automatic on persistent agents.
 
-Gate: Kotlin DSL generation and green Windows/Linux/macOS builds for every GitHub Actions inventory row.
+Gate: Kotlin DSL generation and green native Compile builds for every supported RID.
 
 ## Phase 3 — release contract and candidate assembly
 
-Freeze the per-RID package layout with Agent API/SDK, Platform, and Security review. Implement exact
-manifest/checksum validation, deterministic archives, native smoke jobs for the assembled ZIPs, and
-D29 Git prerequisite evidence.
+Freeze the per-RID package layout with Agent API/SDK, Platform, and Security review. Make Release consume
+only the exact Compile artifacts and perform deterministic archive plus manifest/checksum validation.
+Keep native execution in Compile and collect D29 Git prerequisite evidence.
 
 Gate: all four RID rows have native package evidence. Linux arm64 and D29 are explicit stable-release
 activation gates.
@@ -36,9 +37,9 @@ Gate: draft/staging interruption and mismatch tests pass without creating a publ
 
 ## Phase 5 — cutover
 
-Make the TeamCity CI gate the required GitHub check, reconcile authoritative documentation, and rerun
-the census. GitHub Actions was removed earlier by explicit project-owner decision; do not restore it
-without another explicit decision.
+Publish the appropriate TeamCity Compile status to GitHub, reconcile authoritative documentation, and
+rerun the census. GitHub Actions was removed earlier by explicit project-owner decision; do not restore
+it without another explicit decision.
 
 Gate: every inventory row is closed or has an explicit non-release activation condition; TeamCity is
 the active automatic CI authority.

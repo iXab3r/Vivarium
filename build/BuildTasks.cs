@@ -15,22 +15,23 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  Build                    Build Vivarium.slnx in Release configuration.");
         Console.WriteLine("  Test                     Run host-native tests and write deterministic TRX output.");
         Console.WriteLine("  CI                       Build and test the solution on the current host.");
-        Console.WriteLine("  Publish                  Publish runnable local binaries for --rid or the host RID.");
-        Console.WriteLine("  PublishAll               Publish runnable local binaries for every supported RID.");
+        Console.WriteLine("  Compile                  Compile runnable binaries for --rid or the host RID.");
+        Console.WriteLine("  CompileAll               Compile runnable binaries for every supported RID.");
+        Console.WriteLine("  CompileSmoke             Run native product probes from one Compile output.");
         Console.WriteLine("  PayloadSmoke             Publish and run the NUnit payload for --rid or the host RID.");
         Console.WriteLine("  PayloadCrossMacPublish   Cross-publish the osx-arm64 payload for artifact transfer.");
         Console.WriteLine("  PayloadCrossMacRun       Run the transferred payload on a macOS host.");
         Console.WriteLine("  PayloadNextest           Archive and run the Rust payload with pinned cargo-nextest.");
-        Console.WriteLine("  ReleasePackage           Build deterministic release assets for every supported RID.");
+        Console.WriteLine("  Release                  Package Compile outputs into deterministic release assets.");
         Console.WriteLine("  ReleaseVerify            Verify an existing release directory without rebuilding it.");
         Console.WriteLine("  ReleaseSmoke             Run controller/CLI/agent/bootstrap smokes from the final ZIP for --rid.");
-        Console.WriteLine("  ReleasePublish           Resume/create a draft, verify remote assets, then publish it.");
+        Console.WriteLine("  Publish                  Resume/create a GitHub draft, verify assets, then publish it.");
         Console.WriteLine("  Clean                    Remove only the repository out/ directory.");
         Console.WriteLine();
         Console.WriteLine("Examples:");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Publish");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Publish --rid linux-arm64");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target PublishAll");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }

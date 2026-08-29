@@ -5,78 +5,53 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-[TaskName("ReleasePackage")]
-[TaskDescription("Builds the complete deterministic D19 release candidate asset set.")]
-public sealed class ReleasePackageTask : AsyncFrostingTask<BuildContext>
+[TaskName("Release")]
+[TaskDescription("Packages platform Compile outputs into the deterministic D19 release asset set.")]
+public sealed class ReleaseTask : FrostingTask<BuildContext>
 {
-    public override async Task RunAsync(BuildContext context)
+    public override void Run(BuildContext context)
     {
         var version = context.RequireReleaseVersion();
         var sourceSha = context.RequireSourceSha();
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
-        var publishRoot = Path.Combine(context.OutRoot, "release-publish");
         var stagingRoot = Path.Combine(context.OutRoot, "release-staging");
         PayloadSmokeTask.RecreateDirectory(releaseRoot);
-        PayloadSmokeTask.RecreateDirectory(publishRoot);
         PayloadSmokeTask.RecreateDirectory(stagingRoot);
         EnsureFreeSpace(context.OutRoot);
 
         var assets = new List<ReleaseAsset>();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
-            await DotNetPublisher.PublishAsync(
-                context,
-                ReleaseLayout.Agent,
-                rid,
-                Path.Combine(publishRoot, ReleaseLayout.Agent.Id, rid),
-                version);
-            await DotNetPublisher.PublishAsync(
-                context,
-                ReleaseLayout.Bootstrap,
-                rid,
-                Path.Combine(publishRoot, ReleaseLayout.Bootstrap.Id, rid),
-                version);
-            var name = $"viv-agent-{rid}.zip";
+            var compileRoot = ReleaseLayout.CompileRoot(context, rid);
             var stage = Path.Combine(stagingRoot, "agent", rid);
-            StageAgentTemplate(context, publishRoot, stage, rid, version);
+            CopyDirectory(Path.Combine(compileRoot, "agent"), stage);
+            File.WriteAllText(
+                Path.Combine(stage, "agent", "version"),
+                version + "\n",
+                new UTF8Encoding(false));
+            var name = $"viv-agent-{rid}.zip";
             DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "agent-template", rid));
             Directory.Delete(stage, recursive: true);
-            Directory.Delete(Path.Combine(publishRoot, ReleaseLayout.Agent.Id, rid), recursive: true);
-            Directory.Delete(Path.Combine(publishRoot, ReleaseLayout.Bootstrap.Id, rid), recursive: true);
         }
 
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
-            await DotNetPublisher.PublishAsync(
-                context,
-                ReleaseLayout.Cli,
-                rid,
-                Path.Combine(publishRoot, ReleaseLayout.Cli.Id, rid),
-                version);
-            var name = $"viv-cli-{rid}.zip";
+            var compileRoot = ReleaseLayout.CompileRoot(context, rid);
             var stage = Path.Combine(stagingRoot, "cli", rid);
-            Directory.CreateDirectory(stage);
-            CopyPublishedOutput(publishRoot, stage, ReleaseLayout.Cli, rid, "viv-cli");
+            CopyDirectory(Path.Combine(compileRoot, "cli"), stage);
+            var name = $"viv-cli-{rid}.zip";
             DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "cli", rid));
             Directory.Delete(stage, recursive: true);
-            Directory.Delete(Path.Combine(publishRoot, ReleaseLayout.Cli.Id, rid), recursive: true);
         }
 
         var agentAssets = assets.Where(asset => asset.Component == "agent-template").ToArray();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
-            await DotNetPublisher.PublishAsync(
-                context,
-                ReleaseLayout.Controller,
-                rid,
-                Path.Combine(publishRoot, ReleaseLayout.Controller.Id, rid),
-                version);
-            var name = $"viv-server-{rid}.zip";
+            var compileRoot = ReleaseLayout.CompileRoot(context, rid);
             var stage = Path.Combine(stagingRoot, "server", rid);
-            Directory.CreateDirectory(stage);
-            CopyPublishedOutput(publishRoot, stage, ReleaseLayout.Controller, rid, "viv-server");
+            CopyDirectory(Path.Combine(compileRoot, "server"), stage);
             var packageDirectory = Path.Combine(stage, "packages", "agents");
             Directory.CreateDirectory(packageDirectory);
             foreach (var asset in agentAssets.OrderBy(asset => asset.Name, StringComparer.Ordinal))
@@ -90,10 +65,10 @@ public sealed class ReleasePackageTask : AsyncFrostingTask<BuildContext>
             WriteJson(
                 Path.Combine(stage, "packages", "manifest.json"),
                 new EmbeddedPackageManifest(1, version, agentAssets));
+            var name = $"viv-server-{rid}.zip";
             DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
             assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "server", rid));
             Directory.Delete(stage, recursive: true);
-            Directory.Delete(Path.Combine(publishRoot, ReleaseLayout.Controller.Id, rid), recursive: true);
         }
 
         var orderedAssets = assets.OrderBy(asset => asset.Name, StringComparer.Ordinal).ToArray();
@@ -101,7 +76,6 @@ public sealed class ReleasePackageTask : AsyncFrostingTask<BuildContext>
             Path.Combine(releaseRoot, ReleaseLayout.ManifestName),
             new ReleaseManifest(1, version, sourceSha, orderedAssets));
         WriteChecksums(releaseRoot, orderedAssets.Select(asset => asset.Name).Append(ReleaseLayout.ManifestName));
-        Directory.Delete(publishRoot, recursive: true);
         Directory.Delete(stagingRoot, recursive: true);
         ReleaseVerifier.Verify(context, version, sourceSha);
     }
@@ -115,42 +89,24 @@ public sealed class ReleasePackageTask : AsyncFrostingTask<BuildContext>
         if (available < minimumBytes)
         {
             throw new InvalidOperationException(
-                $"ReleasePackage requires at least 4 GiB free on '{root}', but only {available / (1024 * 1024)} MiB is available.");
+                $"Release requires at least 4 GiB free on '{root}', but only {available / (1024 * 1024)} MiB is available.");
         }
     }
 
-    private static void StageAgentTemplate(
-        BuildContext context,
-        string publishRoot,
-        string stage,
-        string rid,
-        string version)
+    private static void CopyDirectory(string source, string destination)
     {
-        Directory.CreateDirectory(stage);
-        CopyPublishedOutput(publishRoot, stage, ReleaseLayout.Bootstrap, rid, "viv-agent-update");
-        File.Copy(
-            Path.Combine(context.Root, "build", "assets", "bootstrap.json.sample"),
-            Path.Combine(stage, "bootstrap.json.sample"),
-            overwrite: false);
-        var current = Path.Combine(stage, "agent", "current");
-        Directory.CreateDirectory(current);
-        CopyPublishedOutput(publishRoot, current, ReleaseLayout.Agent, rid, "viv-agent");
-        File.WriteAllText(Path.Combine(stage, "agent", "version"), version + "\n", new UTF8Encoding(false));
-    }
+        if (!Directory.Exists(source))
+        {
+            throw new DirectoryNotFoundException($"Compile output is missing: {source}");
+        }
 
-    private static void CopyPublishedOutput(
-        string publishRoot,
-        string destination,
-        ReleaseComponent component,
-        string rid,
-        string releaseName)
-    {
-        DotNetPublisher.CopyOutput(
-            Path.Combine(publishRoot, component.Id, rid),
-            destination,
-            component,
-            rid,
-            releaseName);
+        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(source, file);
+            var target = Path.Combine(destination, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target, overwrite: false);
+        }
     }
 
     internal static void WriteJson<T>(string path, T value)
@@ -226,7 +182,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
             timeoutSeconds: 30);
     }
 
-    private static async Task SmokeControllerAsync(
+    internal static async Task SmokeControllerAsync(
         string executable,
         string workingDirectory,
         string dataDirectory)
@@ -344,6 +300,9 @@ internal static class ReleaseLayout
     };
 
     public static string ReleaseRoot(BuildContext context) => Path.Combine(context.OutRoot, "release");
+
+    public static string CompileRoot(BuildContext context, string rid) =>
+        Path.Combine(context.OutRoot, "build", rid);
 
     public static void RequireSupportedRid(string rid)
     {

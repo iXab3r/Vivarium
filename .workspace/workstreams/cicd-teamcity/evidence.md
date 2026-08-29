@@ -75,3 +75,18 @@ Do not convert a pending platform or release gate into a passing claim based on 
   candidate assembly, four native release smokes, and a paused GitHub deployment.
 - The TeamCity project was not created and settings were not uploaded. Native agent compatibility and
   credential isolation are activation evidence, not local validation claims.
+
+## Simplified Compile -> Release -> Publish pipeline — 2026-08-29
+
+- The project owner replaced the earlier Verify/gate/release-smoke layout with four platform Compile
+  configurations followed by Release and Publish. The complete test suite runs only in Windows Compile;
+  each platform Compile retains a short native product smoke.
+- Kotlin DSL validation succeeded with JDK 21: one project, six build configurations, one VCS root.
+- Root `dotnet build` succeeded with zero warnings and errors; root `dotnet test` passed 142 tests and
+  skipped 9 platform-specific tests on macOS arm64.
+- Cake `Compile --rid osx-arm64` and `CompileSmoke --rid osx-arm64` succeeded. The native server served
+  packaged static assets, CLI reported version 0.1.0, and agent/updater failed closed as expected.
+- Cake `Release` consumed the four existing `out/build/<rid>` trees without invoking `dotnet publish`,
+  produced and internally verified the deterministic asset set, and the final osx-arm64 ZIPs passed
+  the optional local `ReleaseSmoke`.
+- Server import and a new Windows Compile build remain pending for this simplified configuration.

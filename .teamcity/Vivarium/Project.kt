@@ -4,33 +4,23 @@ import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.Project
 
 object Project : Project({
-    description = "Cross-platform Vivarium verification and guarded release candidate pipeline"
+    description = "Cross-platform Vivarium compile, release, and publish pipeline"
 
     vcsRoot(VivariumVcs)
 
-    buildType(VerifyWindows)
-    buildType(VerifyLinux)
-    buildType(VerifyMacos)
-    buildType(CiGate)
-    buildType(ReleasePackage)
-    buildType(ReleaseSmokeWindows)
-    buildType(ReleaseSmokeLinux)
-    buildType(ReleaseSmokeLinuxArm64)
-    buildType(ReleaseSmokeMacos)
-    buildType(ReleaseGate)
-    buildType(PublishGitHub)
+    buildType(CompileWindowsX64)
+    buildType(CompileLinuxX64)
+    buildType(CompileLinuxArm64)
+    buildType(CompileMacosArm64)
+    buildType(Release)
+    buildType(Publish)
 
     buildTypesOrder = arrayListOf(
-        VerifyWindows,
-        VerifyLinux,
-        VerifyMacos,
-        CiGate,
-        ReleasePackage,
-        ReleaseSmokeWindows,
-        ReleaseSmokeLinux,
-        ReleaseSmokeLinuxArm64,
-        ReleaseSmokeMacos,
-        ReleaseGate,
-        PublishGitHub,
+        CompileWindowsX64,
+        CompileLinuxX64,
+        CompileLinuxArm64,
+        CompileMacosArm64,
+        Release,
+        Publish,
     )
 })

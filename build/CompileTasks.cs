@@ -1,35 +1,85 @@
 using Cake.Frosting;
 
-[TaskName("Publish")]
-[TaskDescription("Publishes runnable local binaries for one supported RID.")]
-public sealed class PublishTask : AsyncFrostingTask<BuildContext>
+[TaskName("Compile")]
+[TaskDescription("Compiles runnable binaries for one supported RID.")]
+public sealed class CompileTask : AsyncFrostingTask<BuildContext>
 {
     public override Task RunAsync(BuildContext context) =>
-        LocalPublisher.PublishAsync(context, context.TargetRid);
+        PlatformCompiler.CompileAsync(context, context.TargetRid);
 }
 
-[TaskName("PublishAll")]
-[TaskDescription("Publishes runnable local binaries for every supported RID.")]
-public sealed class PublishAllTask : AsyncFrostingTask<BuildContext>
+[TaskName("CompileAll")]
+[TaskDescription("Compiles runnable binaries for every supported RID.")]
+public sealed class CompileAllTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
     {
         if (context.RequestedRid is not null)
         {
-            throw new InvalidOperationException("PublishAll does not accept --rid; use Publish for one target.");
+            throw new InvalidOperationException("CompileAll does not accept --rid; use Compile for one target.");
         }
 
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
-            await LocalPublisher.PublishAsync(context, rid);
+            await PlatformCompiler.CompileAsync(context, rid);
         }
     }
 }
 
-internal static class LocalPublisher
+[TaskName("CompileSmoke")]
+[TaskDescription("Runs native controller, CLI, agent, and updater probes from one Compile output.")]
+public sealed class CompileSmokeTask : AsyncFrostingTask<BuildContext>
 {
-    public static async Task PublishAsync(BuildContext context, string rid)
+    public override async Task RunAsync(BuildContext context)
     {
+        var rid = context.TargetRid;
+        if (!string.Equals(rid, context.HostRid, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"CompileSmoke requires the native host RID; requested {rid}, host {context.HostRid}.");
+        }
+
+        var root = ReleaseLayout.CompileRoot(context, rid);
+        if (!Directory.Exists(root))
+        {
+            throw new DirectoryNotFoundException($"Compile output is missing: {root}");
+        }
+
+        var extension = OperatingSystem.IsWindows() ? ".exe" : string.Empty;
+        var serverRoot = Path.Combine(root, "server");
+        await ReleaseSmokeTask.SmokeControllerAsync(
+            Path.Combine(serverRoot, "viv-server" + extension),
+            serverRoot,
+            Path.Combine(context.OutRoot, "compile-smoke", rid, "controller-data"));
+
+        var cliRoot = Path.Combine(root, "cli");
+        await BuildProcess.RunAsync(
+            Path.Combine(cliRoot, "viv-cli" + extension),
+            ["--version"],
+            cliRoot,
+            timeoutSeconds: 30);
+
+        var agentRoot = Path.Combine(root, "agent");
+        await BuildProcess.RunExpectingExitCodeAsync(
+            Path.Combine(agentRoot, "agent", "current", "viv-agent" + extension),
+            [],
+            agentRoot,
+            expectedExitCode: 2,
+            timeoutSeconds: 30);
+        await BuildProcess.RunExpectingExitCodeAsync(
+            Path.Combine(agentRoot, "viv-agent-update" + extension),
+            [],
+            agentRoot,
+            expectedExitCode: 2,
+            timeoutSeconds: 30);
+    }
+}
+
+internal static class PlatformCompiler
+{
+    public static async Task CompileAsync(BuildContext context, string rid)
+    {
+        context.SetTeamCityBuildNumber();
         ReleaseLayout.RequireSupportedRid(rid);
         var target = Path.Combine(context.OutRoot, "build", rid);
         var publishRoot = Path.Combine(context.OutRoot, "build-publish", rid);
@@ -78,7 +128,7 @@ internal static class LocalPublisher
             }
         }
 
-        Console.WriteLine($"Vivarium {rid} local build: {target}");
+        Console.WriteLine($"Vivarium {rid} compile output: {target}");
     }
 
     private static (string Destination, string ReleaseName) LocalDestination(

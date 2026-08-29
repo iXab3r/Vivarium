@@ -6,15 +6,15 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-[TaskName("ReleasePublish")]
+[TaskName("Publish")]
 [TaskDescription("Publishes exact release assets through a verified draft-first GitHub release.")]
-public sealed class ReleasePublishTask : AsyncFrostingTask<BuildContext>
+public sealed class PublishTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
     {
         if (!OperatingSystem.IsLinux() || RuntimeInformation.ProcessArchitecture != Architecture.X64)
         {
-            throw new PlatformNotSupportedException("ReleasePublish runs only on the guarded Linux x64 publisher.");
+            throw new PlatformNotSupportedException("Publish runs only on the guarded Linux x64 publisher.");
         }
 
         var version = context.RequireReleaseVersion();
@@ -23,7 +23,7 @@ public sealed class ReleasePublishTask : AsyncFrostingTask<BuildContext>
         var token = Environment.GetEnvironmentVariable("GH_TOKEN");
         if (string.IsNullOrWhiteSpace(token) || token.Contains('%', StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("ReleasePublish requires a resolved publish-only GH_TOKEN environment secret.");
+            throw new InvalidOperationException("Publish requires a resolved publish-only GH_TOKEN environment secret.");
         }
 
         ReleaseVerifier.Verify(context, version, sourceSha);

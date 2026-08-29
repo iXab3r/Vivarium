@@ -114,7 +114,7 @@ public sealed class BuildContext : FrostingContext
                 System.Text.RegularExpressions.RegexOptions.CultureInvariant))
         {
             throw new InvalidOperationException(
-                "ReleasePublish requires --github-repository <owner/repository>.");
+                "Publish requires --github-repository <owner/repository>.");
         }
 
         return GitHubRepository;
