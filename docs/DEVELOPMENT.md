@@ -7,9 +7,8 @@ the practical companion.
 ## Building
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline (AGENTS.md →
-Verification). `global.json` fixes the .NET 10.0.3xx feature band while allowing servicing-patch
-roll-forward. Committed NuGet lock files and `toolchains.lock.json` pin packages, Cake.Frosting,
-cargo-nextest, and GitHub CLI bytes used by CI/CD.
+Verification). `global.json`, committed NuGet lock files, and `toolchains.lock.json` pin the SDK,
+packages, Cake.Frosting, cargo-nextest, and GitHub CLI bytes used by CI/CD.
 
 The provider-neutral build entry point is the Cake.Frosting application under `build/`:
 
