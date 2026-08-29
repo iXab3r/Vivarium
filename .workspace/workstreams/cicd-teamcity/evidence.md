@@ -89,4 +89,6 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - Cake `Release` consumed the four existing `out/build/<rid>` trees without invoking `dotnet publish`,
   produced and internally verified the deterministic asset set, and the final osx-arm64 ZIPs passed
   the optional local `ReleaseSmoke`.
-- Server import and a new Windows Compile build remain pending for this simplified configuration.
+- TeamCity imported exactly the six simplified configurations. Windows Compile build `30845`
+  (`0.1.0.6-5205f60f`) succeeded on `laptop-g15`: 150 passed, 1 ignored, win-x64 compilation and
+  native product smoke succeeded, and TeamCity published 22 Compile files plus the TRX artifact.

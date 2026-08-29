@@ -1,6 +1,6 @@
 # TeamCity CI/CD handover
 
-Status: active; TeamCity project exists, Windows evidence is green, simplified pipeline import pending.
+Status: active; simplified TeamCity pipeline imported, Windows Compile evidence green.
 
 ## Current contract
 
@@ -23,7 +23,8 @@ GitHub Actions remains explicitly disabled by the project owner.
 
 ## Evidence and blockers
 
-- TeamCity Windows build `30843` succeeded on `laptop-g15` with SDK 10.0.303: 152 passed, 2 ignored.
+- TeamCity Windows Compile build `30845` succeeded on `laptop-g15` with SDK 10.0.303: 150 passed,
+  1 ignored, native product smoke green, 22 Compile files plus TRX published.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
 - No compatible Linux x64, Linux arm64, or macOS arm64 TeamCity agent is currently available.
@@ -33,9 +34,7 @@ GitHub Actions remains explicitly disabled by the project owner.
 
 ## Next steps
 
-1. Validate and import the simplified Kotlin DSL.
-2. Run `Compile / Windows x64` and record the new build ID plus TRX/native-smoke evidence.
-3. Add or rotate compatible SDK 10.0.303 agents for the other three RIDs and run their Compile builds.
-4. Run `Release` from a protected SemVer tag and verify it reuses exact Compile artifacts.
-5. Configure the publish-only GitHub secret, then explicitly unpause and exercise `Publish` only after
+1. Add or rotate compatible SDK 10.0.303 agents for the other three RIDs and run their Compile builds.
+2. Run `Release` from a protected SemVer tag and verify it reuses exact Compile artifacts.
+3. Configure the publish-only GitHub secret, then explicitly unpause and exercise `Publish` only after
    the release activation gates are closed.
