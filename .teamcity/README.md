@@ -21,10 +21,10 @@ status is proven on all three operating systems.
 
 Agent activation requirements:
 
-- Windows x64 with the exact SDK from `global.json`;
-- Linux x64 with that SDK, Cargo, and at least 4 GiB free for self-contained publishes;
-- macOS arm64 with that SDK;
-- Linux arm64 with that SDK before the stable `Release gate` can complete.
+- Windows x64 with an SDK from the feature band selected by `global.json`;
+- Linux x64 with that SDK feature band, Cargo, and at least 4 GiB free for self-contained publishes;
+- macOS arm64 with that SDK feature band;
+- Linux arm64 with that SDK feature band before the stable `Release gate` can complete.
 
 The current three-agent license has no macOS agent and no Linux arm64 agent. Capacity must therefore be
 rotated or the license/capacity changed before stable release activation. `Release / Assemble candidate`
