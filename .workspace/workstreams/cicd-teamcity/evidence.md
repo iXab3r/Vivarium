@@ -150,3 +150,7 @@ Do not convert a pending platform or release gate into a passing claim based on 
   timeout in 1.05 seconds.
 - Root `dotnet build` succeeded with zero warnings and errors. Root `dotnet test` passed 143 tests and
   skipped 9 platform-specific tests.
+- TeamCity Windows Compile build `30848` succeeded from revision
+  `1cceb7364739ce74d6a9a85d3a7253da3fe7508b` with build number `0.1.0.9-1cceb736`: 151 tests passed,
+  1 was ignored, and the native product smoke passed. The published `win-x64` artifact contains only
+  `agent/`, `cli/`, and `server/`; the removed `build-info.json` is absent.

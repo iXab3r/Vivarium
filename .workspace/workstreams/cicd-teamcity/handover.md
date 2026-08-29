@@ -24,9 +24,9 @@ producing Compile build. GitHub Actions remains explicitly disabled by the proje
 
 ## Evidence and blockers
 
-- TeamCity Windows Compile build `30847` (`0.1.0.8-a09f9fcc`) succeeded on `laptop-g15` at revision
-  `a09f9fc`: 151 passed, 1 ignored, and the isolated native product smoke returned `viv-cli 0.1.0`.
-  That build predates removal of the final bookkeeping identity file.
+- TeamCity Windows Compile build `30848` (`0.1.0.9-1cceb736`) succeeded at revision `1cceb73`: 151
+  tests passed, 1 was ignored, and the native product smoke passed. Its `win-x64` artifact contains
+  only `agent/`, `cli/`, and `server/`, confirming that the final bookkeeping identity file is gone.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
 - The prerelease matrix passed for all four RIDs. Root tests pass 143 with 9 platform skips, and the
