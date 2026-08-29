@@ -33,7 +33,8 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.0");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-counter 123");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.123");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }

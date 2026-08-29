@@ -9,8 +9,6 @@ object VivariumVcs : GitVcsRoot({
     url = "https://github.com/iXab3r/Vivarium.git"
     branch = "refs/heads/main"
     branchSpec = """
-        +:refs/heads/main
-        +:refs/heads/(feature/*)
-        +:refs/tags/(v*)
+        +:refs/heads/(*)
     """.trimIndent()
 })

@@ -58,7 +58,9 @@ cli/viv-cli[.exe]
 Cross-publishing does not execute foreign binaries. `Test` always runs for the native host and rejects
 an explicit non-host RID; target-native execution evidence must be collected on that target OS and
 architecture. Compile stamps the selected product version into the binaries and the agent's runtime
-version marker; it defaults to `VersionPrefix` and accepts `--build-version <SemVer>` for a release build.
+version marker. `VivariumVersionBase` owns the human-selected `major.minor`; local builds default to
+`major.minor.0`, `--build-counter <number>` produces `major.minor.number`, and
+`--build-version <SemVer>` reproduces an exact version.
 
 The Compile targets produce the matrix of self-contained single-file builds. The four shipped
 executable projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained
@@ -123,16 +125,16 @@ in the current binaries, and the bootstrap freeze gate remains pending (§7/D21)
 
 ## Releases (D19)
 
-The Cake release candidate workflow consumes previously compiled trees and accepts a
-`vX.Y.Z`/SemVer identity:
+The Cake release candidate workflow consumes previously compiled trees. The same counter or exact
+version must be supplied to Compile and Release:
 
 ```text
 dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll \
-  --build-version 0.1.0
+  --build-counter 123
 dotnet run --project build/Vivarium.Build.csproj -- --target Release \
-  --build-version 0.1.0
+  --build-version 0.1.123
 dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
-  --rid <native-rid> --build-version 0.1.0
+  --rid <native-rid> --build-version 0.1.123
 ```
 
 It performs the following work:
@@ -159,21 +161,22 @@ Each controller ZIP contains its static web assets and settings beside the singl
 plus the exact four public `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
-The versioned TeamCity chain is `Compile / <RID> -> Release -> Publish`. Release has snapshot and
-artifact dependencies on all four Compile configurations and only packages their exact outputs.
-For protected `v*` tags, Compile derives the product SemVer from the tag before publishing binaries;
-the snapshot chain keeps all four outputs on the same source revision. Publish has an artifact dependency
-on Release and only uploads that ready candidate to GitHub. GitHub
+The versioned TeamCity chain is `Build Number -> Compile / <RID> -> Release -> Publish`. One shared
+Build Number dependency supplies the patch component to all four fresh Compile builds in a Release
+chain, so every operating system receives the same `major.minor.build` code version. Release has
+snapshot and artifact dependencies on all four Compile configurations and only packages those exact
+outputs. Publish inherits the exact Release version, has an artifact dependency on Release, and only
+uploads that ready candidate to GitHub. GitHub
 publication is committed paused and has no trigger. Its Cake target resolves a checksum-pinned GitHub
-CLI, requires immutable releases to be enabled, proves the protected tag resolves to the TeamCity
-source SHA, creates or safely resumes a compatible draft, verifies GitHub's remote `sha256:` asset
-digests, and publishes last. An already-published exact immutable release is an idempotent success;
-mismatched or extra assets are never clobbered.
+CLI, requires immutable releases to be enabled, creates `v<version>` at the TeamCity source SHA when
+needed, or verifies an existing tag points there, then creates or safely resumes a compatible draft,
+verifies GitHub's remote `sha256:` asset digests, and publishes last. An already-published exact
+immutable release is an idempotent success; mismatched or extra assets are never clobbered.
 
 There is still no public end-user release. Stable activation is blocked until native evidence exists for
 all four RIDs (especially Linux arm64), a macOS TeamCity agent exists, the controller's system-Git
-prerequisite from the desired-configuration work is proven on every controller RID, protected tags and
-the publish-only TeamCity secret are configured, and the paused deployment passes draft-resume failure
+prerequisite from the desired-configuration work is proven on every controller RID, the publish-only
+TeamCity secret is configured, and the paused deployment passes draft-resume failure
 tests. GitHub Actions is intentionally disabled by project-owner decision; GitHub publication remains a
 paused TeamCity deployment and must not be used to bypass these release gates. The portable target keeps
 state in an explicit data/install directory so uninstall is removal of that directory; `viv-cli login`

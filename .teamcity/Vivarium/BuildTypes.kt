@@ -7,6 +7,8 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 private const val DotNet10Parameter = "DotNetCoreSDK10.0_Path"
+private const val BuildCounterParameter = "VivariumBuildCounter"
+private const val BuildVersionParameter = "VivariumBuildVersion"
 
 private fun BuildType.commonVcs() {
     vcs {
@@ -40,10 +42,18 @@ private fun BuildType.requireDotNet() {
     }
 }
 
-private fun cakeArguments(target: String, extra: String = "") =
+private fun cakeArguments(target: String, versionArguments: String, extra: String = "") =
     "run --project build/Vivarium.Build.csproj -- --target $target " +
-        "--source-sha %build.vcs.number% --source-ref %teamcity.build.branch% " +
-        "--build-counter %build.counter%$extra"
+        "--source-sha %build.vcs.number% $versionArguments$extra"
+
+object BuildNumber : BuildType({
+    id("Vivarium_BuildNumber")
+    name = "Build Number"
+    maxRunningBuilds = 1
+    vcs {
+        checkoutMode = CheckoutMode.MANUAL
+    }
+})
 
 private fun compileBuild(
     buildId: String,
@@ -56,6 +66,10 @@ private fun compileBuild(
 ) = BuildType({
     id(buildId)
     name = displayName
+    buildNumberPattern = "${BuildNumber.depParamRefs.buildNumber}"
+    params {
+        param(BuildCounterParameter, "${BuildNumber.depParamRefs.buildNumber}")
+    }
     artifactRules = if (runTests) {
         """
             out/build/$rid/** => $rid
@@ -70,18 +84,18 @@ private fun compileBuild(
             exec {
                 name = "Build and test"
                 path = "dotnet"
-                arguments = cakeArguments("CI")
+                arguments = cakeArguments("CI", "--build-counter %$BuildCounterParameter%")
             }
         }
         exec {
             name = "Compile $rid"
             path = "dotnet"
-            arguments = cakeArguments("Compile", " --rid $rid")
+            arguments = cakeArguments("Compile", "--build-counter %$BuildCounterParameter%", " --rid $rid")
         }
         exec {
             name = "Native product smoke"
             path = "dotnet"
-            arguments = cakeArguments("CompileSmoke", " --rid $rid")
+            arguments = cakeArguments("CompileSmoke", "--build-counter %$BuildCounterParameter%", " --rid $rid")
         }
     }
     if (runTests) importTrx()
@@ -93,6 +107,12 @@ private fun compileBuild(
         }
     }
     requireOs(osName, architecture)
+    dependencies {
+        snapshot(BuildNumber) {
+            reuseBuilds = ReuseBuilds.NO
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+    }
 })
 
 val CompileWindowsX64 = compileBuild(
@@ -128,14 +148,18 @@ val CompileMacosArm64 = compileBuild(
 object Release : BuildType({
     id("Vivarium_Release")
     name = "Release"
+    buildNumberPattern = "${CompileWindowsX64.depParamRefs.buildNumber}"
     maxRunningBuilds = 1
     artifactRules = "out/release/** => release"
     commonVcs()
+    params {
+        param(BuildVersionParameter, "${CompileWindowsX64.depParamRefs.buildNumber}")
+    }
     steps {
         exec {
             name = "Package and native-smoke Compile artifacts"
             path = "dotnet"
-            arguments = cakeArguments("Release")
+            arguments = cakeArguments("Release", "--build-version %$BuildVersionParameter%")
         }
     }
     requireDotNet()
@@ -148,7 +172,7 @@ object Release : BuildType({
         )) {
             dependency(compile) {
                 snapshot {
-                    reuseBuilds = ReuseBuilds.SUCCESSFUL
+                    reuseBuilds = ReuseBuilds.NO
                     onDependencyFailure = FailureAction.FAIL_TO_START
                 }
                 artifacts {
@@ -163,11 +187,13 @@ object Release : BuildType({
 object Publish : BuildType({
     id("Vivarium_Publish")
     name = "Publish"
+    buildNumberPattern = "${Release.depParamRefs.buildNumber}"
     type = BuildTypeSettings.Type.DEPLOYMENT
     paused = true
     maxRunningBuilds = 1
     commonVcs()
     params {
+        param(BuildVersionParameter, "${Release.depParamRefs.buildNumber}")
         param("env.GH_TOKEN", "%github.release.token%")
     }
     steps {
@@ -176,6 +202,7 @@ object Publish : BuildType({
             path = "dotnet"
             arguments = cakeArguments(
                 "Publish",
+                "--build-version %$BuildVersionParameter%",
                 " --github-repository iXab3r/Vivarium")
         }
     }

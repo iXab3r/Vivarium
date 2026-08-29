@@ -154,3 +154,20 @@ Do not convert a pending platform or release gate into a passing claim based on 
   `1cceb7364739ce74d6a9a85d3a7253da3fe7508b` with build number `0.1.0.9-1cceb736`: 151 tests passed,
   1 was ignored, and the native product smoke passed. The published `win-x64` artifact contains only
   `agent/`, `cli/`, and `server/`; the removed `build-info.json` is absent.
+
+## Shared code version — 2026-08-30
+
+- `VivariumVersionBase` now owns human-selected `major.minor`; the default local product version is
+  `0.1.0`, and the TeamCity counter supplies only the patch component.
+- Kotlin DSL validation on JDK 21 succeeded with one project, seven build configurations, and one VCS
+  root. The generated configuration resolves the same `Build Number` dependency into every Compile
+  build; Release forces all four Compile dependencies to start fresh and inherits their exact version.
+- A sequential four-RID `CompileAll --build-counter 4242` emitted TeamCity build number `0.1.4242` and
+  passed `-p:Version=0.1.4242` to all 16 publishes. All 16 final executables contain informational
+  version `0.1.4242+78a18c7f6f6a61b276c42fea1a46ae2d6cc6d0ce`, and every `agent/version` is
+  `0.1.4242`.
+- `Release --build-version 0.1.4242` produced exactly twelve valid ZIPs. Each server ZIP embeds all
+  four agent packages, and the native final-ZIP smoke returned `viv-cli 0.1.4242` with the expected
+  controller, agent, and updater behavior.
+- Root `dotnet build` succeeded without warnings or errors. Root `dotnet test` passed 143 tests and
+  skipped 9 platform-specific tests.

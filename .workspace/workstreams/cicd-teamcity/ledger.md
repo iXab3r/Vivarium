@@ -16,7 +16,7 @@
 | release-contract:d29-git | bundle or verify system Git on every controller RID | release | Platform, Security, Docs | activation gate | accepted D29 commit and per-RID evidence before stable release |
 | release-contract:github | draft-first immutable/idempotent publication | publication | Security | implemented paused; activation evidence pending | negative API tests, draft resume, remote digest verification |
 | teamcity:trusted-source | default-branch DSL and trusted PR policy | TeamCity | Security, Git/Versioning | implemented; server evidence pending | fork PR cannot alter settings or receive credentials |
-| teamcity:pipeline-shape | four Compile configurations -> Release -> Publish | TeamCity | TeamCity Expert, Test Steward | six simplified configurations imported | six visible configurations; Release contains no compile/test step; Publish contains no packaging step |
+| teamcity:pipeline-shape | shared Build Number -> four Compile configurations -> Release -> Publish | TeamCity | TeamCity Expert, Test Steward | seven simplified configurations; server import pending | one counter and one source revision stamp the same version into every RID; Release contains no compile/test step; Publish contains no packaging step |
 | teamcity:test-reporting | import deterministic TRX from Windows Compile | TeamCity | Test Steward | simplified Windows server evidence green | passing/failing/cancelled results visible without running the full suite per RID |
 | cutover:github-actions | remove automatic GitHub Actions workflow | cutover | Reconciliation Lead, Docs | closed by owner decision | remote `ci` workflow `343961597` is `disabled_manually`, YAML removed; automatic CI gap documented pending TeamCity activation |
 

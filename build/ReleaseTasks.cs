@@ -9,7 +9,7 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
     {
-        var version = context.RequireReleaseVersion();
+        var version = context.ProductVersion;
         context.SetTeamCityBuildNumber();
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
         var stagingRoot = Path.Combine(context.OutRoot, "release-staging");
@@ -100,7 +100,7 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
     {
-        var version = context.RequireReleaseVersion();
+        var version = context.ProductVersion;
         var rid = context.RequestedRid
             ?? throw new InvalidOperationException("ReleaseSmoke requires --rid <native-rid>.");
         if (!string.Equals(rid, context.HostRid, StringComparison.Ordinal))

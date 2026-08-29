@@ -12,7 +12,6 @@ public sealed class BuildContext : FrostingContext
         BuildConfiguration = context.Arguments.GetArgument("configuration") ?? "Release";
         RequestedRid = context.Arguments.GetArgument("rid")?.Trim().ToLowerInvariant();
         SourceSha = context.Arguments.GetArgument("source-sha")?.Trim().ToLowerInvariant();
-        SourceRef = context.Arguments.GetArgument("source-ref")?.Trim();
         BuildCounter = context.Arguments.GetArgument("build-counter")?.Trim();
         VersionOverride = NormalizeVersion(context.Arguments.GetArgument("build-version"));
         GitHubRepository = context.Arguments.GetArgument("github-repository")?.Trim();
@@ -27,8 +26,6 @@ public sealed class BuildContext : FrostingContext
     public string? RequestedRid { get; }
 
     public string? SourceSha { get; }
-
-    public string? SourceRef { get; }
 
     public string? BuildCounter { get; }
 
@@ -49,8 +46,17 @@ public sealed class BuildContext : FrostingContext
                 return RequireSemanticVersion(VersionOverride, "--build-version must be SemVer.");
             }
 
-            var tagVersion = VersionFromSourceRef(SourceRef);
-            return tagVersion ?? ReadVersionPrefix();
+            if (string.IsNullOrWhiteSpace(BuildCounter))
+            {
+                return ReadVersionBase() + ".0";
+            }
+
+            if (!BuildCounter.All(char.IsAsciiDigit))
+            {
+                throw new InvalidOperationException("--build-counter must contain only decimal digits.");
+            }
+
+            return ReadVersionBase() + "." + BuildCounter;
         }
     }
 
@@ -85,25 +91,7 @@ public sealed class BuildContext : FrostingContext
 
     public string BuildNumber()
     {
-        var prefix = ProductVersion;
-        if (string.IsNullOrWhiteSpace(BuildCounter) || string.IsNullOrWhiteSpace(SourceSha))
-        {
-            return prefix + "-local";
-        }
-
-        return $"{prefix}.{BuildCounter}-{SourceSha[..Math.Min(8, SourceSha.Length)]}";
-    }
-
-    public string RequireReleaseVersion()
-    {
-        var version = VersionOverride ?? VersionFromSourceRef(SourceRef);
-        if (version is null)
-        {
-            throw new InvalidOperationException(
-                "Release targets require --build-version <SemVer> or a v<SemVer> source ref.");
-        }
-
-        return RequireSemanticVersion(version, "Release version must be SemVer.");
+        return ProductVersion;
     }
 
     public string RequireSourceSha()
@@ -142,19 +130,28 @@ public sealed class BuildContext : FrostingContext
         Console.WriteLine($"##teamcity[buildNumber '{EscapeTeamCity(BuildNumber())}']");
     }
 
-    private string ReadVersionPrefix()
+    private string ReadVersionBase()
     {
         var props = File.ReadAllText(Path.Combine(Root, "Directory.Build.props"));
-        const string start = "<VersionPrefix>";
-        const string end = "</VersionPrefix>";
+        const string start = "<VivariumVersionBase>";
+        const string end = "</VivariumVersionBase>";
         var startIndex = props.IndexOf(start, StringComparison.Ordinal);
         var endIndex = props.IndexOf(end, StringComparison.Ordinal);
         if (startIndex < 0 || endIndex <= startIndex)
         {
-            throw new InvalidDataException("Directory.Build.props does not contain VersionPrefix.");
+            throw new InvalidDataException("Directory.Build.props does not contain VivariumVersionBase.");
         }
 
-        return props[(startIndex + start.Length)..endIndex].Trim();
+        var versionBase = props[(startIndex + start.Length)..endIndex].Trim();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(
+                versionBase,
+                @"^[0-9]+\.[0-9]+$",
+                System.Text.RegularExpressions.RegexOptions.CultureInvariant))
+        {
+            throw new InvalidDataException("VivariumVersionBase must contain exactly major.minor.");
+        }
+
+        return versionBase;
     }
 
     private static string EscapeTeamCity(string value) => value
@@ -210,18 +207,6 @@ public sealed class BuildContext : FrostingContext
             normalized = normalized[1..];
         }
         return normalized;
-    }
-
-    private static string? VersionFromSourceRef(string? sourceRef)
-    {
-        if (string.IsNullOrWhiteSpace(sourceRef) ||
-            !(sourceRef.StartsWith("refs/tags/", StringComparison.Ordinal) || sourceRef.StartsWith('v')))
-        {
-            return null;
-        }
-
-        var normalized = NormalizeVersion(sourceRef);
-        return normalized is not null && IsSemanticVersion(normalized) ? normalized : null;
     }
 
     private static string RequireSemanticVersion(string version, string error)

@@ -4,7 +4,8 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VivariumVersionBase>0.1</VivariumVersionBase>
+    <VersionPrefix>$(VivariumVersionBase).0</VersionPrefix>
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 </Project>

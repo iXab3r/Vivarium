@@ -17,7 +17,7 @@ public sealed class PublishTask : AsyncFrostingTask<BuildContext>
             throw new PlatformNotSupportedException("Publish runs only on the guarded Linux x64 publisher.");
         }
 
-        var version = context.RequireReleaseVersion();
+        var version = context.ProductVersion;
         var sourceSha = context.RequireSourceSha();
         var repository = context.RequireGitHubRepository();
         context.SetTeamCityBuildNumber();
@@ -75,14 +75,19 @@ internal sealed class GitHubReleasePublisher
     public async Task PublishAsync()
     {
         await VerifyImmutableReleasePolicyAsync();
-        await VerifyTagCommitAsync();
+        var tagExists = await VerifyTagIfPresentAsync();
         var expected = ExpectedAssets();
         var release = await GetReleaseAsync();
         if (release is null)
         {
-            await CreateDraftAsync();
+            await CreateDraftAsync(tagExists);
+            await VerifyTagIfPresentAsync(requireTag: true);
             release = await GetReleaseAsync()
                 ?? throw new InvalidOperationException("GitHub did not return the draft immediately after creation.");
+        }
+        else if (!tagExists)
+        {
+            throw new InvalidOperationException($"GitHub release {tag} exists, but its tag does not.");
         }
 
         if (!release.Draft)
@@ -138,10 +143,19 @@ internal sealed class GitHubReleasePublisher
         }
     }
 
-    private async Task VerifyTagCommitAsync()
+    private async Task<bool> VerifyTagIfPresentAsync(bool requireTag = false)
     {
         var result = await RunResultAsync(["api", $"repos/{repository}/commits/{tag}"]);
-        EnsureSuccess(result, $"Could not resolve protected tag {tag}");
+        if (result.ExitCode != 0)
+        {
+            if (!requireTag && result.StandardError.Contains("HTTP 404", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            throw new InvalidOperationException($"Could not resolve tag {tag}. " + SafeError(result));
+        }
+
         using var document = JsonDocument.Parse(result.StandardOutput);
         var actual = document.RootElement.GetProperty("sha").GetString();
         if (!string.Equals(actual, sourceSha, StringComparison.OrdinalIgnoreCase))
@@ -149,6 +163,8 @@ internal sealed class GitHubReleasePublisher
             throw new InvalidOperationException(
                 $"Tag {tag} resolves to {actual}, but the release artifact source is {sourceSha}.");
         }
+
+        return true;
     }
 
     private async Task<RemoteRelease?> GetReleaseAsync()
@@ -168,17 +184,24 @@ internal sealed class GitHubReleasePublisher
         return release;
     }
 
-    private async Task CreateDraftAsync()
+    private async Task CreateDraftAsync(bool tagExists)
     {
         var arguments = new List<string>
         {
             "release", "create", tag,
             "--repo", repository,
             "--draft",
-            "--verify-tag",
             "--title", $"Vivarium {version}",
             "--generate-notes",
         };
+        if (tagExists)
+        {
+            arguments.Add("--verify-tag");
+        }
+        else
+        {
+            arguments.AddRange(["--target", sourceSha]);
+        }
         if (version.Contains('-', StringComparison.Ordinal)) arguments.Add("--prerelease");
         await RunAsync(arguments, timeoutSeconds: 120);
     }

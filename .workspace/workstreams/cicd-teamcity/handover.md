@@ -9,18 +9,20 @@ produce runnable local trees. `Release` packages the exact TeamCity snapshot art
 host-native final-ZIP smoke. `Publish` only uploads the ready Release artifact to GitHub. All Cake build,
 test, and publish subprocesses use one MSBuild worker.
 
-The versioned TeamCity project contains exactly six configurations:
+The versioned TeamCity project contains seven configurations:
 
-1. `Compile / Windows x64` — full solution build and test once, win-x64 compilation, native smoke;
-2. `Compile / Linux x64` — linux-x64 compilation and native smoke;
-3. `Compile / Linux arm64` — linux-arm64 compilation and native smoke;
-4. `Compile / macOS arm64` — osx-arm64 compilation and native smoke;
-5. `Release` — artifact-only deterministic packaging plus one host-native final-ZIP smoke;
-6. `Publish` — paused GitHub deployment consuming only the Release artifact.
+1. `Build Number` — zero-step shared counter for one fresh cross-platform chain;
+2. `Compile / Windows x64` — full solution build and test once, win-x64 compilation, native smoke;
+3. `Compile / Linux x64` — linux-x64 compilation and native smoke;
+4. `Compile / Linux arm64` — linux-arm64 compilation and native smoke;
+5. `Compile / macOS arm64` — osx-arm64 compilation and native smoke;
+6. `Release` — artifact-only deterministic packaging plus one host-native final-ZIP smoke;
+7. `Publish` — paused GitHub deployment consuming only the Release artifact.
 
 There are no TeamCity Verify, composite gate, or standalone release-smoke configurations. Release does
 not produce bookkeeping manifests or checksum inventories; platform execution is internal to the
-producing Compile build. GitHub Actions remains explicitly disabled by the project owner.
+producing Compile build. Release forces a fresh four-platform chain so all four builds share one counter
+and exact `major.minor.build` code version. GitHub Actions remains explicitly disabled by the project owner.
 
 ## Evidence and blockers
 
@@ -34,17 +36,17 @@ producing Compile build. GitHub Actions remains explicitly disabled by the proje
 - The final simplification removed Compile/release/package manifests, checksum inventories, duplicate
   archive verification, duplicate agent/CLI staging copies, and global NuGet locked mode. Deterministic
   packaging, final native smoke, prior D3 diagnostics, and guarded Publish behavior remain.
-- A simulated TeamCity tag build proved that `v0.2.0` produces build number
-  `0.2.0.99-dddddddd` and `viv-cli 0.2.0`. Sequential four-RID Compile and the exact twelve-ZIP Release
-  both passed locally; root tests remain green at 143 passed and 9 platform skips.
+- A sequential local matrix using shared counter `4242` stamped `0.1.4242` into all 16 final
+  executables for the four RIDs; their informational versions also carry the same source SHA. Release
+  produced exactly twelve valid ZIPs and the native final-ZIP smoke returned `viv-cli 0.1.4242`.
 - No compatible Linux x64, Linux arm64, or macOS arm64 TeamCity agent is currently available.
 - D29 still requires the controller Git prerequisite to be proven on every controller RID.
-- GitHub publication stays paused until protected tags, immutable releases, and a publish-only secret
+- GitHub publication stays paused until tag-target behavior, immutable releases, and a publish-only secret
   are configured and exercised without creating a public end-user release.
 
 ## Next steps
 
 1. Add or rotate compatible SDK 10.0.303 agents for the other three RIDs and run their Compile builds.
-2. Run `Release` from a protected SemVer tag and verify it reuses exact Compile artifacts.
+2. Run a fresh `Release` chain and verify all four Compile builds and final binaries use one version.
 3. Configure the publish-only GitHub secret, then explicitly unpause and exercise `Publish` only after
    the release activation gates are closed.
