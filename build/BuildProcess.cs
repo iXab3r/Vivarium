@@ -44,7 +44,7 @@ internal static class BuildProcess
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {
-            TryKill(process);
+            await KillAndDrainAsync(process, stdout, stderr);
             throw new TimeoutException($"{fileName} exceeded the {timeoutSeconds}-second timeout.");
         }
 
@@ -84,7 +84,7 @@ internal static class BuildProcess
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {
-            TryKill(process);
+            await KillAndDrainAsync(process, stdout, stderr);
             throw new TimeoutException($"{fileName} exceeded the {timeoutSeconds}-second timeout.");
         }
 
@@ -130,7 +130,7 @@ internal static class BuildProcess
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {
-            TryKill(process);
+            await KillAndDrainAsync(process, stdout, stderr);
             throw new TimeoutException($"{fileName} exceeded the {timeoutSeconds}-second timeout.");
         }
 
@@ -165,7 +165,7 @@ internal static class BuildProcess
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {
-            TryKill(process);
+            await KillAndDrainAsync(process, stdout, stderr);
             throw new TimeoutException($"{fileName} exceeded the {timeoutSeconds}-second timeout.");
         }
         await Task.WhenAll(stdout, stderr);
@@ -205,6 +205,13 @@ internal static class BuildProcess
         {
             // The process won the race and already exited.
         }
+    }
+
+    private static async Task KillAndDrainAsync(Process process, params Task[] outputTasks)
+    {
+        TryKill(process);
+        await process.WaitForExitAsync();
+        await Task.WhenAll(outputTasks);
     }
 }
 

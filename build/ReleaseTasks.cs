@@ -1,9 +1,7 @@
 using Cake.Frosting;
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 
 [TaskName("Release")]
 [TaskDescription("Packages platform Compile outputs into the deterministic D19 release asset set.")]
@@ -12,19 +10,14 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
     public override async Task RunAsync(BuildContext context)
     {
         var version = context.RequireReleaseVersion();
-        var sourceSha = context.RequireSourceSha();
-        foreach (var rid in ReleaseLayout.SupportedRids)
-        {
-            CompileBuildInfoFile.Verify(context, rid, version, sourceSha);
-        }
-
+        context.SetTeamCityBuildNumber();
         var releaseRoot = ReleaseLayout.ReleaseRoot(context);
         var stagingRoot = Path.Combine(context.OutRoot, "release-staging");
         BuildDirectory.Recreate(releaseRoot);
         BuildDirectory.Recreate(stagingRoot);
         EnsureFreeSpace(context.OutRoot);
 
-        var assets = new List<ReleaseAsset>();
+        var agentPackageNames = new List<string>();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
             var compileRoot = ReleaseLayout.CompileRoot(context, rid);
@@ -33,7 +26,7 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
                 Path.Combine(compileRoot, "agent"),
                 Path.Combine(releaseRoot, name),
                 rid);
-            assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "agent-template", rid));
+            agentPackageNames.Add(name);
         }
 
         foreach (var rid in ReleaseLayout.SupportedRids)
@@ -44,10 +37,8 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
                 Path.Combine(compileRoot, "cli"),
                 Path.Combine(releaseRoot, name),
                 rid);
-            assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "cli", rid));
         }
 
-        var agentAssets = assets.Where(asset => asset.Component == "agent-template").ToArray();
         foreach (var rid in ReleaseLayout.SupportedRids)
         {
             var compileRoot = ReleaseLayout.CompileRoot(context, rid);
@@ -55,30 +46,20 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
             CopyDirectory(Path.Combine(compileRoot, "server"), stage);
             var packageDirectory = Path.Combine(stage, "packages", "agents");
             Directory.CreateDirectory(packageDirectory);
-            foreach (var asset in agentAssets.OrderBy(asset => asset.Name, StringComparer.Ordinal))
+            foreach (var packageName in agentPackageNames.OrderBy(name => name, StringComparer.Ordinal))
             {
                 File.Copy(
-                    Path.Combine(releaseRoot, asset.Name),
-                    Path.Combine(packageDirectory, asset.Name),
+                    Path.Combine(releaseRoot, packageName),
+                    Path.Combine(packageDirectory, packageName),
                     overwrite: false);
             }
 
-            WriteJson(
-                Path.Combine(stage, "packages", "manifest.json"),
-                new EmbeddedPackageManifest(1, version, agentAssets));
             var name = $"viv-server-{rid}.zip";
             DeterministicZip.Create(stage, Path.Combine(releaseRoot, name), rid);
-            assets.Add(ReleaseAsset.FromFile(releaseRoot, name, "server", rid));
             Directory.Delete(stage, recursive: true);
         }
 
-        var orderedAssets = assets.OrderBy(asset => asset.Name, StringComparer.Ordinal).ToArray();
-        WriteJson(
-            Path.Combine(releaseRoot, ReleaseLayout.ManifestName),
-            new ReleaseManifest(1, version, sourceSha, orderedAssets));
-        WriteChecksums(releaseRoot, orderedAssets.Select(asset => asset.Name).Append(ReleaseLayout.ManifestName));
         Directory.Delete(stagingRoot, recursive: true);
-        ReleaseVerifier.Verify(context, version, sourceSha);
         await ReleaseSmokeTask.SmokeVerifiedReleaseAsync(context, context.HostRid, version);
     }
 
@@ -111,29 +92,6 @@ public sealed class ReleaseTask : AsyncFrostingTask<BuildContext>
         }
     }
 
-    internal static void WriteJson<T>(string path, T value)
-    {
-        var json = JsonSerializer.Serialize(value, ReleaseLayout.JsonOptions) + "\n";
-        File.WriteAllText(path, json, new UTF8Encoding(false));
-    }
-
-    private static void WriteChecksums(string releaseRoot, IEnumerable<string> names)
-    {
-        var lines = names.OrderBy(name => name, StringComparer.Ordinal)
-            .Select(name => $"{ReleaseAsset.HashFile(Path.Combine(releaseRoot, name))}  {name}");
-        File.WriteAllText(
-            Path.Combine(releaseRoot, ReleaseLayout.ChecksumsName),
-            string.Join("\n", lines) + "\n",
-            new UTF8Encoding(false));
-    }
-}
-
-[TaskName("ReleaseVerify")]
-[TaskDescription("Verifies release manifest, checksums, and ZIP integrity.")]
-public sealed class ReleaseVerifyTask : FrostingTask<BuildContext>
-{
-    public override void Run(BuildContext context) =>
-        ReleaseVerifier.Verify(context, context.RequireReleaseVersion(), context.RequireSourceSha());
 }
 
 [TaskName("ReleaseSmoke")]
@@ -143,7 +101,6 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
     public override async Task RunAsync(BuildContext context)
     {
         var version = context.RequireReleaseVersion();
-        var sourceSha = context.RequireSourceSha();
         var rid = context.RequestedRid
             ?? throw new InvalidOperationException("ReleaseSmoke requires --rid <native-rid>.");
         if (!string.Equals(rid, context.HostRid, StringComparison.Ordinal))
@@ -151,7 +108,6 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
             throw new InvalidOperationException($"ReleaseSmoke requires the native host RID; requested {rid}, host {context.HostRid}.");
         }
 
-        ReleaseVerifier.Verify(context, version, sourceSha);
         await SmokeVerifiedReleaseAsync(context, rid, version);
     }
 
@@ -287,10 +243,6 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
 
 internal static class ReleaseLayout
 {
-    public const string BuildInfoName = "build-info.json";
-    public const string ManifestName = "release-manifest.json";
-    public const string ChecksumsName = "SHA256SUMS";
-
     public static readonly string[] SupportedRids = ["win-x64", "linux-x64", "linux-arm64", "osx-arm64"];
 
     public static readonly ReleaseComponent Controller =
@@ -302,16 +254,21 @@ internal static class ReleaseLayout
     public static readonly ReleaseComponent Cli =
         new("cli", Path.Combine("src", "Vivarium.Cli"), "Vivarium.Cli");
     public static readonly ReleaseComponent[] Components = [Controller, Agent, Bootstrap, Cli];
-    public static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-    };
 
     public static string ReleaseRoot(BuildContext context) => Path.Combine(context.OutRoot, "release");
 
     public static string CompileRoot(BuildContext context, string rid) =>
         Path.Combine(context.OutRoot, "build", rid);
+
+    public static string[] ReleaseAssetNames() => SupportedRids
+        .SelectMany(rid => new[]
+        {
+            $"viv-server-{rid}.zip",
+            $"viv-agent-{rid}.zip",
+            $"viv-cli-{rid}.zip",
+        })
+        .OrderBy(name => name, StringComparer.Ordinal)
+        .ToArray();
 
     public static void RequireSupportedRid(string rid)
     {
@@ -323,61 +280,6 @@ internal static class ReleaseLayout
                 $"Expected one of: {string.Join(", ", SupportedRids)}.");
         }
     }
-}
-
-internal static class ReleaseVerifier
-{
-    public static void Verify(BuildContext context, string expectedVersion, string expectedSourceSha)
-    {
-        var releaseRoot = ReleaseLayout.ReleaseRoot(context);
-        var manifestPath = Path.Combine(releaseRoot, ReleaseLayout.ManifestName);
-        var manifest = JsonSerializer.Deserialize<ReleaseManifest>(
-            File.ReadAllText(manifestPath),
-            ReleaseLayout.JsonOptions) ?? throw new InvalidDataException("Release manifest is empty.");
-        if (manifest.SchemaVersion != 1 || manifest.Version != expectedVersion || manifest.SourceSha != expectedSourceSha)
-        {
-            throw new InvalidDataException("Release manifest identity does not match the requested release.");
-        }
-
-        var expectedNames = ReleaseLayout.SupportedRids
-            .SelectMany(rid => new[]
-            {
-                $"viv-server-{rid}.zip",
-                $"viv-agent-{rid}.zip",
-                $"viv-cli-{rid}.zip",
-            })
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-        var actualNames = manifest.Assets.Select(asset => asset.Name).OrderBy(name => name, StringComparer.Ordinal).ToArray();
-        if (!expectedNames.SequenceEqual(actualNames, StringComparer.Ordinal))
-        {
-            throw new InvalidDataException("Release manifest does not contain the exact D19 asset matrix.");
-        }
-
-        foreach (var asset in manifest.Assets)
-        {
-            var path = Path.Combine(releaseRoot, asset.Name);
-            var info = new FileInfo(path);
-            if (!info.Exists || info.Length != asset.Size ||
-                !string.Equals(ReleaseAsset.HashFile(path), asset.Sha256, StringComparison.Ordinal))
-            {
-                throw new InvalidDataException($"Release asset identity mismatch: {asset.Name}");
-            }
-            DeterministicZip.Verify(path);
-        }
-
-        var checksumPath = Path.Combine(releaseRoot, ReleaseLayout.ChecksumsName);
-        var expectedChecksums = manifest.Assets.Select(asset => asset.Name)
-            .Append(ReleaseLayout.ManifestName)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .Select(name => $"{ReleaseAsset.HashFile(Path.Combine(releaseRoot, name))}  {name}");
-        var expectedText = string.Join("\n", expectedChecksums) + "\n";
-        if (!string.Equals(File.ReadAllText(checksumPath), expectedText, StringComparison.Ordinal))
-        {
-            throw new InvalidDataException("SHA256SUMS does not exactly match the release assets.");
-        }
-    }
-
 }
 
 internal static class DeterministicZip
@@ -404,36 +306,19 @@ internal static class DeterministicZip
         }
     }
 
-    public static void Verify(string path)
-    {
-        using var archive = ZipFile.OpenRead(path);
-        var names = archive.Entries.Select(entry => entry.FullName).ToArray();
-        if (names.Length == 0 || names.Distinct(StringComparer.Ordinal).Count() != names.Length ||
-            !names.SequenceEqual(names.OrderBy(name => name, StringComparer.Ordinal), StringComparer.Ordinal))
-        {
-            throw new InvalidDataException($"ZIP entries are empty, duplicated, or not sorted: {path}");
-        }
-
-        foreach (var entry in archive.Entries)
-        {
-            var timestamp = entry.LastWriteTime;
-            var hasCanonicalTimestamp = timestamp.Year == 1980 && timestamp.Month == 1 && timestamp.Day == 1 &&
-                                        timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0;
-            if (!hasCanonicalTimestamp || entry.FullName.StartsWith("/", StringComparison.Ordinal) ||
-                entry.FullName.Split('/').Any(segment => segment is "" or "." or ".."))
-            {
-                throw new InvalidDataException($"Unsafe or non-deterministic ZIP entry '{entry.FullName}' in {path}.");
-            }
-        }
-    }
-
     public static void Extract(string path, string destination)
     {
-        Verify(path);
         Directory.CreateDirectory(destination);
         using var archive = ZipFile.OpenRead(path);
+        var names = new HashSet<string>(StringComparer.Ordinal);
         foreach (var entry in archive.Entries)
         {
+            if (!names.Add(entry.FullName) || entry.FullName.StartsWith("/", StringComparison.Ordinal) ||
+                entry.FullName.Split('/').Any(segment => segment is "" or "." or ".."))
+            {
+                throw new InvalidDataException($"Unsafe or duplicate ZIP entry '{entry.FullName}' in {path}.");
+            }
+
             var target = Path.GetFullPath(Path.Combine(destination, entry.FullName));
             var prefix = Path.GetFullPath(destination) + Path.DirectorySeparatorChar;
             if (!target.StartsWith(prefix, StringComparison.Ordinal))
@@ -451,22 +336,3 @@ internal static class DeterministicZip
 }
 
 internal sealed record ReleaseComponent(string Id, string Project, string AssemblyName);
-
-internal sealed record ReleaseManifest(int SchemaVersion, string Version, string SourceSha, ReleaseAsset[] Assets);
-
-internal sealed record EmbeddedPackageManifest(int SchemaVersion, string Version, ReleaseAsset[] Packages);
-
-internal sealed record ReleaseAsset(string Name, string Component, string Rid, long Size, string Sha256)
-{
-    public static ReleaseAsset FromFile(string root, string name, string component, string rid)
-    {
-        var path = Path.Combine(root, name);
-        return new ReleaseAsset(name, component, rid, new FileInfo(path).Length, HashFile(path));
-    }
-
-    public static string HashFile(string path)
-    {
-        using var stream = File.OpenRead(path);
-        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
-    }
-}

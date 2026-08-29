@@ -173,7 +173,7 @@ contracts. The checklist below records the remaining acceptance scope; it does n
 - Panel Downloads page (portable agent/CLI zips from the controller's bundled store), `viv-agent
   enroll`, and the `viv-cli agent push` dev flow (D19).
 - Tagged releases published from guarded TeamCity deployment to GitHub Releases: self-contained per-RID
-  zips + SHA256SUMS (D19, DEVELOPMENT.md).
+  zips (D19, DEVELOPMENT.md).
 
 Deliberately deferred out of Phase 1 (recorded in D14/D18, not abandoned): parameter axes, `exclude`,
 scenario lists, `repeat`/pass-rate cells, live service messages, `clean: reboot` (drags in autologon

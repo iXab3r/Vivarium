@@ -20,13 +20,13 @@ public sealed class PublishTask : AsyncFrostingTask<BuildContext>
         var version = context.RequireReleaseVersion();
         var sourceSha = context.RequireSourceSha();
         var repository = context.RequireGitHubRepository();
+        context.SetTeamCityBuildNumber();
         var token = Environment.GetEnvironmentVariable("GH_TOKEN");
         if (string.IsNullOrWhiteSpace(token) || token.Contains('%', StringComparison.Ordinal))
         {
             throw new InvalidOperationException("Publish requires a resolved publish-only GH_TOKEN environment secret.");
         }
 
-        ReleaseVerifier.Verify(context, version, sourceSha);
         var gh = await GitHubCli.ResolveAsync(context);
         var publisher = new GitHubReleasePublisher(context, gh, repository, version, sourceSha);
         await publisher.PublishAsync();
@@ -35,6 +35,11 @@ public sealed class PublishTask : AsyncFrostingTask<BuildContext>
 
 internal sealed class GitHubReleasePublisher
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
+
     private readonly BuildContext context;
     private readonly string gh;
     private readonly string repository;
@@ -154,7 +159,7 @@ internal sealed class GitHubReleasePublisher
             if (result.StandardError.Contains("HTTP 404", StringComparison.OrdinalIgnoreCase)) return null;
             throw new InvalidOperationException("Could not inspect GitHub release. " + SafeError(result));
         }
-        var release = JsonSerializer.Deserialize<RemoteRelease>(result.StandardOutput, ReleaseLayout.JsonOptions)
+        var release = JsonSerializer.Deserialize<RemoteRelease>(result.StandardOutput, JsonOptions)
             ?? throw new InvalidDataException("GitHub returned an empty release document.");
         if (!string.Equals(release.TagName, tag, StringComparison.Ordinal))
         {
@@ -181,26 +186,12 @@ internal sealed class GitHubReleasePublisher
     private LocalAsset[] ExpectedAssets()
     {
         var root = ReleaseLayout.ReleaseRoot(context);
-        var manifest = JsonSerializer.Deserialize<ReleaseManifest>(
-            File.ReadAllText(Path.Combine(root, ReleaseLayout.ManifestName)),
-            ReleaseLayout.JsonOptions) ?? throw new InvalidDataException("Release manifest is empty.");
-        var names = manifest.Assets.Select(asset => asset.Name)
-            .Append(ReleaseLayout.ManifestName)
-            .Append(ReleaseLayout.ChecksumsName)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-        var actualNames = Directory.EnumerateFiles(root)
-            .Select(path => Path.GetFileName(path)!)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-        if (!names.SequenceEqual(actualNames, StringComparer.Ordinal))
-        {
-            throw new InvalidDataException("Release directory contains missing or unexpected publication files.");
-        }
-        return names.Select(name =>
+        return ReleaseLayout.ReleaseAssetNames().Select(name =>
         {
             var path = Path.Combine(root, name);
-            return new LocalAsset(name, path, new FileInfo(path).Length, "sha256:" + ReleaseAsset.HashFile(path));
+            using var stream = File.OpenRead(path);
+            var digest = Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+            return new LocalAsset(name, path, new FileInfo(path).Length, "sha256:" + digest);
         }).ToArray();
     }
 

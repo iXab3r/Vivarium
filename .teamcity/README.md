@@ -23,8 +23,8 @@ The project deliberately contains only six configurations:
   runs their native product smoke;
 - the Linux x64, Linux arm64, and macOS arm64 Compile configurations compile only their RID and run
   the same short native product smoke without repeating the full test suite;
-- `Release` checks all four Compile build identities, packages without compiling or testing, and runs one
-  host-native smoke from the final ZIP;
+- `Release` packages the four Compile outputs without compiling or testing and runs one host-native
+  smoke from the final ZIP;
 - `Publish` downloads the Release artifact and uploads it to GitHub.
 
 Only Windows Compile is automatically triggered on the default branch while it is the only compatible
@@ -41,8 +41,8 @@ Agent activation requirements:
 The current three-agent license has no macOS agent and no Linux arm64 agent. Capacity must therefore be
 rotated or the license/capacity changed before stable release activation. `Release` has no trigger, is
 serialized, accepts only a SemVer `v*` tag through the Cake validation, and packages candidate artifacts
-without GitHub credentials. Tag Compile builds bake that SemVer into the binaries, and Release rejects
-any input whose RID, source SHA, or version disagrees. GitHub publication remains
+without GitHub credentials. Tag Compile builds bake that SemVer into the binaries, and TeamCity snapshot
+dependencies keep all four Compile outputs on the same revision. GitHub publication remains
 disabled until draft/resume,
 remote-digest, protected-tag, D29 Git-prerequisite, and native four-RID evidence are all closed.
 

@@ -130,3 +130,23 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity published the TRX result and 23 win-x64 Compile files. The artifact root contains
   `agent/`, `cli/`, `server/`, and the 108-byte `build-info.json`; the superseded
   `compile-manifest.json` is absent.
+
+## Owner-directed minimal release contract — 2026-08-29
+
+- Removed the remaining CI bookkeeping files: Compile `build-info.json`, public
+  `release-manifest.json`, embedded `packages/manifest.json`, `SHA256SUMS`, and the standalone
+  `ReleaseVerify` target. Release now produces exactly the twelve D19 ZIP files and runs one native
+  final-ZIP smoke.
+- A simulated TeamCity Compile for tag `v0.2.0`, counter `99`, and source prefix `dddddddd` emitted
+  `##teamcity[buildNumber '0.2.0.99-dddddddd']`; every `dotnet publish` received `-p:Version=0.2.0`,
+  and native `viv-cli --version` returned `viv-cli 0.2.0`.
+- Sequential `CompileAll --build-version 0.2.0` completed all four RIDs in 23.4 seconds. None of the
+  Compile roots contained an identity, manifest, or checksum file.
+- `Release --build-version 0.2.0` completed in 49.1 seconds. The output contained exactly twelve ZIPs;
+  each server ZIP embedded the four conventional `packages/agents/viv-agent-<rid>.zip` files and no
+  package manifest. The final osx-arm64 controller, CLI, agent, and updater smoke passed.
+- An isolated reflection harness ran `BuildProcess.RunAsync` against `/bin/sleep 30` with a one-second
+  timeout. It killed and reaped the process, drained redirected output, and returned the expected
+  timeout in 1.05 seconds.
+- Root `dotnet build` succeeded with zero warnings and errors. Root `dotnet test` passed 143 tests and
+  skipped 9 platform-specific tests.

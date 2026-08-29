@@ -11,8 +11,6 @@ release-rid	osx-arm64	docs/DEVELOPMENT.md	supported
 release-asset	viv-server-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID; embeds all agent/updater RID packages
 release-asset	viv-agent-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID
 release-asset	viv-cli-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID
-release-asset	release-manifest.json	accepted CI/CD plan	proposed exact asset inventory and provenance
-release-asset	SHA256SUMS	docs/DEVELOPMENT.md	checksums for release ZIPs and manifest
 teamcity-agent	10:Cvat	TeamCity read-only census	connected, authorized, non-Windows, no detected .NET CLI
 teamcity-agent	15:laptop-g15	TeamCity read-only census	connected, authorized, Windows, .NET 10 compatible
 teamcity-agent	25:SWIFT3	TeamCity read-only census	connected, authorized, Windows, no detected .NET 10 SDK

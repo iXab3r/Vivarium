@@ -53,14 +53,12 @@ agent/bootstrap.json.sample
 agent/agent/current/viv-agent[.exe]
 agent/agent/version
 cli/viv-cli[.exe]
-build-info.json
 ```
 
 Cross-publishing does not execute foreign binaries. `Test` always runs for the native host and rejects
 an explicit non-host RID; target-native execution evidence must be collected on that target OS and
-architecture. Each Compile tree carries a small identity file with its RID, product version, and source
-SHA. A normal developer Compile may omit `--source-sha`, but such an output is intentionally not
-eligible for Release.
+architecture. Compile stamps the selected product version into the binaries and the agent's runtime
+version marker; it defaults to `VersionPrefix` and accepts `--build-version <SemVer>` for a release build.
 
 The Compile targets produce the matrix of self-contained single-file builds. The four shipped
 executable projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained
@@ -125,27 +123,25 @@ in the current binaries, and the bootstrap freeze gate remains pending (§7/D21)
 
 ## Releases (D19)
 
-The Cake release candidate workflow consumes previously compiled trees and accepts a full source SHA
-and a `vX.Y.Z`/SemVer identity:
+The Cake release candidate workflow consumes previously compiled trees and accepts a
+`vX.Y.Z`/SemVer identity:
 
 ```text
 dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll \
-  --build-version 0.1.0 --source-sha <full-commit-sha>
+  --build-version 0.1.0
 dotnet run --project build/Vivarium.Build.csproj -- --target Release \
-  --build-version 0.1.0 --source-sha <full-commit-sha>
+  --build-version 0.1.0
 dotnet run --project build/Vivarium.Build.csproj -- --target ReleaseSmoke \
-  --rid <native-rid> --build-version 0.1.0 --source-sha <full-commit-sha>
+  --rid <native-rid> --build-version 0.1.0
 ```
 
 It performs the following work:
 
-1. Require the four existing `out/build/<rid>/` Compile outputs and check that every `build-info.json`
-   has the requested source SHA, SemVer, and RID. Release does not compile or test code.
+1. Require the four existing `out/build/<rid>/` Compile outputs. Release does not compile or test code.
 2. Package per-RID zips: `viv-server-<rid>.zip` (the server zip **embeds the agent +
    updater packages for every RID** — an air-gapped farm never phones GitHub), `viv-agent-<rid>.zip`
    (`viv-agent-update` + current `viv-agent` + `bootstrap.json.sample`), `viv-cli-<rid>.zip`.
-3. Write canonical `release-manifest.json` and `SHA256SUMS`, fix ZIP timestamps and entry order, preserve
-   native executable modes, then verify the top-level release asset sizes, digests, and ZIP integrity.
+3. Create deterministic ZIPs with fixed timestamps and entry order while preserving native executable modes.
 4. Run one host-native smoke from the final ZIP inside Release: controller startup plus static-asset
    HTTP probe, exact `viv-cli --version`, fail-closed agent usage, and missing-config updater behavior.
    `ReleaseSmoke` remains available to repeat that check explicitly; the full test suite is not repeated.
@@ -160,17 +156,16 @@ agent/version
 ```
 
 Each controller ZIP contains its static web assets and settings beside the single-file executable,
-plus `packages/manifest.json` and the exact four public
-`packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
+plus the exact four public `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
 The versioned TeamCity chain is `Compile / <RID> -> Release -> Publish`. Release has snapshot and
 artifact dependencies on all four Compile configurations and only packages their exact outputs.
 For protected `v*` tags, Compile derives the product SemVer from the tag before publishing binaries;
-Release refuses any artifact whose build identity disagrees with that tag or source revision.
-Publish has an artifact dependency on Release and only uploads that ready candidate to GitHub. GitHub
+the snapshot chain keeps all four outputs on the same source revision. Publish has an artifact dependency
+on Release and only uploads that ready candidate to GitHub. GitHub
 publication is committed paused and has no trigger. Its Cake target resolves a checksum-pinned GitHub
-CLI, requires immutable releases to be enabled, proves the protected tag resolves to the manifest
+CLI, requires immutable releases to be enabled, proves the protected tag resolves to the TeamCity
 source SHA, creates or safely resumes a compatible draft, verifies GitHub's remote `sha256:` asset
 digests, and publishes last. An already-published exact immutable release is an idempotent success;
 mismatched or extra assets are never clobbered.

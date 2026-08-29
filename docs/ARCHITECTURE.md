@@ -576,7 +576,7 @@ self-contained single-file .NET publishes per RID: no installers or registry sta
 are needed only for elevated/autologon *duties* (D10), never just to run. Controller, bootstrap, and agent state live in
 their explicitly selected data/install directories; `viv-cli login` is the intentional exception and
 stores per-user client trust and credentials under the platform application-data directory. The
-release publish flags, per-RID zips, and `SHA256SUMS` workflow remain Phase 1 delivery work
+release publish flags and per-RID zips remain Phase 1 delivery work
 ([`DEVELOPMENT.md`](DEVELOPMENT.md)); code signing is deferred and recorded (§13).
 
 These names are the public distribution contract; C# project, assembly, and namespace names remain

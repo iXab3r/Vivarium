@@ -85,7 +85,7 @@ public sealed class BuildContext : FrostingContext
 
     public string BuildNumber()
     {
-        var prefix = ReadVersionPrefix();
+        var prefix = ProductVersion;
         if (string.IsNullOrWhiteSpace(BuildCounter) || string.IsNullOrWhiteSpace(SourceSha))
         {
             return prefix + "-local";

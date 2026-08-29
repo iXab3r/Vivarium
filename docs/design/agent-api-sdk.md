@@ -427,9 +427,8 @@ never modifies release bytes. `agent/version` is UTF-8 SemVer plus one newline. 
 matches the frozen prototype's existing `agent/current` and `agent/version` reads without changing its
 source. ZIP entries are sorted, carry one canonical timestamp, reject ambiguous/traversal paths, and set
 0755 only on Unix executables. Each controller release candidate embeds the exact four public
-agent-template ZIP bytes beneath `packages/agents/`, plus a `packages/manifest.json` containing version,
-RID, size, and SHA-256 identity. The controller import/serve implementation remains pending; CI packaging
-does not claim the prototype unauthenticated manifest path satisfies D2/D21.
+agent-template ZIP bytes beneath `packages/agents/`. The controller import/serve implementation remains
+pending; CI packaging does not claim the prototype unauthenticated manifest path satisfies D2/D21.
 
 Target upgrade lifecycle:
 

@@ -1,6 +1,5 @@
 using Cake.Frosting;
 using System.Text;
-using System.Text.Json;
 
 [TaskName("Compile")]
 [TaskDescription("Compiles runnable binaries for one supported RID.")]
@@ -85,7 +84,6 @@ internal static class PlatformCompiler
         context.SetTeamCityBuildNumber();
         ReleaseLayout.RequireSupportedRid(rid);
         var version = context.ProductVersion;
-        var sourceSha = context.SourceSha is null ? null : context.RequireSourceSha();
         var target = Path.Combine(context.OutRoot, "build", rid);
         var publishRoot = Path.Combine(context.OutRoot, "build-publish", rid);
         BuildDirectory.Recreate(target);
@@ -111,7 +109,6 @@ internal static class PlatformCompiler
                 Path.Combine(agentRoot, "agent", "version"),
                 version + "\n",
                 new UTF8Encoding(false));
-            CompileBuildInfoFile.Write(target, rid, version, sourceSha);
         }
         catch
         {
@@ -151,52 +148,6 @@ internal static class PlatformCompiler
         };
     }
 }
-
-internal static class CompileBuildInfoFile
-{
-    public static void Write(string root, string rid, string version, string? sourceSha)
-    {
-        var json = JsonSerializer.Serialize(
-            new CompileBuildInfo(rid, version, sourceSha),
-            ReleaseLayout.JsonOptions) + "\n";
-        File.WriteAllText(
-            Path.Combine(root, ReleaseLayout.BuildInfoName),
-            json,
-            new UTF8Encoding(false));
-    }
-
-    public static void Verify(
-        BuildContext context,
-        string rid,
-        string expectedVersion,
-        string expectedSourceSha)
-    {
-        var root = ReleaseLayout.CompileRoot(context, rid);
-        var buildInfoPath = Path.Combine(root, ReleaseLayout.BuildInfoName);
-        if (!File.Exists(buildInfoPath))
-        {
-            throw new FileNotFoundException($"Compile build info is missing for {rid}.", buildInfoPath);
-        }
-
-        var buildInfo = JsonSerializer.Deserialize<CompileBuildInfo>(
-            File.ReadAllText(buildInfoPath),
-            ReleaseLayout.JsonOptions) ?? throw new InvalidDataException($"Compile build info is empty for {rid}.");
-        if (!string.Equals(buildInfo.Rid, rid, StringComparison.Ordinal) ||
-            !string.Equals(buildInfo.Version, expectedVersion, StringComparison.Ordinal) ||
-            !string.Equals(buildInfo.SourceSha, expectedSourceSha, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidDataException($"Compile build info does not match Release for {rid}.");
-        }
-
-        var versionMarker = Path.Combine(root, "agent", "agent", "version");
-        if (!string.Equals(File.ReadAllText(versionMarker), expectedVersion + "\n", StringComparison.Ordinal))
-        {
-            throw new InvalidDataException($"Compile agent version marker mismatch for {rid}.");
-        }
-    }
-}
-
-internal sealed record CompileBuildInfo(string Rid, string Version, string? SourceSha);
 
 internal static class DotNetPublisher
 {

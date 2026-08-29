@@ -18,7 +18,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  Compile                  Compile runnable binaries for --rid or the host RID.");
         Console.WriteLine("  CompileAll               Compile runnable binaries for every supported RID.");
         Console.WriteLine("  CompileSmoke             Run native product probes from one Compile output.");
-        Console.WriteLine("  Release                  Check Compile identity, package assets, and smoke the native ZIP.");
+        Console.WriteLine("  Release                  Package existing Compile outputs and smoke the native ZIP.");
         Console.WriteLine("  Publish                  Publish the ready Release artifact to GitHub.");
         Console.WriteLine("  Clean                    Remove only the repository out/ directory.");
         Console.WriteLine();
@@ -27,14 +27,13 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  PayloadCrossMacPublish   Cross-publish the osx-arm64 payload for artifact transfer.");
         Console.WriteLine("  PayloadCrossMacRun       Run the transferred payload on a macOS host.");
         Console.WriteLine("  PayloadNextest           Archive and run the Rust payload with pinned cargo-nextest.");
-        Console.WriteLine("  ReleaseVerify            Verify an existing release directory without rebuilding it.");
         Console.WriteLine("  ReleaseSmoke             Run controller/CLI/agent/bootstrap smokes from the final ZIP for --rid.");
         Console.WriteLine();
         Console.WriteLine("Examples:");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
-        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.0 --source-sha <sha>");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.0");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }
