@@ -24,14 +24,15 @@ build. GitHub Actions remains explicitly disabled by the project owner.
 
 ## Evidence and blockers
 
-- TeamCity Windows Compile build `30846` succeeded on `laptop-g15` with SDK 10.0.303 at revision
-  `ce7090f`: 151 passed, 1 ignored, and the isolated native product smoke was green. That build predates
-  the simplification from the checksummed Compile manifest to `build-info.json`.
+- TeamCity Windows Compile build `30847` (`0.1.0.8-a09f9fcc`) succeeded on `laptop-g15` at revision
+  `a09f9fc`: 151 passed, 1 ignored, and the isolated native product smoke returned `viv-cli 0.1.0`.
+  Its 23-file Compile artifact contains the simplified 108-byte `build-info.json` and no checksummed
+  Compile manifest.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
 - The prerelease matrix passed for all four RIDs, and wrong version or wrong source SHA was rejected
   before packaging. Root tests pass 143 with 9 platform skips, and the matching final osx-arm64 release
-  ZIP smoke is green. Current simplified TeamCity evidence is pending.
+  ZIP smoke is green.
 - The simplification pass removed per-file Compile hashes, deep duplicate archive-layout verification,
   duplicate agent/CLI staging copies, and global NuGet locked mode while retaining top-level release
   checksums, deterministic ZIPs, final native smoke, prior D3 diagnostics, and guarded Publish behavior.

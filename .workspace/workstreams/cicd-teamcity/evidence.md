@@ -123,3 +123,10 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - Root `dotnet build` succeeded with zero warnings and errors; root `dotnet test` passed 143 tests and
   skipped 9 platform-specific tests. TeamCity DSL validation still reports one project, six build
   configurations, and one VCS root.
+- TeamCity Windows Compile build `30847` (`0.1.0.8-a09f9fcc`) succeeded on `laptop-g15` from source
+  revision `a09f9fccd83d6967dfe9cfe0b972e460e1876ed2`: 151 tests passed, 1 was ignored, win-x64 Compile
+  succeeded, and `CompileSmoke` completed in 3.9 seconds with `viv-cli 0.1.0` plus the expected
+  fail-closed agent/updater probes.
+- TeamCity published the TRX result and 23 win-x64 Compile files. The artifact root contains
+  `agent/`, `cli/`, `server/`, and the 108-byte `build-info.json`; the superseded
+  `compile-manifest.json` is absent.
