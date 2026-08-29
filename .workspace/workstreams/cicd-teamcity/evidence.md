@@ -171,3 +171,9 @@ Do not convert a pending platform or release gate into a passing claim based on 
   controller, agent, and updater behavior.
 - Root `dotnet build` succeeded without warnings or errors. Root `dotnet test` passed 143 tests and
   skipped 9 platform-specific tests.
+- TeamCity applied revision `e46aecdbdfa331fcf86eae69a780c56d2f268f8e` and imported all seven
+  configurations. Windows Compile build `30852` depended on Build Number build `30851` (`1`) and
+  finished as `0.1.1`; a second build of the same revision, `30854`, depended on Build Number build
+  `30853` (`2`) and finished as `0.1.2`. Both passed 151 tests with 1 ignored. Build `30854` passed
+  `-p:Version=0.1.2` to controller, agent, updater, and CLI publishes, and its native smoke returned
+  `viv-cli 0.1.2`.

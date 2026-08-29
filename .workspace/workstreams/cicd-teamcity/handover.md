@@ -1,6 +1,6 @@
 # TeamCity CI/CD handover
 
-Status: active; simplified TeamCity pipeline imported, Windows Compile evidence green.
+Status: active; shared-version TeamCity pipeline imported, Windows Compile evidence green.
 
 ## Current contract
 
@@ -29,6 +29,9 @@ and exact `major.minor.build` code version. GitHub Actions remains explicitly di
 - TeamCity Windows Compile build `30848` (`0.1.0.9-1cceb736`) succeeded at revision `1cceb73`: 151
   tests passed, 1 was ignored, and the native product smoke passed. Its `win-x64` artifact contains
   only `agent/`, `cli/`, and `server/`, confirming that the final bookkeeping identity file is gone.
+- TeamCity builds `30852` and `30854` ran the same revision through fresh Build Number dependencies
+  `1` and `2`, producing exact code versions `0.1.1` and `0.1.2`. Both passed 151 tests with 1 ignored;
+  build `30854` stamped all four Windows products and native `viv-cli` with `0.1.2`.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
 - The prerelease matrix passed for all four RIDs. Root tests pass 143 with 9 platform skips, and the
