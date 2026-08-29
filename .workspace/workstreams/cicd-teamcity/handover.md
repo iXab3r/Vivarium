@@ -25,8 +25,9 @@ build. GitHub Actions remains explicitly disabled by the project owner.
 
 ## Evidence and blockers
 
-- TeamCity Windows Compile build `30845` succeeded on `laptop-g15` with SDK 10.0.303: 150 passed,
-  1 ignored, native product smoke green, 22 Compile files plus TRX published.
+- TeamCity Windows Compile build `30846` succeeded on `laptop-g15` with SDK 10.0.303 at revision
+  `ce7090f`: 151 passed, 1 ignored, isolated native product smoke green, and 23 Compile files including
+  `compile-manifest.json` plus TRX published.
 - Local macOS Cake CI succeeded: 142 passed, 9 platform skips.
 - Local osx-arm64 Compile/native product smoke and deterministic release packaging have succeeded.
 - The hardened prerelease matrix passed for all four RIDs; wrong version, wrong source SHA, and a

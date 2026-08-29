@@ -107,3 +107,7 @@ Do not convert a pending platform or release gate into a passing claim based on 
   host-native ZIP smoke: controller/static asset, exact CLI version, agent, and updater probes passed.
 - Root `dotnet build` completed with zero warnings and errors. Root `dotnet test` passed 143 tests and
   skipped 9 platform-specific tests on macOS arm64.
+- TeamCity Windows Compile build `30846` (`0.1.0.7-ce7090f7`) succeeded on `laptop-g15` from source and
+  settings revision `ce7090f7949a44379621019e805b1d214f28c209`: 151 tests passed, 1 was ignored,
+  Compile and the isolated native product smoke passed, and TeamCity published 23 Compile files plus
+  TRX. The `win-x64/compile-manifest.json` artifact is present and records the new provenance contract.
