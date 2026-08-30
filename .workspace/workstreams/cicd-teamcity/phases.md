@@ -37,7 +37,7 @@ same Release artifact and pushes its versioned and `latest` tags to the existing
 publishes artifacts and images; it does not deploy a controller.
 
 Gate: each selected destination publishes successfully. GitHub alone requires `github.release.token`;
-Docker publication does not depend on it.
+Docker independently requires its `DockerRepository` and `DockerImageName` destination inputs.
 
 ## Phase 5 — cutover
 

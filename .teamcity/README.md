@@ -44,6 +44,9 @@ The publishers have no trigger and are independent destinations: either can run 
 `Publish / GitHub` needs a TeamCity password parameter named `github.release.token` with GitHub
 Contents write access for this repository. It uses the GitHub REST API directly, creates `v<version>`
 at the build source SHA, resumes a compatible draft, and treats an already-published release with the
-expected assets as a successful rerun. `Publish / Docker` needs no GitHub token, uses the existing
-`registry.eyeauras.net:5000/ixab3r/viv-server` path, and does not perform a Portainer or host
+expected assets as a successful rerun. `Publish / Docker` needs no GitHub token. Following the
+EyeAuras.Web convention, its `DockerRepository` and `DockerImageName` input parameters are deliberately
+empty until the destination is configured. The intended values are `registry.eyeauras.net:5000/` and
+`ixab3r/viv-server`; their absence currently blocks only Docker publication. Dockerfile, context, and
+version parameters are supplied by the DSL. The publisher does not perform a Portainer or host
 deployment.

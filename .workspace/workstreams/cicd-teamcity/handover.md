@@ -21,7 +21,8 @@ agents are not required to produce their binaries. GitHub Actions remains disabl
 GitHub publication uses the REST API directly. It does not require GitHub CLI, immutable-release
 settings, a specific agent OS, or a pre-existing tag. Docker publication uses the existing Cvat Docker
 engine only for image packaging. Both publishers depend directly on Release and are independent;
-the missing `github.release.token` blocks only GitHub publication.
+the missing `github.release.token` blocks only GitHub publication. Docker follows the EyeAuras.Web
+parameter names and is independently blocked until `DockerRepository` and `DockerImageName` are set.
 
 ## Evidence
 
@@ -38,6 +39,6 @@ the missing `github.release.token` blocks only GitHub publication.
 
 ## Next steps
 
-1. Run `Publish / Docker`; Cvat builds, smokes, and pushes the versioned container image without
-   involving GitHub.
+1. Set `DockerRepository=registry.eyeauras.net:5000/` and `DockerImageName=ixab3r/viv-server`, then run
+   `Publish / Docker`; Cvat builds, smokes, and pushes the image without involving GitHub.
 2. Add `github.release.token` when GitHub Releases are wanted, then run `Publish / GitHub` independently.

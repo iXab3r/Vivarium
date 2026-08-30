@@ -240,3 +240,17 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity applied revision `d362c0cc5bac165ef60078d890f26170a9be2c78`. The live dependency pages
   confirm that each publisher has exactly one snapshot dependency on Release and its own direct
   Release artifact dependency; neither publisher references the other.
+
+## EyeAuras-style Docker parameters — 2026-08-30
+
+- The live EyeAuras.Web `Publish` configuration and its root `DockerPublish` template were inspected.
+  The effective contract builds `%DockerImageName%:%DockerImageVersion%`, derives the remote name as
+  `%DockerRepository%%DockerImageName%`, then tags and pushes both the version and `latest`.
+- Vivarium now uses the same parameter names for that contract. Dockerfile, context, and version are
+  fixed by the DSL; `DockerRepository` and `DockerImageName` are non-empty inputs intentionally left
+  unset, so Docker publication is independently blocked until its destination is configured.
+- The old template's image TAR and Portainer webhook steps were not copied: Vivarium retains the
+  previously accepted boundary where CI publishes the image but does not deploy a running server.
+- JDK 21 Kotlin DSL validation succeeds with one project, four build configurations, and one VCS root.
+  Generated XML preserves both empty inputs with `not_empty` validation and keeps Docker dependent
+  only on Release.

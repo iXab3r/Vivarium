@@ -180,9 +180,12 @@ the expected asset names and sizes is an idempotent success. The Docker publishe
 version, and pushes both `<version>` and `latest` tags. It does not deploy or restart a controller.
 
 There is still no public end-user release. GitHub publication requires the missing TeamCity
-`github.release.token` secret; its absence does not block Docker publication. Docker reuses the
-already-authorized EyeAuras registry path and the existing Linux-container Docker agent. Native
-execution evidence on additional operating systems,
+`github.release.token` secret; its absence does not block Docker publication. Docker follows the
+EyeAuras.Web parameter contract: `DockerFileName`, `DockerContextDirectory`, and
+`DockerImageVersion` come from the DSL; `DockerRemoteImageName` is derived; and the destination inputs
+`DockerRepository` and `DockerImageName` remain empty until configured. Their intended initial values
+are `registry.eyeauras.net:5000/` and `ixab3r/viv-server`. Missing destination inputs block only Docker.
+Native execution evidence on additional operating systems,
 the controller's system-Git prerequisite, signing, and upgrade testing remain product-quality work but
 do not prevent producing the initial portable releases. GitHub Actions is intentionally disabled by
 project-owner decision. The portable target keeps
