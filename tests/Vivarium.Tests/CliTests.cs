@@ -34,6 +34,20 @@ public class CliTests
     }
 
     [Test]
+    public void Version_output_preserves_prerelease_identity_and_drops_build_metadata()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                VivariumCliApplication.FormatProductVersion("0.1.0-rc.1+abcdef", new Version(0, 1, 0)),
+                Is.EqualTo("0.1.0-rc.1"));
+            Assert.That(
+                VivariumCliApplication.FormatProductVersion(null, new Version(2, 3, 4, 5)),
+                Is.EqualTo("2.3.4"));
+        });
+    }
+
+    [Test]
     public void Run_arguments_preserve_repeated_only_and_overrides()
     {
         var parsed = (RunCommand)CliArguments.Parse(
@@ -67,7 +81,7 @@ public class CliTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(defaults.Reason, Is.EqualTo("Cancelled by viv CLI"));
+            Assert.That(defaults.Reason, Is.EqualTo("Cancelled by viv-cli"));
             Assert.That(overridden.BuildId, Is.EqualTo("matrix-2"));
             Assert.That(overridden.Reason, Is.EqualTo("operator stop"));
             Assert.That(overridden.Url, Is.EqualTo("https://ctrl:8443"));

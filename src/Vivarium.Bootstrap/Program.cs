@@ -24,7 +24,7 @@ var baseDir = Path.GetFullPath(AppContext.BaseDirectory);
 var configPath = Path.Combine(baseDir, "bootstrap.json");
 if (!File.Exists(configPath))
 {
-    Console.Error.WriteLine($"bootstrap: missing {configPath}");
+    Console.Error.WriteLine($"viv-agent-update: missing {configPath}");
     return 2;
 }
 
@@ -39,7 +39,7 @@ if (!Uri.TryCreate(controllerUrl, UriKind.Absolute, out var controllerUri) ||
     !string.IsNullOrEmpty(controllerUri.Fragment) ||
     fingerprint.Length != 64 || !fingerprint.All(Uri.IsHexDigit))
 {
-    Console.Error.WriteLine("bootstrap: controllerUrl or certificate fingerprint is invalid");
+    Console.Error.WriteLine("viv-agent-update: controllerUrl or certificate fingerprint is invalid");
     return 2;
 }
 
@@ -55,7 +55,7 @@ var healthMarkerPath = Path.Combine(dataDir, "agent-upgrade-health.json");
 var promotionMarkerPath = healthMarkerPath + ".promoted";
 var leasePath = Path.Combine(dataDir, "bootstrap-lease.json");
 var tokenPath = Path.Combine(dataDir, "auth.token");
-var executableName = OperatingSystem.IsWindows() ? "vivarium-agent.exe" : "vivarium-agent";
+var executableName = OperatingSystem.IsWindows() ? "viv-agent.exe" : "viv-agent";
 var rid = CurrentRid();
 Directory.CreateDirectory(agentDir);
 Directory.CreateDirectory(packagesDir);
@@ -68,7 +68,7 @@ try
 }
 catch (IOException)
 {
-    Console.Error.WriteLine("bootstrap: another supervisor already owns this installation");
+    Console.Error.WriteLine("viv-agent-update: another supervisor already owns this installation");
     return 3;
 }
 
@@ -91,7 +91,7 @@ using (singleton)
     var nextLaunchWait = Stopwatch.StartNew();
     string? unrecordedLeaseId = null;
     Stopwatch? unrecordedLeaseWait = null;
-    Console.WriteLine($"vivarium-bootstrap: controller {controllerUri.GetLeftPart(UriPartial.Authority)}");
+    Console.WriteLine($"viv-agent-update: controller {controllerUri.GetLeftPart(UriPartial.Authority)}");
     while (true)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -133,7 +133,7 @@ using (singleton)
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"bootstrap: supervision failed ({SafeMessage(exception)})");
+            Console.Error.WriteLine($"viv-agent-update: supervision failed ({SafeMessage(exception)})");
             if (exception is UnrecordedLeaseException)
             {
                 await Task.Delay(TimeSpan.FromSeconds(2));
@@ -262,7 +262,7 @@ using (singleton)
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"bootstrap: directive fetch failed ({SafeMessage(exception)})");
+            Console.Error.WriteLine($"viv-agent-update: directive fetch failed ({SafeMessage(exception)})");
             return current;
         }
         if (directive is null)
@@ -297,7 +297,7 @@ using (singleton)
             };
             WriteState(failed);
             Console.Error.WriteLine(
-                $"bootstrap: package {ShortDigest(directive.Sha256)} staging failed " +
+                $"viv-agent-update: package {ShortDigest(directive.Sha256)} staging failed " +
                 $"({failed.ReportFailureCode})");
             return failed;
         }
@@ -333,7 +333,7 @@ using (singleton)
         {
             throw new UpgradeStageException("upgrade_prior_digest_mismatch");
         }
-        Console.WriteLine($"bootstrap: staging Agent {manifest.Version} ({ShortDigest(manifest.Sha256)})");
+        Console.WriteLine($"viv-agent-update: staging Agent {manifest.Version} ({ShortDigest(manifest.Sha256)})");
         var finalDirectory = Path.Combine(packagesDir, manifest.Sha256);
         if (Directory.Exists(finalDirectory) && !VerifyExtractedPackage(finalDirectory, manifest.Sha256))
         {
@@ -592,7 +592,7 @@ using (singleton)
                 if (process.HasExited)
                 {
                     DeleteFile(childPath);
-                    Console.WriteLine($"bootstrap: Agent exited with {process.ExitCode}");
+                    Console.WriteLine($"viv-agent-update: Agent exited with {process.ExitCode}");
                     if (current.Pending is not null)
                     {
                         return RollBack(current, "candidate_exited_before_commit");
@@ -629,7 +629,7 @@ using (singleton)
                         catch (Exception exception)
                         {
                             Console.Error.WriteLine(
-                                $"bootstrap: directive poll failed ({SafeMessage(exception)})");
+                                $"viv-agent-update: directive poll failed ({SafeMessage(exception)})");
                         }
                         if (directive?.Action == "rollback" &&
                             NeedsLocalRollback(current, directive.OperationId))
@@ -756,7 +756,7 @@ using (singleton)
         };
         WriteState(committed);
         DeleteUpgradeMarkers();
-        Console.WriteLine($"bootstrap: package {ShortDigest(committed.Active.Sha256)} committed");
+        Console.WriteLine($"viv-agent-update: package {ShortDigest(committed.Active.Sha256)} committed");
         return committed;
     }
 
@@ -780,7 +780,7 @@ using (singleton)
                         recorded.PackageSha256 == slot.Sha256 && recorded.OperationId == operationId)
                     {
                         WriteLease(recorded.LeaseId);
-                        Console.WriteLine($"bootstrap: re-adopted Agent process {recorded.Pid}");
+                        Console.WriteLine($"viv-agent-update: re-adopted Agent process {recorded.Pid}");
                         return new ChildHandle(existing, recorded.LeaseId);
                     }
                     await TerminateChildAsync(existing, operationId);
@@ -932,7 +932,7 @@ using (singleton)
             }
             catch (System.ComponentModel.Win32Exception exception)
             {
-                Console.Error.WriteLine($"bootstrap: child termination retry ({SafeMessage(exception)})");
+                Console.Error.WriteLine($"viv-agent-update: child termination retry ({SafeMessage(exception)})");
             }
             try
             {
@@ -966,7 +966,7 @@ using (singleton)
         WriteState(rolledBack);
         DeleteUpgradeMarkers();
         Console.Error.WriteLine(
-            $"bootstrap: operation {operationId} rolled back to {ShortDigest(previous.Sha256)} ({code})");
+            $"viv-agent-update: operation {operationId} rolled back to {ShortDigest(previous.Sha256)} ({code})");
         return rolledBack;
     }
 
@@ -1039,7 +1039,7 @@ using (singleton)
         catch (Exception exception)
         {
             Console.Error.WriteLine(
-                $"bootstrap: failure report deferred ({SafeMessage(exception)})");
+                $"viv-agent-update: failure report deferred ({SafeMessage(exception)})");
             return current;
         }
     }

@@ -1,0 +1,5 @@
+{
+  "controllerUrl": "https://vivarium.example:8443",
+  "certFingerprint": "SHA256:REPLACE_WITH_CONTROLLER_CERTIFICATE_FINGERPRINT",
+  "enrollToken": "REPLACE_WITH_SINGLE_USE_ENROLLMENT_TOKEN"
+}

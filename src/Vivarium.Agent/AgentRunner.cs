@@ -5,6 +5,7 @@ using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Vivarium.Agent.Facts;
+using Vivarium.Contracts;
 using Vivarium.Contracts.V1;
 
 namespace Vivarium.Agent;
@@ -27,8 +28,7 @@ public sealed class AgentRunner
             PropertyNameCaseInsensitive = false,
         };
 
-    public static readonly string Version =
-        typeof(AgentRunner).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+    public static readonly string Version = VivariumProductVersion.FromAssembly(typeof(AgentRunner).Assembly);
 
     private readonly AgentOptions options;
     private readonly BlobClient blobs;

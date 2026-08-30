@@ -23,7 +23,7 @@ Phase 1 in progress; the Phase 0 pinned-TLS session loop is complete. Persistent
 registrations and status axes, heartbeats, separately managed reported/custom parameters,
 restart-safe build ownership and cancellation, durable FIFO scheduling with queue-wait deadlines,
 acknowledged assignments and terminal results, immutable assigned-agent provenance, the protected
-Agents / Queue & Builds panels, the scoped ControlPlane API, and `viv login` / `viv run` / `viv cancel`
+Agents / Queue & Builds panels, the scoped ControlPlane API, and `viv-cli login` / `viv-cli run` / `viv-cli cancel`
 exist and have tier-2 coverage. Strict Phase-1 `vivarium.yaml` parsing and hardened deterministic
 payload archives are also implemented. The transport-independent management kernel now provides an
 ordered checksummed SQLite migration ledger, fail-closed schema validation, a minimal append-only audit
@@ -57,7 +57,7 @@ authenticated Agent-scoped delivery, durable maintenance drains and operations, 
 restart-safe coordination, exact reconciled health confirmation, one-shot last-known-good rollback,
 two-sided crash-recoverable finalization, strict local integrity and prior binding, durable failure
 quarantine, supervised-bootstrap capability gating, bounded session outboxes, a skew-safe watchdog, and
-`viv agent upgrade` / `viv agent upgrade-status` (D30); new operations always resolve the matching
+`viv-cli agent upgrade` / `viv-cli agent upgrade-status` (D30); new operations always resolve the matching
 Agent package from the running Server release and observed RID, while raw publication is hidden behind
 an explicit development/test option. Real
 bootstrap child-process success and rollback paths and two-Agent isolation have tier-2 evidence.
@@ -74,6 +74,14 @@ out-of-process controller-to-Bootstrap recovery path for a wedged Agent, CLI/UI 
 cross-platform fault evidence remain open. The docs remain authoritative
 for shape — when code and a decision disagree, fix one of them in the same
 commit, never neither.
+
+Vivarium itself now builds through a provider-neutral Cake.Frosting application and a TeamCity
+Compile → Release → Publish chain. Compile tests once and cross-publishes every supported RID with one
+version; Release consumes those exact artifacts and emits deterministic `viv-server`, `viv-agent`, and
+`viv-cli` archives; each Server archive includes both public Agent templates and the exact D30
+`agent-packages/catalog.json`; guarded Publish creates or resumes the matching GitHub Release. GitHub
+Actions is intentionally disabled. Signing, previous-release compatibility CI, and additional native
+platform evidence remain release-quality gates.
 
 ## Repository conventions
 

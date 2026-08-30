@@ -1,3 +1,4 @@
+using Vivarium.Contracts;
 using Vivarium.Controller.Rest.Common;
 
 namespace Vivarium.Controller.Rest.System;
@@ -27,8 +28,7 @@ internal static class SystemResourceFactory
             Url: "/api/v1/system",
             ApiVersion: "v1",
             Status: "ready",
-            ControllerVersion: typeof(SystemResourceFactory).Assembly
-                .GetName().Version?.ToString() ?? "0.0.0.0",
+            ControllerVersion: VivariumProductVersion.FromAssembly(typeof(SystemResourceFactory).Assembly),
             new SystemLimits(
                 RestPagination.DefaultLimit,
                 RestPagination.MaxLimit,

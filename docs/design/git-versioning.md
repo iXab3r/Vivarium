@@ -266,7 +266,7 @@ YAML is the human-facing format. The accepted canonical subset is intentionally 
   treated as the same value unless the schema says so;
 - exactly one trailing newline.
 
-`viv config format` and the controller canonical writer implement the same formatter. A controller
+`viv-cli config format` and the controller canonical writer implement the same formatter. A controller
 mutation rewrites affected documents canonically; it does not reformat unrelated files. Comments are
 not part of the configuration model and may be lost in a document changed through the UI. Durable
 rationale belongs in explicit `metadata.description` or documentation, not only in YAML comments.
@@ -642,7 +642,7 @@ The complete design is accepted only with evidence for:
 - repository initialization and existing-repository attachment on Windows, Linux, and macOS;
 - deterministic managed-local/direct startup when no remote is configured, plus private HTTPS/SSH
   credential and pinned-host-trust failure cases;
-- identical canonical output from REST, UI, CLI, and `viv config format`;
+- identical canonical output from REST, UI, CLI, and `viv-cli config format`;
 - atomic two-resource mutations and stale-base conflicts;
 - rejection of observation/runtime ETags as configuration CAS values;
 - secret-reference validation and representative secret leak rejection;

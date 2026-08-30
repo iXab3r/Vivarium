@@ -10,7 +10,7 @@ A vivarium is an enclosure that keeps organisms under controlled conditions for 
 > registrations, TeamCity-style status axes and reported/custom parameters, heartbeats, a durable
 > compatible-agent build queue, queue-wait deadlines, controller-restart-safe
 > assignment/cancellation/result handshakes, protected Agents and Queue & Builds panels, a scoped
-> ControlPlane API, and working `viv login`, `viv run`, and explicit durable `viv cancel` clients with
+> ControlPlane API, and working `viv-cli login`, `viv-cli run`, and explicit durable `viv-cli cancel` clients with
 > hardened payload archives, immutable assigned-agent provenance, and centralized per-cell
 > results/artifact downloads, bounded durable TRX projection, and the first D30 per-Agent central
 > upgrade path (immutable packages, authenticated delivery, drain/health/rollback, REST/CLI). Install
@@ -38,7 +38,7 @@ Answering those requires real OS installations with versioned, restorable state 
 
 ```mermaid
 flowchart LR
-    CLI["viv CLI / your CI"] --> REST
+    CLI["viv-cli / your CI"] --> REST
     UI["React + Workbench panel"] --> REST
     REST["REST + SSE management plane"] --> C
     C["Controller<br/>Git desired state + scheduler + results<br/>AgentHub gRPC + blob store + SQLite"]
@@ -65,7 +65,7 @@ flowchart LR
 - Declarative image recipes in git, including honest `manual` steps for software with no silent installer.
 - Interactive-desktop guests by default (autologon, unlocked session) — input, overlay, and UI tests are first-class.
 - Debugging affordances: keep-VM-on-fail, snapshot-the-corpse, console access, crash dumps, failure screenshots.
-- `viv exec --image win10-19044 -- <cmd>` — ad-hoc commands on a pristine clone of any image.
+- `viv-cli exec --image win10-19044 -- <cmd>` — ad-hoc commands on a pristine clone of any image.
 - Portable everything: self-contained single-file binaries, xcopy deploy, air-gap friendly — the controller bundles and serves the agent packages itself, and agents auto-update from it.
 
 ## Non-goals

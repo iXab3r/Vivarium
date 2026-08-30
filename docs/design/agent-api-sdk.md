@@ -56,8 +56,8 @@ The Phase 1 implementation already provides:
   eligibility returns only after the Agent confirms the controller's durable receipt. Linux/macOS
   tier-2 evidence launches real bootstrap/Agent processes for success and failed-candidate rollback;
   another tier-2 scenario proves one busy Agent does not block its peer.
-- `viv agent upgrade`, `viv agent upgrade-status`, and the synonymous phase-aware
-  `viv agent upgrade-cancel` / `upgrade-rollback` recovery commands use the public REST
+- `viv-cli agent upgrade`, `viv-cli agent upgrade-status`, and the synonymous phase-aware
+  `viv-cli agent upgrade-cancel` / `upgrade-rollback` recovery commands use the public REST
   resources. Status prints the held-drain flag, retry generation/deadline, failure/cancellation reason,
   and bounded transition history. Starting a packaged Server imports its release `catalog.json`
   idempotently but never silently restarts the fleet. The raw publication endpoint exists only behind an
@@ -70,9 +70,10 @@ The current state is not yet an end-user agent platform:
   not implemented; the current typed observation is deliberately static and connect-time only.
 - The only executable workload is `BuildAssignment`; there is no generic operation envelope or
   AgentExplorer operation lifecycle.
-- Preconfigured archives, installers/setup endpoints, signing/notarization, and the release workflow
-  that produces embedded catalogs are not complete. The D30 manifest path and post-authorization
-  handoff are implemented; the D21 initial installer-authenticity gate remains open.
+- Preconfigured archives, installers/setup endpoints, and signing/notarization are not complete. The
+  TeamCity release workflow now produces embedded catalogs and unstamped public Agent templates; the
+  D30 manifest path and post-authorization handoff are implemented, while the D21 initial
+  installer-authenticity gate remains open.
 - Per-Agent central rollout, drain, health acknowledgement, and rollback are implemented. Fleet/group
   rollout orchestration, release channels/pins, automatic canary policy, and previous-release
   compatibility CI remain future work.
@@ -441,6 +442,23 @@ every supported RID. A release manifest identifies immutable package bytes by ve
 size, and URL. Release/channel policy is declarative Git-backed configuration; package bytes live in
 the authenticated controller store and are referenced by digest rather than committed to Git.
 
+The D19 public installation template has one portable tree, with `.exe` suffixes on Windows:
+
+```text
+viv-agent-update[.exe]
+bootstrap.json.sample
+agent/current/viv-agent[.exe]
+agent/version
+```
+
+`bootstrap.json.sample` contains placeholders only; enrollment will stamp a separate
+`bootstrap.json` without modifying release bytes. ZIP entries are sorted, carry one canonical
+timestamp, reject ambiguous/traversal paths, and mark only known executables as executable. Every
+Server release embeds these four public templates under `packages/agents/` for future Downloads and
+installer flows. They are intentionally distinct from the child-only packages under
+`agent-packages/`: D30 Bootstrap activation accepts an archive with `viv-agent[.exe]` at its root, and
+the colocated schema-v1 catalog binds exactly one such package per RID to the Server version.
+
 Implemented per-Agent upgrade lifecycle (fleet pacing/channel policy remains future work):
 
 1. An authorized request selects an Agent or rollout scope. The controller resolves the only valid
@@ -481,7 +499,7 @@ accumulating retry messages without limit.
 
 Agent development rebuilds a complete Server release bundle and rolls its Agent component to a canary.
 This preserves the Server/Agent release contract in development and production. A hidden, explicitly
-enabled raw publication surface is reserved for integration fixtures; it is not exposed by `viv`, REST
+enabled raw publication surface is reserved for integration fixtures; it is not exposed by `viv-cli`, REST
 OpenAPI, or the panel.
 
 The D30 implementation remains change-controlled. Do not declare it frozen until the remaining

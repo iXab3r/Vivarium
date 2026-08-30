@@ -1,0 +1,28 @@
+[workstream]
+id = "cicd-teamcity"
+status = "active"
+source_root = "/Users/xab3r/Work/Vivarium-1"
+source_revision = "09997927c45344ee8512655e6998a80dccf4a818"
+reference_ci = "git:09997927c45344ee8512655e6998a80dccf4a818:.github/workflows/ci.yml"
+reference_projects = ["/Users/xab3r/Work/PoEBane.Rust", "/Users/xab3r/Work/EyeAuras.CLink"]
+target = "Provider-neutral Cake.Frosting build application with versioned TeamCity CI/CD and guarded GitHub Release publication"
+stable_item_identity = "kind plus repository-local or TeamCity stable ID"
+
+[inventory]
+commands = [
+  "git show 09997927c45344ee8512655e6998a80dccf4a818:.github/workflows/ci.yml | rg '^  [a-z0-9-]+:$'",
+  "rg -n 'Supported RIDs|viv-server|viv-agent|viv-cli-<rid>' docs/DEVELOPMENT.md docs/ARCHITECTURE.md",
+  "teamcity agent list --authorized --limit 0 --json=id,name,connected,enabled,authorized,pool.name",
+  "teamcity project list --limit 0 --json=id,name,parentProjectId",
+  "teamcity job list --limit 0 --json=id,name,projectId,projectName"
+]
+generated_file = "inventory.tsv"
+ledger = "ledger.md"
+
+[baseline]
+github_actions_jobs = 5
+supported_release_rids = 4
+documented_release_zip_assets = 12
+release_metadata_assets = 0
+authorized_teamcity_agents = 3
+connected_teamcity_agents = 3

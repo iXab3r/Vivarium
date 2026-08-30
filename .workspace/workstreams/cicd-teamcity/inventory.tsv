@@ -1,0 +1,18 @@
+kind	stable_id	source	observed_state
+gha-job	test	.github/workflows/ci.yml	build and test on ubuntu, windows, macos
+gha-job	payload-smoke	.github/workflows/ci.yml	native NUnit payload smoke on linux-x64, win-x64, osx-arm64
+gha-job	payload-cross-macos-publish	.github/workflows/ci.yml	cross-publish osx-arm64 payload on Linux
+gha-job	payload-cross-macos-run	.github/workflows/ci.yml	run Linux-published payload on macOS
+gha-job	payload-nextest	.github/workflows/ci.yml	nextest archive and workspace remap smoke on Linux
+release-rid	win-x64	docs/DEVELOPMENT.md	supported
+release-rid	linux-x64	docs/DEVELOPMENT.md	supported
+release-rid	linux-arm64	docs/DEVELOPMENT.md	supported without current native CI evidence
+release-rid	osx-arm64	docs/DEVELOPMENT.md	supported
+release-asset	viv-server-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID; embeds all agent/updater RID packages
+release-asset	viv-agent-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID
+release-asset	viv-cli-<rid>.zip	docs/DEVELOPMENT.md	one per supported RID
+teamcity-agent	10:Cvat	TeamCity read-only census	connected, authorized, non-Windows, no detected .NET CLI
+teamcity-agent	15:laptop-g15	TeamCity read-only census	connected, authorized, Windows, .NET 10 compatible
+teamcity-agent	25:SWIFT3	TeamCity read-only census	connected, authorized, Windows, no detected .NET 10 SDK
+reference-pattern	PoEBane.Rust:build.csproj	/Users/xab3r/Work/PoEBane.Rust	Cake.Frosting build application
+reference-pattern	EyeAuras.CLink:Compile-SmokeTest-PackageRelease	TeamCity and /Users/xab3r/Work/EyeAuras.CLink	thin DSL, exact snapshot/artifact dependencies, guarded GitHub publication

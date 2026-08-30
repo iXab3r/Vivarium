@@ -351,7 +351,7 @@ A Git VCS root defines:
 Source selection resolves each attached root to an immutable commit before a build is queued. Builds
 never execute an unpinned moving branch name.
 
-The first Git integration slice preserves the existing deterministic payload contract: `viv run`
+The first Git integration slice preserves the existing deterministic payload contract: `viv-cli run`
 supplies payload bytes plus a controller-resolved or verified source revision, and the controller
 stores both. Controller-managed Git fetch/archive is the next VCS slice. Agent-side checkout is not
 assumed because pristine machines may not have Git installed; if required later, the TeamCity Expert

@@ -2,6 +2,7 @@ using System.Security.Authentication;
 using System.Text;
 using Grpc.Core;
 using Vivarium.Cli.Configuration;
+using Vivarium.Contracts;
 using Vivarium.Contracts.V1;
 
 namespace Vivarium.Cli;
@@ -60,9 +61,17 @@ internal sealed class VivariumCliApplication(
 
     private int PrintVersion()
     {
-        var version = typeof(VivariumCliApplication).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
-        console.WriteLine($"viv {version}");
+        var version = VivariumProductVersion.FromAssembly(typeof(VivariumCliApplication).Assembly);
+        console.WriteLine($"viv-cli {version}");
         return 0;
+    }
+
+    internal static string FormatProductVersion(string? informationalVersion, Version? assemblyVersion)
+    {
+        var productVersion = informationalVersion?.Split('+', 2)[0];
+        return string.IsNullOrWhiteSpace(productVersion)
+            ? assemblyVersion?.ToString(3) ?? "0.0.0"
+            : productVersion;
     }
 
     private async Task<int> LoginAsync(LoginCommand command, CancellationToken cancellationToken)

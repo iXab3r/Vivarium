@@ -266,6 +266,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
             ApplicationName = typeof(VivariumControllerHost).Assembly.FullName,
+            ContentRootPath = AppContext.BaseDirectory,
         });
         var panelIdentity = CreatePanelIdentity(options.DataDir);
         builder.WebHost.UseStaticWebAssets();

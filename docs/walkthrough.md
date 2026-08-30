@@ -5,10 +5,10 @@ Windows, Linux, and macOS, and an NUnit integration-test project that can verify
 the check up once and run it on demand — locally or from CI.
 
 This is the normative Phase 1 target UX for persistent machines; §7 shows how the same setup grows
-into pristine snapshots at Phase 2. The durable queue, `vivarium.yaml`, `viv run`, agent lifecycle,
+into pristine snapshots at Phase 2. The durable queue, `vivarium.yaml`, `viv-cli run`, agent lifecycle,
 explicit matrix cancellation, raw build/artifact results, and the per-Agent D30 central upgrade core
 exist now. Installer/Downloads flows, fleet rollout automation/UI, public per-test result presentation,
-and `viv exec` are marked below where they remain work. The controller already persists a bounded internal TRX projection with restart catch-up;
+and `viv-cli exec` are marked below where they remain work. The controller already persists a bounded internal TRX projection with restart catch-up;
 the walkthrough does not claim its future REST/Workbench experience exists.
 Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
@@ -17,7 +17,7 @@ Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 Any always-on box you own (your dev machine is fine to start):
 
 ```
-vivarium-controller.exe        # self-contained; creates ./vivarium-data (SQLite + blobs)
+viv-server.exe                 # self-contained; creates ./vivarium-data (SQLite + blobs)
 ```
 
 First run prints the panel URL and an admin token:
@@ -35,7 +35,7 @@ On your workstation, point the CLI at it once — the fingerprint is confirmed o
 pinned from then on:
 
 ```
-viv login https://192.168.1.10:8443
+viv-cli login https://192.168.1.10:8443
 ```
 
 ## 1. Connect three machines — five minutes each
@@ -150,7 +150,7 @@ macOS binaries must carry at least an ad-hoc signature; and TRX needs the
 ## 4. Run
 
 ```
-$ viv run integration
+$ viv-cli run integration
 Submitted matrix build 867b6095-0e12-42e6-a4a8-299c128f21a4
 Results: https://192.168.1.10:8443/builds/867b6095-0e12-42e6-a4a8-299c128f21a4
 matrix: QUEUED
@@ -168,19 +168,19 @@ matrix: FINISHED/FAILED
 $ echo $?   # → 1 (any red cell = nonzero; CI-friendly)
 ```
 
-`viv run integration --no-wait` just enqueues and prints the URL.
+`viv-cli run integration --no-wait` just enqueues and prints the URL.
 
 Stopping is explicit and durable:
 
 ```
-$ viv cancel 867b6095-0e12-42e6-a4a8-299c128f21a4 --reason "superseded by a newer commit"
+$ viv-cli cancel 867b6095-0e12-42e6-a4a8-299c128f21a4 --reason "superseded by a newer commit"
 Cancellation requested for matrix build 867b6095-0e12-42e6-a4a8-299c128f21a4
 State: CANCEL_REQUESTED
 Results: https://192.168.1.10:8443/builds/867b6095-0e12-42e6-a4a8-299c128f21a4
 ```
 
 The parent results page has the same **Stop matrix build** action. Ctrl+C only detaches the local
-`viv run` watch; it deliberately does not cancel remote work.
+`viv-cli run` watch; it deliberately does not cancel remote work.
 
 Under the hood, per cell: queue → compatible agent (D8) → `BuildAssignment` → agent pulls blobs by
 sha256 → steps run while status and heartbeats update centrally → artifacts are pushed → the durable
@@ -196,8 +196,8 @@ TEST/CRASH classification and automatic INFRA retry remain D9 work.
   artifacts (`*.trx`, `logs/`). The next result-adapter slice turns those reports into the full
   rows = tests × columns = cells matrix and adds durable per-test details and logs.
 - Planned ad-hoc access without leaving your desk:
-  `viv exec --agent ubuntu-2204 -- ./sut/myapp --version` (not implemented yet).
-- Rerun one cell after a fix: `viv run integration --only linux`.
+  `viv-cli exec --agent ubuntu-2204 -- ./sut/myapp --version` (not implemented yet).
+- Rerun one cell after a fix: `viv-cli run integration --only linux`.
 
 ## 6. Wire into CI
 
@@ -205,7 +205,7 @@ Vivarium can run jobs directly or be called by an existing CI/source-control pip
 
 ```yaml
 # GitHub Actions / TeamCity step, after publishing out/*
-- run: viv run integration          # waits by default
+- run: viv-cli run integration      # waits by default
   env:
     VIVARIUM_URL: ${{ vars.VIVARIUM_URL }}
     VIVARIUM_TOKEN: ${{ secrets.VIVARIUM_TOKEN }}   # service credential with project Run permission (D26)
@@ -272,7 +272,7 @@ When combos are hand-picked rather than a cross product, name them explicitly:
 ```
 
 `repeat` turns the cell into a pass rate — `47/50 (94%)` with drill-down into individual iterations —
-and `viv run integration --repeat 20` overrides it ad hoc. Repeats on pristine cells are truly
+and `viv-cli run integration --repeat 20` overrides it ad hoc. Repeats on pristine cells are truly
 independent runs: that combination is the honest flakiness detector.
 
 Rule of thumb for where a parameter belongs: values only the test process cares about stay in NUnit
@@ -285,9 +285,9 @@ machine.
    results, it does not author test configurations (v1).
 2. Payload/steps specialization per cell via template variables (`{rid}`, `{exe}`, …), not per-cell
    copy-paste; `rid:` is declared per cell so payload resolves at upload time.
-3. `viv run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.
+3. `viv-cli run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.
 4. Named matrix cells are the unit of rerun (`--only <cell>`) and of matrix columns.
-5. Ad-hoc access will be `viv exec --agent/--image`; console links and the Exec RPC remain planned.
+5. Ad-hoc access will be `viv-cli exec --agent/--image`; console links and the Exec RPC remain planned.
 6. The matrix generalizes past OS: the machine selector is one axis among parameter axes
    (cross-product with `exclude`, or an explicit named `scenarios:` list); parameters flow in as
    `{param.*}` and `VIVARIUM_PARAM_*`.

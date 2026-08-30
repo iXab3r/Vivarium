@@ -26,8 +26,8 @@ fingerprint = ArgValue(args, "--fp") ?? fingerprint;
 
 if (url == null || fingerprint == null)
 {
-    Console.Error.WriteLine("usage: vivarium-agent --url <https://ctrl:8443> --fp <sha256hex> [--token <enroll>] [--data <dir>]");
-    Console.Error.WriteLine("   or: vivarium-agent --config <bootstrap.json> [--data <dir>]");
+    Console.Error.WriteLine("usage: viv-agent --url <https://ctrl:8443> --fp <sha256hex> [--token <enroll>] [--data <dir>]");
+    Console.Error.WriteLine("   or: viv-agent --config <bootstrap.json> [--data <dir>]");
     return 2;
 }
 
@@ -46,7 +46,7 @@ var runner = new AgentRunner(new AgentOptions
     BootstrapLeaseId = ArgValue(args, "--bootstrap-lease-id"),
 });
 
-Console.WriteLine($"vivarium-agent {AgentRunner.Version} (agent id {runner.AgentId})");
+Console.WriteLine($"viv-agent {AgentRunner.Version} (agent id {runner.AgentId})");
 Console.WriteLine($"controller: {url}");
 
 using var cts = new CancellationTokenSource();

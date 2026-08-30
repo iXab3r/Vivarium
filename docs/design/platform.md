@@ -377,6 +377,9 @@ bootstrap contract.
 ## Packaging, signing, and upgrades
 
 - Packages are immutable per RID and identified by version plus SHA-256.
+- Public ZIP candidates use sorted entries and one fixed timestamp; Unix executable entries carry 0755
+  and data/sample/version entries carry 0644. Native release smoke extracts the final ZIP rather than a
+  pre-package publish directory.
 - The controller serves exact package bytes and an authenticated manifest; D21 governs trust before
   installer execution.
 - Archive formats preserve executable bits and symlinks where the target needs them.

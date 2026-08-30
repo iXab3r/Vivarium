@@ -1,4 +1,5 @@
 using Grpc.Core;
+using Vivarium.Contracts;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents;
 using Vivarium.Controller.Agents.Compatibility;
@@ -337,5 +338,5 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
     }
 
     internal static readonly string ServerVersion =
-        typeof(AgentHubService).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+        VivariumProductVersion.FromAssembly(typeof(AgentHubService).Assembly);
 }

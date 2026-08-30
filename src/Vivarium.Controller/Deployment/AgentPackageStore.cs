@@ -480,7 +480,7 @@ public sealed class AgentPackageStore
                     $"An Agent package must contain between 1 and {MaximumEntries} entries.");
             }
 
-            var expectedExecutable = rid == "win-x64" ? "vivarium-agent.exe" : "vivarium-agent";
+            var expectedExecutable = rid == "win-x64" ? "viv-agent.exe" : "viv-agent";
             var names = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             long expanded = 0;
             var hasExecutable = false;

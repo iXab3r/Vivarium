@@ -106,7 +106,7 @@ public sealed class AgentDeploymentTests
         using var http = PinnedClient(controller);
         http.DefaultRequestHeaders.Authorization = new("Bearer", controller.Tokens.AdminToken);
         var rid = CurrentRid();
-        var executableName = rid == "win-x64" ? "vivarium-agent.exe" : "vivarium-agent";
+        var executableName = rid == "win-x64" ? "viv-agent.exe" : "viv-agent";
 
         static byte[] Archive(params (string Path, byte[] Content, int Attributes)[] entries)
         {
@@ -1095,7 +1095,7 @@ public sealed class AgentDeploymentTests
             currentDir,
             renameAgentHost: true);
         var activeDigest = Digest(await File.ReadAllBytesAsync(
-            Path.Combine(currentDir, "vivarium-agent")));
+            Path.Combine(currentDir, "viv-agent")));
         var operationId = new string('e', 32);
         await File.WriteAllTextAsync(
             Path.Combine(installDir, "bootstrap.json"),
@@ -1235,7 +1235,7 @@ public sealed class AgentDeploymentTests
                     Path.Combine(installDir, "data", identityFile));
             }
             var localActive = Digest(await File.ReadAllBytesAsync(
-                Path.Combine(currentDir, "vivarium-agent")));
+                Path.Combine(currentDir, "viv-agent")));
             Assert.That(localActive, Is.Not.EqualTo(controllerPrior));
             await File.WriteAllTextAsync(
                 Path.Combine(installDir, "bootstrap.json"),
@@ -1450,7 +1450,7 @@ public sealed class AgentDeploymentTests
             currentDir,
             renameAgentHost: true);
         var activeDigest = Digest(await File.ReadAllBytesAsync(
-            Path.Combine(currentDir, "vivarium-agent")));
+            Path.Combine(currentDir, "viv-agent")));
         await File.WriteAllTextAsync(
             Path.Combine(installDir, "bootstrap.json"),
             JsonSerializer.Serialize(new
@@ -1678,7 +1678,7 @@ public sealed class AgentDeploymentTests
             archive.ExtractToDirectory(oldSlot);
         }
 
-        MakeExecutable(Path.Combine(oldSlot, "vivarium-agent"));
+        MakeExecutable(Path.Combine(oldSlot, "viv-agent"));
         await File.WriteAllTextAsync(
             Path.Combine(installDir, "agent", "active.json"),
             JsonSerializer.Serialize(new
@@ -1938,7 +1938,7 @@ public sealed class AgentDeploymentTests
         using (var archive = new ZipArchive(result, ZipArchiveMode.Create, leaveOpen: true))
         {
             var executable = archive.CreateEntry(
-                rid == "win-x64" ? "vivarium-agent.exe" : "vivarium-agent",
+                rid == "win-x64" ? "viv-agent.exe" : "viv-agent",
                 CompressionLevel.NoCompression);
             using var writer = new StreamWriter(executable.Open(), Encoding.UTF8, leaveOpen: false);
             writer.Write(content);
@@ -1957,7 +1957,7 @@ public sealed class AgentDeploymentTests
                 var name = Path.GetFileName(file);
                 if (name == "Vivarium.Agent")
                 {
-                    name = "vivarium-agent";
+                    name = "viv-agent";
                 }
 
                 var entry = archive.CreateEntry(name, CompressionLevel.Fastest);
@@ -1978,13 +1978,13 @@ public sealed class AgentDeploymentTests
             var name = Path.GetFileName(file);
             if (renameAgentHost && name == "Vivarium.Agent")
             {
-                name = "vivarium-agent";
+                name = "viv-agent";
             }
 
             var target = Path.Combine(destination, name);
             File.Copy(file, target, overwrite: true);
             if (!OperatingSystem.IsWindows() &&
-                (name == "vivarium-agent" || name == "Vivarium.Bootstrap"))
+                (name == "viv-agent" || name == "Vivarium.Bootstrap"))
             {
                 File.SetUnixFileMode(
                     target,
