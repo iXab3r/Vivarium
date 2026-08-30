@@ -18,6 +18,15 @@ public sealed class ControllerOptions
     /// <summary>How long an assigned build waits for its owning agent to reconnect.</summary>
     public TimeSpan AgentReconnectGrace { get; init; } = TimeSpan.FromSeconds(60);
 
+    /// <summary>Cleanup window after the first TeamCity-style stop request.</summary>
+    public TimeSpan BuildGracefulStopTimeout { get; init; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>Maximum wait for a force-stop result before the Agent is quarantined.</summary>
+    public TimeSpan BuildForceStopTimeout { get; init; } = TimeSpan.FromSeconds(15);
+
+    /// <summary>Bound for an Agent to durably acknowledge one exact assignment/session.</summary>
+    public TimeSpan BuildAssignmentAckTimeout { get; init; } = TimeSpan.FromSeconds(15);
+
     /// <summary>How long a build may wait in the queue before any payload starts.</summary>
     public TimeSpan BuildQueueWaitTimeout { get; init; } = DefaultBuildQueueWaitTimeout;
 

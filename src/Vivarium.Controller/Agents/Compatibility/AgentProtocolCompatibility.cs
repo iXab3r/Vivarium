@@ -98,6 +98,13 @@ internal static class AgentProtocolCompatibility
         ValidatePackageDigest(hello.AgentPackageSha256);
         ValidateOptionalText(hello.UpgradeOperationId, 128, "upgrade_operation_id");
         ValidateOptionalText(hello.UpgradeFailureCode, 64, "upgrade_failure_code");
+        ValidateOptionalText(hello.ProcessInstanceId, 128, "process_instance_id");
+        if (hello.ProcessInstanceId.Length > 0 &&
+            (hello.ProcessInstanceId.Length < 16 ||
+             hello.ProcessInstanceId.Any(character => !char.IsAsciiLetterOrDigit(character))))
+        {
+            throw Invalid("process_instance_id must contain 16-128 ASCII letters or digits");
+        }
         var advertised = NormalizeCapabilities(hello.Capabilities);
         ValidateHostFacts(hello, advertised);
         var negotiated = advertised
@@ -188,11 +195,15 @@ internal static class AgentProtocolCompatibility
             hello.CredentialGeneration != 0 ||
             hello.AgentPackageSha256.Length != 0 ||
             hello.UpgradeOperationId.Length != 0 ||
-            hello.UpgradeFailureCode.Length != 0)
+            hello.UpgradeFailureCode.Length != 0 ||
+            hello.WorkloadRecoveryOutcome != WorkloadRecoveryOutcome.Unspecified ||
+            hello.WorkloadRecoveryBuildId.Length != 0 ||
+            hello.WorkloadRecoveryFailureCode.Length != 0 ||
+            hello.ProcessInstanceId.Length != 0)
         {
             throw Invalid(
                 "legacy protocol requires empty capabilities, host_facts, credential_generation, " +
-                "agent_package_sha256, and upgrade fields");
+                "agent_package_sha256, upgrade, workload recovery, and process instance fields");
         }
     }
 

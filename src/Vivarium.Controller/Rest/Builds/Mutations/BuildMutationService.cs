@@ -75,11 +75,12 @@ internal sealed class BuildMutationService(
         ManagementRequestContext context,
         string matrixBuildId,
         string reason,
+        BuildStopMode mode,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
-        var snapshot = await cancellations.CancelAsync(context, matrixBuildId, reason);
+        var snapshot = await cancellations.CancelAsync(context, matrixBuildId, reason, mode);
         if (snapshot is null)
         {
             return null;

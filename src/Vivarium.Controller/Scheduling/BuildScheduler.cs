@@ -164,7 +164,15 @@ public sealed class BuildScheduler : BackgroundService
         }
 
         await builds.RefreshCancellationAsync(item.BuildId);
-        if (!agents.TrySend(connection!, new ControllerMsg { Build = item.Assignment }))
+        if (!await builds.PrepareAssignmentAttemptAsync(item.BuildId, connection!))
+        {
+            await builds.OnSessionLostAsync(new AgentSessionLoss(
+                connection.AgentId, connection.SessionId, item.BuildId));
+            log.LogWarning(
+                "prepared build {BuildId} could not persist its assignment attempt",
+                item.BuildId);
+        }
+        else if (!agents.TrySend(connection!, new ControllerMsg { Build = item.Assignment }))
         {
             await builds.OnSessionLostAsync(new AgentSessionLoss(
                 connection.AgentId, connection.SessionId, item.BuildId));
@@ -248,7 +256,15 @@ public sealed class BuildScheduler : BackgroundService
             return;
         }
 
-        if (!agents.TrySend(connection, new ControllerMsg { Build = item.Assignment }))
+        if (!await builds.PrepareAssignmentAttemptAsync(item.BuildId, connection))
+        {
+            await builds.OnSessionLostAsync(new AgentSessionLoss(
+                connection.AgentId, connection.SessionId, item.BuildId));
+            log.LogWarning(
+                "prepared build {BuildId} could not persist its assignment attempt",
+                item.BuildId);
+        }
+        else if (!agents.TrySend(connection, new ControllerMsg { Build = item.Assignment }))
         {
             await builds.OnSessionLostAsync(new AgentSessionLoss(
                 connection.AgentId, connection.SessionId, item.BuildId));
@@ -265,6 +281,8 @@ public sealed class BuildScheduler : BackgroundService
     private static bool IsDispatchEligible(AgentSnapshot agent) =>
         agent.Connected &&
         agent.Reconciled &&
+        !agent.Quarantined &&
+        agent.OperationalHealth == AgentOperationalHealth.Healthy &&
         !agent.ParametersChanging &&
         agent.Authorization == AgentAuth.Authorized &&
         agent.Enabled &&

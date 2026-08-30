@@ -928,6 +928,37 @@ includes the held-drain flag, current phase, observed generation/package, failur
 history. Release-channel and staged-rollout policy may later be Git-backed, but it must use this same
 operation path rather than bypass it.
 
+### D31. Agent responsiveness is independently supervised and ambiguity quarantines capacity
+
+Connection, control responsiveness, workload reconciliation, health, lifecycle, and occupancy are
+independent Agent facts. A fresh heartbeat proves only that the current authenticated transport can
+write; every heartbeat carries a small workload assertion which the controller validates against its
+durable owner and fence. Conflicting or missing evidence makes the Agent non-eligible. No reconnect,
+timeout, force-release, or controller-restart path may infer `idle` from silence.
+
+Every Build workload starts inside a native containment boundary and records enough durable local
+identity for a restarted Agent to kill or reconcile surviving work before declaring readiness. Stop is
+two-level and bounded: the first request asks for graceful termination and permits only explicit
+cancellation-cleanup steps; a separately authorized force request terminates the entire containment
+and skips remaining cleanup. Grace expiry quarantines and never grants force authority. Stop intent,
+first reason, mode, acknowledgement, and one non-extending deadline per phase are durable. Missing
+positive termination evidence leaves the Build historically terminal
+only where policy permits, but holds the Agent `UNKNOWN`/quarantined rather than making it schedulable.
+
+Heartbeat, cancellation, fencing, assignment/result acknowledgements, and terminal results use a
+reserved priority control path. Workload output is byte-bounded, may be represented by explicit gaps,
+and cannot block the control path or grow Agent/controller memory without limit. General Agent-process
+restart is a durable operation distinct from package upgrade and machine reboot. It supports waiting
+for current work, cancel-then-restart, and force escalation. If the Agent process cannot consume the
+command, Bootstrap may consume one authenticated `restart-current-child` lifecycle directive and
+terminate the exact recorded child; Bootstrap receives no Build or AgentExplorer domain semantics.
+
+An in-band controller cannot recover a powered-off physical host, kernel hang, or broken network
+without a provider/BMC. Such a host is explicitly `UNREACHABLE` and retains ambiguous occupancy until
+provider or operator reconciliation. The detailed failure catalogue, implementation status, and
+release evidence are maintained in
+[`docs/design/agent-lifecycle-recovery.md`](design/agent-lifecycle-recovery.md).
+
 ## 5. Protocol sketch
 
 ```proto
@@ -946,7 +977,9 @@ message AgentMsg {
     BuildResult result = 4;    // per-step exit codes + sha256 list of uploaded artifacts
     Heartbeat heartbeat = 5;
     AssignmentAccepted assignment_accepted = 6; // exact session accepted build ownership
-    // The future parsed ServiceMessage field must use the next free tag, 7 (D14).
+    // Tag 7 remains reserved for the future parsed ServiceMessage field (D14).
+    BuildStopAcknowledged build_stop_acknowledged = 11;
+    AgentRestartAcknowledged agent_restart_acknowledged = 12;
   }
 }
 
@@ -974,6 +1007,11 @@ message Hello {
   bool interactive = 10;       // live desktop present
   string running_build_id = 11;  // non-empty on re-hello: ghost re-adoption (D4)
   string pool_nonce = 12;      // injected at CreatePoolVm (KVP / fw_cfg) — host-verified identity (D7)
+  // Additive capability/upgrade fields occupy 13-20 (D22/D30).
+  WorkloadRecoveryOutcome workload_recovery_outcome = 21;
+  string workload_recovery_build_id = 22;
+  string workload_recovery_failure_code = 23;
+  string process_instance_id = 24; // one supervised child incarnation; stable across reconnects
 }
 
 message BuildAssignment {
@@ -988,6 +1026,16 @@ message BuildAssignment {
 message CancelBuild {
   string build_id = 1;
   string reason = 2;
+  BuildStopMode mode = 3;
+  string operation_id = 4;
+  int64 deadline_unix_ms = 5;
+}
+
+message RestartAgent {
+  string reason = 1;
+  string operation_id = 2;
+  AgentRestartMode mode = 3;
+  int64 deadline_unix_ms = 4;
 }
 
 message AssignmentAccepted {

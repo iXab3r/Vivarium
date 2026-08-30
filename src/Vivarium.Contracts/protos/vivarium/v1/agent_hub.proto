@@ -21,6 +21,8 @@ message AgentMsg {
     UpgradeHealthConfirmed upgrade_health_confirmed = 8; // tag 7 remains reserved for TeamCity service messages (D14)
     UpgradeCommitConfirmed upgrade_commit_confirmed = 9; // durable launcher commit marker written (D30)
     UpgradeFinalizationConfirmed upgrade_finalization_confirmed = 10; // server-recorded marker persisted locally (D30)
+    BuildStopAcknowledged build_stop_acknowledged = 11; // exact fenced graceful/force intent entered Agent control loop (D31)
+    AgentRestartAcknowledged agent_restart_acknowledged = 12; // restart intent accepted before Agent exits (D31)
   }
 }
 
@@ -115,6 +117,10 @@ message Hello {
   string agent_package_sha256 = 18;   // lowercase SHA-256 of the running package; empty when unavailable
   string upgrade_operation_id = 19;  // launcher-supplied durable operation whose package is running
   string upgrade_failure_code = 20;  // bounded launcher failure/rollback evidence for this operation
+  WorkloadRecoveryOutcome workload_recovery_outcome = 21; // startup cleanup result for a previous active-work journal (D31)
+  string workload_recovery_build_id = 22; // exact Build covered by workload_recovery_outcome
+  string workload_recovery_failure_code = 23; // bounded non-secret recovery diagnostic
+  string process_instance_id = 24; // stable for one supervised Agent child; changes on process restart (D31)
 }
 
 enum AgentProtocolMode {
@@ -187,10 +193,42 @@ message AssignmentAccepted {
 message CancelBuild {
   string build_id = 1;
   string reason = 2;
+  BuildStopMode mode = 3;
+  string operation_id = 4;
+  int64 deadline_unix_ms = 5; // persisted controller deadline; Agent never extends it
 }
 
 message RestartAgent {
   string reason = 1;
+  string operation_id = 2;
+  AgentRestartMode mode = 3;
+  int64 deadline_unix_ms = 4;
+}
+
+enum BuildStopMode {
+  BUILD_STOP_MODE_UNSPECIFIED = 0; // legacy controller: immediate cancellation using the best available mechanism
+  BUILD_STOP_MODE_GRACEFUL = 1;
+  BUILD_STOP_MODE_FORCE = 2;
+}
+
+message BuildStopAcknowledged {
+  string build_id = 1;
+  string operation_id = 2;
+  BuildStopMode mode = 3;
+  string session_id = 4;
+}
+
+enum AgentRestartMode {
+  AGENT_RESTART_MODE_UNSPECIFIED = 0;
+  AGENT_RESTART_MODE_AFTER_CURRENT_WORK = 1;
+  AGENT_RESTART_MODE_CANCEL_THEN_RESTART = 2;
+  AGENT_RESTART_MODE_FORCE = 3;
+}
+
+message AgentRestartAcknowledged {
+  string operation_id = 1;
+  AgentRestartMode mode = 2;
+  string session_id = 3;
 }
 
 message UpgradeHealthAccepted {
@@ -290,4 +328,12 @@ enum BuildOutcome {
 
 message Heartbeat {
   string running_build_id = 1;
+  uint64 sequence = 2; // monotonic for one Agent process; duplicates/regressions are not current evidence
+}
+
+enum WorkloadRecoveryOutcome {
+  WORKLOAD_RECOVERY_OUTCOME_UNSPECIFIED = 0;
+  WORKLOAD_RECOVERY_OUTCOME_NOT_REQUIRED = 1;
+  WORKLOAD_RECOVERY_OUTCOME_SUCCEEDED = 2;
+  WORKLOAD_RECOVERY_OUTCOME_FAILED = 3;
 }

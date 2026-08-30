@@ -17,6 +17,7 @@ internal sealed record AgentReadPageProjection(
 
 internal sealed class AgentRestProjection(
     AgentStore store,
+    AgentOperationalStore operationalStore,
     AgentRegistry registry,
     MatrixBuildStore matrixBuilds,
     ControllerOptions options,
@@ -76,14 +77,14 @@ internal sealed class AgentRestProjection(
             return null;
         }
 
-        var runtime = RuntimeFor(stored.Agent);
+        var runtime = await RuntimeForAsync(stored.Agent);
         return ToFactsResource(stored, runtime);
     }
 
     private async Task<AgentResource> ToResourceAsync(StoredAgentProjection projection)
     {
         var stored = projection.Agent;
-        var runtime = RuntimeFor(stored);
+        var runtime = await RuntimeForAsync(stored);
         var now = timeProvider.GetUtcNow();
         var age = now > runtime.LastCommunication
             ? now - runtime.LastCommunication
@@ -111,6 +112,8 @@ internal sealed class AgentRestProjection(
         var observationRevision = $"observation:{projection.Observation?.Revision ?? 0}";
         var runtimeRevision = $"runtime:{runtime.ConnectionGeneration}:{runtime.ParameterGeneration}:" +
             $"{(runtime.Connected ? 1 : 0)}:{(runtime.Reconciled ? 1 : 0)}:" +
+            $"{HealthValue(runtime.OperationalHealth)}:{(runtime.Quarantined ? 1 : 0)}:" +
+            $"{runtime.OperationalReason}:" +
             $"{(runtime.Authorized ? 1 : 0)}:{(runtime.Enabled ? 1 : 0)}:" +
             $"{ActivityValue(runtime.Activity)}:{runtime.CurrentBuildId}:{freshness}:" +
             runtime.LastCommunication.ToUnixTimeMilliseconds();
@@ -123,6 +126,9 @@ internal sealed class AgentRestProjection(
             new AgentStatusResource(
                 runtime.Connected,
                 runtime.Reconciled,
+                HealthValue(runtime.OperationalHealth),
+                runtime.Quarantined,
+                runtime.OperationalReason,
                 runtime.Authorized,
                 runtime.Enabled,
                 ActivityValue(runtime.Activity)),
@@ -294,14 +300,18 @@ internal sealed class AgentRestProjection(
     private static string? NullIfEmpty(string? value) =>
         string.IsNullOrEmpty(value) ? null : value;
 
-    private RuntimeProjection RuntimeFor(StoredAgent stored)
+    private async Task<RuntimeProjection> RuntimeForAsync(StoredAgent stored)
     {
         var live = registry.Get(stored.AgentId);
         if (live is null)
         {
+            var operational = await operationalStore.GetAsync(stored.AgentId);
             return new RuntimeProjection(
                 Connected: false,
                 Reconciled: false,
+                operational?.Health ?? AgentOperationalHealth.Unknown,
+                operational?.Quarantined ?? false,
+                operational?.Reason ?? "disconnected",
                 stored.Authorized,
                 stored.Enabled,
                 AgentActivity.Idle,
@@ -316,6 +326,9 @@ internal sealed class AgentRestProjection(
             return new RuntimeProjection(
                 live.Connected,
                 live.Reconciled,
+                live.OperationalHealth,
+                live.Quarantined,
+                live.OperationalReason,
                 live.Auth == AgentAuth.Authorized,
                 live.Enabled,
                 live.Activity,
@@ -372,9 +385,20 @@ internal sealed class AgentRestProjection(
         _ => throw new ArgumentException($"unknown agent activity '{value}'", nameof(value)),
     };
 
+    private static string HealthValue(AgentOperationalHealth health) => health switch
+    {
+        AgentOperationalHealth.Unknown => "unknown",
+        AgentOperationalHealth.Healthy => "healthy",
+        AgentOperationalHealth.Unhealthy => "unhealthy",
+        _ => "unknown",
+    };
+
     private sealed record RuntimeProjection(
         bool Connected,
         bool Reconciled,
+        AgentOperationalHealth OperationalHealth,
+        bool Quarantined,
+        string OperationalReason,
         bool Authorized,
         bool Enabled,
         AgentActivity Activity,

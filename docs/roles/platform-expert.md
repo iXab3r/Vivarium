@@ -131,7 +131,8 @@ A platform-facing change is not ready until its review records:
   collectors.
 - Define and prove agent service/install layouts without changing the frozen-bootstrap candidate
   prematurely.
-- Prove graceful-then-forced process-tree cancellation on all supported platforms.
+- Prove graceful stop and separately authorized force process-tree termination on all supported
+  platforms.
 - Add AgentExplorer process, network-endpoint, and environment collectors with partial-failure behavior.
 - Close the Windows secret-file ACL gap and define the macOS/Linux equivalent install permissions.
 - Establish per-RID package/install/upgrade tests and the support evidence published with releases.

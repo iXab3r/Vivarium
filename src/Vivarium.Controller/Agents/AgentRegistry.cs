@@ -17,6 +17,13 @@ public enum AgentActivity
     Upgrading,
 }
 
+public enum AgentOperationalHealth
+{
+    Unknown,
+    Healthy,
+    Unhealthy,
+}
+
 public sealed record AgentSessionSnapshot(string AgentId, string SessionId, long ConnectionGeneration);
 
 public sealed record AgentSessionLoss(string AgentId, string SessionId, string? CurrentBuildId);
@@ -34,6 +41,9 @@ public sealed record AgentSnapshot(
     string Name,
     bool Connected,
     bool Reconciled,
+    AgentOperationalHealth OperationalHealth,
+    bool Quarantined,
+    string OperationalReason,
     AgentAuth Authorization,
     bool Enabled,
     AgentActivity Activity,
@@ -61,6 +71,9 @@ public sealed class ConnectedAgent
     public bool Enabled { get; set; }
     public bool Connected { get; set; }
     public bool Reconciled { get; set; }
+    public AgentOperationalHealth OperationalHealth { get; set; } = AgentOperationalHealth.Unknown;
+    public bool Quarantined { get; set; }
+    public string OperationalReason { get; set; } = "session_not_reconciled";
     public AgentActivity Activity { get; set; } = AgentActivity.Idle;
     public string? CurrentBuildId { get; set; }
     public string SessionId { get; set; } = string.Empty;
@@ -69,6 +82,7 @@ public sealed class ConnectedAgent
     public bool ParametersChanging { get; set; }
     public bool MaintenanceDrain { get; set; }
     public DateTimeOffset LastHeartbeat { get; set; }
+    public ulong LastHeartbeatSequence { get; set; }
     public CancellationTokenSource? SessionAbort { get; set; }
     public Channel<ControllerMsg> Outbox { get; set; } = NewOutbox();
     public TaskCompletionSource<long> SessionChanged { get; set; } = NewSessionSignal();
@@ -89,12 +103,17 @@ public sealed class AgentRegistry
 {
     private readonly ConcurrentDictionary<string, ConnectedAgent> agents = new();
     private readonly AgentStore? store;
+    private readonly AgentOperationalStore? operationalStore;
     private readonly TimeProvider timeProvider;
 
-    public AgentRegistry(AgentStore? store = null, TimeProvider? timeProvider = null)
+    public AgentRegistry(
+        AgentStore? store = null,
+        TimeProvider? timeProvider = null,
+        AgentOperationalStore? operationalStore = null)
     {
         this.store = store;
         this.timeProvider = timeProvider ?? TimeProvider.System;
+        this.operationalStore = operationalStore;
     }
 
     public event Action? Changed;
@@ -180,10 +199,24 @@ public sealed class AgentRegistry
             agent.MaintenanceDrain = maintenanceDrain;
             agent.Connected = true;
             agent.Reconciled = false;
+            if (hello.WorkloadRecoveryOutcome == WorkloadRecoveryOutcome.Failed)
+            {
+                agent.OperationalHealth = AgentOperationalHealth.Unhealthy;
+                agent.Quarantined = true;
+                agent.OperationalReason = string.IsNullOrWhiteSpace(hello.WorkloadRecoveryFailureCode)
+                    ? "workload_recovery_failed"
+                    : hello.WorkloadRecoveryFailureCode;
+            }
+            else if (!agent.Quarantined)
+            {
+                agent.OperationalHealth = AgentOperationalHealth.Unknown;
+                agent.OperationalReason = "session_not_reconciled";
+            }
             agent.SessionId = hello.SessionId;
             agent.ConnectionGeneration = acceptedGeneration;
             agent.ParameterGeneration++;
             agent.LastHeartbeat = timeProvider.GetUtcNow();
+            agent.LastHeartbeatSequence = 0;
             agent.SessionAbort = sessionAbort;
             agent.Outbox = ConnectedAgent.NewOutbox();
             agent.SessionChanged = ConnectedAgent.NewSessionSignal();
@@ -231,22 +264,46 @@ public sealed class AgentRegistry
         return loss;
     }
 
-    public void Heartbeat(AgentConnectionHandle connection)
+    public bool Heartbeat(AgentConnectionHandle connection, Heartbeat heartbeat)
     {
         var agent = Get(connection.AgentId);
         if (agent == null)
         {
-            return;
+            return false;
         }
 
+        var sequenceRegressed = false;
         lock (agent.Gate)
         {
-            if (agent.SessionId == connection.SessionId &&
-                agent.ConnectionGeneration == connection.ConnectionGeneration)
+            if (agent.SessionId != connection.SessionId ||
+                agent.ConnectionGeneration != connection.ConnectionGeneration)
+            {
+                return false;
+            }
+
+            if (heartbeat.Sequence != 0 && heartbeat.Sequence <= agent.LastHeartbeatSequence)
+            {
+                agent.OperationalHealth = AgentOperationalHealth.Unhealthy;
+                agent.Quarantined = true;
+                agent.OperationalReason = "heartbeat_sequence_regressed";
+                sequenceRegressed = true;
+            }
+            else
             {
                 agent.LastHeartbeat = timeProvider.GetUtcNow();
+                if (heartbeat.Sequence != 0)
+                {
+                    agent.LastHeartbeatSequence = heartbeat.Sequence;
+                }
+                return true;
             }
         }
+
+        if (sequenceRegressed)
+        {
+            OnChanged();
+        }
+        return false;
     }
 
     public bool IsCurrent(AgentConnectionHandle connection)
@@ -292,6 +349,11 @@ public sealed class AgentRegistry
                 ? AgentActivity.Building
                 : agent.MaintenanceDrain ? AgentActivity.Upgrading : AgentActivity.Idle;
             agent.Reconciled = true;
+            if (!agent.Quarantined)
+            {
+                agent.OperationalHealth = AgentOperationalHealth.Healthy;
+                agent.OperationalReason = "reconciled";
+            }
             previousSignal = agent.SessionChanged;
             agent.SessionChanged = ConnectedAgent.NewSessionSignal();
         }
@@ -299,6 +361,109 @@ public sealed class AgentRegistry
         previousSignal.TrySetResult(connection.ConnectionGeneration);
         OnChanged();
         return true;
+    }
+
+    public bool Quarantine(string agentId, string reason)
+    {
+        var agent = Get(agentId);
+        if (agent is null)
+        {
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            agent.OperationalHealth = AgentOperationalHealth.Unhealthy;
+            agent.Quarantined = true;
+            agent.OperationalReason = reason;
+        }
+        OnChanged();
+        return true;
+    }
+
+    /// <summary>
+    /// A replacement Agent process is recovery evidence only when its workload assertion agrees
+    /// with the controller's reconciled owner. A new process alone cannot erase ambiguous occupancy.
+    /// </summary>
+    public bool TryClearQuarantineAfterRestart(
+        AgentConnectionHandle connection,
+        string reportedBuildId,
+        string reason)
+    {
+        var agent = Get(connection.AgentId);
+        if (agent is null)
+        {
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            var reportedOwner = string.IsNullOrEmpty(reportedBuildId) ? null : reportedBuildId;
+            if (!IsCurrentLocked(agent, connection) ||
+                !agent.Reconciled ||
+                !string.Equals(agent.CurrentBuildId, reportedOwner, StringComparison.Ordinal))
+            {
+                return false;
+            }
+            agent.Quarantined = false;
+            agent.OperationalHealth = AgentOperationalHealth.Healthy;
+            agent.OperationalReason = reason;
+        }
+        OnChanged();
+        return true;
+    }
+
+    public void ApplyStoredOperationalState(
+        AgentConnectionHandle connection,
+        StoredAgentOperationalState? stored)
+    {
+        if (stored is null)
+        {
+            return;
+        }
+
+        var agent = Get(connection.AgentId);
+        if (agent is null)
+        {
+            return;
+        }
+        lock (agent.Gate)
+        {
+            if (!IsCurrentLocked(agent, connection) || agent.Quarantined)
+            {
+                return;
+            }
+            agent.OperationalHealth = stored.Health;
+            agent.Quarantined = stored.Quarantined;
+            agent.OperationalReason = stored.Reason;
+        }
+        OnChanged();
+    }
+
+    public Task PersistOperationalStateAsync(string agentId)
+    {
+        if (operationalStore is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var agent = Get(agentId);
+        if (agent is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        AgentOperationalHealth health;
+        bool quarantined;
+        string reason;
+        lock (agent.Gate)
+        {
+            health = agent.OperationalHealth;
+            quarantined = agent.Quarantined;
+            reason = agent.OperationalReason;
+        }
+        return operationalStore.SetAsync(
+            agentId, health, quarantined, reason, timeProvider.GetUtcNow());
     }
 
     public void SetAuthorized(string agentId, bool authorized)
@@ -421,6 +586,13 @@ public sealed class AgentRegistry
             {
                 connection = null;
                 reason = $"agent '{agentId}' is still reconciling its session";
+                return false;
+            }
+
+            if (agent.Quarantined || agent.OperationalHealth != AgentOperationalHealth.Healthy)
+            {
+                connection = null;
+                reason = $"agent '{agentId}' is quarantined ({agent.OperationalReason})";
                 return false;
             }
 
@@ -624,6 +796,14 @@ public sealed class AgentRegistry
                 return false;
             }
 
+            if (agent.Quarantined || agent.OperationalHealth != AgentOperationalHealth.Healthy)
+            {
+                connection = null;
+                hello = agent.Hello.Clone();
+                reason = "agent_quarantined";
+                return false;
+            }
+
             if (agent.Auth != AgentAuth.Authorized)
             {
                 connection = null;
@@ -643,6 +823,94 @@ public sealed class AgentRegistry
             connection = ConnectionFor(agent);
             hello = agent.Hello.Clone();
             reason = null;
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Recovery controls intentionally remain available to an unhealthy or busy Agent. They are
+    /// fenced to the exact authenticated session but do not depend on scheduler eligibility.
+    /// </summary>
+    public bool TryGetControlConnection(
+        string agentId,
+        out AgentConnectionHandle? connection,
+        out string? reason)
+    {
+        var agent = Get(agentId);
+        if (agent is null)
+        {
+            connection = null;
+            reason = "agent_unknown";
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            if (!agent.Connected)
+            {
+                connection = null;
+                reason = "agent_disconnected";
+                return false;
+            }
+            if (agent.Auth != AgentAuth.Authorized)
+            {
+                connection = null;
+                reason = "agent_unauthorized";
+                return false;
+            }
+
+            connection = ConnectionFor(agent);
+            reason = null;
+            return true;
+        }
+    }
+
+    public bool SupportsCapability(
+        AgentConnectionHandle connection,
+        string capabilityId,
+        uint contractMajor)
+    {
+        var agent = Get(connection.AgentId);
+        if (agent is null)
+        {
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            return agent.Connected &&
+                agent.SessionId == connection.SessionId &&
+                agent.ConnectionGeneration == connection.ConnectionGeneration &&
+                agent.Hello.Capabilities.Any(capability =>
+                    string.Equals(
+                        capability.CapabilityId,
+                        capabilityId,
+                        StringComparison.Ordinal) &&
+                    capability.ContractMajor == contractMajor);
+        }
+    }
+
+    public bool TryGetProcessInstanceId(
+        AgentConnectionHandle connection,
+        out string? processInstanceId)
+    {
+        var agent = Get(connection.AgentId);
+        if (agent is null)
+        {
+            processInstanceId = null;
+            return false;
+        }
+
+        lock (agent.Gate)
+        {
+            if (!IsCurrentLocked(agent, connection) ||
+                string.IsNullOrWhiteSpace(agent.Hello.ProcessInstanceId))
+            {
+                processInstanceId = null;
+                return false;
+            }
+
+            processInstanceId = agent.Hello.ProcessInstanceId;
             return true;
         }
     }
@@ -697,6 +965,8 @@ public sealed class AgentRegistry
             {
                 if (agent.Connected &&
                     agent.Reconciled &&
+                    !agent.Quarantined &&
+                    agent.OperationalHealth == AgentOperationalHealth.Healthy &&
                     agent.ConnectionGeneration > afterGeneration &&
                     agent.Activity == AgentActivity.Idle &&
                     agent.Hello.RunningBuildId.Length == 0)
@@ -719,32 +989,42 @@ public sealed class AgentRegistry
         }
 
         var persisted = await store.ListAsync();
-        return persisted.Select(record =>
+        var snapshots = new List<AgentSnapshot>(persisted.Count);
+        foreach (var record in persisted)
         {
             var live = Get(record.AgentId);
             if (live == null)
             {
-                return new AgentSnapshot(
+                var operational = operationalStore is null
+                    ? null
+                    : await operationalStore.GetAsync(record.AgentId);
+                snapshots.Add(new AgentSnapshot(
                     record.AgentId, record.Name, false, false,
+                    operational?.Health ?? AgentOperationalHealth.Unknown,
+                    operational?.Quarantined ?? false,
+                    operational?.Reason ?? "disconnected",
                     record.Authorized ? AgentAuth.Authorized : AgentAuth.Unauthorized,
                     record.Enabled, AgentActivity.Idle, null, record.LastSeen, 0, 0, false,
                     record.ReportedParameters, record.CustomParameters, record.Parameters,
                     record.AgentVersion, record.OsFamily, record.OsVersion,
-                    record.Architecture, record.Interactive);
+                    record.Architecture, record.Interactive));
+                continue;
             }
 
             lock (live.Gate)
             {
-                return new AgentSnapshot(
+                snapshots.Add(new AgentSnapshot(
                     record.AgentId, record.Name, live.Connected, live.Reconciled,
+                    live.OperationalHealth, live.Quarantined, live.OperationalReason,
                     live.Auth, live.Enabled,
                     live.Activity, live.CurrentBuildId, live.LastHeartbeat, live.ConnectionGeneration,
                     live.ParameterGeneration, live.ParametersChanging,
                     record.ReportedParameters, record.CustomParameters,
                     record.Parameters, record.AgentVersion, record.OsFamily, record.OsVersion,
-                    record.Architecture, record.Interactive);
+                    record.Architecture, record.Interactive));
             }
-        }).ToArray();
+        }
+        return snapshots;
     }
 
     public void Remove(string agentId)
@@ -775,6 +1055,7 @@ public sealed class AgentRegistry
         {
             return new AgentSnapshot(
                 agent.AgentId, agent.AgentId, agent.Connected, agent.Reconciled,
+                agent.OperationalHealth, agent.Quarantined, agent.OperationalReason,
                 agent.Auth, agent.Enabled,
                 agent.Activity, agent.CurrentBuildId, agent.LastHeartbeat, agent.ConnectionGeneration,
                 agent.ParameterGeneration, agent.ParametersChanging,

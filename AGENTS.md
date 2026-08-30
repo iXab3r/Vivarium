@@ -63,7 +63,15 @@ an explicit development/test option. Real
 bootstrap child-process success and rollback paths and two-Agent isolation have tier-2 evidence.
 Installers/stamped enrollment archives, signing, previous-release compatibility CI, fleet rollout
 orchestration/channels, and the remaining bootstrap bad-download/interrupted-activation evidence are
-not complete, so the bootstrap stays change-controlled and is not yet declared frozen. The docs remain authoritative
+not complete, so the bootstrap stays change-controlled and is not yet declared frozen. The first D31
+responsiveness slice now adds an active-Build journal and startup reconciliation, explicit graceful and
+separately authorized force stop, durable stop/assignment acknowledgements and deadlines, fenced
+heartbeat workload assertions, persistent health quarantine, priority/byte-bounded Agent messaging,
+bounded controller live logs, and durable general Agent restart confirmed only by a newer connection
+generation and a different Bootstrap child process-instance fence. Native process
+containment/resource governance, durable output-gap evidence, an
+out-of-process controller-to-Bootstrap recovery path for a wedged Agent, CLI/UI lifecycle actions, and
+cross-platform fault evidence remain open. The docs remain authoritative
 for shape — when code and a decision disagree, fix one of them in the same
 commit, never neither.
 

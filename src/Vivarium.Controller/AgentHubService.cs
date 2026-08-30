@@ -13,29 +13,35 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
 {
     private readonly AgentRegistry registry;
     private readonly AgentStore store;
+    private readonly AgentOperationalStore operationalStore;
     private readonly TokenStore tokens;
     private readonly AgentLifecycleCoordinator lifecycle;
     private readonly BuildTracker builds;
     private readonly TimeProvider timeProvider;
     private readonly AgentUpgradeService upgrades;
+    private readonly AgentRestartService restarts;
     private readonly ILogger<AgentHubService> log;
 
     public AgentHubService(
         AgentRegistry registry,
         AgentStore store,
+        AgentOperationalStore operationalStore,
         TokenStore tokens,
         AgentLifecycleCoordinator lifecycle,
         BuildTracker builds,
         AgentUpgradeService upgrades,
+        AgentRestartService restarts,
         TimeProvider timeProvider,
         ILogger<AgentHubService> log)
     {
         this.registry = registry;
         this.store = store;
+        this.operationalStore = operationalStore;
         this.tokens = tokens;
         this.lifecycle = lifecycle;
         this.builds = builds;
         this.upgrades = upgrades;
+        this.restarts = restarts;
         this.timeProvider = timeProvider;
         this.log = log;
     }
@@ -111,6 +117,7 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
         AgentGenerationState generations;
         CancellationTokenSource session;
         AgentConnectionHandle connection;
+        StoredAgentOperationalState? operationalState;
         await using (await lifecycle.AcquireAsync(hello.AgentId, context.CancellationToken))
         {
             admission = await tokens.AdmitAgentAsync(
@@ -128,6 +135,8 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
             }
 
             await store.ObserveHelloAsync(hello);
+            operationalState = await operationalStore.GetAsync(hello.AgentId);
+            var restartDrain = await restarts.HasActiveAsync(hello.AgentId);
             generations = await store.AcceptSessionAsync(
                 hello.AgentId,
                 admission.CredentialGeneration);
@@ -138,9 +147,11 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                     hello,
                     admission.Authorization,
                     admission.Enabled,
-                    admission.MaintenanceDrain,
+                    admission.MaintenanceDrain || restartDrain,
                     generations.ConnectionGeneration,
                     session);
+                registry.ApplyStoredOperationalState(connection, operationalState);
+                await registry.PersistOperationalStateAsync(hello.AgentId);
             }
             catch
             {
@@ -234,6 +245,20 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
              negotiation.IsLegacy && hello.RunningBuildId.Length > 0))
         {
             await builds.OnAgentReconnectedAsync(connection, hello.RunningBuildId);
+            var restartConfirmed = await restarts.OnAgentConnectedAsync(connection);
+            if (restartConfirmed &&
+                hello.WorkloadRecoveryOutcome != WorkloadRecoveryOutcome.Failed)
+            {
+                registry.TryClearQuarantineAfterRestart(
+                    connection,
+                    hello.RunningBuildId,
+                    "restart_reconciled");
+            }
+            if (restartConfirmed)
+            {
+                registry.SetMaintenanceDrain(connection.AgentId, admission.MaintenanceDrain);
+            }
+            await registry.PersistOperationalStateAsync(connection.AgentId);
             var healthAcceptance = await upgrades.OnAgentReconciledAsync(connection, session.Token);
             if (healthAcceptance is not null)
             {
@@ -252,7 +277,7 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                 switch (msg.MsgCase)
                 {
                     case AgentMsg.MsgOneofCase.Heartbeat:
-                        registry.Heartbeat(connection);
+                        await builds.OnHeartbeatAsync(msg.Heartbeat, connection);
                         break;
                     case AgentMsg.MsgOneofCase.Log:
                         builds.OnLog(msg.Log, connection);
@@ -266,6 +291,14 @@ public sealed class AgentHubService : AgentHub.AgentHubBase
                     case AgentMsg.MsgOneofCase.AssignmentAccepted:
                         await builds.OnAssignmentAcceptedAsync(
                             msg.AssignmentAccepted, connection);
+                        break;
+                    case AgentMsg.MsgOneofCase.BuildStopAcknowledged:
+                        await builds.OnBuildStopAcknowledgedAsync(
+                            msg.BuildStopAcknowledged, connection);
+                        break;
+                    case AgentMsg.MsgOneofCase.AgentRestartAcknowledged:
+                        await restarts.OnAcknowledgedAsync(
+                            msg.AgentRestartAcknowledged, connection);
                         break;
                     case AgentMsg.MsgOneofCase.UpgradeHealthConfirmed:
                         await upgrades.ConfirmHealthAsync(

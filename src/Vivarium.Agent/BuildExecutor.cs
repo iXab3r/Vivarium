@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Google.Protobuf;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -12,6 +13,9 @@ namespace Vivarium.Agent;
 /// </summary>
 public static class BuildExecutor
 {
+    private static readonly TimeSpan ForceTerminationTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan OutputDrainTimeout = TimeSpan.FromSeconds(5);
+
     public static async Task<BuildResult> ExecuteAsync(
         string workRoot,
         BuildAssignment assignment,
@@ -20,51 +24,126 @@ public static class BuildExecutor
         string sessionId,
         CancellationToken ct)
     {
+        using var stop = new BuildStopController(ct);
+        return await ExecuteAsync(
+            workRoot, assignment, blobs, send, sessionId, stop, observeProcess: null);
+    }
+
+    internal static async Task<BuildResult> ExecuteAsync(
+        string workRoot,
+        BuildAssignment assignment,
+        BlobClient blobs,
+        Func<AgentMsg, CancellationToken, Task> send,
+        string sessionId,
+        BuildStopController stop,
+        Action<Process?>? observeProcess)
+    {
         var workdir = ResolveUnder(workRoot, assignment.BuildId);
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
 
-        await SendStatusAsync(send, assignment.BuildId, -1, "FETCHING", ct);
-        foreach (var blob in assignment.Payload)
+        try
         {
-            await FetchBlobAsync(blob, workdir, assignment.BuildId, sessionId, blobs, ct);
+            await SendStatusAsync(
+                send, assignment.BuildId, -1, "FETCHING", stop.GracefulToken);
+            foreach (var blob in assignment.Payload)
+            {
+                await FetchBlobAsync(
+                    blob, workdir, assignment.BuildId, sessionId, blobs, stop.GracefulToken);
+            }
+        }
+        catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
+        {
+            return CancelledResult(result, stop);
         }
 
         var anyFailed = false;
+        var stopping = false;
         for (var i = 0; i < assignment.Steps.Count; i++)
         {
             var step = assignment.Steps[i];
-            if (!ShouldRun(step.Policy, anyFailed))
+            if (stop.Mode == BuildStopMode.Force)
+            {
+                stopping = true;
+                result.Steps.Add(new StepResult { StepIndex = i, Skipped = true });
+                continue;
+            }
+            if (stop.Mode == BuildStopMode.Graceful)
+            {
+                stopping = true;
+            }
+            if (stopping && step.Policy != StepPolicy.Always ||
+                !stopping && !ShouldRun(step.Policy, anyFailed))
             {
                 result.Steps.Add(new StepResult { StepIndex = i, Skipped = true });
                 continue;
             }
 
-            await SendStatusAsync(send, assignment.BuildId, i, "RUNNING", ct);
-            var stepResult = await RunStepAsync(workdir, assignment, i, step, send, ct);
-            result.Steps.Add(stepResult);
-            if (stepResult.ExitCode != 0 || stepResult.TimedOut)
+            var stepToken = stopping ? stop.ForceToken : stop.GracefulToken;
+            StepExecution execution;
+            try
+            {
+                await SendStatusAsync(
+                    send,
+                    assignment.BuildId,
+                    i,
+                    stopping ? "CANCELLATION_CLEANUP" : "RUNNING",
+                    stepToken);
+                execution = await RunStepAsync(
+                    workdir, assignment, i, step, send, stop, stepToken, observeProcess);
+            }
+            catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
+            {
+                result.Steps.Add(new StepResult { StepIndex = i, Skipped = true });
+                stopping = true;
+                continue;
+            }
+            result.Steps.Add(execution.Result);
+            if (execution.Stopped)
+            {
+                stopping = true;
+                continue;
+            }
+            if (execution.Result.ExitCode != 0 || execution.Result.TimedOut)
             {
                 anyFailed = true;
             }
         }
 
-        await SendStatusAsync(send, assignment.BuildId, -1, "COLLECTING", ct);
-        foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect))
+        if (stop.Mode != BuildStopMode.Force)
         {
-            var fullPath = Path.Combine(workdir, relativePath);
-            var sha = await blobs.UploadAsync(
-                fullPath,
-                assignment.BuildId,
-                sessionId,
-                ct);
-            result.Artifacts.Add(new Artifact
+            var collectionToken = stop.Mode == BuildStopMode.Graceful
+                ? stop.ForceToken
+                : stop.GracefulToken;
+            try
             {
-                Path = relativePath.Replace('\\', '/'),
-                Sha256 = sha,
-                Size = new FileInfo(fullPath).Length,
-            });
+                await SendStatusAsync(
+                    send, assignment.BuildId, -1, "COLLECTING", collectionToken);
+                foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect))
+                {
+                    var fullPath = Path.Combine(workdir, relativePath);
+                    var sha = await blobs.UploadAsync(
+                        fullPath,
+                        assignment.BuildId,
+                        sessionId,
+                        collectionToken);
+                    result.Artifacts.Add(new Artifact
+                    {
+                        Path = relativePath.Replace('\\', '/'),
+                        Sha256 = sha,
+                        Size = new FileInfo(fullPath).Length,
+                    });
+                }
+            }
+            catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
+            {
+            }
+        }
+
+        if (stop.Mode != BuildStopMode.Unspecified)
+        {
+            return CancelledResult(result, stop);
         }
 
         result.Outcome = anyFailed ? BuildOutcome.Failed : BuildOutcome.Succeeded;
@@ -118,13 +197,15 @@ public static class BuildExecutor
         _ => !anyFailed,
     };
 
-    private static async Task<StepResult> RunStepAsync(
+    private static async Task<StepExecution> RunStepAsync(
         string workdir,
         BuildAssignment assignment,
         int stepIndex,
         Step step,
         Func<AgentMsg, CancellationToken, Task> send,
-        CancellationToken ct)
+        BuildStopController stop,
+        CancellationToken ct,
+        Action<Process?>? observeProcess)
     {
         var resultsDir = ResolveUnder(workdir, "results");
         Directory.CreateDirectory(resultsDir);
@@ -163,9 +244,19 @@ public static class BuildExecutor
 
         using var process = Process.Start(psi)
             ?? throw new InvalidOperationException($"failed to start '{step.Program}'");
+        try
+        {
+            observeProcess?.Invoke(process);
+        }
+        catch
+        {
+            await ForceTerminateAsync(process);
+            throw;
+        }
 
-        var stdout = PumpAsync(process.StandardOutput.BaseStream, LogStream.Stdout);
-        var stderr = PumpAsync(process.StandardError.BaseStream, LogStream.Stderr);
+        using var outputCts = new CancellationTokenSource();
+        var stdout = PumpAsync(process.StandardOutput.BaseStream, LogStream.Stdout, outputCts.Token);
+        var stderr = PumpAsync(process.StandardError.BaseStream, LogStream.Stderr, outputCts.Token);
 
         var timedOut = false;
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -181,47 +272,156 @@ public static class BuildExecutor
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
             timedOut = true;
-            process.Kill(entireProcessTree: true);
-            await process.WaitForExitAsync(ct);
+            await ForceTerminateAsync(process);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
+        {
+            await StopProcessAsync(process, stop);
+        }
+
+        if (!process.HasExited)
+        {
+            throw new WorkloadTerminationException(
+                $"workload process {process.Id} remained alive after termination");
+        }
+        observeProcess?.Invoke(null);
+        await DrainOutputAsync(stdout, stderr, outputCts);
+        return new StepExecution(new StepResult
+        {
+            StepIndex = stepIndex,
+            ExitCode = timedOut || stop.Mode != BuildStopMode.Unspecified ? -1 : process.ExitCode,
+            TimedOut = timedOut,
+        }, stop.Mode != BuildStopMode.Unspecified);
+
+        async Task PumpAsync(Stream source, LogStream stream, CancellationToken outputToken)
+        {
+            var buffer = new byte[8192];
+            int read;
+            try
+            {
+                while ((read = await source.ReadAsync(buffer, outputToken)) > 0)
+                {
+                    await send(new AgentMsg
+                    {
+                        Log = new LogChunk
+                        {
+                            BuildId = assignment.BuildId,
+                            StepIndex = stepIndex,
+                            Stream = stream,
+                            Data = ByteString.CopyFrom(buffer, 0, read),
+                        },
+                    }, outputToken);
+                }
+            }
+            catch (OperationCanceledException) when (outputToken.IsCancellationRequested)
+            {
+            }
+        }
+    }
+
+    private static async Task StopProcessAsync(Process process, BuildStopController stop)
+    {
+        if (stop.Mode == BuildStopMode.Graceful && !process.HasExited)
+        {
+            RequestGracefulTermination(process);
+            try
+            {
+                // A graceful deadline is controller evidence, not permission for a hard kill. Keep
+                // the Agent control loop alive and wait for either process exit or an explicit,
+                // authorized force command that cancels ForceToken.
+                await process.WaitForExitAsync(stop.ForceToken);
+            }
+            catch (OperationCanceledException) when (stop.Mode == BuildStopMode.Force)
+            {
+            }
+        }
+
+        if (!process.HasExited && stop.Mode == BuildStopMode.Force)
+        {
+            await ForceTerminateAsync(process);
+        }
+    }
+
+    private static void RequestGracefulTermination(Process process)
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                _ = process.CloseMainWindow();
+                return;
+            }
+            _ = Kill(process.Id, 15); // SIGTERM; hard-stop requires a later explicit force command.
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private static async Task ForceTerminateAsync(Process process)
+    {
+        try
         {
             if (!process.HasExited)
             {
                 process.Kill(entireProcessTree: true);
-                await process.WaitForExitAsync(CancellationToken.None);
             }
-
-            throw;
+        }
+        catch (InvalidOperationException)
+        {
+        }
+        catch (System.ComponentModel.Win32Exception exception)
+        {
+            throw new WorkloadTerminationException(
+                $"could not force-terminate workload process {process.Id}", exception);
         }
 
-        await Task.WhenAll(stdout, stderr);
-        return new StepResult
+        try
         {
-            StepIndex = stepIndex,
-            ExitCode = timedOut ? -1 : process.ExitCode,
-            TimedOut = timedOut,
-        };
+            await process.WaitForExitAsync().WaitAsync(ForceTerminationTimeout);
+        }
+        catch (TimeoutException exception)
+        {
+            throw new WorkloadTerminationException(
+                $"workload process {process.Id} ignored force termination", exception);
+        }
+    }
 
-        async Task PumpAsync(Stream source, LogStream stream)
+    private static async Task DrainOutputAsync(
+        Task stdout,
+        Task stderr,
+        CancellationTokenSource outputCts)
+    {
+        try
         {
-            var buffer = new byte[8192];
-            int read;
-            while ((read = await source.ReadAsync(buffer, CancellationToken.None)) > 0)
+            await Task.WhenAll(stdout, stderr).WaitAsync(OutputDrainTimeout);
+        }
+        catch (TimeoutException)
+        {
+            outputCts.Cancel();
+            try
             {
-                await send(new AgentMsg
-                {
-                    Log = new LogChunk
-                    {
-                        BuildId = assignment.BuildId,
-                        StepIndex = stepIndex,
-                        Stream = stream,
-                        Data = ByteString.CopyFrom(buffer, 0, read),
-                    },
-                }, CancellationToken.None);
+                await Task.WhenAll(stdout, stderr);
+            }
+            catch (OperationCanceledException)
+            {
             }
         }
     }
+
+    private static BuildResult CancelledResult(BuildResult result, BuildStopController stop)
+    {
+        result.Outcome = BuildOutcome.Cancelled;
+        result.StatusText = stop.Reason ?? (stop.Mode == BuildStopMode.Force
+            ? "build force-stopped"
+            : "build cancelled");
+        return result;
+    }
+
+    private sealed record StepExecution(StepResult Result, bool Stopped);
+
+    [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
+    private static extern int Kill(int processId, int signal);
 
     private static string ResolveProgram(string workdir, string workingDirectory, string program)
     {

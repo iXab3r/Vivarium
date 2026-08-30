@@ -36,6 +36,7 @@ public sealed class AgentRunner
     private readonly string? packageDigestSha256;
     private readonly TaskCompletionSource<bool> authorized = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly CancellationTokenSource restartRequested = new();
+    private readonly ActiveBuildJournal activeBuildJournal;
     private readonly object pendingLock = new();
     private readonly object activeBuildLock = new();
     private string? authToken;
@@ -46,6 +47,11 @@ public sealed class AgentRunner
     private ActiveBuild? activeBuild;
     private PlatformFactSnapshot? platformFacts;
     private ulong credentialGeneration;
+    private long heartbeatSequence;
+    private volatile bool restartAfterBuild;
+    private WorkloadRecoveryOutcome workloadRecoveryOutcome = WorkloadRecoveryOutcome.NotRequired;
+    private string workloadRecoveryBuildId = string.Empty;
+    private string workloadRecoveryFailureCode = string.Empty;
 
     public string AgentId { get; }
 
@@ -98,6 +104,7 @@ public sealed class AgentRunner
             ? ValidateAuthToken(File.ReadAllText(tokenPath).Trim())
             : null;
         credentialGeneration = authToken is null ? 0 : ReadCredentialGeneration();
+        activeBuildJournal = new ActiveBuildJournal(options.DataDir);
         if (File.Exists(PendingResultPath))
         {
             pendingResult = BuildResult.Parser.ParseFrom(File.ReadAllBytes(PendingResultPath));
@@ -107,6 +114,25 @@ public sealed class AgentRunner
             }
 
             runningBuildId = pendingResult.BuildId;
+        }
+
+        var interruptedBuild = activeBuildJournal.Current;
+        if (pendingResult is not null && interruptedBuild is not null)
+        {
+            if (!string.Equals(
+                    pendingResult.BuildId, interruptedBuild.BuildId, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "active Build journal conflicts with the pending terminal result");
+            }
+
+            // A durable terminal result proves that workload execution finished before the prior
+            // process died. It is safe to retire the earlier active marker.
+            activeBuildJournal.Complete(interruptedBuild.BuildId);
+        }
+        else if (interruptedBuild is not null)
+        {
+            runningBuildId = interruptedBuild.BuildId;
         }
 
         blobs = new BlobClient(options.ControllerUrl, options.CertFingerprintSha256) { BearerToken = authToken };
@@ -125,6 +151,15 @@ public sealed class AgentRunner
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(
             ct, restartRequested.Token, leaseLost.Token);
         var leaseMonitor = MonitorBootstrapLeaseAsync(leaseLost, linked.Token);
+        try
+        {
+            await RecoverInterruptedBuildAsync(linked.Token);
+        }
+        catch (OperationCanceledException) when (linked.IsCancellationRequested)
+        {
+            leaseLost.Cancel();
+            return;
+        }
         try
         {
             platformFacts = await platformFactsCollector.CollectAsync(
@@ -175,9 +210,24 @@ public sealed class AgentRunner
         }
         finally
         {
+            ActiveBuild? stopping;
             lock (activeBuildLock)
             {
-                activeBuild?.Cancellation.Cancel();
+                stopping = activeBuild;
+                stopping?.Stop.Request(
+                    BuildStopMode.Force,
+                    "Agent process is stopping",
+                    DateTimeOffset.UtcNow.AddSeconds(10));
+            }
+            if (stopping is not null)
+            {
+                try
+                {
+                    await stopping.Completion.Task.WaitAsync(TimeSpan.FromSeconds(20));
+                }
+                catch (TimeoutException)
+                {
+                }
             }
 
             leaseLost.Cancel();
@@ -203,15 +253,17 @@ public sealed class AgentRunner
         using var call = client.Session(cancellationToken: ct);
         var writer = new SessionWriter(call.RequestStream);
         var sessionId = Guid.NewGuid().ToString("N");
-
-        await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
-        currentSessionId = sessionId;
-        currentWriter = writer;
-
         using var sessionCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        var heartbeats = HeartbeatLoopAsync(writer, sessionCts.Token);
+        var writerPump = Task.Run(
+            () => writer.RunAsync(sessionCts.Token), CancellationToken.None);
+        Task heartbeats = Task.CompletedTask;
         try
         {
+            await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
+            currentSessionId = sessionId;
+            currentWriter = writer;
+            heartbeats = HeartbeatLoopAsync(writer, sessionCts.Token);
+
             await foreach (var msg in call.ResponseStream.ReadAllAsync(ct))
             {
                 switch (msg.MsgCase)
@@ -260,7 +312,7 @@ public sealed class AgentRunner
                         break;
 
                     case ControllerMsg.MsgOneofCase.Cancel:
-                        CancelBuild(msg.Cancel);
+                        await StopBuildAsync(msg.Cancel, writer, sessionId, ct);
                         break;
 
                     case ControllerMsg.MsgOneofCase.ResultAccepted:
@@ -283,8 +335,11 @@ public sealed class AgentRunner
                         break;
 
                     case ControllerMsg.MsgOneofCase.Restart:
-                        restartRequested.Cancel();
-                        return;
+                        if (await RequestRestartAsync(msg.Restart, writer, sessionId, ct))
+                        {
+                            return;
+                        }
+                        break;
                 }
             }
         }
@@ -296,9 +351,17 @@ public sealed class AgentRunner
             }
 
             sessionCts.Cancel();
+            writer.Complete();
             try
             {
                 await heartbeats;
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            try
+            {
+                await writerPump;
             }
             catch (OperationCanceledException)
             {
@@ -408,6 +471,134 @@ public sealed class AgentRunner
         }
     }
 
+    private async Task RecoverInterruptedBuildAsync(CancellationToken cancellationToken)
+    {
+        var record = activeBuildJournal.Current;
+        if (record is null)
+        {
+            return;
+        }
+
+        workloadRecoveryBuildId = record.BuildId;
+        if (record.ProcessId is null || record.ProcessStartUtcTicks is null)
+        {
+            FailWorkloadRecovery("process_identity_unavailable");
+            return;
+        }
+
+        try
+        {
+            using var process = Process.GetProcessById(record.ProcessId.Value);
+            if (process.HasExited ||
+                process.StartTime.ToUniversalTime().Ticks != record.ProcessStartUtcTicks.Value)
+            {
+                FailWorkloadRecovery("process_identity_mismatch");
+                return;
+            }
+
+            process.Kill(entireProcessTree: true);
+            await process.WaitForExitAsync(cancellationToken)
+                .WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
+            if (!process.HasExited)
+            {
+                FailWorkloadRecovery("process_termination_unproven");
+                return;
+            }
+
+            QueueResultDurably(new BuildResult
+            {
+                BuildId = record.BuildId,
+                Outcome = BuildOutcome.InfrastructureFailed,
+                StatusText = "Agent restarted while the Build owned a workload process",
+            });
+            activeBuildJournal.Complete(record.BuildId);
+            workloadRecoveryOutcome = WorkloadRecoveryOutcome.Succeeded;
+            workloadRecoveryFailureCode = string.Empty;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (ArgumentException)
+        {
+            FailWorkloadRecovery("process_identity_missing");
+        }
+        catch (TimeoutException)
+        {
+            FailWorkloadRecovery("process_termination_timeout");
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or
+                                           System.ComponentModel.Win32Exception or
+                                           NotSupportedException)
+        {
+            FailWorkloadRecovery("process_termination_failed");
+        }
+    }
+
+    private void FailWorkloadRecovery(string failureCode)
+    {
+        workloadRecoveryOutcome = WorkloadRecoveryOutcome.Failed;
+        workloadRecoveryFailureCode = failureCode;
+    }
+
+    private async Task<bool> RequestRestartAsync(
+        RestartAgent request,
+        SessionWriter writer,
+        string sessionId,
+        CancellationToken cancellationToken)
+    {
+        var mode = request.Mode == AgentRestartMode.Unspecified
+            ? AgentRestartMode.Force
+            : request.Mode;
+        var restartNow = false;
+        lock (activeBuildLock)
+        {
+            if (activeBuild is null)
+            {
+                restartNow = true;
+            }
+            else
+            {
+                restartAfterBuild = true;
+                if (mode == AgentRestartMode.CancelThenRestart)
+                {
+                    activeBuild.Stop.Request(
+                        BuildStopMode.Graceful,
+                        request.Reason,
+                        ParseDeadline(request.DeadlineUnixMs));
+                }
+                else if (mode == AgentRestartMode.Force)
+                {
+                    activeBuild.Stop.Request(
+                        BuildStopMode.Force,
+                        request.Reason,
+                        ParseDeadline(request.DeadlineUnixMs));
+                }
+            }
+        }
+
+        await writer.SendAsync(new AgentMsg
+        {
+            AgentRestartAcknowledged = new AgentRestartAcknowledged
+            {
+                OperationId = request.OperationId,
+                Mode = mode,
+                SessionId = sessionId,
+            },
+        }, cancellationToken);
+
+        if (restartNow)
+        {
+            restartRequested.Cancel();
+        }
+        return restartNow;
+    }
+
+    private static DateTimeOffset? ParseDeadline(long unixMilliseconds) =>
+        unixMilliseconds == 0
+            ? null
+            : DateTimeOffset.FromUnixTimeMilliseconds(unixMilliseconds);
+
     private async Task AcceptBuildAsync(BuildAssignment assignment)
     {
         ActiveBuild? build = null;
@@ -435,8 +626,8 @@ public sealed class AgentRunner
                     {
                         build = new ActiveBuild(
                             assignment.Clone(),
-                            CancellationTokenSource.CreateLinkedTokenSource(
-                                restartRequested.Token));
+                            new BuildStopController());
+                        activeBuildJournal.Accept(assignment.BuildId);
                         activeBuild = build;
                         runningBuildId = assignment.BuildId;
                         accepted = true;
@@ -466,8 +657,13 @@ public sealed class AgentRunner
         }
     }
 
-    private void CancelBuild(CancelBuild cancellation)
+    private async Task StopBuildAsync(
+        CancelBuild cancellation,
+        SessionWriter writer,
+        string sessionId,
+        CancellationToken cancellationToken)
     {
+        BuildStopMode effectiveMode;
         lock (activeBuildLock)
         {
             if (activeBuild?.Assignment.BuildId != cancellation.BuildId)
@@ -475,9 +671,22 @@ public sealed class AgentRunner
                 return; // idempotent: already finished or belongs to another build
             }
 
-            activeBuild.CancellationReason = cancellation.Reason;
-            activeBuild.Cancellation.Cancel();
+            effectiveMode = activeBuild.Stop.Request(
+                cancellation.Mode,
+                cancellation.Reason,
+                ParseDeadline(cancellation.DeadlineUnixMs));
         }
+
+        await writer.SendAsync(new AgentMsg
+        {
+            BuildStopAcknowledged = new BuildStopAcknowledged
+            {
+                BuildId = cancellation.BuildId,
+                OperationId = cancellation.OperationId,
+                Mode = effectiveMode,
+                SessionId = sessionId,
+            },
+        }, cancellationToken);
     }
 
     private async Task ExecuteBuildAsync(ActiveBuild build)
@@ -488,17 +697,26 @@ public sealed class AgentRunner
         {
             var workRoot = Path.Combine(options.DataDir, "builds");
             result = await BuildExecutor.ExecuteAsync(
-                workRoot, assignment, blobs, SendRoutedAsync, currentSessionId, build.Cancellation.Token);
+                workRoot,
+                assignment,
+                blobs,
+                SendRoutedAsync,
+                currentSessionId,
+                build.Stop,
+                process => activeBuildJournal.ObserveProcess(assignment.BuildId, process));
         }
-        catch (OperationCanceledException) when (build.Cancellation.IsCancellationRequested)
+        catch (WorkloadTerminationException exception)
         {
-            result = new BuildResult
+            Console.Error.WriteLine(
+                $"[agent] build {assignment.BuildId} could not be contained: {exception.Message}");
+            lock (activeBuildLock)
             {
-                BuildId = assignment.BuildId,
-                SessionId = currentSessionId,
-                Outcome = BuildOutcome.Cancelled,
-                StatusText = build.CancellationReason ?? "build stopped",
-            };
+                workloadRecoveryOutcome = WorkloadRecoveryOutcome.Failed;
+                workloadRecoveryBuildId = assignment.BuildId;
+                workloadRecoveryFailureCode = "workload_termination_unproven";
+            }
+            build.Completion.TrySetResult(true);
+            return;
         }
         catch (Exception ex)
         {
@@ -515,6 +733,7 @@ public sealed class AgentRunner
         // Make the terminal result durable before releasing active ownership. This closes the small
         // window in which a second assignment could otherwise start before the first result existed.
         QueueResultDurably(result);
+        activeBuildJournal.Complete(assignment.BuildId);
         lock (activeBuildLock)
         {
             if (ReferenceEquals(activeBuild, build))
@@ -523,8 +742,13 @@ public sealed class AgentRunner
             }
         }
 
-        build.Cancellation.Dispose();
+        build.Stop.Dispose();
+        build.Completion.TrySetResult(true);
         await TryFlushPendingResultAsync(CancellationToken.None);
+        if (restartAfterBuild)
+        {
+            restartRequested.Cancel();
+        }
     }
 
     private async Task HeartbeatLoopAsync(SessionWriter writer, CancellationToken ct)
@@ -536,7 +760,11 @@ public sealed class AgentRunner
             {
                 await writer.SendAsync(new AgentMsg
                 {
-                    Heartbeat = new Heartbeat { RunningBuildId = runningBuildId ?? string.Empty },
+                    Heartbeat = new Heartbeat
+                    {
+                        RunningBuildId = runningBuildId ?? string.Empty,
+                        Sequence = checked((ulong)Interlocked.Increment(ref heartbeatSequence)),
+                    },
                 }, ct);
                 await TryFlushPendingResultAsync(ct);
             }
@@ -574,6 +802,10 @@ public sealed class AgentRunner
             AgentPackageSha256 = facts?.PackageDigestSha256 ?? packageDigestSha256 ?? string.Empty,
             UpgradeOperationId = options.UpgradeOperationId ?? string.Empty,
             UpgradeFailureCode = BoundUpgradeFailureCode(options.UpgradeFailureCode),
+            WorkloadRecoveryOutcome = workloadRecoveryOutcome,
+            WorkloadRecoveryBuildId = workloadRecoveryBuildId,
+            WorkloadRecoveryFailureCode = workloadRecoveryFailureCode,
+            ProcessInstanceId = options.BootstrapLeaseId ?? string.Empty,
         };
         hello.Capabilities.Add(new CapabilitySupport
         {
@@ -1001,15 +1233,16 @@ public sealed class AgentRunner
 
     private sealed class ActiveBuild
     {
-        public ActiveBuild(BuildAssignment assignment, CancellationTokenSource cancellation)
+        public ActiveBuild(BuildAssignment assignment, BuildStopController stop)
         {
             Assignment = assignment;
-            Cancellation = cancellation;
+            Stop = stop;
         }
 
         public BuildAssignment Assignment { get; }
-        public CancellationTokenSource Cancellation { get; }
-        public string? CancellationReason { get; set; }
+        public BuildStopController Stop { get; }
+        public TaskCompletionSource<bool> Completion { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
     private sealed record UpgradeMarker(

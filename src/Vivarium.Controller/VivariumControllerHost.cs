@@ -163,6 +163,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         var managementCommands = new ManagementCommandAuthorizer(
             managementAuthorizer, audits, options.TimeProvider);
         var agentStore = new AgentStore(database);
+        var agentOperationalStore = new AgentOperationalStore(database);
         var configurationRepository = await ManagedGitRepository.OpenOrCreateAsync(
             Path.Combine(options.DataDir, "configuration"),
             "controller");
@@ -181,7 +182,8 @@ public sealed class VivariumControllerHost : IAsyncDisposable
             options.TimeProvider);
         await administrationBootstrap.InitializeAsync();
         var agentLifecycle = new AgentLifecycleCoordinator();
-        var registry = new AgentRegistry(agentStore, options.TimeProvider);
+        var registry = new AgentRegistry(
+            agentStore, options.TimeProvider, agentOperationalStore);
         var agentConfigurationActivation = new AgentDesiredConfigurationActivationSink(registry);
         var agentDesiredConfiguration = new AgentDesiredConfigurationService(
             configurationRepository,
@@ -216,6 +218,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
                 AgentHubService.ServerVersion);
         }
         var agentUpgradeStore = new AgentUpgradeStore(database, options.TimeProvider);
+        var agentRestartStore = new AgentRestartStore(database);
         var buildStore = new BuildStore(database, blobAccessStore);
         var buildQueueStore = new BuildQueueStore(database);
         await buildQueueStore.InitializeQueueDeadlinesAsync(options.BuildQueueWaitTimeout);
@@ -233,7 +236,10 @@ public sealed class VivariumControllerHost : IAsyncDisposable
             options.TimeProvider,
             options.AgentReconnectGrace,
             managementCommands,
-            trxProjectionService);
+            trxProjectionService,
+            options.BuildGracefulStopTimeout,
+            options.BuildForceStopTimeout,
+            options.BuildAssignmentAckTimeout);
         await builds.InitializeAsync();
         var agentAdministration = new AgentAdministration(
             registry,
@@ -279,6 +285,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         builder.Services.AddSingleton<IConfigurationRepository>(configurationRepository);
         builder.Services.AddSingleton(configurationReconciler);
         builder.Services.AddSingleton(agentStore);
+        builder.Services.AddSingleton(agentOperationalStore);
         builder.Services.AddSingleton(agentLifecycle);
         builder.Services.AddSingleton(registry);
         builder.Services.AddSingleton<IAgentDesiredConfigurationActivationSink>(
@@ -301,6 +308,8 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         builder.Services.AddSingleton(trxProjectionService);
         builder.Services.AddSingleton(agentPackages);
         builder.Services.AddSingleton(agentUpgradeStore);
+        builder.Services.AddSingleton(agentRestartStore);
+        builder.Services.AddSingleton<AgentRestartService>();
         builder.Services.AddSingleton<AgentUpgradeService>();
         builder.Services.AddSingleton<IBuildResultProjectionParticipant>(trxProjectionService);
         builder.Services.AddSingleton(matrixBuildStore);
@@ -319,6 +328,8 @@ public sealed class VivariumControllerHost : IAsyncDisposable
             services => services.GetRequiredService<BuildScheduler>());
         builder.Services.AddHostedService(
             services => services.GetRequiredService<AgentUpgradeService>());
+        builder.Services.AddHostedService(
+            services => services.GetRequiredService<AgentRestartService>());
         builder.Services.AddDataProtection()
             .SetApplicationName($"Vivarium.Controller.Panel.{panelIdentity}");
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -337,6 +348,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         builder.Services.AddScoped<PanelManagementContext>();
         builder.Services.AddVivariumRestApi();
         builder.Services.AddAgentRestApi();
+        builder.Services.AddAgentRestartApi();
         builder.Services.AddAgentDesiredConfigurationRestApi();
         builder.Services.AddAdministrationSetupApi();
         builder.Services.AddAuditRestApi();
@@ -369,6 +381,7 @@ public sealed class VivariumControllerHost : IAsyncDisposable
         app.MapVivariumSystemApi();
         app.MapVivariumOpenApi();
         app.MapAgentRestApi();
+        app.MapAgentRestartApi();
         app.MapAgentDesiredConfigurationRestApi();
         app.MapAdministrationSetupApi();
         app.MapAuditRestApi();

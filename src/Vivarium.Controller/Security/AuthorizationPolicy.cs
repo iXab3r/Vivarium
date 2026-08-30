@@ -71,6 +71,7 @@ public static class AuthorizationPermissionIds
     public const string ProjectRolesManage = "project.roles.manage";
     public const string BuildRun = "build.run";
     public const string BuildCancel = "build.cancel";
+    public const string BuildForceStop = "build.force-stop";
     public const string BuildQueueManage = "build.queue.manage";
     public const string BuildParametersCustomize = "build.parameters.customize";
     public const string BuildLogView = "build.log.view";
@@ -112,7 +113,7 @@ public static class AuthorizationPermissionIds
     public static IReadOnlySet<string> Catalog { get; } = new HashSet<string>(
     [
         ProjectView, ProjectSettingsView, ProjectSettingsPropose, ProjectSettingsApprove,
-        ProjectCreate, ProjectDelete, ProjectRolesManage, BuildRun, BuildCancel,
+        ProjectCreate, ProjectDelete, ProjectRolesManage, BuildRun, BuildCancel, BuildForceStop,
         BuildQueueManage, BuildParametersCustomize, BuildLogView, BuildArtifactView,
         BuildRuntimeSensitiveView, BuildAgentSummaryView, ProjectAgentEnable,
         ProjectAgentAuthorize, ProjectAgentRemove, ProjectAgentPolicyChange,
@@ -146,6 +147,7 @@ internal static class AuthorizationBuiltInRoles
         ProjectDeveloper,
         AuthorizationPermissionIds.ProjectSettingsPropose,
         AuthorizationPermissionIds.ProjectSettingsApprove,
+        AuthorizationPermissionIds.BuildForceStop,
         AuthorizationPermissionIds.ProjectCreate,
         AuthorizationPermissionIds.ProjectDelete,
         AuthorizationPermissionIds.ProjectRolesManage,

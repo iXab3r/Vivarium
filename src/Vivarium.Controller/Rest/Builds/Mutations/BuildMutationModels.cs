@@ -36,7 +36,7 @@ public sealed record BuildSubmissionStepRequest(
     string? Policy,
     bool ExpectedReboot);
 
-public sealed record BuildCancellationRequest(string? Reason);
+public sealed record BuildCancellationRequest(string? Reason, string? Mode = null);
 
 internal sealed record BuildSubmissionResponse(
     int Status,

@@ -66,6 +66,10 @@ public sealed class AgentProtocolCompatibilityTests
             AssertField(Hello.Descriptor, 18, "agent_package_sha256");
             AssertField(Hello.Descriptor, 19, "upgrade_operation_id");
             AssertField(Hello.Descriptor, 20, "upgrade_failure_code");
+            AssertField(Hello.Descriptor, 21, "workload_recovery_outcome");
+            AssertField(Hello.Descriptor, 22, "workload_recovery_build_id");
+            AssertField(Hello.Descriptor, 23, "workload_recovery_failure_code");
+            AssertField(Hello.Descriptor, 24, "process_instance_id");
 
             AssertField(Welcome.Descriptor, 1, "server_time_unix_ms");
             AssertField(Welcome.Descriptor, 2, "authorized");
@@ -78,6 +82,8 @@ public sealed class AgentProtocolCompatibilityTests
             AssertField(AgentMsg.Descriptor, 8, "upgrade_health_confirmed");
             AssertField(AgentMsg.Descriptor, 9, "upgrade_commit_confirmed");
             AssertField(AgentMsg.Descriptor, 10, "upgrade_finalization_confirmed");
+            AssertField(AgentMsg.Descriptor, 11, "build_stop_acknowledged");
+            AssertField(AgentMsg.Descriptor, 12, "agent_restart_acknowledged");
             AssertField(ControllerMsg.Descriptor, 7, "upgrade_health_accepted");
             AssertField(ControllerMsg.Descriptor, 8, "upgrade_commit_accepted");
             AssertField(ControllerMsg.Descriptor, 9, "upgrade_commit_recorded");

@@ -34,6 +34,9 @@ public sealed record AgentResource(
 public sealed record AgentStatusResource(
     bool Connected,
     bool Reconciled,
+    string OperationalHealth,
+    bool Quarantined,
+    string OperationalReason,
     bool Authorized,
     bool Enabled,
     string Activity);

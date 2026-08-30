@@ -35,7 +35,7 @@ public class BuildLeaseTests
     }
 
     [Test]
-    public async Task Lost_session_keeps_capacity_during_grace_then_finishes_infra_atomically()
+    public async Task Lost_session_finishes_history_but_quarantines_ambiguous_runtime_occupancy()
     {
         await using var harness = await LeaseHarness.StartAsync(rootDir);
         var connection = harness.Connect("session-1");
@@ -77,19 +77,18 @@ public class BuildLeaseTests
             Assert.That(queue?.State, Is.EqualTo(BuildQueueItemState.Removed));
             Assert.That(queue?.RemovalReason, Is.EqualTo(BuildStore.ReconnectGraceExpiredStatus));
             Assert.That(result.Outcome, Is.EqualTo(BuildOutcome.InfrastructureFailed));
-            Assert.That(harness.Registry.Get("agent-1")?.CurrentBuildId, Is.Null);
+            Assert.That(harness.Registry.Get("agent-1")?.CurrentBuildId, Is.EqualTo("lease-expiry"));
+            Assert.That(harness.Registry.Get("agent-1")?.Quarantined, Is.True);
+            Assert.That(harness.Registry.Get("agent-1")?.OperationalReason,
+                Is.EqualTo("workload_ownership_expired_unconfirmed"));
             Assert.That(harness.Builds.GetSnapshots().Any(item => item.BuildId == "lease-expiry"),
                 Is.False,
                 "lease expiry must evict the same terminal PendingBuild state as an agent result");
         });
 
-        await harness.Queue.EnqueueAsync(new BuildAssignment { BuildId = "capacity-released" }, "");
-        Assert.That(await harness.Queue.TryClaimAsync("capacity-released", "agent-1"), Is.True);
         Assert.That(
-            await harness.Queue.TryPrepareDispatchAsync(
-                "capacity-released", "agent-1", "future-session", harness.Time.GetUtcNow()),
-            Is.True,
-            "the active-build and claimed-queue unique indexes are both released at expiry");
+            harness.Registry.TryBeginBuild("agent-1", "unsafe-overlap", out _),
+            Is.False);
     }
 
     [Test]

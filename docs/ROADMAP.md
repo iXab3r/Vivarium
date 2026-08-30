@@ -47,15 +47,23 @@ Foundation now implemented:
       deterministically for compatibility matching, and centrally editable without racing assignment;
       the selected name and both parameter maps are copied into immutable build history (D8, D14).
 - [x] One-build-per-agent ownership and explicit, idempotent cancellation: stop requests survive
-      session reconnects and controller restarts, kill the agent-side process tree, and finish as
-      `CANCELLED`; assignments, cancellation intent, and terminal results are durable, while
-      disabling does not interrupt current work (D4, D14).
+      session reconnects and controller restarts; graceful stop and separately authorized force stop
+      are durable and finish as `CANCELLED` when termination is proven. Assignments, cancellation
+      intent, and terminal results are durable, while disabling does not interrupt current work (D4,
+      D14, D31).
+- [ ] Complete the D31 responsiveness hardening tracked in
+      [`design/agent-lifecycle-recovery.md`](design/agent-lifecycle-recovery.md): native workload
+      containment, durable output-gap evidence, controller-to-Bootstrap recovery for a wedged Agent,
+      resource governance, and native cross-platform/two-Agent fault evidence. The active-work
+      journal, bounded graceful/force stop, acknowledgements/deadlines, health/quarantine, priority
+      messaging, bounded memory, and in-band durable Agent restart are implemented.
 - [x] Durable TeamCity-style FIFO Build Queue with requirement matching, independent eligibility
       axes, incompatible-head bypass, exact-session assignment acknowledgements, result
       acknowledgements, restart recovery, and the protected Queue & Builds panel (D4, D8, D14).
 - [x] Bounded durable reconnect leases: a lost owning session has one non-extending grace window;
-      matching re-adoption clears it, while expiry finishes the build as `INFRA` and atomically
-      releases agent and queue capacity (D4, D9, D20).
+      matching re-adoption clears it, while expiry finishes Build history as `INFRA` but quarantines
+      and retains ambiguous runtime occupancy until positive recovery evidence arrives (D4, D9, D20,
+      D31).
 - [x] The provider-facing post-rollback readiness barrier: an Agent is not reusable until a newer
       idle session reports no running build (D5).
 - [x] Atomic, request-idempotent `ControlPlane` submission plus durable snapshot watching, blob

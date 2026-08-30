@@ -16,6 +16,7 @@ public enum ManagementPermission
     BuildSubmit,
     BuildWatch,
     BuildCancel,
+    BuildForceStop,
     AgentList,
     AgentAuthorize,
     AgentManage,
@@ -296,7 +297,8 @@ public sealed class ManagementAuthorizer(VivariumDatabase? database = null)
         ManagementPermission.AgentPackageRead =>
             AuthorizationResource.FleetRoot,
         ManagementPermission.BuildSubmit or ManagementPermission.BuildWatch or
-        ManagementPermission.BuildCancel or ManagementPermission.BlobRead or
+        ManagementPermission.BuildCancel or ManagementPermission.BuildForceStop or
+        ManagementPermission.BlobRead or
         ManagementPermission.BlobWrite or ManagementPermission.BlobDiscover or
         ManagementPermission.ArtifactRead => AuthorizationResource.ProjectRoot,
         _ => AuthorizationResource.Global,
@@ -310,6 +312,7 @@ public sealed class ManagementAuthorizer(VivariumDatabase? database = null)
         ManagementPermission.BuildSubmit => AuthorizationPermissionIds.BuildRun,
         ManagementPermission.BuildWatch => AuthorizationPermissionIds.ProjectView,
         ManagementPermission.BuildCancel => AuthorizationPermissionIds.BuildCancel,
+        ManagementPermission.BuildForceStop => AuthorizationPermissionIds.BuildForceStop,
         ManagementPermission.AgentList => AuthorizationPermissionIds.FleetSummaryView,
         ManagementPermission.AgentAuthorize or ManagementPermission.EnrollmentTokenCreate =>
             AuthorizationPermissionIds.FleetAgentAuthorize,

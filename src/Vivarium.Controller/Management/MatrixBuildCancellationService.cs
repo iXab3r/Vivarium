@@ -37,15 +37,20 @@ public sealed class MatrixBuildCancellationService
     public async Task<BuildSnapshot?> CancelAsync(
         ManagementRequestContext context,
         string matrixBuildId,
-        string? reason = null)
+        string? reason = null,
+        BuildStopMode mode = BuildStopMode.Graceful)
     {
         ArgumentNullException.ThrowIfNull(context);
         await (authorization ?? throw new InvalidOperationException(
                 "application command authorization is not configured"))
             .DemandAsync(
                 context,
-                ManagementPermission.BuildCancel,
-                "matrix-build.cancel",
+                mode == BuildStopMode.Force
+                    ? ManagementPermission.BuildForceStop
+                    : ManagementPermission.BuildCancel,
+                mode == BuildStopMode.Force
+                    ? "matrix-build.force-stop"
+                    : "matrix-build.cancel",
                 "matrix-build",
                 matrixBuildId);
         var effectiveReason = string.IsNullOrWhiteSpace(reason) ? DefaultReason : reason.Trim();
@@ -57,7 +62,9 @@ public sealed class MatrixBuildCancellationService
             AuditEventDraft.Create(
                 context,
                 now,
-                "matrix-build.cancel",
+                mode == BuildStopMode.Force
+                    ? "matrix-build.force-stop"
+                    : "matrix-build.cancel",
                 "matrix-build",
                 matrixBuildId),
             context);
@@ -68,7 +75,7 @@ public sealed class MatrixBuildCancellationService
 
         foreach (var child in committed.ActiveChildren)
         {
-            await builds.CancelBuildFromControllerAsync(child.BuildId, child.Reason);
+            await builds.StopBuildFromControllerAsync(child.BuildId, child.Reason, mode);
         }
 
         queue.NotifyChanged();

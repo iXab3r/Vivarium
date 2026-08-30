@@ -8,6 +8,7 @@ of truth for delivery order and status.
 | Design | Maintainer role | Scope |
 |---|---|---|
 | [Agent API/SDK](agent-api-sdk.md) | Agent API/SDK Expert | AgentHub, capability negotiation, enrollment, deployment, upgrades, and SDK boundary |
+| [Agent lifecycle and recovery](agent-lifecycle-recovery.md) | Agent API/SDK + Scheduling/Coordination Experts | Failure catalogue, responsiveness, Build stop escalation, workload containment, restart, quarantine, and recovery evidence |
 | [TeamCity domain](teamcity.md) | TeamCity Expert | Projects, configurations, builds, steps, requirements, matrices, and build chains |
 | [AgentExplorer](agent-explorer.md) | AgentExplorer Expert | Host inventory, observation, remote operations, and fleet management |
 | [Machine providers/images](machine-providers-images.md) | Machine Providers/Images Expert | Provider hosts, pools, images, clone/revert/power/console, sealing, drift, and capacity |

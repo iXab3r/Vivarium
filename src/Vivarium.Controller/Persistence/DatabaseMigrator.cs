@@ -7,7 +7,7 @@ namespace Vivarium.Controller.Persistence;
 
 internal static class DatabaseMigrator
 {
-    internal const int CurrentVersion = 12;
+    internal const int CurrentVersion = 13;
     private const string MinimumControllerVersion = "0.0.0";
     private const string PhaseOneFingerprint =
         "explicit Phase-1 legacy adoption and column backfills v1\n" +
@@ -86,6 +86,12 @@ internal static class DatabaseMigrator
             AgentPackageUpgradeSchemaSql,
             static (connection, transaction) =>
                 Execute(connection, transaction, AgentPackageUpgradeSchemaSql)),
+        new(
+            13,
+            "agent-lifecycle-supervision",
+            AgentLifecycleSupervisionSchemaSql,
+            static (connection, transaction) =>
+                Execute(connection, transaction, AgentLifecycleSupervisionSchemaSql)),
     ];
 
     private static readonly HashSet<string> KnownUnversionedTables =
@@ -174,13 +180,21 @@ internal static class DatabaseMigrator
             "authorization_user_credentials",
         ]), StringComparer.Ordinal);
 
-    private static readonly HashSet<string> KnownVersionedTables =
+    private static readonly HashSet<string> VersionTwelveTables =
         new(VersionElevenTables.Concat([
             "agent_packages",
             "agent_package_publication_requests",
             "agent_upgrade_operations",
             "agent_upgrade_events",
             "agent_maintenance_drains",
+        ]), StringComparer.Ordinal);
+
+    private static readonly HashSet<string> KnownVersionedTables =
+        new(VersionTwelveTables.Concat([
+            "agent_operational_health",
+            "build_stop_operations",
+            "build_assignment_attempts",
+            "agent_restart_operations",
         ]), StringComparer.Ordinal);
 
     private static readonly HashSet<string> VersionTwoTables =
@@ -609,6 +623,7 @@ internal static class DatabaseMigrator
         VerifyAuthorizationPolicySchema(connection, transaction: null);
         VerifyUserCredentialSchema(connection, transaction: null);
         VerifyAgentPackageUpgradeSchema(connection, transaction: null);
+        VerifyAgentLifecycleSupervisionSchema(connection, transaction: null);
 
         VerifyExactNamedObjects(connection, CurrentNamedObjects);
     }
@@ -630,7 +645,8 @@ internal static class DatabaseMigrator
             9 => VersionNineTables,
             10 => VersionTenTables,
             11 => VersionElevenTables,
-            12 => KnownVersionedTables,
+            12 => VersionTwelveTables,
+            13 => KnownVersionedTables,
             _ => throw new InvalidDataException($"unsupported applied schema version {version}"),
         };
         VerifyExactTableSet(connection, expectedTables);
@@ -709,6 +725,11 @@ internal static class DatabaseMigrator
             VerifyAgentPackageUpgradeSchema(connection, transaction: null);
         }
 
+        if (version >= 13)
+        {
+            VerifyAgentLifecycleSupervisionSchema(connection, transaction: null);
+        }
+
         var expectedObjects = version switch
         {
             0 => EmptyNamedObjects,
@@ -723,7 +744,8 @@ internal static class DatabaseMigrator
             9 => VersionNineNamedObjects,
             10 => VersionTenNamedObjects,
             11 => VersionElevenNamedObjects,
-            12 => CurrentNamedObjects,
+            12 => VersionTwelveNamedObjects,
+            13 => CurrentNamedObjects,
             _ => throw new InvalidDataException($"unsupported applied schema version {version}"),
         };
         VerifyExactNamedObjects(connection, expectedObjects);
@@ -1149,6 +1171,24 @@ internal static class DatabaseMigrator
             VerifyExactTableDefinition(connection, transaction, table, AgentPackageUpgradeSchemaSql);
         }
         VerifyAgentPackageUpgradeRows(connection, transaction);
+    }
+
+    private static void VerifyAgentLifecycleSupervisionSchema(
+        SqliteConnection connection,
+        SqliteTransaction? transaction)
+    {
+        string[] tables =
+        [
+            "agent_operational_health",
+            "build_stop_operations",
+            "build_assignment_attempts",
+            "agent_restart_operations",
+        ];
+        foreach (var table in tables)
+        {
+            VerifyExactTableDefinition(
+                connection, transaction, table, AgentLifecycleSupervisionSchemaSql);
+        }
     }
 
     private static void VerifyAgentPackageUpgradeRows(
@@ -2381,8 +2421,11 @@ internal static class DatabaseMigrator
     private static readonly IReadOnlyDictionary<string, NamedSchemaObject> VersionElevenNamedObjects =
         VersionTenNamedObjects;
 
-    private static readonly IReadOnlyDictionary<string, NamedSchemaObject> CurrentNamedObjects =
+    private static readonly IReadOnlyDictionary<string, NamedSchemaObject> VersionTwelveNamedObjects =
         CreateVersionTwelveNamedObjects();
+
+    private static readonly IReadOnlyDictionary<string, NamedSchemaObject> CurrentNamedObjects =
+        CreateVersionThirteenNamedObjects();
 
     private static IReadOnlyDictionary<string, NamedSchemaObject> CreateAuditNamedObjects()
     {
@@ -2536,6 +2579,22 @@ internal static class DatabaseMigrator
                 new("index", AgentUpgradeOperationsOneActiveIndexDefinitionSql),
             ["agent_upgrade_events_by_operation"] =
                 new("index", AgentUpgradeEventsByOperationIndexDefinitionSql),
+        };
+        return result;
+    }
+
+    private static IReadOnlyDictionary<string, NamedSchemaObject> CreateVersionThirteenNamedObjects()
+    {
+        var result = new Dictionary<string, NamedSchemaObject>(VersionTwelveNamedObjects, StringComparer.Ordinal)
+        {
+            ["build_stop_operations_due"] =
+                new("index", BuildStopOperationsDueIndexDefinitionSql),
+            ["build_assignment_attempts_due"] =
+                new("index", BuildAssignmentAttemptsDueIndexDefinitionSql),
+            ["agent_restart_operations_due"] =
+                new("index", AgentRestartOperationsDueIndexDefinitionSql),
+            ["agent_restart_operations_one_active"] =
+                new("index", AgentRestartOperationsOneActiveIndexDefinitionSql),
         };
         return result;
     }
@@ -4082,6 +4141,148 @@ internal static class DatabaseMigrator
         CREATE INDEX agent_upgrade_events_by_operation
             ON agent_upgrade_events(operation_id, event_id);
         """;
+
+    private const string AgentLifecycleSupervisionSchemaSql = """
+        CREATE TABLE agent_operational_health (
+            agent_id TEXT PRIMARY KEY REFERENCES agents(agent_id) ON DELETE CASCADE,
+            health TEXT NOT NULL CHECK (health IN ('UNKNOWN', 'HEALTHY', 'UNHEALTHY')),
+            quarantined INTEGER NOT NULL CHECK (quarantined IN (0, 1)),
+            reason_code TEXT NOT NULL CHECK (length(reason_code) BETWEEN 1 AND 128),
+            updated_unix_ms INTEGER NOT NULL CHECK (updated_unix_ms >= 0)
+        ) STRICT;
+
+        CREATE TABLE build_stop_operations (
+            build_id TEXT PRIMARY KEY REFERENCES builds(build_id) ON DELETE CASCADE,
+            operation_id TEXT NOT NULL UNIQUE CHECK (length(operation_id) = 32),
+            state TEXT NOT NULL CHECK (
+                state IN (
+                    'REQUESTED', 'ACKNOWLEDGED', 'GRACE_EXPIRED', 'COMPLETED', 'EXPIRED')),
+            mode TEXT NOT NULL CHECK (mode IN ('GRACEFUL', 'FORCE')),
+            reason TEXT NOT NULL CHECK (length(reason) BETWEEN 1 AND 512),
+            deadline_unix_ms INTEGER NOT NULL CHECK (deadline_unix_ms > created_unix_ms),
+            acknowledged_mode TEXT NULL CHECK (
+                acknowledged_mode IS NULL OR acknowledged_mode IN ('GRACEFUL', 'FORCE')),
+            acknowledged_session_id TEXT NULL CHECK (
+                acknowledged_session_id IS NULL OR length(acknowledged_session_id) BETWEEN 1 AND 128),
+            created_unix_ms INTEGER NOT NULL CHECK (created_unix_ms >= 0),
+            updated_unix_ms INTEGER NOT NULL CHECK (updated_unix_ms >= created_unix_ms),
+            acknowledged_unix_ms INTEGER NULL CHECK (
+                acknowledged_unix_ms IS NULL OR acknowledged_unix_ms >= created_unix_ms),
+            completed_unix_ms INTEGER NULL CHECK (
+                completed_unix_ms IS NULL OR completed_unix_ms >= created_unix_ms),
+            CHECK (
+                (state = 'REQUESTED' AND acknowledged_mode IS NULL
+                    AND acknowledged_session_id IS NULL AND acknowledged_unix_ms IS NULL
+                    AND completed_unix_ms IS NULL)
+                OR (state = 'ACKNOWLEDGED' AND acknowledged_mode IS NOT NULL
+                    AND acknowledged_session_id IS NOT NULL AND acknowledged_unix_ms IS NOT NULL
+                    AND completed_unix_ms IS NULL)
+                OR (state IN ('GRACE_EXPIRED', 'COMPLETED', 'EXPIRED')
+                    AND completed_unix_ms IS NOT NULL))
+        ) STRICT;
+
+        CREATE TABLE build_assignment_attempts (
+            build_id TEXT PRIMARY KEY REFERENCES builds(build_id) ON DELETE CASCADE,
+            agent_id TEXT NOT NULL,
+            session_id TEXT NOT NULL CHECK (length(session_id) BETWEEN 1 AND 128),
+            state TEXT NOT NULL CHECK (state IN ('WAITING', 'ACKNOWLEDGED', 'EXPIRED')),
+            deadline_unix_ms INTEGER NOT NULL CHECK (deadline_unix_ms > created_unix_ms),
+            created_unix_ms INTEGER NOT NULL CHECK (created_unix_ms >= 0),
+            updated_unix_ms INTEGER NOT NULL CHECK (updated_unix_ms >= created_unix_ms),
+            acknowledged_unix_ms INTEGER NULL CHECK (
+                acknowledged_unix_ms IS NULL OR acknowledged_unix_ms >= created_unix_ms),
+            CHECK (
+                (state = 'WAITING' AND acknowledged_unix_ms IS NULL)
+                OR (state = 'ACKNOWLEDGED' AND acknowledged_unix_ms IS NOT NULL)
+                OR state = 'EXPIRED')
+        ) STRICT;
+
+        CREATE TABLE agent_restart_operations (
+            operation_id TEXT PRIMARY KEY CHECK (length(operation_id) = 32),
+            agent_id TEXT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
+            state TEXT NOT NULL CHECK (
+                state IN ('REQUESTED', 'ACKNOWLEDGED', 'SUCCEEDED', 'FAILED')),
+            mode TEXT NOT NULL CHECK (
+                mode IN ('AFTER_CURRENT_WORK', 'CANCEL_THEN_RESTART', 'FORCE')),
+            actor_type TEXT NOT NULL CHECK (length(actor_type) BETWEEN 1 AND 64),
+            actor_id TEXT NOT NULL CHECK (length(actor_id) BETWEEN 1 AND 256),
+            request_id TEXT NOT NULL CHECK (length(request_id) BETWEEN 1 AND 256),
+            request_hash TEXT NOT NULL CHECK (
+                length(request_hash) = 64
+                AND request_hash = lower(request_hash)
+                AND request_hash NOT GLOB '*[^0-9a-f]*'),
+            correlation_id TEXT NOT NULL CHECK (length(correlation_id) BETWEEN 1 AND 256),
+            reason TEXT NOT NULL CHECK (length(reason) BETWEEN 1 AND 512),
+            requested_connection_generation INTEGER NOT NULL CHECK (
+                requested_connection_generation > 0),
+            requested_process_instance_id TEXT NOT NULL CHECK (
+                length(requested_process_instance_id) BETWEEN 16 AND 128),
+            acknowledged_connection_generation INTEGER NULL CHECK (
+                acknowledged_connection_generation IS NULL
+                OR acknowledged_connection_generation = requested_connection_generation),
+            observed_connection_generation INTEGER NULL CHECK (
+                observed_connection_generation IS NULL
+                OR observed_connection_generation > requested_connection_generation),
+            observed_process_instance_id TEXT NULL CHECK (
+                observed_process_instance_id IS NULL
+                OR (length(observed_process_instance_id) BETWEEN 16 AND 128
+                    AND observed_process_instance_id <> requested_process_instance_id)),
+            deadline_unix_ms INTEGER NOT NULL CHECK (deadline_unix_ms > created_unix_ms),
+            failure_code TEXT NOT NULL DEFAULT '' CHECK (length(failure_code) <= 128),
+            created_unix_ms INTEGER NOT NULL CHECK (created_unix_ms >= 0),
+            updated_unix_ms INTEGER NOT NULL CHECK (updated_unix_ms >= created_unix_ms),
+            completed_unix_ms INTEGER NULL CHECK (
+                completed_unix_ms IS NULL OR completed_unix_ms >= created_unix_ms),
+            CHECK (
+                (state = 'REQUESTED' AND acknowledged_connection_generation IS NULL
+                    AND observed_connection_generation IS NULL
+                    AND observed_process_instance_id IS NULL AND completed_unix_ms IS NULL)
+                OR (state = 'ACKNOWLEDGED' AND acknowledged_connection_generation IS NOT NULL
+                    AND observed_connection_generation IS NULL
+                    AND observed_process_instance_id IS NULL AND completed_unix_ms IS NULL)
+                OR (state = 'SUCCEEDED' AND observed_connection_generation IS NOT NULL
+                    AND observed_process_instance_id IS NOT NULL
+                    AND completed_unix_ms IS NOT NULL)
+                OR (state = 'FAILED' AND completed_unix_ms IS NOT NULL)),
+            UNIQUE(actor_type, actor_id, request_id)
+        ) STRICT;
+
+        CREATE INDEX build_stop_operations_due
+            ON build_stop_operations(deadline_unix_ms, operation_id)
+            WHERE state IN ('REQUESTED', 'ACKNOWLEDGED');
+
+        CREATE INDEX build_assignment_attempts_due
+            ON build_assignment_attempts(deadline_unix_ms, build_id)
+            WHERE state = 'WAITING';
+
+        CREATE INDEX agent_restart_operations_due
+            ON agent_restart_operations(deadline_unix_ms, operation_id)
+            WHERE state IN ('REQUESTED', 'ACKNOWLEDGED');
+
+        CREATE UNIQUE INDEX agent_restart_operations_one_active
+            ON agent_restart_operations(agent_id)
+            WHERE state IN ('REQUESTED', 'ACKNOWLEDGED');
+        """;
+
+    private const string BuildStopOperationsDueIndexDefinitionSql =
+        "CREATE INDEX build_stop_operations_due " +
+        "ON build_stop_operations(deadline_unix_ms, operation_id) " +
+        "WHERE state IN ('REQUESTED', 'ACKNOWLEDGED')";
+
+    private const string BuildAssignmentAttemptsDueIndexDefinitionSql =
+        "CREATE INDEX build_assignment_attempts_due " +
+        "ON build_assignment_attempts(deadline_unix_ms, build_id) " +
+        "WHERE state = 'WAITING'";
+
+    private const string AgentRestartOperationsDueIndexDefinitionSql =
+        "CREATE INDEX agent_restart_operations_due " +
+        "ON agent_restart_operations(deadline_unix_ms, operation_id) " +
+        "WHERE state IN ('REQUESTED', 'ACKNOWLEDGED')";
+
+    private const string AgentRestartOperationsOneActiveIndexDefinitionSql =
+        "CREATE UNIQUE INDEX agent_restart_operations_one_active " +
+        "ON agent_restart_operations(agent_id) " +
+        "WHERE state IN ('REQUESTED', 'ACKNOWLEDGED')";
 
     private const string AgentPackagesByRidIndexDefinitionSql =
         "CREATE INDEX agent_packages_by_rid " +

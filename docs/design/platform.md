@@ -296,16 +296,19 @@ No process is killed by an unverified PID after the original process identity ha
 
 ### Stop contract
 
-Cancellation has two bounded phases:
+Cancellation has two separately authorized bounded modes:
 
-1. Request graceful termination using the platform adapter when the step policy allows it.
-2. After the configured grace period, force termination of the entire containment group.
+1. Graceful stop requests termination using the platform adapter when the step policy allows it.
+   Missing termination evidence at the grace deadline quarantines the Agent; it never grants force
+   authority.
+2. An explicit force-stop request terminates the entire containment group and has its own bounded
+   result deadline.
 
 The common terminal reason is `cancelled`, `timed_out`, or `force_terminated`; native mechanisms are
 diagnostic metadata. Windows console-control delivery, Unix `SIGTERM`/`SIGKILL`, GUI close requests,
 and service stop are not interchangeable. A step may declare the supported graceful mechanism;
-otherwise the adapter goes directly to bounded containment termination. The controller and REST API
-must not expose Unix signals as the universal contract.
+otherwise the adapter reports graceful stop as unsupported; it does not silently acquire force-stop
+authority. The controller and REST API must not expose Unix signals as the universal contract.
 
 Output streams remain byte streams until decoded by an explicitly selected encoding. Backpressure,
 chunk limits, secret redaction, and retention belong to the Logs Expert; the platform adapter must

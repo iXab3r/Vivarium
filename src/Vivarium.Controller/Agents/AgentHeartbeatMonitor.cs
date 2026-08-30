@@ -43,5 +43,7 @@ public sealed class AgentHeartbeatMonitor : BackgroundService
         }
 
         await builds.SweepExpiredLeasesAsync(now);
+        await builds.SweepDueAssignmentAttemptsAsync(now);
+        await builds.SweepDueStopsAsync(now);
     }
 }

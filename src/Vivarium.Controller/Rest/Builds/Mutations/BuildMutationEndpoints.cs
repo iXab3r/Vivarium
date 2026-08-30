@@ -1,4 +1,5 @@
 using Vivarium.Controller.Blobs.Access;
+using Vivarium.Contracts.V1;
 using Vivarium.Controller.Management;
 using Vivarium.Controller.Rest.Common;
 using Vivarium.Controller.Security;
@@ -44,8 +45,10 @@ public static class BuildMutationEndpoints
             .WithTags("Builds")
             .WithSummary("Request convergent cancellation of a matrix Build")
             .WithDescription(
-                "Durably preserves the first accepted reason and returns current authoritative " +
-                "Build state. No If-Match is required for this convergent compatibility mutation.")
+                "mode=graceful requests bounded cleanup and quarantines on missing termination " +
+                "evidence; it never grants force authority. mode=force is a separately authorized " +
+                "immediate hard stop. The first reason is preserved. No If-Match is required for " +
+                "this convergent mutation.")
             .Produces<BuildResource>()
             .Produces<VivariumProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
             .Produces<VivariumProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")
@@ -137,14 +140,29 @@ public static class BuildMutationEndpoints
         }
 
         if (request is null || string.IsNullOrWhiteSpace(request.Reason) ||
-            request.Reason.Length > 1024 || request.Reason.Any(character =>
+            request.Reason.Length > 512 || request.Reason.Any(character =>
                 character is '\r' or '\n' or '\0'))
         {
             return ValidationProblem(
                 context,
                 "cancellation_reason_invalid",
                 "The cancellation reason is invalid",
-                "reason must contain 1-1024 safe characters.");
+                "reason must contain 1-512 safe characters.");
+        }
+
+        var mode = request.Mode?.Trim().ToLowerInvariant() switch
+        {
+            null or "" or "graceful" => BuildStopMode.Graceful,
+            "force" => BuildStopMode.Force,
+            _ => BuildStopMode.Unspecified,
+        };
+        if (mode == BuildStopMode.Unspecified)
+        {
+            return ValidationProblem(
+                context,
+                "stop_mode_invalid",
+                "The stop mode is invalid",
+                "mode must be graceful or force.");
         }
 
         try
@@ -153,6 +171,7 @@ public static class BuildMutationEndpoints
                 authentication.Context!,
                 matrixBuildId,
                 request.Reason.Trim(),
+                mode,
                 context.RequestAborted);
             if (build is null)
             {
@@ -168,7 +187,9 @@ public static class BuildMutationEndpoints
         {
             return RestProblems.PermissionDenied(
                 context,
-                ManagementPermission.BuildCancel.ToString(),
+                (mode == BuildStopMode.Force
+                    ? ManagementPermission.BuildForceStop
+                    : ManagementPermission.BuildCancel).ToString(),
                 new RestProblemTarget("build", matrixBuildId));
         }
     }

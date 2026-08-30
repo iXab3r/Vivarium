@@ -55,7 +55,7 @@ public sealed class DatabaseMigrationTests
         Assert.Multiple(() =>
         {
             Assert.That(state.Rows.Select(row => row.Number),
-                Is.EqualTo(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }));
+                Is.EqualTo(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 }));
             Assert.That(state.Rows.Select(row => row.Name),
                 Is.EqualTo(new[]
                 {
@@ -71,6 +71,7 @@ public sealed class DatabaseMigrationTests
                     "git-backed-authorization-policy",
                     "private-user-credentials",
                     "agent-package-upgrade-operations",
+                    "agent-lifecycle-supervision",
                 }));
             Assert.That(state.Rows.All(row => row.ChecksumLength == 64), Is.True);
             Assert.That(state.Version, Is.EqualTo(VivariumDatabase.CurrentSchemaVersion));
@@ -1439,12 +1440,24 @@ public sealed class DatabaseMigrationTests
 
     private void DropAgentPackageUpgradeSchema()
     {
+        DropAgentLifecycleSupervisionSchema();
         ExecuteRaw("""
             DROP TABLE agent_maintenance_drains;
             DROP TABLE agent_upgrade_events;
             DROP TABLE agent_upgrade_operations;
             DROP TABLE agent_package_publication_requests;
             DROP TABLE agent_packages;
+            """);
+    }
+
+    private void DropAgentLifecycleSupervisionSchema()
+    {
+        ExecuteRaw("""
+            DROP TABLE agent_restart_operations;
+            DROP TABLE build_assignment_attempts;
+            DROP TABLE build_stop_operations;
+            DROP TABLE agent_operational_health;
+            DELETE FROM schema_migrations WHERE migration_number = 13;
             """);
     }
 
