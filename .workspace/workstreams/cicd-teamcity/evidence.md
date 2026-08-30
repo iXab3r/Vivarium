@@ -195,3 +195,12 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - Publish no longer depends on a specific operating system, GitHub CLI, or repository release-policy
   setting. A safe local invocation without `GH_TOKEN` stopped immediately with
   `Publish requires a resolved GH_TOKEN environment secret.` and made no GitHub API mutation.
+- TeamCity applied revision `c7c8493d0ff4e7db2f364f986745d7ec299b1b85` and replaced the seven old
+  configurations with exactly `Compile`, `Release`, and `Publish`. Publish is not paused and has no
+  operating-system requirement; `env.GH_TOKEN` remains the unresolved `%github.release.token%` link.
+- TeamCity Compile build `30857` succeeded on `laptop-g15` as version `0.1.15`: 151 tests passed, 1
+  was ignored on Windows, and the published `build/` artifact contains `win-x64`, `linux-x64`,
+  `linux-arm64`, and `osx-arm64` from the one build.
+- TeamCity Release build `30859` reused Compile `30857`, preserved version `0.1.15`, passed its final
+  Windows-native server/CLI/agent/updater smoke, and published exactly the twelve expected ZIPs.
+  Publish was not executed and no GitHub release was created.
