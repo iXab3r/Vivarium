@@ -587,6 +587,14 @@ builds use patch `0` unless an explicit counter or complete version is supplied.
 `v<version>` at the chain's source commit; a Git tag is an output of publication, not the source of the
 version.
 
+The portable server ZIP remains the canonical binary input, while the normal Linux server deployment
+is also published as `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` and `latest`. The
+container is built from the exact `linux-x64` server release, listens on HTTPS port 8443, and keeps the
+complete controller data directory in the `/var/lib/vivarium` volume. Updating the controller means
+pulling and recreating the container; the image is replaceable and never owns instance state. Image
+publication and deployment are separate operations — CI pushes the image but does not reach into a
+running user's controller.
+
 These names are the public distribution contract; C# project, assembly, and namespace names remain
 `Vivarium.*`. Before the D2 freeze gate, the bootstrap prototype is renamed to `viv-agent-update` and
 its child lookup to `viv-agent`. This naming-only source change does not alter its update, trust, or

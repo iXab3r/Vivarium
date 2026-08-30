@@ -8,6 +8,8 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 private const val DotNet10Parameter = "DotNetCoreSDK10.0_Path"
 private const val BuildVersionParameter = "VivariumBuildVersion"
+private const val DockerImageParameter = "VivariumDockerImage"
+private const val DockerImage = "registry.eyeauras.net:5000/ixab3r/viv-server"
 
 private fun BuildType.commonVcs() {
     vcs {
@@ -101,9 +103,9 @@ object Release : BuildType({
     }
 })
 
-object Publish : BuildType({
+object PublishGitHub : BuildType({
     id("Vivarium_Publish")
-    name = "Publish"
+    name = "Publish / GitHub"
     buildNumberPattern = "${Release.depParamRefs.buildNumber}"
     type = BuildTypeSettings.Type.DEPLOYMENT
     maxRunningBuilds = 1
@@ -131,6 +133,77 @@ object Publish : BuildType({
             artifacts {
                 cleanDestination = true
                 artifactRules = "release/** => out/release"
+            }
+        }
+    }
+})
+
+object PublishDocker : BuildType({
+    id("Vivarium_PublishDocker")
+    name = "Publish / Docker"
+    buildNumberPattern = "${Release.depParamRefs.buildNumber}"
+    type = BuildTypeSettings.Type.DEPLOYMENT
+    maxRunningBuilds = 1
+    commonVcs()
+    params {
+        param(BuildVersionParameter, "${Release.depParamRefs.buildNumber}")
+        param(DockerImageParameter, DockerImage)
+    }
+    steps {
+        exec {
+            name = "Build linux-x64 server image"
+            path = "docker"
+            arguments = "build --pull --file build/docker/viv-server.Dockerfile " +
+                "--build-arg VIVARIUM_VERSION=%$BuildVersionParameter% " +
+                "--build-arg VIVARIUM_SOURCE_SHA=%build.vcs.number% " +
+                "--tag %$DockerImageParameter%:%$BuildVersionParameter% out/docker/server"
+        }
+        exec {
+            name = "Smoke server image"
+            path = "docker"
+            arguments = "run --rm %$DockerImageParameter%:%$BuildVersionParameter% --version"
+        }
+        exec {
+            name = "Tag latest"
+            path = "docker"
+            arguments = "tag %$DockerImageParameter%:%$BuildVersionParameter% %$DockerImageParameter%:latest"
+        }
+        exec {
+            name = "Push version"
+            path = "docker"
+            arguments = "push %$DockerImageParameter%:%$BuildVersionParameter%"
+        }
+        exec {
+            name = "Push latest"
+            path = "docker"
+            arguments = "push %$DockerImageParameter%:latest"
+        }
+        exec {
+            name = "Clean local image"
+            executionMode = BuildStep.ExecutionMode.ALWAYS
+            path = "/bin/sh"
+            arguments = "-c \"docker image rm --force " +
+                "%$DockerImageParameter%:%$BuildVersionParameter% %$DockerImageParameter%:latest || true\""
+        }
+    }
+    requirements {
+        equals("docker.server.osType", "linux")
+    }
+    dependencies {
+        dependency(PublishGitHub) {
+            snapshot {
+                reuseBuilds = ReuseBuilds.SUCCESSFUL
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+        }
+        dependency(Release) {
+            snapshot {
+                reuseBuilds = ReuseBuilds.SUCCESSFUL
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+            artifacts {
+                cleanDestination = true
+                artifactRules = "release/viv-server-linux-x64.zip!** => out/docker/server"
             }
         }
     }

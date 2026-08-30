@@ -127,7 +127,8 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
         await SmokeControllerAsync(
             Path.Combine(controllerRoot, "viv-server" + extension),
             controllerRoot,
-            Path.Combine(smokeRoot, "controller-data"));
+            Path.Combine(smokeRoot, "controller-data"),
+            version);
 
         var cliRoot = Path.Combine(smokeRoot, "cli");
         DeterministicZip.Extract(Path.Combine(releaseRoot, $"viv-cli-{rid}.zip"), cliRoot);
@@ -168,8 +169,21 @@ public sealed class ReleaseSmokeTask : AsyncFrostingTask<BuildContext>
     internal static async Task SmokeControllerAsync(
         string executable,
         string workingDirectory,
-        string dataDirectory)
+        string dataDirectory,
+        string expectedVersion)
     {
+        var versionOutput = await BuildProcess.CaptureAsync(
+            executable,
+            ["--version"],
+            workingDirectory,
+            timeoutSeconds: 30);
+        Console.WriteLine(versionOutput);
+        if (!string.Equals(versionOutput, $"viv-server {expectedVersion}", StringComparison.Ordinal))
+        {
+            throw new InvalidDataException(
+                $"Server version mismatch: expected viv-server {expectedVersion}, got {versionOutput}.");
+        }
+
         Console.WriteLine($"> {executable} --data {dataDirectory} --port 0");
         var startInfo = new ProcessStartInfo(executable)
         {

@@ -204,3 +204,21 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity Release build `30859` reused Compile `30857`, preserved version `0.1.15`, passed its final
   Windows-native server/CLI/agent/updater smoke, and published exactly the twelve expected ZIPs.
   Publish was not executed and no GitHub release was created.
+
+## Docker server distribution — 2026-08-30
+
+- The old EyeAuras.Web pipeline was inspected from source and from successful TeamCity publish build
+  `30500`: Windows produced the Linux application payload, Cvat only assembled and pushed the image,
+  and Portainer rollout was separate and disabled. Vivarium keeps those useful boundaries without the
+  legacy image-tar artifact or an in-CI deployment webhook.
+- The official Microsoft registry contains `mcr.microsoft.com/dotnet/runtime-deps:10.0-noble`.
+  Vivarium's image copies the exact released `linux-x64` server tree, restores the executable bit,
+  installs system Git, runs as the unprivileged `app` user, and makes only `/var/lib/vivarium`
+  writable and persistent.
+- Cake's new `DockerImage` target compiles successfully. It builds from an existing Compile tree and
+  verifies the container reports the exact stamped product version; Docker is not installed on the
+  local macOS host, so the image itself remains to be proven by the first Cvat publish.
+- TeamCity DSL validation on JDK 21 reports one project, exactly four build configurations, and one
+  VCS root. The final chain is `Compile -> Release -> Publish / GitHub -> Publish / Docker`; the Docker
+  publisher also takes the exact `viv-server-linux-x64.zip` artifact directly from Release and pushes
+  `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` plus `latest`.

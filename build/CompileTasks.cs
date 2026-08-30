@@ -53,7 +53,8 @@ public sealed class CompileSmokeTask : AsyncFrostingTask<BuildContext>
         await ReleaseSmokeTask.SmokeControllerAsync(
             Path.Combine(serverRoot, "viv-server" + extension),
             serverRoot,
-            Path.Combine(smokeRoot, "controller-data"));
+            Path.Combine(smokeRoot, "controller-data"),
+            context.ProductVersion);
 
         var cliRoot = Path.Combine(root, "cli");
         await ReleaseSmokeTask.SmokeCliAsync(

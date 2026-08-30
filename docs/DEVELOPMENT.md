@@ -37,6 +37,7 @@ dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux
 dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64
 dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid osx-arm64
 dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll
+dotnet run --project build/Vivarium.Build.csproj -- --target DockerImage
 dotnet run --project build/Vivarium.Build.csproj -- --target Test
 ```
 
@@ -61,6 +62,10 @@ architecture. Compile stamps the selected product version into the binaries and 
 version marker. `VivariumVersionBase` owns the human-selected `major.minor`; local builds default to
 `major.minor.0`, `--build-counter <number>` produces `major.minor.number`, and
 `--build-version <SemVer>` reproduces an exact version.
+
+`DockerImage` requires a local Docker engine and an existing `out/build/linux-x64/server` tree. It
+builds `viv-server:<version>` from those already-compiled bytes and runs the containerized server's
+`--version` probe; it never recompiles the product inside Docker.
 
 The Compile targets produce the matrix of self-contained single-file builds. The four shipped
 executable projects set `PublishSingleFile` explicitly, while Cake supplies the RID, self-contained
@@ -87,10 +92,12 @@ never a requirement.
 | 4. Real hypervisor E2E | QEMU/KVM smoke once that driver exists — GitHub's hosted **Linux** runners expose `/dev/kvm` (Windows runners cannot do Hyper-V); Hyper-V E2E on a **self-hosted** runner: the dev machine first, later the farm itself | KVM: CI, later; Hyper-V: self-hosted, scheduled/manual |
 
 GitHub Actions is intentionally disabled: the remote `ci` workflow is manually disabled and its YAML
-is absent from `.github/workflows`. TeamCity owns CI/CD through exactly three configurations:
-`Compile`, `Release`, and `Publish`. Compile runs the complete test suite once, cross-publishes all four
-RIDs sequentially, and runs a short native product smoke only for its current host. Cross-publishing
-foreign RIDs does not require an agent for their operating system. Tier 2 contains the implemented
+is absent from `.github/workflows`. TeamCity owns CI/CD through four explicit configurations:
+`Compile`, `Release`, `Publish / GitHub`, and `Publish / Docker`. Compile runs the complete test suite
+once, cross-publishes all four RIDs sequentially, and runs a short native product smoke only for its
+current host. Cross-publishing foreign RIDs does not require an agent for their operating system. The
+Docker publisher needs a Linux-container Docker engine because it builds and pushes an image, not
+because product compilation is platform-bound. Tier 2 contains the implemented
 session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build cross-process
 cases are not complete; tiers 3 and 4 await providers.
 
@@ -160,16 +167,20 @@ Each controller ZIP contains its static web assets and settings beside the singl
 plus the exact four public `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
-The versioned TeamCity chain is `Compile -> Release -> Publish`. Compile uses its own TeamCity counter
-as the patch version and cross-publishes all four RIDs, guaranteeing one `major.minor.build` code
-version for the complete artifact set. Release only packages that Compile output. Publish inherits the
-exact Release version and uploads the ready candidate through the GitHub REST API. It creates
+The versioned TeamCity chain is
+`Compile -> Release -> Publish / GitHub -> Publish / Docker`. Compile uses its own TeamCity counter as
+the patch version and cross-publishes all four RIDs, guaranteeing one `major.minor.build` code version
+for the complete artifact set. Release only packages that Compile output. The GitHub publisher inherits
+the exact Release version and uploads the ready candidate through the GitHub REST API. It creates
 `v<version>` at the TeamCity source SHA when needed, or verifies an existing tag points there, then
 creates or resumes a draft, uploads missing assets, and publishes it. An already-published release with
-the expected asset names and sizes is an idempotent success.
+the expected asset names and sizes is an idempotent success. The Docker publisher then builds the exact
+`linux-x64` server ZIP into `registry.eyeauras.net:5000/ixab3r/viv-server`, probes its stamped
+version, and pushes both `<version>` and `latest` tags. It does not deploy or restart a controller.
 
 There is still no public end-user release. The only missing CI/CD configuration required to run Publish
-is the TeamCity `github.release.token` secret. Native execution evidence on additional operating systems,
+is the TeamCity `github.release.token` secret. Docker publication reuses the already-authorized
+EyeAuras registry path and the existing Linux-container Docker agent. Native execution evidence on additional operating systems,
 the controller's system-Git prerequisite, signing, and upgrade testing remain product-quality work but
 do not prevent producing the initial portable releases. GitHub Actions is intentionally disabled by
 project-owner decision. The portable target keeps
@@ -179,8 +190,13 @@ intentionally keeps per-user trust and credentials in AppData/XDG config. Binari
 
 ## Upgrading a farm
 
-- **Controller**: stop → back up `vivarium-data/` (SQLite backup + blob dir copy) → replace the
-  binary → start. Schema migrations are forward-only and applied on startup.
+- **Controller (Docker)**: back up the `vivarium-data` volume, then run
+  `docker compose -f deploy/docker-compose.yml pull` followed by
+  `docker compose -f deploy/docker-compose.yml up -d`. The replacement container reuses
+  `/var/lib/vivarium`; schema migrations are forward-only and applied on startup. Pin the image to an
+  explicit version instead of `latest` when rollout timing must be controlled.
+- **Controller (portable ZIP)**: stop → back up `vivarium-data/` (SQLite backup + blob dir copy) →
+  replace the binary → start.
 - **Agents (target after D2 ships)**: update from the controller's store. Roll out with a canary build
   before broadcasting `RestartAgent` fleet-wide. The current Phase 1 implementation does not yet
   publish or serve agent manifests.

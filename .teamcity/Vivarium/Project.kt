@@ -10,11 +10,13 @@ object Project : Project({
 
     buildType(Compile)
     buildType(Release)
-    buildType(Publish)
+    buildType(PublishGitHub)
+    buildType(PublishDocker)
 
     buildTypesOrder = arrayListOf(
         Compile,
         Release,
-        Publish,
+        PublishGitHub,
+        PublishDocker,
     )
 })
