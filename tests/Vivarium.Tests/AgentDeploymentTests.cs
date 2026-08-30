@@ -16,6 +16,7 @@ namespace Vivarium.Tests;
 [TestFixture]
 public sealed class AgentDeploymentTests
 {
+    private static readonly TimeSpan RestartDeliveryEvidenceTimeout = TimeSpan.FromSeconds(60);
     private string rootDir = null!;
 
     [SetUp]
@@ -626,8 +627,32 @@ public sealed class AgentDeploymentTests
             }
             controller.Registry.EndBuild(second.AgentId, "peer-build");
             controller.Registry.EndBuild(first.AgentId, "busy-build");
+            await controller.AgentUpgrades.TryAdvanceAsync(operationId);
 
-            await firstTask.WaitAsync(TimeSpan.FromSeconds(20));
+            // D30 persists restart intent before delivery and permits three attempts separated by
+            // a 15-second retry deadline. The evidence window must cover that bounded delivery
+            // contract, including a session handoff or a loaded Windows CI host.
+            try
+            {
+                await firstTask.WaitAsync(RestartDeliveryEvidenceTimeout);
+            }
+            catch (TimeoutException exception)
+            {
+                var stalled = await controller.AgentUpgrades.FindAsync(operationId);
+                var stalledAgent = controller.Registry.Get(first.AgentId);
+                var events = await controller.AgentUpgrades.ListEventsAsync(operationId);
+                throw new AssertionException(
+                    $"Agent did not consume the bounded restart delivery: " +
+                    $"state={stalled?.State}, attempts={stalled?.RestartAttempts}, " +
+                    $"lastDispatchGeneration={stalled?.LastDispatchConnectionGeneration}, " +
+                    $"nextRestartAt={stalled?.NextRestartAt:O}, " +
+                    $"connected={stalledAgent?.Connected}, reconciled={stalledAgent?.Reconciled}, " +
+                    $"activity={stalledAgent?.Activity}, generation={stalledAgent?.ConnectionGeneration}, " +
+                    $"coordinator={controller.AgentUpgrades.ExecuteTask?.Status}, " +
+                    $"events=[{string.Join(", ", events.Select(value =>
+                        $"{value.Phase}:{value.Code}@{value.ConnectionGeneration}"))}]",
+                    exception);
+            }
             using var manifest = await agentHttp.GetAsync(
                 $"/bootstrap/manifest?os={platform.Os}&arch={platform.Arch}");
             var manifestText = await manifest.Content.ReadAsStringAsync();
