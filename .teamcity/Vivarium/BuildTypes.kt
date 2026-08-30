@@ -152,12 +152,12 @@ object PublishDocker : BuildType({
     params {
         text(DockerContextDirectoryParameter, "out/docker/server", allowEmpty = false)
         text(DockerFileNameParameter, "build/docker/viv-server.Dockerfile", allowEmpty = false)
-        text(DockerImageNameParameter, "", allowEmpty = false)
+        text(DockerImageNameParameter, "ixab3r/viv-server", allowEmpty = false)
         text(DockerImageVersionParameter, "${Release.depParamRefs.buildNumber}", allowEmpty = false)
         param(
             DockerRemoteImageNameParameter,
             "%$DockerRepositoryParameter%%$DockerImageNameParameter%")
-        text(DockerRepositoryParameter, "", allowEmpty = false)
+        text(DockerRepositoryParameter, "registry.eyeauras.net:5000/", allowEmpty = false)
     }
     steps {
         exec {

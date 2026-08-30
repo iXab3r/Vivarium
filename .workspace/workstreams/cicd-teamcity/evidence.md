@@ -257,3 +257,6 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity applied revision `f8fb1b6309c6769c2ce0fd48ca08c8395a74db53`. Its live parameter page
   shows the six expected Docker inputs, and the custom-run dialog reports `Value must be specified`
   for both empty destination fields. No Docker build was started.
+- The project owner then selected the known destination values as defaults. The DSL now supplies
+  `DockerRepository=registry.eyeauras.net:5000/` and `DockerImageName=ixab3r/viv-server` while keeping
+  both parameters overridable.

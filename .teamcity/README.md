@@ -45,8 +45,6 @@ The publishers have no trigger and are independent destinations: either can run 
 Contents write access for this repository. It uses the GitHub REST API directly, creates `v<version>`
 at the build source SHA, resumes a compatible draft, and treats an already-published release with the
 expected assets as a successful rerun. `Publish / Docker` needs no GitHub token. Following the
-EyeAuras.Web convention, its `DockerRepository` and `DockerImageName` input parameters are deliberately
-empty until the destination is configured. The intended values are `registry.eyeauras.net:5000/` and
-`ixab3r/viv-server`; their absence currently blocks only Docker publication. Dockerfile, context, and
-version parameters are supplied by the DSL. The publisher does not perform a Portainer or host
-deployment.
+EyeAuras.Web convention, its overridable `DockerRepository` and `DockerImageName` inputs default to
+`registry.eyeauras.net:5000/` and `ixab3r/viv-server`. Dockerfile, context, and version parameters are
+also supplied by the DSL. The publisher does not perform a Portainer or host deployment.
