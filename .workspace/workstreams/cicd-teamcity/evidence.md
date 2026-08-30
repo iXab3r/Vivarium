@@ -254,3 +254,6 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - JDK 21 Kotlin DSL validation succeeds with one project, four build configurations, and one VCS root.
   Generated XML preserves both empty inputs with `not_empty` validation and keeps Docker dependent
   only on Release.
+- TeamCity applied revision `f8fb1b6309c6769c2ce0fd48ca08c8395a74db53`. Its live parameter page
+  shows the six expected Docker inputs, and the custom-run dialog reports `Value must be specified`
+  for both empty destination fields. No Docker build was started.
