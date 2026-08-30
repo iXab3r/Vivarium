@@ -1,0 +1,11 @@
+services:
+  viv-server:
+    image: registry.eyeauras.net:5000/ixab3r/viv-server:latest
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    volumes:
+      - vivarium-data:/var/lib/vivarium
+
+volumes:
+  vivarium-data:

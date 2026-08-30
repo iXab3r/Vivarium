@@ -1,4 +1,19 @@
+using System.Reflection;
 using Vivarium.Controller;
+
+if (args is ["--version"])
+{
+    var assembly = typeof(ControllerOptions).Assembly;
+    var informationalVersion = assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+        .InformationalVersion;
+    var productVersion = informationalVersion?.Split('+', 2)[0];
+    var version = string.IsNullOrWhiteSpace(productVersion)
+        ? assembly.GetName().Version?.ToString(3) ?? "0.0.0"
+        : productVersion;
+    Console.WriteLine($"viv-server {version}");
+    return;
+}
 
 var dataDir = ArgValue(args, "--data")
     ?? Environment.GetEnvironmentVariable("VIVARIUM_DATA")

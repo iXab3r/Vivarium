@@ -204,3 +204,59 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - TeamCity Release build `30859` reused Compile `30857`, preserved version `0.1.15`, passed its final
   Windows-native server/CLI/agent/updater smoke, and published exactly the twelve expected ZIPs.
   Publish was not executed and no GitHub release was created.
+
+## Docker server distribution — 2026-08-30
+
+- The old EyeAuras.Web pipeline was inspected from source and from successful TeamCity publish build
+  `30500`: Windows produced the Linux application payload, Cvat only assembled and pushed the image,
+  and Portainer rollout was separate and disabled. Vivarium keeps those useful boundaries without the
+  legacy image-tar artifact or an in-CI deployment webhook.
+- The official Microsoft registry contains `mcr.microsoft.com/dotnet/runtime-deps:10.0-noble`.
+  Vivarium's image copies the exact released `linux-x64` server tree, restores the executable bit,
+  installs system Git, runs as the unprivileged `app` user, and makes only `/var/lib/vivarium`
+  writable and persistent.
+- Cake's new `DockerImage` target compiles successfully. It builds from an existing Compile tree and
+  verifies the container reports the exact stamped product version; Docker is not installed on the
+  local macOS host, so the image itself remains to be proven by the first Cvat publish.
+- TeamCity DSL validation on JDK 21 reported one project, exactly four build configurations, and one
+  VCS root. The initial Docker import chained GitHub before Docker; the Docker publisher also took the
+  exact `viv-server-linux-x64.zip` artifact directly from Release and pushed
+  `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` plus `latest`.
+- Root `dotnet build` succeeded with zero warnings or errors; root `dotnet test` passed 143 tests and
+  skipped 9 Windows-only cases. Native `CompileSmoke` proved that both server and CLI `--version`
+  probes report the exact stamped `0.1.6000` test version.
+- TeamCity applied source/settings revision `399a24d90dc387b2e954592db6fa54e3a8076238` and now shows
+  exactly `Compile`, `Release`, `Publish / GitHub`, and `Publish / Docker`. The Docker publisher has no
+  configuration-health findings and has one compatible agent; no Docker build or registry push has
+  run yet.
+
+## Independent publication destinations — 2026-08-30
+
+- The project owner required GitHub Releases and Docker registry publication to be independent because
+  either destination may be used alone.
+- The Kotlin DSL now gives both publishers exactly one snapshot dependency: `Release`. The generated
+  XML confirms that Docker has no dependency on GitHub; the missing `github.release.token` therefore
+  affects only `Publish / GitHub`.
+- TeamCity applied revision `d362c0cc5bac165ef60078d890f26170a9be2c78`. The live dependency pages
+  confirm that each publisher has exactly one snapshot dependency on Release and its own direct
+  Release artifact dependency; neither publisher references the other.
+
+## EyeAuras-style Docker parameters — 2026-08-30
+
+- The live EyeAuras.Web `Publish` configuration and its root `DockerPublish` template were inspected.
+  The effective contract builds `%DockerImageName%:%DockerImageVersion%`, derives the remote name as
+  `%DockerRepository%%DockerImageName%`, then tags and pushes both the version and `latest`.
+- Vivarium now uses the same parameter names for that contract. Dockerfile, context, and version are
+  fixed by the DSL; `DockerRepository` and `DockerImageName` are non-empty inputs intentionally left
+  unset, so Docker publication is independently blocked until its destination is configured.
+- The old template's image TAR and Portainer webhook steps were not copied: Vivarium retains the
+  previously accepted boundary where CI publishes the image but does not deploy a running server.
+- JDK 21 Kotlin DSL validation succeeds with one project, four build configurations, and one VCS root.
+  Generated XML preserves both empty inputs with `not_empty` validation and keeps Docker dependent
+  only on Release.
+- TeamCity applied revision `f8fb1b6309c6769c2ce0fd48ca08c8395a74db53`. Its live parameter page
+  shows the six expected Docker inputs, and the custom-run dialog reports `Value must be specified`
+  for both empty destination fields. No Docker build was started.
+- The project owner then selected the known destination values as defaults. The DSL now supplies
+  `DockerRepository=registry.eyeauras.net:5000/` and `DockerImageName=ixab3r/viv-server` while keeping
+  both parameters overridable.

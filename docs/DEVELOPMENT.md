@@ -33,6 +33,7 @@ dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux
 dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid linux-arm64
 dotnet run --project build/Vivarium.Build.csproj -- --target Compile --rid osx-arm64
 dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll
+dotnet run --project build/Vivarium.Build.csproj -- --target DockerImage
 dotnet run --project build/Vivarium.Build.csproj -- --target Test
 ```
 
@@ -64,6 +65,10 @@ The first managed-local configuration repository implementation uses the system 
 yet a release-support claim: controller packaging must bundle Git or verify/document the prerequisite
 on every supported controller RID before an end-user release.
 
+`DockerImage` requires a local Docker engine and an existing `out/build/linux-x64/server` tree. It
+builds `viv-server:<version>` from those already-compiled bytes and runs the containerized server's
+`--version` probe; it never recompiles the product inside Docker.
+
 ## Test tiers (D20)
 
 | Tier | What | Runs where |
@@ -74,11 +79,14 @@ on every supported controller RID before an end-user release.
 | 4. Real hypervisor E2E | QEMU/KVM and Hyper-V smoke on explicitly provisioned hosts | TeamCity self-hosted agents, scheduled/manual, later |
 
 GitHub Actions is intentionally disabled and `.github/workflows/ci.yml` is absent. TeamCity owns CI/CD
-through exactly three configurations: `Compile`, `Release`, and `Publish`. Compile runs the complete
-test suite once, cross-publishes all four RIDs sequentially, and runs a short native product smoke.
-Release packages only the exact Compile artifacts. Publish is a guarded deployment that uploads the
-verified Release candidate. The default-branch VCS trigger belongs only to Compile; fork pull requests
-must not execute repository-controlled code on persistent agents.
+through four explicit configurations:
+`Compile`, `Release`, `Publish / GitHub`, and `Publish / Docker`. Compile runs the complete test suite
+once, cross-publishes all four RIDs sequentially, and runs a short native product smoke. Release
+packages only the exact Compile artifacts. The independent GitHub and Docker publishers consume
+Release directly; Docker requires a Linux-container engine only for image packaging. Cross-publishing
+foreign RIDs does not require an agent for their operating system. The default-branch VCS trigger
+belongs only to Compile; fork pull requests must not execute repository-controlled code on persistent
+agents.
 
 Tier 2 includes the implemented session/lifecycle/queue/REST tests, two-Agent upgrade isolation,
 restart recovery, and real Bootstrap child success/rollback fixtures on Linux/macOS. Equivalent Windows
@@ -158,21 +166,37 @@ Server startup imports that catalog and fails closed if it is incomplete, corrup
 Release runs a native smoke from the final ZIP, including Server startup/catalog import, static assets,
 exact `viv-cli --version`, fail-closed Agent usage, and missing-config updater behavior.
 
-The TeamCity chain is `Compile -> Release -> Publish`. Compile owns the patch counter and exact source
-SHA; Release inherits its artifacts and version; Publish uses the GitHub REST API to create or verify
-`v<version>` at that source SHA, resume a compatible draft, upload missing assets, and publish it. An
-already-published release with the exact expected asset names, sizes, and GitHub-reported SHA-256
-digests is an idempotent success. Publish
+The TeamCity graph is `Compile -> Release -> { Publish / GitHub, Publish / Docker }`. Compile owns the
+patch counter and exact source SHA, cross-publishes all four RIDs, and guarantees one
+`major.minor.build` code version for the complete artifact set. Release inherits those exact artifacts
+and version without rebuilding.
+
+`Publish / GitHub` uses the GitHub REST API to create or verify `v<version>` at the source SHA, resume
+only a byte-identical draft, upload missing assets, and publish it. An already-published release with
+the exact expected asset names, sizes, and GitHub-reported SHA-256 digests is an idempotent success. It
 requires one TeamCity password parameter, `github.release.token`, with repository Contents write
-access. The pipeline can now produce initial portable releases, but signing, previous-release
-compatibility CI, installer trust, and native evidence on additional operating systems remain release
-quality gates. Binaries are unsigned for now, so Windows SmartScreen/MOTW and macOS Gatekeeper friction
-remain documented limitations (§13).
+access; its absence does not block Docker publication.
+
+`Publish / Docker` builds the exact `linux-x64` Server ZIP into
+`registry.eyeauras.net:5000/ixab3r/viv-server`, probes its stamped version, and pushes both `<version>`
+and `latest` tags. It does not deploy or restart a controller. Dockerfile, context, and version inputs
+come from the DSL; the overridable destination inputs default to
+`DockerRepository=registry.eyeauras.net:5000/` and `DockerImageName=ixab3r/viv-server`.
+
+The pipeline can now produce initial portable releases, but signing, previous-release compatibility
+CI, installer trust, the portable Controller system-Git prerequisite, and native evidence on
+additional operating systems remain release quality gates. Binaries are unsigned for now, so Windows
+SmartScreen/MOTW and macOS Gatekeeper friction remain documented limitations (§13).
 
 ## Upgrading a farm
 
-- **Controller**: stop → back up `vivarium-data/` (SQLite backup + blob dir copy) → replace the
-  binary → start. Schema migrations are forward-only and applied on startup.
+- **Controller (Docker)**: back up the `vivarium-data` volume, then run
+  `docker compose -f deploy/docker-compose.yml pull` followed by
+  `docker compose -f deploy/docker-compose.yml up -d`. The replacement container reuses
+  `/var/lib/vivarium`; schema migrations are forward-only and applied on startup. Pin the image to an
+  explicit version instead of `latest` when rollout timing must be controlled.
+- **Controller (portable ZIP)**: stop → back up `vivarium-data/` (SQLite backup + blob dir copy) →
+  replace the binary → start. Schema migrations are forward-only and applied on startup.
 - **Agents**: import/publish immutable packages, upgrade a canary Agent, then request the remaining
   per-Agent operations centrally. Active work drains first; no host login or reboot is required.
   Upgrade creation requires the current `vivarium.bootstrap-supervisor.v1` capability; an

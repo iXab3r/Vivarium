@@ -19,6 +19,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  CompileAll               Compile runnable binaries for every supported RID.");
         Console.WriteLine("  CompileSmoke             Run native product probes from one Compile output.");
         Console.WriteLine("  Release                  Package existing Compile outputs and smoke the native ZIP.");
+        Console.WriteLine("  DockerImage              Build and smoke the linux-x64 viv-server Docker image.");
         Console.WriteLine("  Publish                  Publish the ready Release artifact to GitHub.");
         Console.WriteLine("  Clean                    Remove only the repository out/ directory.");
         Console.WriteLine();
@@ -35,6 +36,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-counter 123");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target CompileAll --build-version 0.1.123");
+        Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target DockerImage --build-version 0.1.123");
         Console.WriteLine("  dotnet run --project build/Vivarium.Build.csproj -- --target Test");
     }
 }

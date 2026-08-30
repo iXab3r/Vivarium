@@ -27,13 +27,17 @@ Keep native execution in Compile and collect D29 Git prerequisite evidence.
 Gate: the all-RID Compile artifact packages into the exact release layout and the host-native final ZIP
 passes smoke. Additional native platform evidence and D29 remain follow-up product-quality work.
 
-## Phase 4 — guarded publication
+## Phase 4 — publication
 
-Publish only the exact release-gated TeamCity artifact. Use the computed code version to create the
-release tag at the source commit, plus a serialized manual deployment, a publish-only credential,
-draft-first upload, and publish-last behavior through the GitHub REST API.
+Publish only the exact release-gated TeamCity artifact. GitHub and Docker are independent destinations
+that both consume Release directly. GitHub uses the computed code version to create the release tag at
+the source commit, plus a serialized manual deployment, a publish-only credential, draft-first upload,
+and publish-last behavior through the GitHub REST API. Docker builds the Linux server image from the
+same Release artifact and pushes its versioned and `latest` tags to the existing EyeAuras registry. CI
+publishes artifacts and images; it does not deploy a controller.
 
-Gate: `github.release.token` is configured and a first release publishes successfully.
+Gate: each selected destination publishes successfully. GitHub alone requires `github.release.token`;
+Docker uses its overridable repository and image-name defaults independently.
 
 ## Phase 5 — cutover
 

@@ -595,6 +595,14 @@ The CLR Assembly/File versions remain the stable `major.minor.0.0` compatibility
 their numeric fields are 16-bit; protocol negotiation, runtime status, package catalogs, CLI output,
 and releases use the unbounded SemVer product/informational version.
 
+The portable Server ZIP remains the canonical binary input, while the normal Linux Server deployment
+is also published as `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` and `latest`. The
+container is built from the exact `linux-x64` Server release, listens on HTTPS port 8443, and keeps the
+complete controller data directory in the `/var/lib/vivarium` volume. Updating the controller means
+pulling and recreating the container; the image is replaceable and never owns instance state. Image
+publication and deployment are separate operations — CI pushes the image but does not reach into a
+running user's controller.
+
 The release runtime depends only on itself: every Server archive embeds both the unstamped public
 Agent template and a D30 child-only Agent package for every supported RID. The schema-v1
 `agent-packages/catalog.json` binds those immutable child packages to the exact Server version and is

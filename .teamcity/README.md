@@ -16,28 +16,36 @@ and fails before compiling the Kotlin configuration.
 Create the TeamCity project from `https://github.com/iXab3r/Vivarium.git`, then enable versioned settings
 from `.teamcity` with **use settings from the default branch**. Do not enable fork pull requests.
 
-The project deliberately contains exactly three configurations:
+The project deliberately contains exactly four configurations:
 
 - `Compile` builds and tests once, cross-publishes every supported RID with one version, and runs a
   native product smoke only for the current host;
 - `Release` packages the Compile output without compiling or testing and runs one host-native
   smoke from the final ZIP;
-- `Publish` downloads the Release artifact and uploads it to GitHub.
+- `Publish / GitHub` downloads the Release artifact and uploads it to GitHub;
+- `Publish / Docker` builds the exact linux-x64 server artifact into a container image and pushes its
+  version plus `latest` tag to the EyeAuras registry.
 
 Compile is automatically triggered on the default branch. Any agent with the exact SDK from
 `global.json` can run the complete cross-platform build; separate Linux and macOS agents are not
 required. Configure commit-status publication after the chain is proven.
 
-Agent requirement:
+Agent requirements:
 
-- any supported host with the exact SDK from `global.json`.
+- Compile, Release, and GitHub publication: any supported host with the exact SDK from `global.json`;
+- Docker publication: any agent exposing a Linux-container Docker engine. This is image packaging,
+  not platform-specific product compilation.
 
 `Release` has no trigger, is serialized, and starts one fresh Compile. `VivariumVersionBase` `0.1` and
-Compile counter `123` stamp the exact code version `0.1.123` into every RID. Release and Publish inherit
-that exact version from their dependencies.
+Compile counter `123` stamp the exact code version `0.1.123` into every RID. Both publishers depend
+directly on Release and inherit its exact version.
 
-Publish has no trigger. Its only missing configuration is a TeamCity password parameter named
-`github.release.token` with GitHub Contents write access for this repository. The publisher uses the
-GitHub REST API directly, creates `v<version>` at the build source SHA, resumes only a byte-identical
-draft, and treats an already-published release with the exact expected asset SHA-256 digests as a
-successful rerun.
+The publishers have no trigger and are independent destinations: either can run without the other.
+`Publish / GitHub` needs a TeamCity password parameter named `github.release.token` with GitHub
+Contents write access for this repository. It uses the GitHub REST API directly, creates `v<version>`
+at the build source SHA, resumes only a byte-identical draft, and treats an already-published release
+with the exact expected asset SHA-256 digests as a successful rerun. `Publish / Docker` needs no
+GitHub token. Following the EyeAuras.Web convention, its overridable `DockerRepository` and
+`DockerImageName` inputs default to `registry.eyeauras.net:5000/` and `ixab3r/viv-server`.
+Dockerfile, context, and version parameters are also supplied by the DSL. The publisher does not
+perform a Portainer or host deployment.
