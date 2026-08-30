@@ -146,6 +146,7 @@ public sealed class ManagedGitRepository : IConfigurationRepository
 
         await RecoverCheckoutAsync(cancellationToken);
         var head = await TryGetHeadAsync(cancellationToken);
+        await EnsureCanonicalCheckoutConfigurationAsync(head, cancellationToken);
         if (head is null)
         {
             await CreateBaselineAsync(cancellationToken);
@@ -166,6 +167,78 @@ public sealed class ManagedGitRepository : IConfigurationRepository
         // Reconciliation must be able to inspect an invalid human-authored HEAD after restart and
         // retain its durable last-known-good projection. The newly-created baseline is validated
         // before any Git object is made authoritative in CreateBaselineAsync.
+    }
+
+    private async Task EnsureCanonicalCheckoutConfigurationAsync(
+        ConfigurationRevision? head,
+        CancellationToken cancellationToken)
+    {
+        var localAutoCrlf = await git.RunAsync(
+            ["config", "--local", "--get", "core.autocrlf"],
+            allowFailure: true,
+            cancellationToken: cancellationToken);
+        var localEol = await git.RunAsync(
+            ["config", "--local", "--get", "core.eol"],
+            allowFailure: true,
+            cancellationToken: cancellationToken);
+        if (string.Equals(localAutoCrlf, "false", StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(localEol, "lf", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var previousAutoCrlf = await git.RunAsync(
+            ["config", "--get", "core.autocrlf"],
+            allowFailure: true,
+            cancellationToken: cancellationToken);
+        var previousEol = await git.RunAsync(
+            ["config", "--get", "core.eol"],
+            allowFailure: true,
+            cancellationToken: cancellationToken);
+        previousAutoCrlf = previousAutoCrlf.Length == 0 ? "false" : previousAutoCrlf;
+        previousEol = previousEol.Length == 0 ? "native" : previousEol;
+
+        var checkoutClean = head is null
+            ? await CheckoutIsEmptyAsync(cancellationToken)
+            : await CheckoutMatchesAsync(head.Commit, cancellationToken);
+        if (!checkoutClean)
+        {
+            throw DirtyCheckoutException();
+        }
+
+        await git.RunAsync(
+            ["config", "--local", "core.autocrlf", "false"],
+            cancellationToken: cancellationToken);
+        await git.RunAsync(
+            ["config", "--local", "core.eol", "lf"],
+            cancellationToken: cancellationToken);
+
+        if (head is null)
+        {
+            return;
+        }
+
+        // Re-prove cleanliness using the previous effective conversion policy immediately before
+        // rematerializing the checkout. The repository lock serializes controller writers; a human
+        // edit racing this migration is preserved and turns startup into a dirty-checkout failure.
+        if (!await CheckoutMatchesAsync(
+                head.Commit,
+                cancellationToken,
+                previousAutoCrlf,
+                previousEol))
+        {
+            throw DirtyCheckoutException();
+        }
+
+        await git.RunAsync(
+            ["reset", "--hard", head.Commit],
+            cancellationToken: cancellationToken);
+        if (!await CheckoutMatchesAsync(head.Commit, cancellationToken))
+        {
+            throw new ConfigurationRepositoryException(
+                "CONFIG_CHECKOUT_SYNC_FAILED",
+                "The managed repository checkout could not be rematerialized with canonical line endings.");
+        }
     }
 
     private async Task CreateBaselineAsync(CancellationToken cancellationToken)
@@ -1249,13 +1322,33 @@ public sealed class ManagedGitRepository : IConfigurationRepository
 
     private async Task<bool> CheckoutMatchesAsync(
         string commit,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? autoCrlfOverride = null,
+        string? eolOverride = null)
     {
+        var configuration = new List<string>();
+        if (autoCrlfOverride is not null)
+        {
+            configuration.AddRange(["-c", $"core.autocrlf={autoCrlfOverride}"]);
+        }
+        if (eolOverride is not null)
+        {
+            configuration.AddRange(["-c", $"core.eol={eolOverride}"]);
+        }
+
+        var diffArguments = new List<string>(configuration)
+        {
+            "diff", "--name-only", "--no-ext-diff", commit, "--",
+        };
         var changed = await git.RunAsync(
-            ["diff", "--name-only", "--no-ext-diff", commit, "--"],
+            diffArguments,
             cancellationToken: cancellationToken);
+        var untrackedArguments = new List<string>(configuration)
+        {
+            "ls-files", "--others",
+        };
         var untracked = await git.RunAsync(
-            ["ls-files", "--others"],
+            untrackedArguments,
             cancellationToken: cancellationToken);
         return changed.Length == 0 && untracked.Length == 0;
     }

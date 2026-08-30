@@ -59,10 +59,43 @@ public sealed class ManagedGitRepositoryTests
         });
         Assert.That(await RunGitAsync(repositoryPath, "status", "--porcelain=v1"), Is.Empty);
         Assert.That(await RunGitAsync(repositoryPath, "symbolic-ref", "HEAD"), Is.EqualTo("refs/heads/main"));
+        Assert.That(
+            await RunGitAsync(repositoryPath, "config", "--local", "--get", "core.autocrlf"),
+            Is.EqualTo("false"));
+        Assert.That(
+            await RunGitAsync(repositoryPath, "config", "--local", "--get", "core.eol"),
+            Is.EqualTo("lf"));
 
         var reopened = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
         Assert.That(await reopened.GetAuthoritativeHeadAsync(), Is.EqualTo(initial));
         Assert.That((await reopened.ValidateRevisionAsync(initial)).IsValid, Is.True);
+    }
+
+    [Test]
+    public async Task Reopen_repins_line_endings_and_rematerializes_a_clean_checkout()
+    {
+        var repositoryPath = NewRepositoryPath();
+        var repository = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        var initial = await repository.GetAuthoritativeHeadAsync();
+        await RunGitAsync(repositoryPath, "config", "--local", "core.autocrlf", "true");
+        await RunGitAsync(repositoryPath, "config", "--local", "core.eol", "native");
+        await RunGitAsync(repositoryPath, "reset", "--hard", initial.Commit);
+
+        _ = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+
+        var manifestBytes = await File.ReadAllBytesAsync(
+            Path.Combine(repositoryPath, ".vivarium", "repository.yaml"));
+        var autoCrlf = await RunGitAsync(
+            repositoryPath, "config", "--local", "--get", "core.autocrlf");
+        var eol = await RunGitAsync(
+            repositoryPath, "config", "--local", "--get", "core.eol");
+        Assert.Multiple(() =>
+        {
+            Assert.That(manifestBytes, Does.Not.Contain((byte)'\r'));
+            Assert.That(autoCrlf, Is.EqualTo("false"));
+            Assert.That(eol, Is.EqualTo("lf"));
+        });
+        Assert.That(await RunGitAsync(repositoryPath, "status", "--porcelain=v1"), Is.Empty);
     }
 
     [Test]

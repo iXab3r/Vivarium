@@ -69,7 +69,9 @@ versioned mutations and must not claim false atomicity across Git repositories.
   validates the complete canonical tree with bounded size/path/schema and secret checks, and advances
   the authoritative ref through expected-old compare-and-swap. Bounded process execution, stable
   commit provenance, a private checkout recovery marker, and fail-closed human dirty-state handling
-  protect the repository boundary.
+  protect the repository boundary. Repository-local line-ending policy is pinned to
+  `core.autocrlf=false` and `core.eol=lf`; adoption rematerializes only a checkout proven clean under
+  its previous effective policy.
 - SQLite migration v5 durably records revision sets/members, per-scope active and last-known-good
   pointers, idempotent mutation operations, and the Agent desired projection. Migration v6 adds bounded
   affected-target metadata, exact conflict revision/diff replay, and retryable repository-attempt
@@ -491,7 +493,9 @@ the owning domain's policy and audit event. `Accept observed state` is an explic
 
 A manually modified dirty controller checkout is not an alternate desired state. The controller
 refuses new writes and apply from that checkout, reports the paths, and requires the operator to
-commit, discard, or move the changes through Git deliberately.
+commit, discard, or move the changes through Git deliberately. Startup never normalizes through human
+changes: an older checkout is converted to the canonical LF policy only after its index and worktree
+exactly match `HEAD`, and cleanliness is re-proven immediately before the reset.
 
 ### Agent property application and interlocks
 
