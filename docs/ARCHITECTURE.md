@@ -580,11 +580,12 @@ release publish flags and per-RID zips remain Phase 1 delivery work
 ([`DEVELOPMENT.md`](DEVELOPMENT.md)); code signing is deferred and recorded (§13).
 
 The release version is the code identity shared by every RID. The repository owns `major.minor`
-through `VivariumVersionBase`; one TeamCity Build Number dependency allocates the numeric patch for a
-fresh release chain, producing `major.minor.build`. That exact version is stamped into every platform
-binary and carried unchanged through Release and Publish. Local builds use patch `0` unless an explicit
-counter or complete version is supplied. Publish creates `v<version>` at the chain's source commit; a
-Git tag is an output of publication, not the source of the version.
+through `VivariumVersionBase`; the single TeamCity Compile configuration uses its build counter as the
+numeric patch, producing `major.minor.build`. That Compile cross-publishes every RID, so the exact same
+version is stamped into every platform binary and carried unchanged through Release and Publish. Local
+builds use patch `0` unless an explicit counter or complete version is supplied. Publish creates
+`v<version>` at the chain's source commit; a Git tag is an output of publication, not the source of the
+version.
 
 These names are the public distribution contract; C# project, assembly, and namespace names remain
 `Vivarium.*`. Before the D2 freeze gate, the bootstrap prototype is renamed to `viv-agent-update` and

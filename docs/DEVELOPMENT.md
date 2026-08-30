@@ -8,7 +8,7 @@ the practical companion.
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline (AGENTS.md →
 Verification). `global.json` pins the SDK, package references pin Cake.Frosting and application
-dependencies, and `toolchains.lock.json` pins downloaded cargo-nextest and GitHub CLI bytes.
+dependencies, and `toolchains.lock.json` pins downloaded cargo-nextest bytes.
 
 The provider-neutral build entry point is the Cake.Frosting application under `build/`:
 
@@ -81,17 +81,16 @@ never a requirement.
 
 | Tier | What | Runs where |
 |---|---|---|
-| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | manual/local Cake `CI`; TeamCity `Compile / Windows x64` |
-| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | manual/local Cake `CI`; TeamCity `Compile / Windows x64` |
+| 1. Logic | scheduler/compat matching, matrix expansion, template vars, TRX/JUnit adapters vs golden files, blob store (hash verify, ref-counted GC), fencing/idempotency, state machines on **virtual time** | manual/local Cake `CI`; TeamCity `Compile` |
+| 2. Protocol (in-process) | real Kestrel on a loopback port + real agent child processes: Session/Welcome, enrollment + authorization, upgrade handshake (bootstrap swaps a fake "new" agent), reconnect → ghost re-adoption, result idempotency, kill-mid-build | manual/local Cake `CI`; TeamCity `Compile` |
 | 3. FakeMachineProvider | simulated pool VMs backed by local agent processes (revert = process restart + workdir reset): full D8 conveyor, pool grow/drain, INFRA recycling, canaries — deterministic, zero hypervisors | no automatic CI until TeamCity activation |
 | 4. Real hypervisor E2E | QEMU/KVM smoke once that driver exists — GitHub's hosted **Linux** runners expose `/dev/kvm` (Windows runners cannot do Hyper-V); Hyper-V E2E on a **self-hosted** runner: the dev machine first, later the farm itself | KVM: CI, later; Hyper-V: self-hosted, scheduled/manual |
 
 GitHub Actions is intentionally disabled: the remote `ci` workflow is manually disabled and its YAML
-is absent from `.github/workflows`. TeamCity owns CI/CD through four platform Compile configurations,
-one Release configuration, and one paused Publish deployment. The complete test suite runs exactly
-once, in `Compile / Windows x64`; every Compile configuration also runs a short native product smoke
-for its own RID. This avoids repeating the same test suite four times while still proving that each
-platform's produced executables start natively. Tier 2 contains the implemented
+is absent from `.github/workflows`. TeamCity owns CI/CD through exactly three configurations:
+`Compile`, `Release`, and `Publish`. Compile runs the complete test suite once, cross-publishes all four
+RIDs sequentially, and runs a short native product smoke only for its current host. Cross-publishing
+foreign RIDs does not require an agent for their operating system. Tier 2 contains the implemented
 session/lifecycle/queue/control-plane tests, but upgrade-handshake and kill-mid-build cross-process
 cases are not complete; tiers 3 and 4 await providers.
 
@@ -161,24 +160,19 @@ Each controller ZIP contains its static web assets and settings beside the singl
 plus the exact four public `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
-The versioned TeamCity chain is `Build Number -> Compile / <RID> -> Release -> Publish`. One shared
-Build Number dependency supplies the patch component to all four fresh Compile builds in a Release
-chain, so every operating system receives the same `major.minor.build` code version. Release has
-snapshot and artifact dependencies on all four Compile configurations and only packages those exact
-outputs. Publish inherits the exact Release version, has an artifact dependency on Release, and only
-uploads that ready candidate to GitHub. GitHub
-publication is committed paused and has no trigger. Its Cake target resolves a checksum-pinned GitHub
-CLI, requires immutable releases to be enabled, creates `v<version>` at the TeamCity source SHA when
-needed, or verifies an existing tag points there, then creates or safely resumes a compatible draft,
-verifies GitHub's remote `sha256:` asset digests, and publishes last. An already-published exact
-immutable release is an idempotent success; mismatched or extra assets are never clobbered.
+The versioned TeamCity chain is `Compile -> Release -> Publish`. Compile uses its own TeamCity counter
+as the patch version and cross-publishes all four RIDs, guaranteeing one `major.minor.build` code
+version for the complete artifact set. Release only packages that Compile output. Publish inherits the
+exact Release version and uploads the ready candidate through the GitHub REST API. It creates
+`v<version>` at the TeamCity source SHA when needed, or verifies an existing tag points there, then
+creates or resumes a draft, uploads missing assets, and publishes it. An already-published release with
+the expected asset names and sizes is an idempotent success.
 
-There is still no public end-user release. Stable activation is blocked until native evidence exists for
-all four RIDs (especially Linux arm64), a macOS TeamCity agent exists, the controller's system-Git
-prerequisite from the desired-configuration work is proven on every controller RID, the publish-only
-TeamCity secret is configured, and the paused deployment passes draft-resume failure
-tests. GitHub Actions is intentionally disabled by project-owner decision; GitHub publication remains a
-paused TeamCity deployment and must not be used to bypass these release gates. The portable target keeps
+There is still no public end-user release. The only missing CI/CD configuration required to run Publish
+is the TeamCity `github.release.token` secret. Native execution evidence on additional operating systems,
+the controller's system-Git prerequisite, signing, and upgrade testing remain product-quality work but
+do not prevent producing the initial portable releases. GitHub Actions is intentionally disabled by
+project-owner decision. The portable target keeps
 state in an explicit data/install directory so uninstall is removal of that directory; `viv-cli login`
 intentionally keeps per-user trust and credentials in AppData/XDG config. Binaries are unsigned for now
 — SmartScreen/MOTW friction on Windows and Gatekeeper prompts on macOS are known and documented (§13).

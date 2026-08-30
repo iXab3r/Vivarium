@@ -11,16 +11,6 @@
           "digest": "66786b9abe23920d022a182d1416b1bbc8130dd4872a9553d76985a1708dcd1e"
         }
       }
-    },
-    "githubCli": {
-      "version": "2.97.0",
-      "artifacts": {
-        "linux-x64": {
-          "url": "https://github.com/cli/cli/releases/download/v2.97.0/gh_2.97.0_linux_amd64.tar.gz",
-          "algorithm": "sha256",
-          "digest": "a2c9b8497e1f85b1ad0dfcb78b5a622e098801b8e461e459e88e1ee12f018112"
-        }
-      }
     }
   }
 }

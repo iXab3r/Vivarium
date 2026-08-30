@@ -8,20 +8,12 @@ object Project : Project({
 
     vcsRoot(VivariumVcs)
 
-    buildType(BuildNumber)
-    buildType(CompileWindowsX64)
-    buildType(CompileLinuxX64)
-    buildType(CompileLinuxArm64)
-    buildType(CompileMacosArm64)
+    buildType(Compile)
     buildType(Release)
     buildType(Publish)
 
     buildTypesOrder = arrayListOf(
-        BuildNumber,
-        CompileWindowsX64,
-        CompileLinuxX64,
-        CompileLinuxArm64,
-        CompileMacosArm64,
+        Compile,
         Release,
         Publish,
     )

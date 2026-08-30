@@ -177,3 +177,21 @@ Do not convert a pending platform or release gate into a passing claim based on 
   `30853` (`2`) and finished as `0.1.2`. Both passed 151 tests with 1 ignored. Build `30854` passed
   `-p:Version=0.1.2` to controller, agent, updater, and CLI publishes, and its native smoke returned
   `viv-cli 0.1.2`.
+
+## Single cross-platform Compile — 2026-08-30
+
+- The Kotlin DSL validates on JDK 21 as one project, exactly three build configurations, and one VCS
+  root. The chain is `Compile -> Release -> Publish`; Compile has no operating-system requirement and
+  runs CI once before cross-publishing all four RIDs.
+- Local Cake `CI --build-counter 5000` succeeded with 143 tests passed and 9 platform tests skipped on
+  macOS arm64. `CompileAll --build-counter 5000` then published all four RIDs sequentially with one
+  MSBuild worker.
+- All 16 final executables contain informational version
+  `0.1.5000+c1262cd2c19d576b40ef226700576df0f27d3f42`, and all four `agent/version` files contain
+  `0.1.5000`. The native Compile smoke returned `viv-cli 0.1.5000` and passed the controller, agent,
+  and updater probes.
+- `Release --build-version 0.1.5000` produced exactly twelve valid ZIPs. Every server ZIP embeds all
+  four agent packages, and its automatic native final-ZIP smoke passed.
+- Publish no longer depends on a specific operating system, GitHub CLI, or repository release-policy
+  setting. A safe local invocation without `GH_TOKEN` stopped immediately with
+  `Publish requires a resolved GH_TOKEN environment secret.` and made no GitHub API mutation.
