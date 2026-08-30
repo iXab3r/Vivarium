@@ -1,6 +1,6 @@
 # TeamCity CI/CD handover
 
-Status: active; cross-platform binary pipeline proven, Docker server publication in progress.
+Status: active; cross-platform binary pipeline proven, Docker publisher imported, first image pending.
 
 ## Current contract
 
@@ -38,7 +38,6 @@ TeamCity configuration that prevents the final chain from running is `github.rel
 
 ## Next steps
 
-1. Import the Docker publication configuration, then build/smoke the image on Cvat as part of the
-   first complete publish.
-2. Add `github.release.token` as a TeamCity password parameter with GitHub Contents write access.
-3. Run `Publish / Docker`; its dependency publishes GitHub first, then the versioned container image.
+1. Add `github.release.token` as a TeamCity password parameter with GitHub Contents write access.
+2. Run `Publish / Docker`; its dependency publishes GitHub first, then Cvat builds, smokes, and pushes
+   the versioned container image.

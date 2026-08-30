@@ -222,3 +222,10 @@ Do not convert a pending platform or release gate into a passing claim based on 
   VCS root. The final chain is `Compile -> Release -> Publish / GitHub -> Publish / Docker`; the Docker
   publisher also takes the exact `viv-server-linux-x64.zip` artifact directly from Release and pushes
   `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` plus `latest`.
+- Root `dotnet build` succeeded with zero warnings or errors; root `dotnet test` passed 143 tests and
+  skipped 9 Windows-only cases. Native `CompileSmoke` proved that both server and CLI `--version`
+  probes report the exact stamped `0.1.6000` test version.
+- TeamCity applied source/settings revision `399a24d90dc387b2e954592db6fa54e3a8076238` and now shows
+  exactly `Compile`, `Release`, `Publish / GitHub`, and `Publish / Docker`. The Docker publisher has no
+  configuration-health findings and has one compatible agent; no Docker build or registry push has
+  run yet.
