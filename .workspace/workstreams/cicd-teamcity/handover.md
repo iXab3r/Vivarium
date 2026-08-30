@@ -20,8 +20,8 @@ agents are not required to produce their binaries. GitHub Actions remains disabl
 
 GitHub publication uses the REST API directly. It does not require GitHub CLI, immutable-release
 settings, a specific agent OS, or a pre-existing tag. Docker publication uses the existing Cvat Docker
-engine only for image packaging and depends on successful GitHub publication. The only missing
-TeamCity configuration that prevents the final chain from running is `github.release.token`.
+engine only for image packaging. Both publishers depend directly on Release and are independent;
+the missing `github.release.token` blocks only GitHub publication.
 
 ## Evidence
 
@@ -38,6 +38,6 @@ TeamCity configuration that prevents the final chain from running is `github.rel
 
 ## Next steps
 
-1. Add `github.release.token` as a TeamCity password parameter with GitHub Contents write access.
-2. Run `Publish / Docker`; its dependency publishes GitHub first, then Cvat builds, smokes, and pushes
-   the versioned container image.
+1. Run `Publish / Docker`; Cvat builds, smokes, and pushes the versioned container image without
+   involving GitHub.
+2. Add `github.release.token` when GitHub Releases are wanted, then run `Publish / GitHub` independently.

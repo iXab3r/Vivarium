@@ -29,14 +29,15 @@ passes smoke. Additional native platform evidence and D29 remain follow-up produ
 
 ## Phase 4 — publication
 
-Publish only the exact release-gated TeamCity artifact. Use the computed code version to create the
-release tag at the source commit, plus a serialized manual deployment, a publish-only credential,
-draft-first upload, and publish-last behavior through the GitHub REST API. After GitHub publication,
-build the Linux server image from that same Release artifact and push its versioned and `latest` tags
-to the existing EyeAuras registry. CI publishes artifacts and images; it does not deploy a controller.
+Publish only the exact release-gated TeamCity artifact. GitHub and Docker are independent destinations
+that both consume Release directly. GitHub uses the computed code version to create the release tag at
+the source commit, plus a serialized manual deployment, a publish-only credential, draft-first upload,
+and publish-last behavior through the GitHub REST API. Docker builds the Linux server image from the
+same Release artifact and pushes its versioned and `latest` tags to the existing EyeAuras registry. CI
+publishes artifacts and images; it does not deploy a controller.
 
-Gate: `github.release.token` is configured and the first GitHub release plus Docker image publish
-successfully.
+Gate: each selected destination publishes successfully. GitHub alone requires `github.release.token`;
+Docker publication does not depend on it.
 
 ## Phase 5 — cutover
 

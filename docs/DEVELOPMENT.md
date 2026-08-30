@@ -167,20 +167,22 @@ Each controller ZIP contains its static web assets and settings beside the singl
 plus the exact four public `packages/agents/viv-agent-<rid>.zip` bytes. This is a candidate import layout; the controller-side
 store and authenticated manifest endpoint are still not implemented.
 
-The versioned TeamCity chain is
-`Compile -> Release -> Publish / GitHub -> Publish / Docker`. Compile uses its own TeamCity counter as
-the patch version and cross-publishes all four RIDs, guaranteeing one `major.minor.build` code version
-for the complete artifact set. Release only packages that Compile output. The GitHub publisher inherits
-the exact Release version and uploads the ready candidate through the GitHub REST API. It creates
+The versioned TeamCity graph is
+`Compile -> Release -> { Publish / GitHub, Publish / Docker }`. Compile uses its own TeamCity counter
+as the patch version and cross-publishes all four RIDs, guaranteeing one `major.minor.build` code
+version for the complete artifact set. Release only packages that Compile output. The two publishers
+are independent destinations and may run separately. The GitHub publisher inherits the exact Release
+version and uploads the ready candidate through the GitHub REST API. It creates
 `v<version>` at the TeamCity source SHA when needed, or verifies an existing tag points there, then
 creates or resumes a draft, uploads missing assets, and publishes it. An already-published release with
 the expected asset names and sizes is an idempotent success. The Docker publisher then builds the exact
 `linux-x64` server ZIP into `registry.eyeauras.net:5000/ixab3r/viv-server`, probes its stamped
 version, and pushes both `<version>` and `latest` tags. It does not deploy or restart a controller.
 
-There is still no public end-user release. The only missing CI/CD configuration required to run Publish
-is the TeamCity `github.release.token` secret. Docker publication reuses the already-authorized
-EyeAuras registry path and the existing Linux-container Docker agent. Native execution evidence on additional operating systems,
+There is still no public end-user release. GitHub publication requires the missing TeamCity
+`github.release.token` secret; its absence does not block Docker publication. Docker reuses the
+already-authorized EyeAuras registry path and the existing Linux-container Docker agent. Native
+execution evidence on additional operating systems,
 the controller's system-Git prerequisite, signing, and upgrade testing remain product-quality work but
 do not prevent producing the initial portable releases. GitHub Actions is intentionally disabled by
 project-owner decision. The portable target keeps

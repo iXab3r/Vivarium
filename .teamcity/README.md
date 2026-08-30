@@ -37,13 +37,13 @@ Agent requirements:
   not platform-specific product compilation.
 
 `Release` has no trigger, is serialized, and starts one fresh Compile. `VivariumVersionBase` `0.1` and
-Compile counter `123` stamp the exact code version `0.1.123` into every RID. Release and both publishers
-inherit that exact version from their dependencies.
+Compile counter `123` stamp the exact code version `0.1.123` into every RID. Both publishers depend
+directly on Release and inherit its exact version.
 
-The publishers have no trigger. `Publish / Docker` depends on successful `Publish / GitHub`, so a final
-publish never pushes a container when GitHub publication is blocked. The only missing configuration is a TeamCity password parameter named
-`github.release.token` with GitHub Contents write access for this repository. The publisher uses the
-GitHub REST API directly, creates `v<version>` at the build source SHA, resumes a compatible draft, and
-treats an already-published release with the expected assets as a successful rerun. Docker publication
-uses the existing `registry.eyeauras.net:5000/ixab3r/viv-server` path and does not perform a
-Portainer or host deployment.
+The publishers have no trigger and are independent destinations: either can run without the other.
+`Publish / GitHub` needs a TeamCity password parameter named `github.release.token` with GitHub
+Contents write access for this repository. It uses the GitHub REST API directly, creates `v<version>`
+at the build source SHA, resumes a compatible draft, and treats an already-published release with the
+expected assets as a successful rerun. `Publish / Docker` needs no GitHub token, uses the existing
+`registry.eyeauras.net:5000/ixab3r/viv-server` path, and does not perform a Portainer or host
+deployment.

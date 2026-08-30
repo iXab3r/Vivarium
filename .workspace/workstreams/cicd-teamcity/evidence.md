@@ -218,9 +218,9 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - Cake's new `DockerImage` target compiles successfully. It builds from an existing Compile tree and
   verifies the container reports the exact stamped product version; Docker is not installed on the
   local macOS host, so the image itself remains to be proven by the first Cvat publish.
-- TeamCity DSL validation on JDK 21 reports one project, exactly four build configurations, and one
-  VCS root. The final chain is `Compile -> Release -> Publish / GitHub -> Publish / Docker`; the Docker
-  publisher also takes the exact `viv-server-linux-x64.zip` artifact directly from Release and pushes
+- TeamCity DSL validation on JDK 21 reported one project, exactly four build configurations, and one
+  VCS root. The initial Docker import chained GitHub before Docker; the Docker publisher also took the
+  exact `viv-server-linux-x64.zip` artifact directly from Release and pushed
   `registry.eyeauras.net:5000/ixab3r/viv-server:<version>` plus `latest`.
 - Root `dotnet build` succeeded with zero warnings or errors; root `dotnet test` passed 143 tests and
   skipped 9 Windows-only cases. Native `CompileSmoke` proved that both server and CLI `--version`
@@ -229,3 +229,11 @@ Do not convert a pending platform or release gate into a passing claim based on 
   exactly `Compile`, `Release`, `Publish / GitHub`, and `Publish / Docker`. The Docker publisher has no
   configuration-health findings and has one compatible agent; no Docker build or registry push has
   run yet.
+
+## Independent publication destinations — 2026-08-30
+
+- The project owner required GitHub Releases and Docker registry publication to be independent because
+  either destination may be used alone.
+- The Kotlin DSL now gives both publishers exactly one snapshot dependency: `Release`. The generated
+  XML confirms that Docker has no dependency on GitHub; the missing `github.release.token` therefore
+  affects only `Publish / GitHub`.

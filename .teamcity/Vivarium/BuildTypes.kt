@@ -190,12 +190,6 @@ object PublishDocker : BuildType({
         equals("docker.server.osType", "linux")
     }
     dependencies {
-        dependency(PublishGitHub) {
-            snapshot {
-                reuseBuilds = ReuseBuilds.SUCCESSFUL
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-        }
         dependency(Release) {
             snapshot {
                 reuseBuilds = ReuseBuilds.SUCCESSFUL
