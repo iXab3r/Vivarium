@@ -17,7 +17,7 @@
 | release-contract:d29-git | bundle or verify system Git on every controller RID | release | Platform, Security, Docs | activation gate | accepted D29 commit and per-RID evidence before stable release |
 | release-contract:github | token-gated GitHub REST publication | publication | Security | implemented; TeamCity token missing | with `github.release.token`, create/resume draft, upload expected assets, and publish |
 | teamcity:trusted-source | default-branch DSL and trusted PR policy | TeamCity | Security, Git/Versioning | implemented; server evidence pending | fork PR cannot alter settings or receive credentials |
-| teamcity:pipeline-shape | Compile -> Release -> independent GitHub and Docker publishers | TeamCity | TeamCity Expert, Test Steward | four configurations imported; independent publisher graph pending import | one Compile counter and source revision stamp every RID; Release contains no compile/test step; either publisher can run alone |
+| teamcity:pipeline-shape | Compile -> Release -> independent GitHub and Docker publishers | TeamCity | TeamCity Expert, Test Steward | independent four-configuration graph imported; first Docker build pending | one Compile counter and source revision stamp every RID; Release contains no compile/test step; either publisher can run alone |
 | teamcity:test-reporting | import deterministic TRX from Compile | TeamCity | Test Steward | Windows server evidence green | passing/failing/cancelled results visible from the single test run |
 | cutover:github-actions | remove automatic GitHub Actions workflow | cutover | Reconciliation Lead, Docs | closed by owner decision | remote `ci` workflow `343961597` is `disabled_manually`, YAML removed; automatic CI gap documented pending TeamCity activation |
 

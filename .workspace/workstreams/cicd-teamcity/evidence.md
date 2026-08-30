@@ -237,3 +237,6 @@ Do not convert a pending platform or release gate into a passing claim based on 
 - The Kotlin DSL now gives both publishers exactly one snapshot dependency: `Release`. The generated
   XML confirms that Docker has no dependency on GitHub; the missing `github.release.token` therefore
   affects only `Publish / GitHub`.
+- TeamCity applied revision `d362c0cc5bac165ef60078d890f26170a9be2c78`. The live dependency pages
+  confirm that each publisher has exactly one snapshot dependency on Release and its own direct
+  Release artifact dependency; neither publisher references the other.
