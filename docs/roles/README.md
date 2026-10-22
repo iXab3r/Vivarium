@@ -15,6 +15,8 @@ Start each delegated architect, advisor, and reviewer with empty conversation co
 
 Each agent independently inspects the relevant contracts, code, tests, and documents and reports its own evidence, conclusions, and uncertainty. The final reviewer must be separate from the implementer and design advisor, remain read-only, and inspect the final diff at the named revision. Disclose unavailable independent review rather than presenting self-review as independent.
 
+Role approval language describes a review judgment, not user permission, exclusive edit rights, or authority to expand scope.
+
 Role consultation is bounded to the contracts actually touched. A role is a perspective; naming or co-holding several roles in one agent does not create independent review.
 
 ## Product and domain experts
@@ -65,8 +67,8 @@ Role consultation is bounded to the contracts actually touched. A role is a pers
 1. Adopt the smallest set of roles that covers the change and state the lead role before acting.
 2. Read `AGENTS.md` and all of `docs/ARCHITECTURE.md` before structural work, then read the selected
    role guide and focused design completely.
-3. A domain expert may propose an agent capability, but only Agent API/SDK Expert changes the shared
-   Agent API/capability contract.
+3. Changes to the shared Agent API/capability contract require the Agent API/SDK perspective and
+   design review. Any contributor may implement the accepted change; roles do not grant exclusive edit authority.
 4. Every user-visible web change routes through UI Expert; every public management contract routes
    through Vivarium REST Expert.
 5. Every desired-setting/property mutation routes through Git/Versioning Expert. Runtime actions are
