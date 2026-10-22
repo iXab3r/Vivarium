@@ -108,8 +108,9 @@ numbered decision. Keep target design and implementation status separate.
 ## Expert-role routing
 
 Canonical role packs and their focused designs are indexed in
-[`docs/roles/README.md`](docs/roles/README.md). Thin project-agent adapters live in `.codex/agents/`
-and `.claude/agents/`; never duplicate durable role instructions there.
+[`docs/roles/README.md`](docs/roles/README.md). Markdown guides are the shared role contract. Native
+Claude discovery adapters retain their tool/model metadata and link to those guides; never duplicate
+durable instructions in harness-specific prompt files. Follow the index's independent-delegation rules.
 
 - **Agent API/SDK Expert** owns AgentHub, capabilities, enrollment, deployment, upgrades, and SDK
   compatibility. Other experts request agent capabilities through this role.
@@ -148,9 +149,9 @@ and `.claude/agents/`; never duplicate durable role instructions there.
 
 ### 1. Think before coding
 
-Do not assume; do not hide confusion; surface tradeoffs. State assumptions when they matter. If
-multiple interpretations exist, present them instead of picking silently. If a simpler approach exists,
-say so. If a wrong guess would create churn, stop and ask.
+Inspect relevant evidence and state material assumptions. Resolve routine choices from the existing
+contracts and user intent. Ask only when an unresolved decision materially changes behavior, scope, or
+a contract; continue independent work while awaiting a necessary answer.
 
 ### 2. Simplicity first
 
@@ -167,7 +168,9 @@ should trace to the task at hand.
 
 ### 4. Verification
 
-Once code exists: `dotnet build` and `dotnet test` at the solution root must pass before handoff
+For code changes: `dotnet build` and `dotnet test` at the solution root must pass before handoff
 (test-tier definitions and CI mapping: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)), and
 protocol changes must keep `Vivarium.Contracts` backward-compatible within a minor version (pool
 checkpoints may carry a stale agent until its post-revert upgrade).
+
+Documentation-only changes require factual consistency, local-link, native-adapter metadata, and diff checks. Report unrun code/runtime checks; do not trigger release or fleet operations merely to validate prose.

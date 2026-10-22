@@ -121,8 +121,9 @@ handover.
 - The Reconciliation Lead schedules and records; it does not override the Agent API, TeamCity,
   AgentExplorer, REST, UI, Git/versioning, platform, security, logging, or documentation expert for a
   touched domain.
-- Prefer a read-only exploration agent for census generation and a clean-context reviewer after each
-  phase. Review findings return to the ledger as reclassifications or baseline corrections, never as
+- Start delegated census/design agents and reviewers with empty context under the
+  [independent-delegation contract](README.md#independent-delegation). Use a read-only final reviewer
+  separate from the implementer and design/census advisor after each phase. Review findings return to the ledger as reclassifications or baseline corrections, never as
   chat-only observations.
 - Update `handover.md` before pausing or switching to unrelated work. Include exact commands and identify
   which outputs are generated so the next agent does not edit them manually.
