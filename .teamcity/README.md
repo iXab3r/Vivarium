@@ -4,11 +4,10 @@ The Kotlin DSL is the desired CI/CD configuration. It deliberately does not cont
 GitHub tokens, or a pull-request feature. Manual builds may select any branch from the public Vivarium
 VCS root; the automatic VCS trigger runs only the default branch.
 
-Validate before import:
-
-```text
-teamcity project settings validate .teamcity
-```
+Inspect TeamCity with `teamcity-cli` from `@eyeauras/teamcity-cli`. The retired JetBrains
+`teamcity` CLI command previously shown here is no longer available; do not reinstall it or translate
+its syntax by guesswork. Inspect the installed CLI help and the checked-in Kotlin DSL tooling before
+choosing validation for an import. Documentation maintenance does not require importing settings.
 
 Run validation with JDK 21 active. The current TeamCity DSL security agent does not support Java 26
 and fails before compiling the Kotlin configuration.

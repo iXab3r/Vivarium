@@ -121,7 +121,12 @@ These roles complement domain experts; they do not replace them.
 
 ## Loading context without loading everything
 
-Contributors use progressive context loading:
+Contributors use progressive context loading. Delegated architects, advisors, and reviewers start
+with empty conversation context and independently gather the focused evidence described in the
+[role index](../roles/README.md#independent-delegation); do not forward the author's reasoning or a
+preferred verdict as their brief.
+
+Contributors load:
 
 1. Read the applicable `AGENTS.md` files. For a structural proposal or implementation, read
    `docs/ARCHITECTURE.md` completely as required by the root contract.
