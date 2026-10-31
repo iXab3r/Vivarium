@@ -25,7 +25,8 @@ implementation_milestones_accepted = 0
 planning_gate = "P0 executable reference-backed REST corpus, minimal deterministic production-code composition/cost proof and genuine RED baseline precede structural replacement (D38), alongside D36 model/protocol/mutation gates. D34/D35 accept shared authentication/storage/UI technologies while preserving TeamCity/Vivarium UX. RF-10 accepts separate milestone merges."
 continuous_conformance = "D37: TeamCity Build/Agent semantic superset; every affected milestone proves business AC, TCM/wire cases, cumulative implemented base and relevant extension neutrality."
 milestone_delivery = "D39: REST contract/code/REST acceptance task blocks, mechanical slice/global API-complete, focused checks and final aggregate + Security/Adversarial review; zero milestone debt before closure and next implementation."
-accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction"]
+subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement complete lifecycles/integrations, native REST contract/acceptance children; preserve one full API ledger and separate subsystem/milestone/global evidence."
+accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
 authorized = "Read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."

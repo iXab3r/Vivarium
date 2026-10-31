@@ -1,6 +1,6 @@
-# Coherent Vivarium refactor — plan v1.7
+# Coherent Vivarium refactor — plan v1.8
 
-Status: **plan under owner iteration; D38 executable-first and D39 task/ledger/closure directions accepted**.
+Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
@@ -203,8 +203,8 @@ Domain-compatible REST and scenarios grow with each domain milestone. R5 is the 
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Published plan: **8 milestones, 8 milestone parent issues and 46 native sub-issues** (54 issues total).
-The REST breakdown #12 also parents five focused P0 tasks. Start at
+Published plan: **8 milestones, 8 milestone parent issues and 67 native sub-issues** (75 issues total).
+Subsystem slices parent their REST subtasks; #12 also owns the cross-cutting P0 foundation. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are
 [R0 #3](https://github.com/iXab3r/Vivarium/issues/3),
 [R1 #4](https://github.com/iXab3r/Vivarium/issues/4),
@@ -237,12 +237,18 @@ plan was written or code was committed: close after their own gate passes and th
 been accepted in main. Preserve verified evidence while that milestone remains integration-pending;
 completed earlier milestones do not wait for R6 to close their issues.
 
-D39 task blocks are linked in [api-blocks.tsv](api-blocks.tsv): P0 contract #12 → code #35/#36 →
-REST acceptance #42; R0 #43 → existing code → #44; R1 #45 → code → #46; R2 #47 → code → #48;
-R3 #49 → code → #50; R4 #51 → code → #52; R5 #53 → #27 → #28; R6 #54 → code → #55.
-Existing milestone parents #2–#9 are explicit closure gates. No extra endpoint/closure epics.
-The [API ledger](api-ledger.tsv) seeds 449 discovery headings, with normalization/allocation/cases
-still open. [Status](api-status.json) is UNVERIFIED, not a compatibility percentage or executable
+D40 makes the [16 logical subsystems](subsystems.tsv) the units of implementation and completed
+lifecycle/integration. [17 subsystem slices](subsystem-slices.tsv) bind owning code tasks to native
+REST-contract/acceptance children, including separate P0/R5 protocol-foundation slices. Reuse the
+existing code tasks; new owners #56/#57/#58 cover Agent fleet, required capacity and deployments.
+For example VCS #19 owns REST #59/#60; queue/run #20 owns #65/#66; results #25 owns #71/#72.
+[api-blocks.tsv](api-blocks.tsv) aggregates these slices by milestone; #2–#9 retain closure gates.
+Do not implement endpoints as independent work units or equate this catalogue with extra Chiral nodes.
+The [API ledger](api-ledger.tsv) preserves all 449 discovery headings and links each to one primary
+subsystem, related owners and REST/code tasks. Exact methods/variants, case bindings and delivery
+allocation remain open; the primary owner's milestone does not postpone earlier required cases.
+[Status](api-status.json) separates subsystem lifecycle/integration, API and milestone/global status.
+All remain UNVERIFIED/NOT_ACCEPTED, not a compatibility percentage or executable
 report. Task #36 implements the small mechanical validator/result binding; #42 verifies it and
 the actual RED baseline. No product API-complete, tests, review PASS or debt clearance is claimed.
 

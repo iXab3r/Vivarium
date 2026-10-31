@@ -179,6 +179,11 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   required checks at coherent checkpoints, formal independent aggregate correctness/simplicity and
   explicit Security/Adversarial review at milestone end. Fix all milestone findings/debts there;
   no carryover, no next-milestone implementation before closure, no per-task review/full-suite tax.
+- D40 makes coherent subsystems the implementation units. Maintain the full REST ledger with one
+  primary subsystem/variant owner and related-owner links; attach REST-contract/acceptance subtasks
+  to same-milestone subsystem implementation tasks. Track subsystem lifecycle/integration and API
+  completeness separately, with milestone/global rollups. See [subsystems](docs/design/subsystems.md).
+  REST discovery/TDD still comes early; do not implement route by route or multiply state authorities.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

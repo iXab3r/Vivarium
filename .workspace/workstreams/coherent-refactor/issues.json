@@ -118,7 +118,7 @@
       "key": "host"
     },
     {
-      "parent": 3,
+      "parent": 14,
       "url": "https://github.com/iXab3r/Vivarium/issues/15",
       "title": "R0: Establish Automation and shared local debug fixtures",
       "state": "open",
@@ -136,7 +136,7 @@
       "key": "login"
     },
     {
-      "parent": 4,
+      "parent": 16,
       "url": "https://github.com/iXab3r/Vivarium/issues/17",
       "title": "R1: Enforce current project/fleet rights and token lifecycle",
       "state": "open",
@@ -235,9 +235,9 @@
       "key": "facade"
     },
     {
-      "parent": 8,
+      "parent": 27,
       "url": "https://github.com/iXab3r/Vivarium/issues/28",
-      "title": "R5: Run unchanged CLI and actual other-client journeys",
+      "title": "R5: Verify REST protocol and conformance foundation REST acceptance",
       "state": "open",
       "milestone": "R5",
       "number": 28,
@@ -282,7 +282,7 @@
     {
       "key": "rest_protocol",
       "number": 33,
-      "title": "P0: Specify locator, fields, paging, media and error contracts",
+      "title": "P0: Specify REST protocol and conformance foundation REST contract",
       "url": "https://github.com/iXab3r/Vivarium/issues/33",
       "milestone": "P0",
       "parent": 12,
@@ -321,7 +321,7 @@
       "title": "R0.1: Run and debug a real local server plus Agent",
       "url": "https://github.com/iXab3r/Vivarium/issues/37",
       "milestone": "R0",
-      "parent": 3,
+      "parent": 14,
       "state": "open"
     },
     {
@@ -330,7 +330,7 @@
       "title": "R0.2: Prove the first unchanged-CLI build on the local lab",
       "url": "https://github.com/iXab3r/Vivarium/issues/38",
       "milestone": "R0",
-      "parent": 3,
+      "parent": 14,
       "state": "open"
     },
     {
@@ -348,7 +348,7 @@
       "title": "R0: Bind business AC and cumulative TeamCity model checks",
       "url": "https://github.com/iXab3r/Vivarium/issues/40",
       "milestone": "R0",
-      "parent": 3,
+      "parent": 14,
       "state": "open"
     },
     {
@@ -357,13 +357,13 @@
       "title": "R2: Preserve explicit custom runs on disabled agents",
       "url": "https://github.com/iXab3r/Vivarium/issues/41",
       "milestone": "R2",
-      "parent": 5,
+      "parent": 56,
       "state": "open"
     },
     {
       "key": "P0-api-verification",
       "number": 42,
-      "title": "P0: Verify the REST baseline and mechanical API-ledger accounting",
+      "title": "P0: Verify REST protocol and conformance foundation REST acceptance",
       "state": "open",
       "parent": 12,
       "milestone": "P0",
@@ -372,119 +372,308 @@
     {
       "key": "R0-api-contract",
       "number": 43,
-      "title": "R0: Freeze REST contract and API-ledger scope",
+      "title": "R0: Specify Host, administration and observability REST contract",
       "state": "open",
-      "parent": 3,
+      "parent": 14,
       "milestone": "R0",
       "url": "https://github.com/iXab3r/Vivarium/issues/43"
     },
     {
       "key": "R0-api-verification",
       "number": 44,
-      "title": "R0: Verify REST acceptance and publish API-complete status",
+      "title": "R0: Verify Host, administration and observability REST acceptance",
       "state": "open",
-      "parent": 3,
+      "parent": 14,
       "milestone": "R0",
       "url": "https://github.com/iXab3r/Vivarium/issues/44"
     },
     {
       "key": "R1-api-contract",
       "number": 45,
-      "title": "R1: Freeze REST contract and API-ledger scope",
+      "title": "R1: Specify Identity, accounts and access REST contract",
       "state": "open",
-      "parent": 4,
+      "parent": 16,
       "milestone": "R1",
       "url": "https://github.com/iXab3r/Vivarium/issues/45"
     },
     {
       "key": "R1-api-verification",
       "number": 46,
-      "title": "R1: Verify REST acceptance and publish API-complete status",
+      "title": "R1: Verify Identity, accounts and access REST acceptance",
       "state": "open",
-      "parent": 4,
+      "parent": 16,
       "milestone": "R1",
       "url": "https://github.com/iXab3r/Vivarium/issues/46"
     },
     {
       "key": "R2-api-contract",
       "number": 47,
-      "title": "R2: Freeze REST contract and API-ledger scope",
+      "title": "R2: Specify Projects and versioned C# catalog REST contract",
       "state": "open",
-      "parent": 5,
+      "parent": 18,
       "milestone": "R2",
       "url": "https://github.com/iXab3r/Vivarium/issues/47"
     },
     {
       "key": "R2-api-verification",
       "number": 48,
-      "title": "R2: Verify REST acceptance and publish API-complete status",
+      "title": "R2: Verify Projects and versioned C# catalog REST acceptance",
       "state": "open",
-      "parent": 5,
+      "parent": 18,
       "milestone": "R2",
       "url": "https://github.com/iXab3r/Vivarium/issues/48"
     },
     {
       "key": "R3-api-contract",
       "number": 49,
-      "title": "R3: Freeze REST contract and API-ledger scope",
+      "title": "R3: Specify Triggers and release coordination REST contract",
       "state": "open",
-      "parent": 6,
+      "parent": 23,
       "milestone": "R3",
       "url": "https://github.com/iXab3r/Vivarium/issues/49"
     },
     {
       "key": "R3-api-verification",
       "number": 50,
-      "title": "R3: Verify REST acceptance and publish API-complete status",
+      "title": "R3: Verify Triggers and release coordination REST acceptance",
       "state": "open",
-      "parent": 6,
+      "parent": 23,
       "milestone": "R3",
       "url": "https://github.com/iXab3r/Vivarium/issues/50"
     },
     {
       "key": "R4-api-contract",
       "number": 51,
-      "title": "R4: Freeze REST contract and API-ledger scope",
+      "title": "R4: Specify Build logs and service messages REST contract",
       "state": "open",
-      "parent": 7,
+      "parent": 24,
       "milestone": "R4",
       "url": "https://github.com/iXab3r/Vivarium/issues/51"
     },
     {
       "key": "R4-api-verification",
       "number": 52,
-      "title": "R4: Verify REST acceptance and publish API-complete status",
+      "title": "R4: Verify Build logs and service messages REST acceptance",
       "state": "open",
-      "parent": 7,
+      "parent": 24,
       "milestone": "R4",
       "url": "https://github.com/iXab3r/Vivarium/issues/52"
     },
     {
       "key": "R5-api-contract",
       "number": 53,
-      "title": "R5: Freeze REST contract and API-ledger scope",
+      "title": "R5: Specify REST protocol and conformance foundation REST contract",
       "state": "open",
-      "parent": 8,
+      "parent": 27,
       "milestone": "R5",
       "url": "https://github.com/iXab3r/Vivarium/issues/53"
     },
     {
       "key": "R6-api-contract",
       "number": 54,
-      "title": "R6: Freeze REST contract and API-ledger scope",
+      "title": "R6: Specify Import, coexistence and recovery REST contract",
       "state": "open",
-      "parent": 9,
+      "parent": 29,
       "milestone": "R6",
       "url": "https://github.com/iXab3r/Vivarium/issues/54"
     },
     {
       "key": "R6-api-verification",
       "number": 55,
-      "title": "R6: Verify REST acceptance and publish API-complete status",
+      "title": "R6: Verify Import, coexistence and recovery REST acceptance",
       "state": "open",
-      "parent": 9,
+      "parent": 29,
       "milestone": "R6",
       "url": "https://github.com/iXab3r/Vivarium/issues/55"
+    },
+    {
+      "key": "SS-AGT-implementation",
+      "number": 56,
+      "title": "R2: Deliver Agent fleet, pools and compatibility subsystem",
+      "state": "open",
+      "parent": 5,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/56"
+    },
+    {
+      "key": "SS-CAP-implementation",
+      "number": 57,
+      "title": "R3: Deliver Provider and cloud capacity subsystem",
+      "state": "open",
+      "parent": 6,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/57"
+    },
+    {
+      "key": "SS-DEP-implementation",
+      "number": 58,
+      "title": "R3: Deliver Deployments and publication subsystem",
+      "state": "open",
+      "parent": 6,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/58"
+    },
+    {
+      "key": "SS-VCS@R2-contract",
+      "number": 59,
+      "title": "R2: Specify VCS, changes and source checkout REST contract",
+      "state": "open",
+      "parent": 19,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/59"
+    },
+    {
+      "key": "SS-VCS@R2-test",
+      "number": 60,
+      "title": "R2: Verify VCS, changes and source checkout REST acceptance",
+      "state": "open",
+      "parent": 19,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/60"
+    },
+    {
+      "key": "SS-AGT@R2-contract",
+      "number": 61,
+      "title": "R2: Specify Agent fleet, pools and compatibility REST contract",
+      "state": "open",
+      "parent": 56,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/61"
+    },
+    {
+      "key": "SS-AGT@R2-test",
+      "number": 62,
+      "title": "R2: Verify Agent fleet, pools and compatibility REST acceptance",
+      "state": "open",
+      "parent": 56,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/62"
+    },
+    {
+      "key": "SS-CAP@R3-contract",
+      "number": 63,
+      "title": "R3: Specify Provider and cloud capacity REST contract",
+      "state": "open",
+      "parent": 57,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/63"
+    },
+    {
+      "key": "SS-CAP@R3-test",
+      "number": 64,
+      "title": "R3: Verify Provider and cloud capacity REST acceptance",
+      "state": "open",
+      "parent": 57,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/64"
+    },
+    {
+      "key": "SS-RUN@R2-contract",
+      "number": 65,
+      "title": "R2: Specify Queue, run lifecycle and build history REST contract",
+      "state": "open",
+      "parent": 20,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/65"
+    },
+    {
+      "key": "SS-RUN@R2-test",
+      "number": 66,
+      "title": "R2: Verify Queue, run lifecycle and build history REST acceptance",
+      "state": "open",
+      "parent": 20,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/66"
+    },
+    {
+      "key": "SS-EXEC@R3-contract",
+      "number": 67,
+      "title": "R3: Specify Steps, runners, features and execution parameters REST contract",
+      "state": "open",
+      "parent": 22,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/67"
+    },
+    {
+      "key": "SS-EXEC@R3-test",
+      "number": 68,
+      "title": "R3: Verify Steps, runners, features and execution parameters REST acceptance",
+      "state": "open",
+      "parent": 22,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/68"
+    },
+    {
+      "key": "SS-CHAIN@R3-contract",
+      "number": 69,
+      "title": "R3: Specify Build chains and dependency selection REST contract",
+      "state": "open",
+      "parent": 21,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/69"
+    },
+    {
+      "key": "SS-CHAIN@R3-test",
+      "number": 70,
+      "title": "R3: Verify Build chains and dependency selection REST acceptance",
+      "state": "open",
+      "parent": 21,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/70"
+    },
+    {
+      "key": "SS-RES@R4-contract",
+      "number": 71,
+      "title": "R4: Specify Tests, problems, triage and statistics REST contract",
+      "state": "open",
+      "parent": 25,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/71"
+    },
+    {
+      "key": "SS-RES@R4-test",
+      "number": 72,
+      "title": "R4: Verify Tests, problems, triage and statistics REST acceptance",
+      "state": "open",
+      "parent": 25,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/72"
+    },
+    {
+      "key": "SS-BLOB@R4-contract",
+      "number": 73,
+      "title": "R4: Specify Artifacts, byte storage and retention REST contract",
+      "state": "open",
+      "parent": 26,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/73"
+    },
+    {
+      "key": "SS-BLOB@R4-test",
+      "number": 74,
+      "title": "R4: Verify Artifacts, byte storage and retention REST acceptance",
+      "state": "open",
+      "parent": 26,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/74"
+    },
+    {
+      "key": "SS-DEP@R3-contract",
+      "number": 75,
+      "title": "R3: Specify Deployments and publication REST contract",
+      "state": "open",
+      "parent": 58,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/75"
+    },
+    {
+      "key": "SS-DEP@R3-test",
+      "number": 76,
+      "title": "R3: Verify Deployments and publication REST acceptance",
+      "state": "open",
+      "parent": 58,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/76"
     }
   ],
   "milestones": [

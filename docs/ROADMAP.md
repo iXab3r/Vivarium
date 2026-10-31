@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D39) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D40) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
@@ -35,6 +35,12 @@ closure gate. [Block register](../.workspace/workstreams/coherent-refactor/api-b
 final independent aggregate and Security/Adversarial review and zero debt before the next milestone.
 The current ledger/status is an unverified discovery seed; #36 implements accounting, #42 verifies
 the initial baseline. No runtime API completeness or review PASS is claimed by creating these tasks.
+
+D40 makes [coherent subsystems](design/subsystems.md) the implementation units. REST-contract and
+acceptance subtasks belong to their subsystem slice; milestone blocks aggregate their progress.
+The full discovery ledger retains one primary owner and collaborator links per operation. Track
+subsystem lifecycle/integration and API-complete separately, then milestone/global status. These
+logical owners do not imply extra services/nodes or delayed early REST obligations.
 
 D37 makes Build/Agent semantics a continuously tested TeamCity superset. The
 [business AC](acceptance/README.md) are stable implementation-independent requirements;

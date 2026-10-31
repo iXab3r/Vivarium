@@ -19,8 +19,9 @@ correctness, ordinary feedback and cost diagnostics distinct, with explicit comm
 
 ## API ledger, review and verification cadence (D39)
 
-Follow [task-backed API delivery](design/api-ledger-delivery.md). Each milestone has REST contract,
-implementation and REST acceptance tasks; its parent owns final closure. Publish mechanical slice
+Follow [task-backed API delivery](design/api-ledger-delivery.md). Under D40, implement finished
+[subsystems](design/subsystems.md); their slice tasks parent same-milestone REST-contract/acceptance
+subtasks. Milestones aggregate those slices and their parent owns final closure. Publish mechanical slice
 and global API-complete with exact scope and valid case evidence; unknown denominators stay unknown.
 Read ledger/results for status without running tests. During TDD run affected cases; batch broader
 checks at coherent handoff/milestone gates and reuse unchanged valid evidence. Do not duplicate

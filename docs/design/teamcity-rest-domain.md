@@ -15,6 +15,10 @@ TeamCity wire compatibility constrains the resource model and command semantics 
 Design shared services from those contracts, then expose native /api/v1 and compatible /app/rest
 projections. Do not first build an unrelated Vivarium model and discover its incompatibilities in R5.
 Do not mirror every wire DTO as a table or put business rules in HTTP handlers either.
+D40 makes the [subsystem lifecycle](subsystems.md) the implementation unit: use REST resources and
+subpaths to assign primary/collaborating owners, attach REST subtasks to the real subsystem work,
+then roll up subsystem, milestone and global evidence. Early REST constraints do not prescribe an
+endpoint-by-endpoint implementation order or another domain authority.
 
 The [wire contract](teamcity-rest-compatibility.md) owns protocol acceptance. The
 [workstream breakdown](../../.workspace/workstreams/coherent-refactor/rest-breakdown.md) owns current

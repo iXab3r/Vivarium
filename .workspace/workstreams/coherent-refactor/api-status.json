@@ -12,141 +12,265 @@
   "ledger_validator_and_result_binding": "not implemented; task #36",
   "blocks": [
     {
-      "key": "P0",
-      "parent": 2,
-      "contract": 12,
-      "code": [
-        35,
-        36
-      ],
-      "test": 42,
-      "spec_parent": 12,
-      "scope": "Reference profile, full discovery/allocation, stable case IDs, locator/fields/media/errors and resource/mutation contracts. Produce honest current-product RED, not product parity.",
-      "test_title": "P0: Verify the REST baseline and mechanical API-ledger accounting",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "P0",
+      "parent_issue": 2,
+      "subsystem_slices": "SS-PROTO@P0",
+      "contract_issues": "33",
+      "implementation_issues": "35;36",
+      "verification_issues": "42",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R0",
-      "parent": 3,
-      "contract": 43,
-      "code": [
-        14,
-        15,
-        37,
-        38,
-        40
-      ],
-      "test": 44,
-      "scope": "Freeze the exact discovery/current identity, Agent reads/state, seeded Project/BuildType, enqueue/watch/cancel/history identity and artifact/raw-output smoke profile before the local farm implementation.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R0",
+      "parent_issue": 3,
+      "subsystem_slices": "SS-HOST@R0",
+      "contract_issues": "43",
+      "implementation_issues": "14;15;37;38;40",
+      "verification_issues": "44",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R1",
-      "parent": 4,
-      "contract": 45,
-      "code": [
-        16,
-        17
-      ],
-      "test": 46,
-      "scope": "Freeze required users/groups/roles/permissions/grants, credential forms, tokens/sessions and installation-account outcomes; include same-cookie/token current revocation, denial and inherited project scope.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R1",
+      "parent_issue": 4,
+      "subsystem_slices": "SS-IAM@R1",
+      "contract_issues": "45",
+      "implementation_issues": "16;17",
+      "verification_issues": "46",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R2",
-      "parent": 5,
-      "contract": 47,
-      "code": [
-        18,
-        19,
-        20,
-        41
-      ],
-      "test": 48,
-      "scope": "Freeze editable Project/BuildType/template/settings collections, inheritance/reset/order, VCS roots/changes, custom-build freeze, Agent requirements/pools/run policy and stable queue/run/history identities. Include explicit custom runs on disabled suitable Agents.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R2",
+      "parent_issue": 5,
+      "subsystem_slices": "SS-CFG@R2;SS-VCS@R2;SS-AGT@R2;SS-RUN@R2",
+      "contract_issues": "47;59;61;65",
+      "implementation_issues": "18;19;20;41;56",
+      "verification_issues": "48;60;62;66",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R3",
-      "parent": 6,
-      "contract": 49,
-      "code": [
-        21,
-        22,
-        23
-      ],
-      "test": 50,
-      "scope": "Freeze dependency/reuse/artifact selection, runners/features/property effects, triggers, approvals, locks/counters and publication ownership. Required deployment/capacity operations need explicit owners and faithful mappings, not automatic exemptions.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R3",
+      "parent_issue": 6,
+      "subsystem_slices": "SS-CAP@R3;SS-EXEC@R3;SS-CHAIN@R3;SS-TRG@R3;SS-DEP@R3",
+      "contract_issues": "63;67;69;49;75",
+      "implementation_issues": "21;22;23;57;58",
+      "verification_issues": "64;68;70;50;76",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R4",
-      "parent": 7,
-      "contract": 51,
-      "code": [
-        24,
-        25,
-        26
-      ],
-      "test": 52,
-      "scope": "Freeze durable logs/download/tail/gaps, file trees/ranges/archives, test/problem identity versus occurrences, history/triage/statistics, mutable build metadata and retention/access effects.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R4",
+      "parent_issue": 7,
+      "subsystem_slices": "SS-LOG@R4;SS-RES@R4;SS-BLOB@R4",
+      "contract_issues": "51;71;73",
+      "implementation_issues": "24;25;26",
+      "verification_issues": "52;72;74",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R5",
-      "parent": 8,
-      "contract": 53,
-      "code": [
-        27
-      ],
-      "test": 28,
-      "scope": "Reconcile all remaining required method/path/variant/client/non-REST surfaces and cumulative earlier slices, including required admin/plugin/license/node mappings. No first discovery of fundamental model semantics or successful stubs.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R5",
+      "parent_issue": 8,
+      "subsystem_slices": "SS-PROTO@R5",
+      "contract_issues": "53",
+      "implementation_issues": "27",
+      "verification_issues": "28",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     },
     {
-      "key": "R6",
-      "parent": 9,
-      "contract": 54,
-      "code": [
-        29,
-        30,
-        31
-      ],
-      "test": 55,
-      "scope": "Freeze imported/native ID and relationship visibility, retained test/log/artifact bytes, repeated import/whole-entity diff choices, source cleanup independence, backup/restore and coexistence/final-delta read/write behavior. Preserve all cumulative compatibility.",
-      "scope_frozen": false,
-      "required_case_count": null,
+      "block": "R6",
+      "parent_issue": 9,
+      "subsystem_slices": "SS-MIG@R6",
+      "contract_issues": "54",
+      "implementation_issues": "29;30",
+      "verification_issues": "55",
+      "scope_state": "unfrozen",
       "api_complete": "UNVERIFIED",
-      "review": "NOT_REVIEWED",
-      "debt": "NOT_ASSESSED"
+      "review_state": "NOT_REVIEWED",
+      "debt_state": "NOT_ASSESSED"
     }
-  ]
+  ],
+  "tracking_model": "D40: subsystem ownership + milestone slice + independent REST evidence",
+  "discovery_rows_without_subsystem_owner": 0,
+  "subsystems": [
+    {
+      "subsystem_id": "SS-HOST",
+      "name": "Host, administration and observability",
+      "primary_issue": 14,
+      "exclusive_discovery_rows": 32,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-IAM",
+      "name": "Identity, accounts and access",
+      "primary_issue": 16,
+      "exclusive_discovery_rows": 58,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-CFG",
+      "name": "Projects and versioned C# catalog",
+      "primary_issue": 18,
+      "exclusive_discovery_rows": 94,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-VCS",
+      "name": "VCS, changes and source checkout",
+      "primary_issue": 19,
+      "exclusive_discovery_rows": 59,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-AGT",
+      "name": "Agent fleet, pools and compatibility",
+      "primary_issue": 56,
+      "exclusive_discovery_rows": 42,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-CAP",
+      "name": "Provider and cloud capacity",
+      "primary_issue": 57,
+      "exclusive_discovery_rows": 10,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-RUN",
+      "name": "Queue, run lifecycle and build history",
+      "primary_issue": 20,
+      "exclusive_discovery_rows": 51,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-EXEC",
+      "name": "Steps, runners, features and execution parameters",
+      "primary_issue": 22,
+      "exclusive_discovery_rows": 30,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-CHAIN",
+      "name": "Build chains and dependency selection",
+      "primary_issue": 21,
+      "exclusive_discovery_rows": 15,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-TRG",
+      "name": "Triggers and release coordination",
+      "primary_issue": 23,
+      "exclusive_discovery_rows": 8,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-LOG",
+      "name": "Build logs and service messages",
+      "primary_issue": 24,
+      "exclusive_discovery_rows": 1,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-RES",
+      "name": "Tests, problems, triage and statistics",
+      "primary_issue": 25,
+      "exclusive_discovery_rows": 26,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-BLOB",
+      "name": "Artifacts, byte storage and retention",
+      "primary_issue": 26,
+      "exclusive_discovery_rows": 8,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-DEP",
+      "name": "Deployments and publication",
+      "primary_issue": 58,
+      "exclusive_discovery_rows": 13,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-MIG",
+      "name": "Import, coexistence and recovery",
+      "primary_issue": 29,
+      "exclusive_discovery_rows": 2,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    },
+    {
+      "subsystem_id": "SS-PROTO",
+      "name": "REST protocol and conformance foundation",
+      "primary_issue": 12,
+      "exclusive_discovery_rows": 0,
+      "required_variant_count": null,
+      "implementation": "NOT_ACCEPTED",
+      "integration": "UNVERIFIED",
+      "api_complete": "UNVERIFIED"
+    }
+  ],
+  "subsystem_slices": 17
 }

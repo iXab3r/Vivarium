@@ -3,12 +3,15 @@
 > Status: **Accepted direction — D39; task graph/ledger seed only, no runtime parity claimed**
 > Owners: Reconciliation, TeamCity/REST, Test Steward, affected domains and Security
 
-## Task blocks, not endpoint tickets
+## Subsystem task ownership and milestone aggregates
 
-GitHub owns live task state. Each milestone has a REST contract task, existing implementation tasks,
-a separate REST acceptance task and its existing parent as the closure gate. Keep the native parent
-and milestone on every task. The [block register](../../.workspace/workstreams/coherent-refactor/api-blocks.tsv)
-contains exact task IDs. Do not create one issue per endpoint or invent another workflow bot.
+GitHub owns live task state. D40 makes a coherent subsystem slice the implementation unit: its
+owning implementation task parents REST-contract and REST-acceptance subtasks in the same milestone.
+The [subsystem catalogue](subsystems.md) defines ownership and completed lifecycles; the
+[slice register](../../.workspace/workstreams/coherent-refactor/subsystem-slices.tsv) contains exact
+task IDs. The milestone [block register](../../.workspace/workstreams/coherent-refactor/api-blocks.tsv)
+aggregates those subsystem slices and retains the parent closure gate. It is not an execution plan
+for unrelated endpoints. Do not create one implementation issue per route or another workflow bot.
 
 Work progresses contract-ready → focused real RED → implementation → REST verification → final
 milestone review/fixes → main delivery → bottom-up issue/milestone closure. Contract/code readiness
@@ -40,7 +43,8 @@ The delivered ledger must mechanically enforce:
 
 - Stable operation and variant/case IDs; exact method/path/request/media/auth/state/effect dimensions,
   source/profile and applicability. Source operation IDs survive splits; duplicates/orphans fail.
-- One owning contract/code/verification block per milestone slice, with explicit cross-slice links.
+- One primary subsystem/variant owner and its implementation/REST tasks per milestone slice, with
+  collaborators and cross-slice links; no duplicate counting. Global/subsystem/milestone rollups agree.
   No unallocated required item at P0 exit; unknown source behavior remains visible and blocking.
 - Independently frozen scope per slice and cumulative delivered scope. Scope changes have explicit
   reason/history; a failing required case cannot move to a later milestone or disappear to pass.
@@ -51,8 +55,9 @@ The delivered ledger must mechanically enforce:
   RED and harness-failure remain distinct. Issue closure, response schemas and replay GREEN do not
   establish product compatibility. Discovery/input rows and executed cases have separate counts.
 
-Every milestone acceptance publishes its **API-complete status**, not merely an issue completion
-percentage. Report frozen/unfrozen scope; required/bound/executed/GREEN/RED/blocked/unbound/stale
+Every subsystem and milestone acceptance publishes its **API-complete status**, not merely an issue
+completion percentage; subsystem lifecycle/integration readiness is a separate claim. Report
+frozen/unfrozen scope; required/bound/executed/GREEN/RED/blocked/unbound/stale
 cases; implemented-but-unverified items; unallocated discovery; tested candidate/profile; open debts
 and review verdicts. If normalization/scope is incomplete, global compatibility percentage is
 **unknown**. Never present GREEN / discovered headings as an API compatibility percentage.

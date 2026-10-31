@@ -4,12 +4,12 @@
 - Frozen/pushed checkpoint: `cbb285a55701e0be0c726c57d9daccd8bfb529e7`, annotated tag
   `checkpoint/pre-refactor-2026-10-31`; runtime remains `09dd40b`.
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
-  Plan v1.7 remains draft for unresolved choices; RF-10 delivery and D34–D39 directions are accepted.
+  Plan v1.8 remains draft for unresolved choices; RF-10 delivery and D34–D40 directions are accepted.
   No implementation milestone is complete.
-- GitHub: P0/roadmap #2, implementation parents #3–#9, original children #10–#31, REST sub-children
-  #32–#36 under #12, local-lab #37/#38 and first business bindings #40 under #3, AC baseline #39
-  under #2 and explicit disabled-Agent variant #41 under #5, plus D39 tasks #42–#55:
-  eight milestones, 54 open issues and 46 native child relationships with matching milestones.
+- GitHub: #2–#9 remain milestone closure parents. D40 reuses existing subsystem code tasks, moves
+  REST contract/acceptance tasks under their same-milestone subsystem owner and adds #56–#76:
+  eight milestones, 75 open issues and 67 native child links. Exact graph is in issues.json and
+  subsystem-slices.tsv; do not restore the older flat per-milestone REST execution chain.
 - Owner accepted RF-10 on 2026-10-31: each milestone may merge separately into main after its own
   acceptance/review, and its issues close after that delivery. Use milestone integration branches where
   useful; remove obsolete code with its replacement. R6 is cumulative acceptance, not the first main merge.
@@ -71,6 +71,11 @@
   #42 verifies baseline/ledger. Formal reviews only at milestone end, including explicit independent
   Security/Adversarial; resolve all milestone debts before next implementation. No current review,
   debt clearance, test run or API-complete claim. GitHub owns task state; result ledger owns evidence.
+- D40: 16 logical subsystems, 17 delivery slices, one primary owner/task plus related owners for
+  every one of the same 449 discovery headings. subsystem-slices.tsv is the implementation/REST
+  task graph; api-blocks.tsv is milestone aggregation. Proto has no exclusive top-level resource;
+  native/non-REST requirements still apply. Classification is planning ownership, not verified
+  reference semantics, frozen allocation or API acceptance. No product/tests/reviews were run.
 - Next: execute #35's verified cohorts immediately, with #12/#32–#34/#36/#39 supplying the affected
   model/protocol/mutation/reference evidence alongside tests; see plan.md's immediate execution order.
   Do not require whole-API prose completion before the first sound test cohort. #40 grows

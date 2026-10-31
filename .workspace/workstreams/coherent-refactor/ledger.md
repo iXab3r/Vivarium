@@ -1,6 +1,6 @@
 # Refactor ledger
 
-Planning baseline: `cbb285a`; plan v1.7. All implementation gates are OPEN/unverified.
+Planning baseline: `cbb285a`; plan v1.8. All implementation gates are OPEN/unverified.
 The existing TeamCity ledger and inventories remain the source universe; do not duplicate/waive them.
 
 | Gate | Status | Evidence now | Required closure |
@@ -8,7 +8,7 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 | Checkpoint | DONE | Pushed commit and annotated `checkpoint/pre-refactor-2026-10-31` tag | Already recorded; not a release/live-data backup |
 | Current code census | DONE (inventory only) | `source-inventory.tsv`, reproducible `census.py` | P0 still needs per-path disposition/invariant ownership |
 | Depot reference study | DONE (bounded study) | `depot-study.md`, frozen references and selected primary issues/code | Package/API and identity choices still need P0 decisions |
-| Plan publication | VERIFIED publication, not delivery | `issues.json`: 8 milestones, 54 open issues, 46 verified native child links; all issues/milestones contain D39 blocks and closure rules | GitHub owns task state; no implementation issue closed |
+| Plan publication | VERIFIED publication, not delivery | `issues.json`: 8 milestones, 75 open issues, 67 native child links; subsystem-owned REST tasks and D39 closure rules | GitHub owns task state; no implementation issue closed |
 | RF-10 delivery model | ACCEPTED | Owner selected separate milestone merges into main on 2026-10-31 | Per-milestone acceptance/review/cleanup; closure after that milestone reaches main; R6 cumulative verification |
 | D34/D35 direction | ACCEPTED, NOT IMPLEMENTED | Depot authentication/installation user; TeamCity RBAC 1:1 in PG; Chiral resource settings; TypeScript/Vite Workbench; seven actual source role definitions captured read-only | Resolve concrete bindings/client profiles, implement and prove R0/R1; no runtime claim |
 | D34/D35 issue synchronization | DONE | 24 affected issue bodies response-verified, including 19 explicit contract addenda; R0/R1 milestone descriptions updated | Keep future accepted refinements synchronized; no implementation issue closed |
@@ -16,9 +16,10 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 | D36 priority/UI clarification | ACCEPTED, NOT IMPLEMENTED | REST-driven model before implementation; shared UI technology preserves current UX; local Host+Agent/CLI gates in R0 | P0 structural contracts and R0 actual process/client evidence |
 | D37 acceptance/conformance | ACCEPTED, NOT EXECUTED | 110 canonical business AC specified-unbound; 10 TCM invariants; 38 technical candidates; family-level trace map; fresh PoeBane Testing Architect study | #39 review/refine independent contracts/oracles; #40 bind real R0 evidence; cumulative per-milestone gates |
 | D38 executable-first slice | ACCEPTED, NOT EXECUTED | #35, test-first design and three planned-unexecuted checkpoints; bounded simulation/composition contract | Prepare exact SDK, freeze verified cohorts, prove replay/composition controls and run actual current-product RED before replacement; measure cost before bulk expansion |
-| D39 task/ledger/closure | TASK GRAPH/SEED RECORDED, NOT EXECUTED | Eight contract/code/REST-acceptance blocks; 449 unallocated discovery headings; API status UNVERIFIED; debt NOT_ASSESSED; review NOT_REVIEWED | #36 mechanical ledger/result accounting, #42 baseline verification; each milestone final correctness/simplicity + Security/Adversarial PASS and zero debt before next implementation |
+| D39 task/ledger/closure | POLICY/SEED RECORDED, NOT EXECUTED | Eight milestone aggregates, now composed from D40 subsystem slices; 449 headings with variant/delivery allocation still open; API UNVERIFIED; debt NOT_ASSESSED; review NOT_REVIEWED | #36 mechanical ledger/result accounting, #42 baseline verification; each milestone final correctness/simplicity + Security/Adversarial PASS and zero debt before next implementation |
+| D40 subsystem ownership | TASK GRAPH/CLASSIFICATION, NOT IMPLEMENTED | 16 logical owners/17 slices; all 449 discovery rows have one primary subsystem, implementation/REST task links and collaborators; native REST children under subsystem slices | #36 joins subsystem/milestone/case evidence; prove complete lifecycles/integrations and API separately; exact variants/allocation remain open |
 | TCM-GAP-001 | OPEN, UNIMPLEMENTED/UNVERIFIED | Explicit suitable-agent custom run on a disabled Agent documented by TeamCity; absolute normal-queue prohibition clarified in AC-AG-02/06 and TC-AG-01 | #41 freezes reference request/permission variant and proves normal-block/explicit-target behavior; docs are not runtime PASS |
-| P0 | OPEN | Plan v1.7, accepted D34–D39/RF-10, remaining choices open, S01…38 and business trace links | Execute P0.REST.1–3, #36 ledger accounting and #42 verification; resolve structural/model/protocol/mutation and AC/oracle gates; linked rows are not coverage |
+| P0 | OPEN | Plan v1.8, accepted D34–D40/RF-10, remaining choices open, S01…38 and business trace links | Execute P0.REST.1–3, #36 subsystem-aware ledger accounting and #42 verification; resolve structural/model/protocol/mutation and AC/oracle gates; linked rows are not coverage |
 | R0 | OPEN | Local-lab contract and first wire subset; no new-stack run delivered | R0.1 Host+Agent; R0.2 unchanged CLI; R0.3 restart/regressions/cleanup |
 | R1 | OPEN | Proposed contracts only | Approved Identity/current-access ordinary-user UI/client evidence |
 | R2 | OPEN | Existing invariants and requirements, no target implementation | Source Compile + PG durable execution + real Agent/UI evidence |
@@ -27,5 +28,5 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 | R5 | OPEN | Compatibility contract, route census still pending | Exact unchanged-client/HTTP-variant conformance |
 | R6 | OPEN | Metadata inventory only; 0/97 accepted | Full history/diff/restore/coexistence/final cleanup and integrated acceptance |
 
-RF-10 and D34–D39 direction are accepted; no product implementation, scenario execution or
+RF-10 and D34–D40 direction are accepted; no product implementation, scenario execution or
 independent review is claimed. GitHub issue links are maintained in `issues.json`.

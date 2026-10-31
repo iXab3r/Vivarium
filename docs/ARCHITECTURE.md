@@ -1242,6 +1242,24 @@ delivery and close bottom-up. No debt carried into the next milestone's implemen
 refines D37/D38 cadence and RF-10 without weakening compatibility, required checks or merge scope.
 See [API-ledger delivery](design/api-ledger-delivery.md); no workflow service or new runner is implied.
 
+### D40. Subsystems are implementation units; REST tracks their complete external behavior
+
+Accepted owner direction, 2026-11-01. Implement coherent subsystems and their real integration,
+using REST path families/subpaths as discovery evidence rather than a handler-by-handler work order.
+Keep a full REST ledger with one primary subsystem per operation/variant and explicit collaborator
+links. Subsystem, milestone slice and REST case are independent tracking axes; do not duplicate the
+global universe or count shared operations multiple times. Logical subsystem boundaries do not
+require more processes/nodes/projects or duplicate settings/business authorities.
+
+Subsystem implementation tasks own finished business/native/UI/Agent lifecycles and dependencies;
+their same-milestone REST contract and REST acceptance subtasks establish the API obligations and
+proof. Reuse existing domain tasks and retain early TDD/reference constraints. Milestone API task
+blocks aggregate subsystem slices rather than dictate domain implementation. Publish subsystem
+implementation/integration readiness and API-complete separately, plus milestone/global rollups.
+Ownership assignment/zero exclusive routes/closed tickets do not establish runtime completeness.
+Required early variants are not deferred to a full-owner task's later milestone. D39 review/cost/
+zero-debt/main-delivery gates remain. See [subsystem catalogue](design/subsystems.md).
+
 ## 5. Protocol sketch
 
 ```proto

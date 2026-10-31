@@ -171,6 +171,9 @@ milestone/domain/security/simplicity review gates, without a new per-test approv
 D39 makes that a final aggregate milestone checkpoint, with explicit Security/Adversarial verdicts
 and zero carried debt. Its [task blocks and mechanical ledger](api-ledger-delivery.md) report API
 completeness from frozen cases and valid evidence; status queries do not trigger suite runs.
+D40 adds subsystem ownership/slices to these joins. Prove the coherent subsystem lifecycle and
+integration, then its exact REST variants; keep native/UI/Agent and non-REST claims in their actual
+owners. Global, subsystem and milestone rollups use the same case IDs without duplicate counting.
 
 The [acceptance map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) links business
 AC to existing S* candidates, TC* requirements, TCM invariants and milestone. Relationship counts are

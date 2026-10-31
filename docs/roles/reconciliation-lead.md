@@ -54,6 +54,9 @@ and evidence explicit.
    the tracked ledger/result evidence owns compatibility and source-universe facts. `scope.toml`,
    evidence and handover must agree with those authorities, not become another manually maintained
    task board. No API-complete claim from task closure or a discovery count.
+   D40 joins primary/related subsystem ownership, subsystem slice/code/REST task, milestone and
+   case/result evidence. Keep one full universe and no duplicate counting; implementation progress
+   means actual subsystem lifecycle/integration, separately from its REST acceptance.
 6. **Handovers are executable.** On every pause, record the baseline and remaining counts, active phase,
    changed artifacts, exact verification status, blockers, and the next concrete commands. A fresh
    agent must be able to resume without rediscovering the scope.

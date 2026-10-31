@@ -21,6 +21,7 @@ below provide the technical details; legacy implementation sections describe evi
 | [Testing and continuous conformance](testing-model.md) | Business Acceptance + Testing Architect + Test Steward + TeamCity/REST | Business AC, TCM superset invariants, independent evidence pyramid and per-milestone drift/extension checks (D37) |
 | [Early REST test-first gate](teamcity-rest-test-first.md) | TeamCity/REST + Testing Architect + Test Steward | Executable P0 corpus, strict WireMock.Net replay, genuine RED baseline, mandatory TDD/acceptance and honest partial-milestone gates (D38) |
 | [API ledger and milestone delivery](api-ledger-delivery.md) | Reconciliation + REST + Test Steward + Security | Task blocks, mechanical slice/global API-complete, focused checks, final aggregate/adversarial review and zero-debt closure (D39) |
+| [Subsystem ownership](subsystems.md) | Reconciliation + domain owners + REST/Test Steward | Coherent subsystem implementation units, primary/collaborating REST ownership, native child tasks and subsystem/milestone/global progress (D40) |
 | [AgentExplorer](agent-explorer.md) | AgentExplorer Expert | Host inventory, observation, remote operations, and fleet management |
 | [Machine providers/images](machine-providers-images.md) | Machine Providers/Images Expert | Provider hosts, pools, images, clone/revert/power/console, sealing, drift, and capacity |
 | [REST API](rest-api.md) | Vivarium REST Expert | Canonical `/api/v1` management surface, events, compatibility, and Git-aware mutations |
