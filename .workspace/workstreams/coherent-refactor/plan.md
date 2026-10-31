@@ -73,6 +73,46 @@ but 10.0.103 is installed. Earlier build/test attempts are not green evidence. D
 test-toolchain preparation into the first P0 REST execution slice; R0 inherits it. Do not lower the
 pin or treat unavailable checks as passed or as product RED.
 
+## Immediate execution order — status review, 2026-10-31
+
+The target direction is sufficiently settled to begin the D38 executable contract slice. Replacement
+code is not delivered: the compatible facade, new conformance corpus and actual RED baseline are
+absent; all 110 business AC remain specified-unbound. All 36 REST decomposition findings remain open.
+Do not treat the remaining reference investigation as 36 product-policy questions for the owner.
+
+The next deliverable is executable REST evidence in #35, with #32–#34/#36 supplying the affected
+contracts alongside it. P0.REST.1–3 may progress by verified cohorts; do not finish a prose-only
+whole-API specification or design a simulator platform before executing the first sound cohort.
+
+| Order | Concrete work | Observable result / dependency |
+|---|---|---|
+| 1 | Prepare the pinned SDK 10.0.303 and reproduce existing build/test checks | Actual toolchain/baseline result; an SDK error is not product RED |
+| 2 | Freeze first cross-family reference cases under the pinned server/client profile | Exact requests/responses/effects and per-assertion sources; uncertain values reference-blocked. Obtain missing installed-schema/raw-wire export through approved CLI tooling without blocking already grounded cases |
+| 3 | Prove the small NUnit composition and strict replay/assertion controls | Real requests, deliberate bad-response detection, independent readiness and owned reset/cleanup; controlled actors/time only where required; measured cost, no new test language |
+| 4 | Run that cohort against the actual current Vivarium HTTP boundary | Genuine RED/GREEN/product-blocked report and regression baseline before replacement; a healthy missing route is RED, repeated dependency failures are not independent semantic defects |
+| 5 | Expand verified cases across the required families while closing #32–#34/#36 | Broad discoverable coverage, exact variant allocation and model/mutation proof. No guessed expectations or self-generated oracle; preserve earlier GREEN |
+| 6 | After P0 exit, deliver the new-stack Host+Agent/unchanged-CLI loop in R0 | R0.1 local real farm, R0.2 actual compatible smoke, R0.3 restart/cleanup; not a prerequisite for first current-product RED |
+
+Highest-risk contracts to settle early:
+
+- Reference fidelity: installed 2026.1.3 versus rolling docs/older public source; raw wire versus CLI
+  output; complete method/variant/client inventory. The current inventories are discovery, not proof.
+- Shared run identity/state: one-cell/matrix/composite mapping, queue-to-history continuity,
+  imported/native allocation and state versus outcome. Resolve before replacement schema/commands.
+- Editable C# and mutation completion: owned/effective settings, reset/replace/reorder, computed
+  fields and managed/user source boundary, Git commit versus activation and read-after-write.
+  Prove the proposed representation with real edits before adopting it; no hidden override store.
+- Actual credential/permission behavior: framework authentication is chosen, but exact compatible
+  transports, token lifetimes, current rights and special build/installation identities need cases.
+- Historical graph and byte ownership: retained relationships/IDs, replace conflict unit, immutable
+  published history and Storage transfer/retention limits. Model constraints precede PG design;
+  full inventory/download and migration execution do not block the first REST tests.
+
+Real discoveries that change a product promise or legacy-data retirement need an explicit owner
+decision. Other unknown TeamCity defaults/errors/effects require evidence, not a new Vivarium policy.
+Detailed panel composition, extra provider implementations and fleet rollout are outside the first
+test-slice critical path. Required server/plugin/cloud operations remain allocated/open, not waived.
+
 ## Target ownership and reuse
 
 One ASP.NET Core Host owns in-process Chiral logical resource nodes. Proposed boundaries are Host,

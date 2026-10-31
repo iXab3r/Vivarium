@@ -63,7 +63,11 @@
   session.ts, management-api.ts, nodes-api.ts/node-settings.ts and Access list/inspector were inspected.
 - Read-only source role census captured seven definitions and their permissions/includes, including
   RESTRICTEDBOT and TOOLS_INTEGRATION, under ignored artifacts/depot-refactor-study/teamcity-role-*.json.
-- Next: execute #12/#32–#36/#39 contract work and refine the business/model/wire mapping; #40 grows
+- Status review: corrected stale 31-AC entries in scope/ledger to canonical 110; no new AC or runtime
+  evidence. All 36 reference decomposition findings remain open; no compatible facade or new RED suite.
+- Next: execute #35's verified cohorts immediately, with #12/#32–#34/#36/#39 supplying the affected
+  model/protocol/mutation/reference evidence alongside tests; see plan.md's immediate execution order.
+  Do not require whole-API prose completion before the first sound test cohort. #40 grows
   the real R0 base suite and #41 the targeted-run case. Continue bounded P0 discovery for
   exact C# mutation representation, wire/client universe, retained-history volume and old-runtime data.
   Do not begin R0 by silently selecting unresolved alternatives.
