@@ -28,6 +28,12 @@ all-GREEN selection while required behavior is unfinished, but it must still bui
 Raw full-suite RED remains visible/nonzero; passing a declared partial gate does not mean full
 compatibility. Setup failures and regressions in previously passing cases cannot be allowed RED.
 
+P0.REST.2 first proves a small deterministic composition around production services/HTTP middleware,
+with controlled timers and scripted external actors. WireMock is the HTTP replay adapter, not a
+required extra hop for every case or a second TeamCity model. Measure code/data/setup/run/cleanup
+cost and prove reset/isolation before expanding the corpus. Real PG/Git/Storage, Kestrel/CLI/Agent
+and process/platform claims retain their corresponding real checks; see the linked D38 contract.
+
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline
 (AGENTS.md → Verification). `global.json` pins the SDK, package references pin Cake.Frosting and
 application dependencies, and `toolchains.lock.json` pins downloaded cargo-nextest bytes.

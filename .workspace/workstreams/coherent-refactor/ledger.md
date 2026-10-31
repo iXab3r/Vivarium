@@ -1,6 +1,6 @@
 # Refactor ledger
 
-Planning baseline: `cbb285a`; plan v1.4. All implementation gates are OPEN/unverified.
+Planning baseline: `cbb285a`; plan v1.6. All implementation gates are OPEN/unverified.
 The existing TeamCity ledger and inventories remain the source universe; do not duplicate/waive them.
 
 | Gate | Status | Evidence now | Required closure |
@@ -16,7 +16,7 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 | D36 priority/UI clarification | ACCEPTED, NOT IMPLEMENTED | REST-driven model before implementation; shared UI technology preserves current UX; local Host+Agent/CLI gates in R0 | P0 structural contracts and R0 actual process/client evidence |
 | D37 acceptance/conformance | ACCEPTED, NOT EXECUTED | 31 canonical business AC specified-unbound; 10 TCM invariants; 38 technical candidates; initial family-level trace map; fresh PoeBane Testing Architect study | #39 review/refine independent contracts/oracles; #40 bind real R0 evidence; cumulative per-milestone gates |
 | TCM-GAP-001 | OPEN, UNIMPLEMENTED/UNVERIFIED | Explicit suitable-agent custom run on a disabled Agent documented by TeamCity; absolute normal-queue prohibition clarified in AC-AG-02/06 and TC-AG-01 | #41 freezes reference request/permission variant and proves normal-block/explicit-target behavior; docs are not runtime PASS |
-| P0 | OPEN | Plan v1.4, accepted D34–D37/RF-10, remaining choices open, S01…38 and business trace links | Resolve structural/model/protocol/mutation and AC/oracle gates; no count of linked rows is coverage |
+| P0 | OPEN | Plan v1.6, accepted D34–D38/RF-10, remaining choices open, S01…38 and business trace links | Execute P0.REST.1–3, including minimal deterministic composition/cost proof; resolve structural/model/protocol/mutation and AC/oracle gates; linked rows are not coverage |
 | R0 | OPEN | Local-lab contract and first wire subset; no new-stack run delivered | R0.1 Host+Agent; R0.2 unchanged CLI; R0.3 restart/regressions/cleanup |
 | R1 | OPEN | Proposed contracts only | Approved Identity/current-access ordinary-user UI/client evidence |
 | R2 | OPEN | Existing invariants and requirements, no target implementation | Source Compile + PG durable execution + real Agent/UI evidence |

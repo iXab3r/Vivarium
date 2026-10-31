@@ -42,6 +42,105 @@ oracle or establish TeamCity equivalence. Likewise, do not implement a second sc
 catalog or provider in the mock. Replay bounded observed sequences and faults; real Vivarium must
 produce its own settings, authorization, queue/history transitions and byte references.
 
+## Deterministic behavior without deploying a complete server
+
+Owner clarification, 2026-10-31: thousands of cases must be simple and cheap, and the test
+infrastructure must help reduce total maintained code. Use a small deterministic test composition
+around **production Vivarium code**, with WireMock as its HTTP replay adapter. Do not make a stateful
+TeamCity emulator the foundation of every test. This refines D38, not the accepted product semantics.
+
+WireMock scenario states are sufficient for finite request/response transcripts [W2]. They do not
+provide the product scheduler, virtual time for all components, database isolation or gRPC Agent
+execution. Do not force those boundaries through HTTP or write them inside response callbacks.
+ASP.NET Core TestServer can exercise an actual application's HTTP pipeline in process [H1]; this
+avoids a deployed Server executable without replacing its routes, binding, auth or serialization.
+The current Host is not yet composed that way: this is a proposed delivery seam, not existing proof.
+
+| Question | Smallest sufficient composition | Deliberate limit |
+|---|---|---|
+| Does a client send/interpret the frozen contract? | Real client plus strict WireMock transcript | Proves client/replay controls, not Vivarium behavior |
+| Are locator/media/projection/error variants compatible? | Actual production parser or HTTP pipeline, small immutable fixtures and independent expected data | Direct parser tests do not prove routing; HTTP cases keep the real pipeline |
+| How does Vivarium react to Agent messages, deadlines or failures? | Actual owning services and relevant REST boundary, controlled time and scripted external actors | Driver emits specified messages; Vivarium decides permission, compatibility, ownership and transitions |
+| Are queries, grants, claims, revisions and bytes correct? | Same production services with real PostgreSQL, Git or Storage for the affected claim | Fake storage or SQLite cannot prove PostgreSQL behavior; a transcript cannot prove activation or durable effects |
+| Does a client/build/process really work? | Small decisive real Kestrel/client/Agent/workload journeys, plus focused real-platform/fault gates | TestServer has no real TLS/socket/process evidence; scripted completion is not executed work |
+
+These are evidence choices within the D37 pyramid, not five new test tiers or a new runner. A case
+records its cheapest sufficient boundary; do not run every case against every target. Cover required
+variants at their actual boundary, with a selected overlap between cheap compositions and real-host
+journeys to detect composition drift. WireMock replay need not be on the product execution path or
+repeated per case when no client, upstream HTTP behavior or assertion-control claim requires it.
+
+### Permitted simulator state and causal ownership
+
+The shared fixture may own a transcript cursor, named input bindings, an external connection state,
+queued scripted deliveries, captured requests, controlled clock and isolated resource lifetimes.
+Keep driver actions explicit: send the specified Hello/ACK/result, withhold a message, disconnect,
+release a barrier or advance time. AgentHub drivers use its actual protocol/accepted seam, not a new
+HTTP Agent API. Build-specific test input/output is allowed; a generic build executor is not.
+
+It must not choose eligible agents, resolve roles/inheritance/locators, allocate authoritative runs,
+implement queue optimization or compute expected outcomes. Reusing production logic inside the
+tested composition is intended; using it to produce the expected result is not. A stubbed external
+Agent can exercise result ingestion while the real controller owns its transition, but that case
+cannot claim an executable ran. Never rewrite the product database to the expected post-action state.
+Pre-action seed data may use the real owning schema for an unrelated precondition; creation/auth/
+execution claims must exercise their actual boundary. No privileged test route or auth bypass.
+
+For example, arrange a source-backed queued-build fixture and two reported Agent parameter sets;
+submit the request to the actual service/REST route and observe its assignment. The driver can then
+send the specified ACK or disconnect. The expected assignment/state is frozen reference evidence;
+neither the driver nor the assertion helper runs a second compatibility/scheduling algorithm.
+
+Control timer scheduling as well as the current date: FakeTimeProvider supports explicit advances
+and timers [H2]. Merely overriding GetUtcNow does not virtualize PeriodicTimer or Task.Delay. Inject
+one clock through the participating production timers; use existing one-pass operations when the
+claim is that operation, and a smaller timer-wiring test when the background trigger is the claim.
+Advance in explicit steps and await an observable completion/barrier. Advancing the clock does not
+drain arbitrary asynchronous work or serialize PostgreSQL transactions. Bound waits with a separate
+real-time watchdog so a stalled virtual clock cannot hang CI. Exercise concurrency using explicit
+barriers and real competing operations; virtual time alone does not prove race freedom.
+
+### Keep thousands of cases boring
+
+- Use stable NUnit data cases: fixture/precondition, request or short action sequence, literal
+  expected response/effects and source. Small C# builders or shared immutable fixture files are
+  enough; no scenario language, interpreter, generic workflow engine or second Gherkin corpus.
+- Share one request driver/comparator and only demonstrated setup. Preserve useful per-case
+  assertions and failure diffs; helpers must not contain product decisions or calculate the oracle.
+  Do not snapshot huge generated trees when a small explicit contractual projection is sufficient.
+- Reuse expensive immutable preparation and an owned PG instance per worker/run where isolation
+  permits; give each case isolated mutable data, clock, actor state, Git/Storage roots and journal.
+  Choose/prove database reset or independent database boundaries against actual connection/background
+  behavior. An outer transaction is not assumed to cover separately opened application connections.
+  Do not start a container, migrate a fresh cluster or launch an Agent per locator/media variant.
+- Compare costs before adding fakes. Real local PG may be simpler than maintaining another query/
+  transaction model [H3]. No speculative repository layer or universal in-memory database for tests.
+- Record fixture C# size, hand-maintained fixture data, new product hooks, setup/run/cleanup time,
+  discovery overhead, memory and failure artifact size on representative batches. Growth in case
+  data is distinct from growth in executable framework logic; both have maintenance cost. Repeated
+  transcripts need shared immutable inputs, not a more powerful emulator. Make no speed/LOC claim
+  without measurements; do not invent a fixed quota or a new metrics service.
+
+If a helper starts deciding business policy or a new ordinary variant needs new framework logic,
+stop and simplify its boundary. If the cheap composition needs substantial production-only-for-tests
+plumbing, retain the small existing real-host fixture until a measured refactor is justified.
+Deleting old tests requires preserving their unique assertions and evidence boundary, not just count.
+
+### P0.REST.2 composition proof before bulk expansion
+
+First prove a small representative cohort on the existing stack: a read/projection variant, a
+mutation with real read-back and denial, a scripted Agent delivery/fault, and a timer boundary.
+Use only reference-established expectations; missing prerequisites stay explicitly blocked. Compare
+the same applicable cases through the existing real Host and the minimal in-process composition.
+Include a real PG concurrency/durability check when that target storage is available; transitional
+SQLite evidence remains labelled as such and does not close the PG gate. R0 still supplies the real
+new-stack Host+Agent journey; this spike does not defer the first genuine current-product RED to R0.
+
+Publish the composition/evidence matrix, startup/reset isolation controls, repeatability results,
+bounded failure/cleanup behavior and measured maintenance/runtime cost. Select the cheaper adequate
+composition from that evidence before materializing thousands of variants. This is part of the
+existing P0.REST.2 gate, not a new milestone or authorization to build a simulator platform.
+
 ## Establish expectations without guessing
 
 For each case record the source reference/profile, operation and exact variant, business/TCM links,
@@ -168,7 +267,7 @@ cases GREEN and no unresolved reference/product/binding blockers; R5/R6 cannot w
 | Checkpoint | Concrete output and exit evidence |
 |---|---|
 | P0.REST.1 | Freeze a broad, cross-family, independently sourced case corpus and reviewed applicability ledger; stable case IDs/provenance, exact first positive/negative expectations, missing-reference entries explicit |
-| P0.REST.2 | Implement reusable same-framework conformance tests and strict WireMock.Net replay; unchanged-client/request controls GREEN, assertion-failure controls work, isolation/cleanup and target selection proven |
+| P0.REST.2 | Prove the minimal production-code composition and bounded external actors on representative cases before bulk expansion; implement same-framework conformance and strict WireMock.Net replay; client/assertion controls, timer/reset/isolation/cleanup, target selection and measured cost documented |
 | P0.REST.3 | Execute that verified corpus against the actual healthy Vivarium boundary; publish genuine RED/GREEN/product-blocked results and exact known-RED baseline; prove that a wrong endpoint/status/type/effect is detected |
 
 These checkpoints are the first P0 implementation slice, not merely a harness design deferred to R0.
@@ -190,4 +289,7 @@ was added or product code changed; no build, runtime test, release or fleet oper
 - **W3:** [Request journal and unmatched-request controls](https://wiremock.org/dotnet/admin-api-reference/), [stubbing and reset](https://wiremock.org/dotnet/stubbing/).
 - **W4:** [WireMock.Net project/license](https://github.com/wiremock/WireMock.Net): Apache-2.0, consistent with repository dependency policy.
 - **N1:** [NUnit data-driven cases](https://docs.nunit.org/articles/nunit/writing-tests/attributes/testcasesource.html).
+- **H1:** [ASP.NET Core in-process integration testing](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-10.0). TestServer exercises the application pipeline; real transport/process claims require separate evidence.
+- **H2:** [FakeTimeProvider and explicit timer control](https://learn.microsoft.com/en-us/dotnet/core/extensions/timeprovider-testing). It does not replace async/DB completion synchronization.
+- **H3:** [Database strategy trade-offs](https://learn.microsoft.com/en-us/ef/core/testing/choosing-a-testing-strategy). This is evidence about fake-provider limits and real-database cost, not a decision to adopt EF or its test architecture.
 - **Reference inputs:** [REST inventory and gaps](../acceptance/rest-gap-review.md), [reference-constrained handling](teamcity-rest-recommendations.md), [testing hierarchy](testing-model.md).

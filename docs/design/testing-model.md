@@ -115,6 +115,13 @@ boundaries. They are not the business-requirement hierarchy. Reuse EyeAuras.Auto
 Playwright and existing .NET test/public contracts; do not create a second runner, scheduler, report
 engine or generic simulator to give the pyramid a uniform appearance.
 
+D38's [deterministic composition boundary](teamcity-rest-test-first.md#deterministic-behavior-without-deploying-a-complete-server)
+uses production code in process where sufficient, controlled timers and small external-actor drivers.
+WireMock is an HTTP transcript adapter; it need not run in every product test. Only real owning
+services decide product state. Prove isolation and measure a representative P0.REST.2 cohort before
+bulk expansion; reuse real PG where cheaper than maintaining fake persistence. Thousands of cases
+should add reviewed data and assertions, not another model, scenario interpreter or fixture per case.
+
 ## Evidence selection and oracle
 
 For each task record in its existing plan/issue: actual risk → required observable → existing evidence

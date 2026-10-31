@@ -169,6 +169,9 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   are expected as coverage expands. Preserve implemented GREEN cases, execute/report remaining raw
   RED explicitly, and distinguish missing reference/product prerequisites from harness/setup errors.
   No guessed oracle, skipped placeholder, automatic RED allowance or product-derived expectation.
+  Deterministic fixtures run production logic with controlled time and bounded external actors;
+  WireMock replays HTTP rather than implementing a second model. P0.REST.2 proves the smallest
+  composition, isolation/timer control and maintenance/runtime cost before bulk case expansion.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

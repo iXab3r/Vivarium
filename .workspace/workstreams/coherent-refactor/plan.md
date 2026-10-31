@@ -1,4 +1,4 @@
-# Coherent Vivarium refactor — plan v1.5
+# Coherent Vivarium refactor — plan v1.6
 
 Status: **plan under owner iteration; D38's first executable REST test slice is accepted direction**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
@@ -143,11 +143,16 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 
 Dependencies: P0.REST.1–3 executable test-first gate + P0 structural/representation gates → R0 → R1 → R2 → R3 → R4 → R5 → R6.
 P0 starts with the [D38 executable REST suite and initial RED baseline](../../../docs/design/teamcity-rest-test-first.md).
-P0.REST.1 freezes independent expectations, P0.REST.2 runs strict WireMock.Net/client controls,
+P0.REST.1 freezes independent expectations, P0.REST.2 proves minimal deterministic production-code
+composition/cost before bulk expansion and runs strict WireMock.Net/client controls,
 and P0.REST.3 executes the same corpus against the healthy actual Vivarium boundary. Hundreds or
 thousands of reviewed variants are expected as coverage expands; missing reference/setup is not
 product RED. Preserve standard raw results and a monotonic known-RED/regression ledger; each main
 milestone accepts its declared delivered set while the remaining full-suite RED stays visible.
+The simulator controls time and external deliveries, not product decisions. Use cheap in-process
+evidence where sufficient and real PG/Git/Storage/transport/Agent checks where required; no universal
+WireMock-backed TeamCity engine or new scenario interpreter. Thousands of variants should primarily
+add reviewed data, not framework logic. Composition/timer/isolation and cost proof belongs to #35.
 
 P0 also includes resource/ID/state/authority schemas, protocol fixtures, C# mutation proof and per-operation
 milestone allocation, not just counting routes. See [REST breakdown](rest-breakdown.md) and

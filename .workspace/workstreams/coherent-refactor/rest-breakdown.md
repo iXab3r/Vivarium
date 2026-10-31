@@ -104,6 +104,9 @@ discovered rows stay unverified. P0 exit requires reconciliation/disposition and
 contracts plus the [executable D38 gate](../../../docs/design/teamcity-rest-test-first.md); a design-only
 REST-HARNESS does not satisfy it. Ordinary, replay-control, delivered-case and full raw RED targets
 remain distinguishable in required verification. Exact commands/results are the harness deliverable.
+P0.REST.2 must first prove the [bounded deterministic composition](../../../docs/design/teamcity-rest-test-first.md#deterministic-behavior-without-deploying-a-complete-server):
+production decisions, controlled external actors/timers, real storage where claimed, repeatable
+isolation and measured code/runtime cost. WireMock is the HTTP adapter; no second TeamCity model.
 
 R0 does not wait for downloading the full retained artifact archive. The current
 CLI has no dedicated Swagger export command; obtain metadata through an approved supported export

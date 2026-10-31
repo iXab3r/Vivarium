@@ -4,7 +4,7 @@
 - Frozen/pushed checkpoint: `cbb285a55701e0be0c726c57d9daccd8bfb529e7`, annotated tag
   `checkpoint/pre-refactor-2026-10-31`; runtime remains `09dd40b`.
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
-  Plan v1.4 remains draft for unresolved choices; RF-10 delivery and D34–D37 directions are accepted.
+  Plan v1.6 remains draft for unresolved choices; RF-10 delivery and D34–D38 directions are accepted.
   No implementation milestone is complete.
 - GitHub: P0/roadmap #2, implementation parents #3–#9, original children #10–#31, REST sub-children
   #32–#36 under #12, local-lab #37/#38 and first business bindings #40 under #3, AC baseline #39
@@ -39,12 +39,23 @@
   npm metadata lacks gitHead; full Swagger/inline/other-client union and binary provenance are open.
 - D37 requires a continuous TeamCity semantic superset, with highest-level business-language AC.
   Read docs/acceptance/*.feature, docs/design/testing-model.md and the Business Acceptance/Testing
-  Architect roles. Thirty-one AC are specified-unbound, not parsed/executed passes. S01–S38 are
+  Architect roles. All 110 AC are specified-unbound, not parsed/executed passes. S01–S38 are
   supporting technical candidates; acceptance-map.tsv and requirement-routing.tsv are initial
   family-level traceability, not coverage. Reuse exact feature files in future bindings.
 - Fresh PoeBane source 2984e1f (Testing Architect change 48a4735, 2026-10-27) was read remotely;
   its older dirty source-owner checkout was untouched. poebane-testing-study.md records transferred
   evidence/selection/oracle principles; no Rust-specific budgets/permissions/new runner imported.
+- D38/#35 is the first executable P0 slice: independent corpus, verified replay/composition, actual
+  current-Vivarium RED baseline before replacement. P0.REST.2 first proves cheap production-code
+  composition, controlled timers/external actors, isolation and measured code/data/runtime cost.
+  WireMock is an HTTP adapter, not a model simulator. Read teamcity-rest-test-first.md and
+  rest-conformance-checkpoints.tsv. All three checkpoints remain planned-unexecuted; no new corpus,
+  simulator, dependency, benchmark or RED execution exists. No production source/farm was mutated.
+  Inspection: current VivariumControllerHost.StartAsync directly constructs storage/TLS/services and
+  wires Kestrel/background workers; no TestServer composition seam was found there. BuildScheduler
+  has DispatchAvailableAsync, queue timeout monitor has SweepOnceAsync and a TimeProvider-backed
+  PeriodicTimer. Its test's GetUtcNow-only clock does not virtualize timer scheduling. Depot's
+  AccessPolicyTests/DepotFixture separate real-PG policy inputs from real Host/OIDC/process claims.
 - TCM-GAP-001/#41: disable blocks ordinary automatic queue work, not the documented explicitly
   targeted suitable-agent diagnostic/custom run. TC-AG-01 and AC-AG-02/06 clarified; reference
   2026.1.3 variant and actual replacement behavior still open. No source TeamCity write performed.

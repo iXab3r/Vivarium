@@ -22,6 +22,9 @@ and [early REST breakdown](../.workspace/workstreams/coherent-refactor/rest-brea
 D38 makes executable REST compatibility tests the first P0 execution slice: P0.REST.1 freezes
 reference-backed cases, P0.REST.2 implements strict WireMock.Net replay and the shared conformance
 tests, and P0.REST.3 publishes actual Vivarium RED/GREEN/blockers before structural replacement.
+Before bulk expansion, P0.REST.2 proves a minimal deterministic production-code composition with
+scripted external actors/timers, isolation and measured maintenance/runtime cost. WireMock handles
+HTTP replay; it does not become a second scheduler or a required server for every test.
 See [the mandatory TDD/acceptance gate](design/teamcity-rest-test-first.md). Broad coverage should
 produce hundreds/thousands of meaningful variants; no mock-only GREEN or guessed failing oracle.
 UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.

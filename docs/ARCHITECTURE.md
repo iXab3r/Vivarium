@@ -1202,6 +1202,14 @@ evidence; resolve ambiguity through isolated reference observations rather than 
 responses, current permissions, real state effects and bytes. Do not build another TeamCity engine
 inside the mock or use production mutations merely to generate fixtures.
 
+Deterministic behavior tests compose the actual production HTTP/application services with controlled
+time and small scripted external actors. WireMock is one HTTP transcript/fault adapter, not the
+foundation for a replacement scheduler/catalog/RBAC engine. Prefer an in-process production pipeline
+where sufficient; preserve real PG/Git/Storage, transport, Agent and platform evidence for claims that
+need those boundaries. Prove isolation, timer control and measured setup/run/cleanup/code cost on a
+representative P0.REST.2 cohort before bulk expansion. No second scenario language or generic
+simulator platform; a simpler existing real-host fixture is valid when cheaper overall.
+
 Record executed product RED separately from product-blocked, reference-blocked/unbound and harness/
 environment failure. Missing SDK/startup, an unmatched stub or an empty run is not behavioral RED.
 TDD preserves the real failing assertion before implementation, or the existing GREEN baseline if
