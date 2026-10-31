@@ -172,6 +172,13 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   Deterministic fixtures run production logic with controlled time and bounded external actors;
   WireMock replays HTTP rather than implementing a second model. P0.REST.2 proves the smallest
   composition, isolation/timer control and maintenance/runtime cost before bulk case expansion.
+- D39 requires task blocks (REST contract → implementation → REST acceptance → milestone closure)
+  and a mechanically checked API ledger/status at each milestone. GitHub owns live task state;
+  ledger/results own compatibility evidence. Unknown denominators are unknown, not percentages.
+  Follow [API-ledger delivery](docs/design/api-ledger-delivery.md): focused TDD during work, batch
+  required checks at coherent checkpoints, formal independent aggregate correctness/simplicity and
+  explicit Security/Adversarial review at milestone end. Fix all milestone findings/debts there;
+  no carryover, no next-milestone implementation before closure, no per-task review/full-suite tax.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

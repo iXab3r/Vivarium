@@ -1,0 +1,152 @@
+{
+  "status": "UNVERIFIED",
+  "reference": "2026.1.3 build 222742; captured reference, not a fresh source-server probe",
+  "discovery_rows": 449,
+  "normalized_operation_variant_denominator": null,
+  "global_api_complete": false,
+  "global_compatibility_percent": null,
+  "materialized_cases": 0,
+  "executed_cases": 0,
+  "raw_red_baseline_executed": false,
+  "discovery_rows_unallocated": 449,
+  "ledger_validator_and_result_binding": "not implemented; task #36",
+  "blocks": [
+    {
+      "key": "P0",
+      "parent": 2,
+      "contract": 12,
+      "code": [
+        35,
+        36
+      ],
+      "test": 42,
+      "spec_parent": 12,
+      "scope": "Reference profile, full discovery/allocation, stable case IDs, locator/fields/media/errors and resource/mutation contracts. Produce honest current-product RED, not product parity.",
+      "test_title": "P0: Verify the REST baseline and mechanical API-ledger accounting",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R0",
+      "parent": 3,
+      "contract": 43,
+      "code": [
+        14,
+        15,
+        37,
+        38,
+        40
+      ],
+      "test": 44,
+      "scope": "Freeze the exact discovery/current identity, Agent reads/state, seeded Project/BuildType, enqueue/watch/cancel/history identity and artifact/raw-output smoke profile before the local farm implementation.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R1",
+      "parent": 4,
+      "contract": 45,
+      "code": [
+        16,
+        17
+      ],
+      "test": 46,
+      "scope": "Freeze required users/groups/roles/permissions/grants, credential forms, tokens/sessions and installation-account outcomes; include same-cookie/token current revocation, denial and inherited project scope.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R2",
+      "parent": 5,
+      "contract": 47,
+      "code": [
+        18,
+        19,
+        20,
+        41
+      ],
+      "test": 48,
+      "scope": "Freeze editable Project/BuildType/template/settings collections, inheritance/reset/order, VCS roots/changes, custom-build freeze, Agent requirements/pools/run policy and stable queue/run/history identities. Include explicit custom runs on disabled suitable Agents.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R3",
+      "parent": 6,
+      "contract": 49,
+      "code": [
+        21,
+        22,
+        23
+      ],
+      "test": 50,
+      "scope": "Freeze dependency/reuse/artifact selection, runners/features/property effects, triggers, approvals, locks/counters and publication ownership. Required deployment/capacity operations need explicit owners and faithful mappings, not automatic exemptions.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R4",
+      "parent": 7,
+      "contract": 51,
+      "code": [
+        24,
+        25,
+        26
+      ],
+      "test": 52,
+      "scope": "Freeze durable logs/download/tail/gaps, file trees/ranges/archives, test/problem identity versus occurrences, history/triage/statistics, mutable build metadata and retention/access effects.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R5",
+      "parent": 8,
+      "contract": 53,
+      "code": [
+        27
+      ],
+      "test": 28,
+      "scope": "Reconcile all remaining required method/path/variant/client/non-REST surfaces and cumulative earlier slices, including required admin/plugin/license/node mappings. No first discovery of fundamental model semantics or successful stubs.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    },
+    {
+      "key": "R6",
+      "parent": 9,
+      "contract": 54,
+      "code": [
+        29,
+        30,
+        31
+      ],
+      "test": 55,
+      "scope": "Freeze imported/native ID and relationship visibility, retained test/log/artifact bytes, repeated import/whole-entity diff choices, source cleanup independence, backup/restore and coexistence/final-delta read/write behavior. Preserve all cumulative compatibility.",
+      "scope_frozen": false,
+      "required_case_count": null,
+      "api_complete": "UNVERIFIED",
+      "review": "NOT_REVIEWED",
+      "debt": "NOT_ASSESSED"
+    }
+  ]
+}

@@ -168,6 +168,9 @@ own base-model/wire semantics. Testing Architect selects minimal trustworthy com
 coverage migration; Test Steward maintains bindings, fixture lifecycle, execution and honest evidence.
 Roles can be co-held for work; self-adoption is not independent review. Use the existing independent
 milestone/domain/security/simplicity review gates, without a new per-test approval ceremony.
+D39 makes that a final aggregate milestone checkpoint, with explicit Security/Adversarial verdicts
+and zero carried debt. Its [task blocks and mechanical ledger](api-ledger-delivery.md) report API
+completeness from frozen cases and valid evidence; status queries do not trigger suite runs.
 
 The [acceptance map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) links business
 AC to existing S* candidates, TC* requirements, TCM invariants and milestone. Relationship counts are

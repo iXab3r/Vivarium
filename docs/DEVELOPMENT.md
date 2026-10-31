@@ -17,6 +17,20 @@ storage claims require those real boundaries. Each milestone runs affected check
 cumulative implemented TeamCity base suite with relevant extension-neutrality checks. Keep long
 correctness, ordinary feedback and cost diagnostics distinct, with explicit commands and gaps.
 
+## API ledger, review and verification cadence (D39)
+
+Follow [task-backed API delivery](design/api-ledger-delivery.md). Each milestone has REST contract,
+implementation and REST acceptance tasks; its parent owns final closure. Publish mechanical slice
+and global API-complete with exact scope and valid case evidence; unknown denominators stay unknown.
+Read ledger/results for status without running tests. During TDD run affected cases; batch broader
+checks at coherent handoff/milestone gates and reuse unchanged valid evidence. Do not duplicate
+full REST/E2E/platform runs or formal reviews per task/edit/reviewer. Required checks still apply.
+
+At milestone end perform independent aggregate correctness/domain/simplicity and explicit
+Security/Adversarial review at the exact revision. Fix all findings and introduced/exposed technical
+tails through same-milestone tasks, verify narrowly, renew affected verdicts, then deliver/close.
+No debts carried into next-milestone implementation; no security follow-up waiver at closure.
+
 ## Building
 
 D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first

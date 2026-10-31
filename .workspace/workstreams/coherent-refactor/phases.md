@@ -3,7 +3,7 @@
 Active: P0 contract/TDD preparation; executable replacement corpus has not started.
 
 1. Checkpoint and census — complete.
-2. Depot/PoeBane study and plan v1.6 — recorded; RF-10 accepted (separate milestone merges to main).
+2. Depot/PoeBane study and plan v1.7 — recorded; RF-10 accepted (separate milestone merges to main).
    D34/D35 accept Depot authentication/superuser, exact TeamCity RBAC in PG, Chiral settings ownership
    and Depot-style TypeScript/Vite Workbench UI; remaining choices still require P0 work.
 3. Deep REST resource/ID/state/protocol/mutation/harness/allocation — open #12/#32–#36 before
@@ -17,6 +17,10 @@ Active: P0 contract/TDD preparation; executable replacement corpus has not start
    prove small replay/production-code composition controls and record actual current-product RED.
    Start sound cohorts before whole-API prose completion; P0 still closes structural/allocation gates
    before replacement. First RED does not wait for R0; all three checkpoints remain unexecuted.
+8. D39 task blocks and discovery ledger seed are recorded; #36 mechanical accounting and #42 actual
+   baseline verification remain open. API-complete UNVERIFIED; no security review/debt-clearance
+   PASS. At each milestone end finish aggregate and explicit Security/Adversarial review and all
+   same-milestone debt before main closure/next implementation. No mass per-task runs/reviews.
 
 Acceptance dependencies and exact exit contracts live in `plan.md`; status/evidence lives in
 `ledger.md`, TC requirement assignment in `requirement-routing.tsv`, external coordination in

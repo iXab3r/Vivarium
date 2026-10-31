@@ -26,6 +26,12 @@ previously GREEN cases are mandatory regressions. Broad compatibility coverage m
 or thousands of focused cases. Mock GREEN is not product acceptance, and hidden/ignored future tests
 or a guessed oracle are not a valid baseline.
 
+D39 adds [task blocks/API-ledger closure](../design/api-ledger-delivery.md): stable operation/case
+bindings, mechanical slice/global status, no percentage from unknown scope and no suite execution
+for status queries. Use focused TDD and batch broader checks at coherent checkpoints. Formal
+aggregate and Security/Adversarial review happens at milestone end; fix all milestone debt there
+before closure/next-milestone implementation. Do not add per-task reviews or full-matrix reruns.
+
 ## Territory
 
 This is a function role, not ownership of a directory. It applies to tests under

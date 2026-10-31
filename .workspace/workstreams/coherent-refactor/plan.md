@@ -1,6 +1,6 @@
-# Coherent Vivarium refactor — plan v1.6
+# Coherent Vivarium refactor — plan v1.7
 
-Status: **plan under owner iteration; D38's first executable REST test slice is accepted direction**.
+Status: **plan under owner iteration; D38 executable-first and D39 task/ledger/closure directions accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
@@ -203,7 +203,7 @@ Domain-compatible REST and scenarios grow with each domain milestone. R5 is the 
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Published plan: **8 milestones, 8 milestone parent issues and 32 native sub-issues** (40 issues total).
+Published plan: **8 milestones, 8 milestone parent issues and 46 native sub-issues** (54 issues total).
 The REST breakdown #12 also parents five focused P0 tasks. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are
 [R0 #3](https://github.com/iXab3r/Vivarium/issues/3),
@@ -220,7 +220,7 @@ Early concrete tasks: [REST breakdown #12](https://github.com/iXab3r/Vivarium/is
 [protocol #33](https://github.com/iXab3r/Vivarium/issues/33),
 [mutation/C# proof #34](https://github.com/iXab3r/Vivarium/issues/34),
 [executable conformance and RED baseline #35](https://github.com/iXab3r/Vivarium/issues/35),
-[variant/milestone allocation #36](https://github.com/iXab3r/Vivarium/issues/36),
+[mechanical API-ledger/scope accounting #36](https://github.com/iXab3r/Vivarium/issues/36),
 [local Host+Agent #37](https://github.com/iXab3r/Vivarium/issues/37) and
 [first unchanged-CLI run #38](https://github.com/iXab3r/Vivarium/issues/38).
 
@@ -230,12 +230,21 @@ D37 work: [business AC/model baseline #39](https://github.com/iXab3r/Vivarium/is
 The last finding corrects an over-broad normal-queue rule; TC-AG-01 retains its ID and the total
 technical requirement count stays 120. Reference execution and replacement implementation remain open.
 
-Each milestone has a parent issue and bounded child deliverables. GitHub mirrors this workstream;
-the [ledger](ledger.md), [phase state](phases.md) and [handover](handover.md) remain authoritative for
-evidence/status. Target counts are not coverage. Do not close implementation issues because this
+Each milestone has a parent issue and bounded child deliverables. D39 makes GitHub authoritative for
+live task/closure state; structured ledger/results own compatibility evidence. Workstream summaries
+must follow those authorities, not become another task board. Target counts are not coverage. Do not close implementation issues because this
 plan was written or code was committed: close after their own gate passes and their milestone has
 been accepted in main. Preserve verified evidence while that milestone remains integration-pending;
 completed earlier milestones do not wait for R6 to close their issues.
+
+D39 task blocks are linked in [api-blocks.tsv](api-blocks.tsv): P0 contract #12 → code #35/#36 →
+REST acceptance #42; R0 #43 → existing code → #44; R1 #45 → code → #46; R2 #47 → code → #48;
+R3 #49 → code → #50; R4 #51 → code → #52; R5 #53 → #27 → #28; R6 #54 → code → #55.
+Existing milestone parents #2–#9 are explicit closure gates. No extra endpoint/closure epics.
+The [API ledger](api-ledger.tsv) seeds 449 discovery headings, with normalization/allocation/cases
+still open. [Status](api-status.json) is UNVERIFIED, not a compatibility percentage or executable
+report. Task #36 implements the small mechanical validator/result binding; #42 verifies it and
+the actual RED baseline. No product API-complete, tests, review PASS or debt clearance is claimed.
 
 ### Earliest hands-on checkpoints
 
@@ -298,12 +307,14 @@ real UI actions; API/DB shortcuts may prepare fixtures but cannot prove that the
 Keep developer, viewer, project admin, fleet admin and unprivileged user distinct; an omnipotent admin
 running every acceptance test would miss the most important access boundaries.
 
-At every checkpoint: root build/test on the exact prepared SDK; affected cheap tests; real PG contract
-tests; affected Gherkin/client/OS scenarios; existing regression invariants; safe evidence and owned
-cleanup. No blanket all-platform/chaos rerun per tiny edit. Before each milestone merge: its declared
-suite and relevant existing regressions, independent affected-domain/security review and an independent
-simplicity review against the exact candidate revision. R6 additionally proves the full cumulative
-acceptance suite. These are future gates, not reviews claimed by this planning session.
+During TDD use focused changed-case/regression checks. At coherent handoff/milestone checkpoints
+batch required root build/test and due real PG/Gherkin/client/OS/cumulative evidence; reuse valid
+unchanged results. Status queries read results without running tests. No full matrix per edit/task.
+At milestone end perform final independent aggregate correctness/domain/simplicity and explicit
+Security/Adversarial review against the exact head/base/target. Fix all actionable findings and
+introduced/exposed debts through same-milestone tasks, verify narrowly and renew affected verdicts.
+No milestone closure or next-milestone implementation before zero debt, acceptance and verified
+main delivery. R6 proves full cumulative acceptance. No review or runtime PASS is claimed here.
 
 Every such merge includes affected business/model/wire cases plus a small cumulative implemented
 TeamCity base suite and relevant extension-neutrality checks. A new native capability is not a waiver

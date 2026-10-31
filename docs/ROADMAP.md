@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D38) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D39) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
@@ -28,6 +28,13 @@ HTTP replay; it does not become a second scheduler or a required server for ever
 See [the mandatory TDD/acceptance gate](design/teamcity-rest-test-first.md). Broad coverage should
 produce hundreds/thousands of meaningful variants; no mock-only GREEN or guessed failing oracle.
 UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.
+
+D39 binds every milestone to contract → implementation → REST-acceptance tasks and its parent
+closure gate. [Block register](../.workspace/workstreams/coherent-refactor/api-blocks.tsv) and
+[API-ledger delivery](design/api-ledger-delivery.md) define mechanical API-complete, focused tests,
+final independent aggregate and Security/Adversarial review and zero debt before the next milestone.
+The current ledger/status is an unverified discovery seed; #36 implements accounting, #42 verifies
+the initial baseline. No runtime API completeness or review PASS is claimed by creating these tasks.
 
 D37 makes Build/Agent semantics a continuously tested TeamCity superset. The
 [business AC](acceptance/README.md) are stable implementation-independent requirements;

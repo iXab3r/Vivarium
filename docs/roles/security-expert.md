@@ -55,7 +55,9 @@ silently replaced while a build is queued or running.
 
 ## Required review gates
 
-Request a Security Expert review before merging any change that:
+Under D39, perform the formal independent Security/Adversarial review on the complete milestone
+candidate before its final acceptance/main merge. The following changes select the review's reach;
+they do not require a separate formal review for every task or child integration:
 
 - adds an AgentHub message, REST endpoint, browser mutation, credential, permission, or service-token
   scope;
@@ -68,9 +70,14 @@ Request a Security Expert review before merging any change that:
 - removes or raises a size, time, rate, concurrency, retention, or pagination bound;
 - allows submitted code onto a new class of persistent or privileged machine.
 
-The review must produce one of: approved with stated evidence, approved with tracked follow-up, or
-blocked with a concrete violated invariant. Findings must identify the reachable asset, actor, and
-failure path rather than rely on generic hardening advice.
+The review must produce PASS with stated evidence/limits or BLOCKED with a concrete violated
+invariant. Findings identify the reachable asset, actor and failure path, not generic hardening.
+All actionable milestone findings and introduced/exposed debts must be fixed in the same milestone
+before closure or next-milestone implementation; no approved-with-later-security-follow-up waiver.
+Recheck changed findings against the exact final head/base/target and reuse unaffected evidence.
+The [D39 delivery contract](../design/api-ledger-delivery.md) defines cadence and closure. Trace
+least-privileged/cross-project/stale-credential, hostile input, resource and ownership/restart paths
+where reachable; use bounded synthetic proofs, not a mass scan or a mandatory exploit matrix.
 
 ## Working method
 

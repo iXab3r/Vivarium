@@ -1224,6 +1224,24 @@ Harness/environment failures always fail verification. Full family/API acceptanc
 required cases GREEN with no unresolved reference/binding/product blockers. See
 [the early test-first contract](design/teamcity-rest-test-first.md) for P0.REST.1–3 and reporting.
 
+### D39. Task-backed API completeness and debt-free milestone closure
+
+Accepted owner direction, 2026-11-01. Each milestone has linked REST-contract, implementation and
+REST-acceptance tasks; its parent is the closure gate. GitHub owns task state; a structured API ledger
+with stable operation/variant IDs and actual result provenance owns compatibility evidence. Publish
+slice and global API-complete status at each milestone. Unknown inventory/variant denominators stay
+unknown, and issue/schema/replay completion is not runtime compatibility. P0's RED-baseline delivery
+does not claim product API-complete. Required prior GREEN cannot regress or move out of scope.
+
+Use focused TDD and retain valid unchanged evidence. Batch required broader checks at coherent
+handoff/milestone checkpoints; do not run full matrices or formal reviews per edit/task. Final
+independent milestone review covers correctness/affected contracts/simplicity and explicit
+Security/Adversarial behavior at the exact integrated revision. Fix all actionable findings and
+introduced/exposed debts within that milestone, renew affected evidence/sign-off, then verify main
+delivery and close bottom-up. No debt carried into the next milestone's implementation. This
+refines D37/D38 cadence and RF-10 without weakening compatibility, required checks or merge scope.
+See [API-ledger delivery](design/api-ledger-delivery.md); no workflow service or new runner is implied.
+
 ## 5. Protocol sketch
 
 ```proto

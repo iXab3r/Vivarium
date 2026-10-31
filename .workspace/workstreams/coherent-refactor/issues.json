@@ -309,7 +309,7 @@
     {
       "key": "rest_allocation",
       "number": 36,
-      "title": "P0: Allocate REST variants to milestones and freeze the R0 profile",
+      "title": "P0: Implement API-ledger accounting and freeze REST milestone scopes",
       "url": "https://github.com/iXab3r/Vivarium/issues/36",
       "milestone": "P0",
       "parent": 12,
@@ -359,6 +359,132 @@
       "milestone": "R2",
       "parent": 5,
       "state": "open"
+    },
+    {
+      "key": "P0-api-verification",
+      "number": 42,
+      "title": "P0: Verify the REST baseline and mechanical API-ledger accounting",
+      "state": "open",
+      "parent": 12,
+      "milestone": "P0",
+      "url": "https://github.com/iXab3r/Vivarium/issues/42"
+    },
+    {
+      "key": "R0-api-contract",
+      "number": 43,
+      "title": "R0: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 3,
+      "milestone": "R0",
+      "url": "https://github.com/iXab3r/Vivarium/issues/43"
+    },
+    {
+      "key": "R0-api-verification",
+      "number": 44,
+      "title": "R0: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 3,
+      "milestone": "R0",
+      "url": "https://github.com/iXab3r/Vivarium/issues/44"
+    },
+    {
+      "key": "R1-api-contract",
+      "number": 45,
+      "title": "R1: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 4,
+      "milestone": "R1",
+      "url": "https://github.com/iXab3r/Vivarium/issues/45"
+    },
+    {
+      "key": "R1-api-verification",
+      "number": 46,
+      "title": "R1: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 4,
+      "milestone": "R1",
+      "url": "https://github.com/iXab3r/Vivarium/issues/46"
+    },
+    {
+      "key": "R2-api-contract",
+      "number": 47,
+      "title": "R2: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 5,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/47"
+    },
+    {
+      "key": "R2-api-verification",
+      "number": 48,
+      "title": "R2: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 5,
+      "milestone": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/issues/48"
+    },
+    {
+      "key": "R3-api-contract",
+      "number": 49,
+      "title": "R3: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 6,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/49"
+    },
+    {
+      "key": "R3-api-verification",
+      "number": 50,
+      "title": "R3: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 6,
+      "milestone": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/issues/50"
+    },
+    {
+      "key": "R4-api-contract",
+      "number": 51,
+      "title": "R4: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 7,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/51"
+    },
+    {
+      "key": "R4-api-verification",
+      "number": 52,
+      "title": "R4: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 7,
+      "milestone": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/issues/52"
+    },
+    {
+      "key": "R5-api-contract",
+      "number": 53,
+      "title": "R5: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 8,
+      "milestone": "R5",
+      "url": "https://github.com/iXab3r/Vivarium/issues/53"
+    },
+    {
+      "key": "R6-api-contract",
+      "number": 54,
+      "title": "R6: Freeze REST contract and API-ledger scope",
+      "state": "open",
+      "parent": 9,
+      "milestone": "R6",
+      "url": "https://github.com/iXab3r/Vivarium/issues/54"
+    },
+    {
+      "key": "R6-api-verification",
+      "number": 55,
+      "title": "R6: Verify REST acceptance and publish API-complete status",
+      "state": "open",
+      "parent": 9,
+      "milestone": "R6",
+      "url": "https://github.com/iXab3r/Vivarium/issues/55"
     }
   ],
   "milestones": [

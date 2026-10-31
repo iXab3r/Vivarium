@@ -4,12 +4,12 @@
 - Frozen/pushed checkpoint: `cbb285a55701e0be0c726c57d9daccd8bfb529e7`, annotated tag
   `checkpoint/pre-refactor-2026-10-31`; runtime remains `09dd40b`.
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
-  Plan v1.6 remains draft for unresolved choices; RF-10 delivery and D34–D38 directions are accepted.
+  Plan v1.7 remains draft for unresolved choices; RF-10 delivery and D34–D39 directions are accepted.
   No implementation milestone is complete.
 - GitHub: P0/roadmap #2, implementation parents #3–#9, original children #10–#31, REST sub-children
   #32–#36 under #12, local-lab #37/#38 and first business bindings #40 under #3, AC baseline #39
-  under #2 and explicit disabled-Agent variant #41 under #5: eight milestones, 40 open issues,
-  32 native child relationships with matching milestones.
+  under #2 and explicit disabled-Agent variant #41 under #5, plus D39 tasks #42–#55:
+  eight milestones, 54 open issues and 46 native child relationships with matching milestones.
 - Owner accepted RF-10 on 2026-10-31: each milestone may merge separately into main after its own
   acceptance/review, and its issues close after that delivery. Use milestone integration branches where
   useful; remove obsolete code with its replacement. R6 is cumulative acceptance, not the first main merge.
@@ -65,6 +65,12 @@
   RESTRICTEDBOT and TOOLS_INTEGRATION, under ignored artifacts/depot-refactor-study/teamcity-role-*.json.
 - Status review: corrected stale 31-AC entries in scope/ledger to canonical 110; no new AC or runtime
   evidence. All 36 reference decomposition findings remain open; no compatible facade or new RED suite.
+- D39 (2026-11-01): 14 task issues #42–#55 added; all 54 issues/8 milestones synchronized and native
+  links verified. api-blocks.tsv is the task graph, api-ledger.tsv seeds 449 source headings, and
+  api-status.json is an explicitly unverified seed snapshot. #36 delivers mechanical accounting;
+  #42 verifies baseline/ledger. Formal reviews only at milestone end, including explicit independent
+  Security/Adversarial; resolve all milestone debts before next implementation. No current review,
+  debt clearance, test run or API-complete claim. GitHub owns task state; result ledger owns evidence.
 - Next: execute #35's verified cohorts immediately, with #12/#32–#34/#36/#39 supplying the affected
   model/protocol/mutation/reference evidence alongside tests; see plan.md's immediate execution order.
   Do not require whole-API prose completion before the first sound test cohort. #40 grows

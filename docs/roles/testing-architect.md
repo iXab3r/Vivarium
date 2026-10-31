@@ -20,6 +20,11 @@ execution categories or material suite cost, record the composition/oracle/reuse
 before dependent implementation and obtain the existing affected-domain/test review at its gate.
 Routine cases through accepted fixtures need that local reasoning, not another agent/report/approval.
 
+D39's [task/ledger contract](../design/api-ledger-delivery.md) makes formal review a final milestone
+checkpoint. Keep focused TDD, reuse unchanged valid evidence and batch broad checks only when the
+changed risk/coherent gate needs them. API-complete needs frozen scope and genuine case evidence;
+status queries do not run suites. All introduced/exposed milestone debt closes before the next one.
+
 Separate these axes: functional boundary; real/controlled/recorded environment; in/out-of-process
 placement; clock/storage/Agent/provider; runner; and ordinary/extended/long/platform/performance
 selection. Gherkin does not force a process or browser. A real process proves only the boundary it

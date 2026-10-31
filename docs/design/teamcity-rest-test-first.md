@@ -240,7 +240,9 @@ can enter its known-RED baseline. Do not call the existing discovery inventories
 4. Refactor with the implemented compatibility set, reference replay controls and affected native/
    business checks still GREEN. Changing expected results to fit the implementation is not TDD.
 
-Every affected milestone/merge runs mandatory conformance checks. Previously GREEN cases cannot be
+Every affected milestone runs mandatory conformance acceptance. During TDD use focused changed-case
+checks; D39 batches broader checks and formal review at coherent milestone gates rather than each
+task/edit/child merge. Previously GREEN cases cannot be
 added back to the known-RED set to conceal regressions. Newly found required failing variants reopen
 their family's acceptance. A new reference version is a reviewed separate profile, not a rewrite of
 the old oracle. Use no automatic baseline expansion or wildcard permission to fail.
@@ -256,11 +258,16 @@ The full raw conformance run remains visibly RED/nonzero while required failures
 milestone regression gate may pass only its declared delivered set plus no unexpected regressions;
 its name/report must state that scope and remaining RED. Preserve standard raw test results and the
 existing reporting path, not a custom format or an `allow_failure` that labels parity successful.
-CI must keep the failing full target/job and its raw artifacts distinguishable from a passing partial
-gate. Changes to failure kinds/root causes within known-RED cases stay visible for triage; the case
+When the full target is run, keep its failure and raw artifacts distinguishable from a passing partial
+gate. D39's ledger reports the full known case set while separating new execution, valid unchanged
+evidence and stale/unknown cases; generating status must not launch suites or claim a fresh full run.
+Changes to failure kinds/root causes within known-RED cases stay visible for triage; the case
 ID is not permission to swallow any exception.
 Harness/environment failures always fail the gate. Full API/family acceptance requires all required
 cases GREEN and no unresolved reference/product/binding blockers; R5/R6 cannot waive the baseline.
+The [D39 delivery contract](api-ledger-delivery.md) binds each milestone to contract/code/REST-test
+tasks, mechanical API-complete status, final aggregate and Security/Adversarial review, and no debt
+carryover. P0 baseline acceptance is not product API-complete.
 
 ## First executable checkpoints inside P0
 

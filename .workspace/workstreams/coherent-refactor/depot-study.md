@@ -86,6 +86,16 @@ Depot's existing autonomous merge/deployment authority applies to Depot, not to 
 does not import its permissions, its business grants, optional role sync or an entire infrastructure
 copy. Standard framework composition is transferable; domain policy requires a Vivarium contract.
 
+## Follow-up: task-backed milestone gates (2026-11-01)
+
+Re-read issue-development.md, build-and-verification.md and adversarial-reviewer.md at the same
+frozen Depot revision, plus live issue bodies #42/#80/#188. Concrete API bindings precede code;
+review findings become same-milestone fixes; final aggregate simplicity/acceptance names exact
+revision/evidence. D39 transfers these practices into Vivarium tasks and API-ledger accounting.
+The owner explicitly chooses formal review at milestone end, so Depot's every-PR cadence is not
+transferred. Neither are autonomous merge/deploy permissions or its protected-auth approval rules.
+No Depot files, runtime or production source services were changed.
+
 ## Follow-up: actual UI and storage integration (2026-10-31)
 
 Owner accepted D34/D35 after the initial study. The frontend dependency/source inspection corrects

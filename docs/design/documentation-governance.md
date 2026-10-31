@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Implemented**
 > Maintainer role: [Docs Expert](../roles/docs-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D38
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D39
 
 ## Purpose
 
@@ -61,7 +61,7 @@ Precedence is scoped, not a single universal ranking. When two sources appear to
 review it; neither document silently wins outside its scope. Prior art and draft designs never override
 an accepted decision.
 
-The new acceptance baseline and D32–D38 focused contracts are the starting point for replacement
+The new acceptance baseline and D32–D39 focused contracts are the starting point for replacement
 work. Older examples, role packs, historical delivery sequences and pre-refactor implementation
 sections cannot overrule them merely because they use words such as "must", "only" or "never".
 An actual contradiction is not resolved by a header disclaimer alone: repair the conflicting body,

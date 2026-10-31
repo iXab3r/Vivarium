@@ -50,9 +50,10 @@ and evidence explicit.
 4. **Phase gates are evidence gates.** A phase is a coherent risk group, not a calendar bucket. It closes
    only when every assigned item is classified and the checks required by its affected surface have
    passed.
-5. **There is one source of truth for status.** `scope.toml`, the ledger, the evidence log, and the
-   handover must agree. An external issue may mirror this state for coordination, but it does not
-   replace the tracked workstream.
+5. **There is one source of truth per status.** Under D39, GitHub owns live task/closure state;
+   the tracked ledger/result evidence owns compatibility and source-universe facts. `scope.toml`,
+   evidence and handover must agree with those authorities, not become another manually maintained
+   task board. No API-complete claim from task closure or a discovery count.
 6. **Handovers are executable.** On every pause, record the baseline and remaining counts, active phase,
    changed artifacts, exact verification status, blockers, and the next concrete commands. A fresh
    agent must be able to resume without rediscovering the scope.
@@ -123,7 +124,7 @@ handover.
   touched domain.
 - Start delegated census/design agents and reviewers with empty context under the
   [independent-delegation contract](README.md#independent-delegation). Use a read-only final reviewer
-  separate from the implementer and design/census advisor after each phase. Review findings return to the ledger as reclassifications or baseline corrections, never as
+  separate from the implementer and design/census advisor at each final milestone gate. Review findings return to the ledger as reclassifications or baseline corrections, never as
   chat-only observations.
 - Update `handover.md` before pausing or switching to unrelated work. Include exact commands and identify
   which outputs are generated so the next agent does not edit them manually.
