@@ -1,4 +1,4 @@
-# Depot-style Workbench UI
+# TeamCity/Vivarium UI on the shared Workbench stack
 
 > Status: **Accepted — D35, 2026-10-31**
 > Implementation: **Current panel is Blazor; replacement not implemented**
@@ -27,10 +27,15 @@ Follow source and current server-backed scenarios where older Depot prose still 
 
 ## Composition to transfer
 
-Use one compact product header with sign-in/current account, My keys and sign-out; one shallow
-Workbench rail; a resizable contextual outline/list; and the selected entity's inspector/page.
-Reuse native tree disclosure, selection, keyboard behavior, focus, split layout and disposal.
-Use a pinned npm package/lock and packaged fonts/assets, with license/provenance evidence.
+Owner clarification, 2026-10-31: transfer Depot's technology and integration patterns, not its product
+layout. Preserve the useful current Vivarium/TeamCity pages, navigation, tables, actions and build-local
+tabs while replacing the rendering stack. A mandatory Depot-style outline/inspector split for every
+screen is not accepted. Choose Workbench controls/layouts to support the existing CI workflow.
+
+Reuse the pinned package/assets, same-origin Host integration, account/Identity styling, schema-based
+Nodes editor, current-authority checks, keyboard/focus behavior and lifecycle/disposal. Use a package
+lock and license/provenance evidence. Visual redesign is separately scoped; parity migration should
+not force users to relearn a package-repository UI.
 
 Do not add React adapters, a second SPA framework, a frontend runtime server, duplicate headers or
 a custom set of lookalike controls. Add an editor dependency only for an actual editing workflow;
@@ -38,7 +43,7 @@ honor the real Workbench peer dependencies. Build/release inputs are pinned and 
 
 ## Vivarium information architecture
 
-Adapt the composition to CI rather than copying Depot's package entities:
+Retain and complete the TeamCity/current-Vivarium information architecture using the shared stack:
 
 - Projects/Builds: project/configuration outline, history and selected build inspector.
 - Queue: actionable waiting/running work, requirements/compatibility reasons and cancellation.

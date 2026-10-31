@@ -12,6 +12,7 @@ of truth for delivery order and status.
 | [TeamCity domain](teamcity.md) | TeamCity Expert | Projects, configurations, builds, steps, requirements, matrices, and build chains |
 | [TeamCity behavioral parity](teamcity-parity.md) | TeamCity + Results + Logs + Scheduling + REST/UI | Required configuration, execution, test history, requirements, logs, automation and historical-import parity for replacing TeamCity (D32) |
 | [TeamCity REST compatibility](teamcity-rest-compatibility.md) | Vivarium REST + TeamCity + Test Steward | Unchanged-client `/app/rest` compatibility, locators, media types, paging, errors, mutations and conformance (D33) |
+| [REST-driven shared domain](teamcity-rest-domain.md) | REST + TeamCity + Scheduling + Git/Persistence | Early resource/ID/state/command/authority contracts, C# mutation gate and first compatible local execution (D36) |
 | [AgentExplorer](agent-explorer.md) | AgentExplorer Expert | Host inventory, observation, remote operations, and fleet management |
 | [Machine providers/images](machine-providers-images.md) | Machine Providers/Images Expert | Provider hosts, pools, images, clone/revert/power/console, sealing, drift, and capacity |
 | [REST API](rest-api.md) | Vivarium REST Expert | Canonical `/api/v1` management surface, events, compatibility, and Git-aware mutations |

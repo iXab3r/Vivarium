@@ -3,11 +3,13 @@
 Active: P0 owner iteration / bounded follow-up discovery.
 
 1. Checkpoint and census — complete.
-2. Depot study and plan v1.2 — recorded; RF-10 accepted (separate milestone merges to main).
+2. Depot study and plan v1.3 — recorded; RF-10 accepted (separate milestone merges to main).
    D34/D35 accept Depot authentication/superuser, exact TeamCity RBAC in PG, Chiral settings ownership
    and Depot-style TypeScript/Vite Workbench UI; remaining choices still require P0 work.
-3. Decisions/source disposition/client and history inventories — open P0 issues.
-4. R0…R6 implementation — not started or accepted.
+3. Deep REST resource/ID/state/protocol/mutation/harness/allocation — open #12/#32–#36 before
+   structural implementation. Initial 456 synthetic fixture rows discovered, not reconciled coverage.
+4. R0.1 local Host+real Agent (#37), R0.2 unchanged-CLI smoke (#38), R0.3 restart/cleanup — planned.
+5. R1…R6 domain expansion and cumulative client/migration proof — not started or accepted.
 
 Acceptance dependencies and exact exit contracts live in `plan.md`; status/evidence lives in
 `ledger.md`, TC requirement assignment in `requirement-routing.tsv`, external coordination in

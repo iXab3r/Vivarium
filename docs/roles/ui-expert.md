@@ -10,10 +10,13 @@ Own every user-visible browser change and the Depot-style Workbench target (D35)
 Depot's actual frontend uses TypeScript/Vite and a pinned @eyeauras/workbench package, with static
 assets served by ASP.NET Core. React/React Router, a separate frontend service and a custom shell/
 control framework are not required. Native Identity pages keep standard handlers and share styling.
+The owner selected technology alignment, not a forced Depot layout. Preserve useful current
+Vivarium/TeamCity navigation, pages, tables and build-local tabs; choose controls/layout per workflow.
 
 ## Ownership
 
-- Compact application header/account controls, shallow rail, resizable context outline/list and inspector.
+- Current Vivarium/TeamCity workflow composition using shared Workbench controls and account integration;
+  context outline/split inspector only where that workflow benefits, not as a mandatory screen template.
 - CI project/configuration/build pages, Queue, Agents, Nodes and Access; stable routes and entity-local tabs.
 - Workbench dependency provenance/licensing, bundled assets, accessibility, keyboard/selection/focus,
   narrow-width reflow, page lifetime/disposal and bounded loading.

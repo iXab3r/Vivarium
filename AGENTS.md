@@ -149,6 +149,11 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D34 adopts Depot's stock Identity/OpenIddict OIDC, normal cookie and installation-user lifecycle.
   TeamCity role/permission IDs, editability, scopes, groups and inheritance must match 1:1; do not
   retain the superseded immutable role floor or reinterpret TeamCity grants as narrower fleet grants.
+- D35 shares Depot's UI technologies/integration, not a mandatory layout redesign. Preserve useful
+  current Vivarium/TeamCity navigation, pages and workflows while porting to TypeScript/Workbench.
+- D36 makes REST resource/identity/state/mutation/protocol decomposition a P0 structural gate.
+  R0 must provide a real local Host+Agent and first unchanged-CLI smoke path; R5 is cumulative
+  conformance. Do not defer compatibility model decisions until after domain implementation.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

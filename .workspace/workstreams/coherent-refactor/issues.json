@@ -3,7 +3,7 @@
     {
       "parent": null,
       "url": "https://github.com/iXab3r/Vivarium/issues/2",
-      "title": "P0: Agree replacement contracts and acceptance",
+      "title": "P0: REST-first contracts and replacement plan",
       "state": "open",
       "milestone": "P0",
       "number": 2,
@@ -12,7 +12,7 @@
     {
       "parent": null,
       "url": "https://github.com/iXab3r/Vivarium/issues/3",
-      "title": "R0: Run and debug one isolated Chiral Host",
+      "title": "R0: Local server + Agent and first compatible run",
       "state": "open",
       "milestone": "R0",
       "number": 3,
@@ -30,7 +30,7 @@
     {
       "parent": null,
       "url": "https://github.com/iXab3r/Vivarium/issues/5",
-      "title": "R2: Run a source-based C# Compile",
+      "title": "R2: Author C# configurations and run source Compile",
       "state": "open",
       "milestone": "R2",
       "number": 5,
@@ -57,7 +57,7 @@
     {
       "parent": null,
       "url": "https://github.com/iXab3r/Vivarium/issues/8",
-      "title": "R5: Prove unchanged TeamCity clients",
+      "title": "R5: Close cumulative unchanged-client conformance",
       "state": "open",
       "milestone": "R5",
       "number": 8,
@@ -93,7 +93,7 @@
     {
       "parent": 2,
       "url": "https://github.com/iXab3r/Vivarium/issues/12",
-      "title": "P0: Freeze actual TeamCity client and HTTP variant scope",
+      "title": "P0: Decompose REST compatibility before structural implementation",
       "state": "open",
       "milestone": "P0",
       "number": 12,
@@ -129,7 +129,7 @@
     {
       "parent": 4,
       "url": "https://github.com/iXab3r/Vivarium/issues/16",
-      "title": "R1: Implement approved ordinary and installation sign-in",
+      "title": "R1: Complete ordinary sign-in and installation-account lifecycle",
       "state": "open",
       "milestone": "R1",
       "number": 16,
@@ -165,7 +165,7 @@
     {
       "parent": 5,
       "url": "https://github.com/iXab3r/Vivarium/issues/20",
-      "title": "R2: Replace queue persistence and expose the complete run journey",
+      "title": "R2: Extend catalogue-aware scheduling and full run journey",
       "state": "open",
       "milestone": "R2",
       "number": 20,
@@ -269,11 +269,74 @@
       "milestone": "R6",
       "number": 31,
       "key": "simplify"
+    },
+    {
+      "key": "rest_domain",
+      "number": 32,
+      "title": "P0: Freeze REST-driven resource identities and state model",
+      "url": "https://github.com/iXab3r/Vivarium/issues/32",
+      "milestone": "P0",
+      "parent": 12,
+      "state": "open"
+    },
+    {
+      "key": "rest_protocol",
+      "number": 33,
+      "title": "P0: Specify locator, fields, paging, media and error contracts",
+      "url": "https://github.com/iXab3r/Vivarium/issues/33",
+      "milestone": "P0",
+      "parent": 12,
+      "state": "open"
+    },
+    {
+      "key": "rest_mutations",
+      "number": 34,
+      "title": "P0: Prove C# editing and REST mutation authority boundaries",
+      "url": "https://github.com/iXab3r/Vivarium/issues/34",
+      "milestone": "P0",
+      "parent": 12,
+      "state": "open"
+    },
+    {
+      "key": "rest_harness",
+      "number": 35,
+      "title": "P0: Design independent REST reference and unchanged-client conformance",
+      "url": "https://github.com/iXab3r/Vivarium/issues/35",
+      "milestone": "P0",
+      "parent": 12,
+      "state": "open"
+    },
+    {
+      "key": "rest_allocation",
+      "number": 36,
+      "title": "P0: Allocate REST variants to milestones and freeze the R0 profile",
+      "url": "https://github.com/iXab3r/Vivarium/issues/36",
+      "milestone": "P0",
+      "parent": 12,
+      "state": "open"
+    },
+    {
+      "key": "local_agent_lab",
+      "number": 37,
+      "title": "R0.1: Run and debug a real local server plus Agent",
+      "url": "https://github.com/iXab3r/Vivarium/issues/37",
+      "milestone": "R0",
+      "parent": 3,
+      "state": "open"
+    },
+    {
+      "key": "local_rest_smoke",
+      "number": 38,
+      "title": "R0.2: Prove the first unchanged-CLI build on the local lab",
+      "url": "https://github.com/iXab3r/Vivarium/issues/38",
+      "milestone": "R0",
+      "parent": 3,
+      "state": "open"
     }
   ],
   "milestones": [
     {
-      "title": "P0: Agree replacement contracts and acceptance",
+      "title": "P0: REST-first contracts and replacement plan",
       "key": "P0",
       "number": 1,
       "url": "https://github.com/iXab3r/Vivarium/milestone/1"
@@ -281,7 +344,7 @@
     {
       "key": "R0",
       "url": "https://github.com/iXab3r/Vivarium/milestone/2",
-      "title": "R0: Run and debug one isolated Chiral Host",
+      "title": "R0: Local server + Agent and first compatible run",
       "number": 2
     },
     {
@@ -293,7 +356,7 @@
     {
       "key": "R2",
       "url": "https://github.com/iXab3r/Vivarium/milestone/4",
-      "title": "R2: Run a source-based C# Compile",
+      "title": "R2: Author C# configurations and run source Compile",
       "number": 4
     },
     {
@@ -311,7 +374,7 @@
     {
       "key": "R5",
       "url": "https://github.com/iXab3r/Vivarium/milestone/7",
-      "title": "R5: Prove unchanged TeamCity clients",
+      "title": "R5: Close cumulative unchanged-client conformance",
       "number": 7
     },
     {

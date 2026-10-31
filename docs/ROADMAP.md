@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D35) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D36) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
@@ -12,6 +12,13 @@ Owner clarifications: D34 accepts Depot authentication/superuser and TeamCity au
 D35 accepts Chiral configuration ownership, PostgreSQL business state and Depot's actual
 TypeScript/Vite Workbench UI. RF-10 permits each verified milestone to merge separately into main.
 These target decisions are recorded; their runtime replacement is not implemented.
+
+D36 brings resource/identity/state/mutation/protocol REST decomposition into P0 before implementation.
+The first new-stack local server + real Agent lab is R0.1; unchanged CLI smoke execution is R0.2,
+with restart/cleanup proof at R0 exit. R2 adds full source-based C# Compile; R5 is cumulative
+conformance. See the [concrete local gates](../.workspace/workstreams/coherent-refactor/local-lab.md)
+and [early REST breakdown](../.workspace/workstreams/coherent-refactor/rest-breakdown.md).
+UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.
 
 ## Immediate priority — replace TeamCity without functional loss (D32)
 

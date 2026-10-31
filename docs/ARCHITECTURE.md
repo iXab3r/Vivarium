@@ -1073,7 +1073,7 @@ limits. Adoption of the framework does not prove wire compatibility. Required ev
 unchanged-token/cookie withdrawal, nested and project inheritance, editable roles, project-limited
 delegation, and unchanged CLI role/group/user mutations. See the focused Identity/authorization designs.
 
-### D35. Use Depot's node/configuration boundaries and Workbench UI composition
+### D35. Use Depot's node/configuration boundaries and shared UI technology
 
 Accepted owner direction, 2026-10-31; implementation is pending. One initial Host composes logical
 Chiral resource owners with explicit schemas, dependencies/readiness and configuration lifecycle.
@@ -1085,20 +1085,52 @@ settings service. Large log/artifact bytes use EyeAuras.Storage where its contra
 owns references, manifests, authorization, retention and import lineage. Framework keys/settings need
 private durable storage and backup; “PostgreSQL for state” does not mean binary artifacts inside SQL.
 
-Follow Depot's actual production UI: TypeScript/Vite plus the pinned `@eyeauras/workbench` package
+Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
 adapters, a frontend runtime server, and an extra application framework are not required. Workbench
 provides the shell, rail, tree/list, split inspector and controls; native Identity pages keep stock
 handlers and share product styling/navigation. Server-supplied account/antiforgery bootstrap contains
 no bearer secret. UI queries/mutations use same-origin authorized REST, with server-side current rights.
 
-Adapt Depot's composition, not its repository/package model: Vivarium needs Projects/Builds,
+Owner clarification: reuse Depot's technologies/integration, not a forced UI redesign. Preserve useful
+TeamCity/current-Vivarium navigation, page composition and workflows; use Workbench controls where
+appropriate rather than imposing an outline/inspector split everywhere. Vivarium needs Projects/Builds,
 Queue, Agents, Nodes and Access, with build-local logs/tests/artifacts/dependencies and stable deep
 links. Nodes reuse schema forms, masked secret replacement, stale-edit handling and saved/active
 state. Access exposes TeamCity roles/groups/project assignments, not package Read/Write/Delete grants.
 Remove Blazor surfaces at their proven replacement milestone; do not build screens twice indefinitely.
 Real ordinary-user UI journeys run through EyeAuras.Automation/Reqnroll/Playwright against actual
 Host/PG/storage, with independently selectable cases and guarded credential diagnostics.
+
+### D36. Design the shared model from REST contracts and deliver a local server/Agent loop early
+
+Accepted owner priority, 2026-10-31; implementation is pending. TeamCity compatibility is a structural
+input before domain implementation, not a late wrapper around an incompatible completed model.
+P0 decomposes real client requests, reference metadata, resource identities/relations, state machines,
+mutations, locator/fields/media/paging/error rules, data authority and conformance fixtures. The
+TeamCity Project/BuildType/Build/Agent/VCS/Test resource graph and command semantics guide the shared
+application model; wire DTOs and endpoint handlers do not become EF entities or a second authority.
+Native REST, compatible REST and UI remain projections over the same services/state.
+
+Freeze the structurally significant decisions before R0: canonical Build and composite/matrix mapping,
+queue/history identity continuity, source/native/imported ID allocation, role/project scope, immutable
+settings/source revisions, and C# fields writable through configuration API mutations. Assign every
+discovered operation/variant to an owner, authority and milestone; unresolved compatibility is visible
+and cannot be counted as supported. Full source-history transfer is not a prerequisite to a local lab.
+Detailed late-domain variants are refined before their own domain milestone; R5 is cumulative
+conformance, not the first REST implementation or initial contract discovery.
+
+R0 must include a reproducible local Host plus real separate Agent process with actual PostgreSQL,
+Storage, local TLS, technical installation authentication and ordinary enrollment/authorization.
+R0.1 proves prepare/start/status/attach/reset/stop and Agent ready state; R0.2 proves a seeded Git-owned
+smoke configuration through unchanged teamcity-cli: queue, inspect, run/watch, cancel and artifact
+download, plus bounded restart/reconnect evidence. Use the eventual catalog/queue/Agent/Storage
+services and a thin process-runner subset, not a disposable lab-only engine. R1 completes ordinary
+OIDC and TeamCity scoped access; R2 adds full C# catalog authoring/evaluation and exact source checkout.
+
+See [REST domain contract](design/teamcity-rest-domain.md), the workstream REST breakdown and local
+lab gates. Current legacy session tests/manual process entry points are prior evidence, not proof
+that the new PG/Chiral local environment has already been delivered.
 
 ## 5. Protocol sketch
 

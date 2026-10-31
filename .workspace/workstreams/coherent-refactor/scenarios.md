@@ -1,7 +1,7 @@
 # Acceptance scenario catalogue — draft v1
 
 Write executable English `.feature` files as each approved mechanism is implemented; this table is
-the planning catalogue, **not 35 implemented/passing scenarios**. Each case is independently selected
+the planning catalogue, **not 37 implemented/passing scenarios**. Each case is independently selected
 and owns a fresh fixture where isolation is needed. Scenario outlines cover named variants, not a
 Cartesian product of every OS, role, runner and fault. `requirement-routing.tsv` assigns every existing
 TC requirement to its primary milestone and candidate scenarios; that is planning coverage only.
@@ -13,7 +13,7 @@ TC requirement to its primary milestone and candidate scenarios; that is plannin
 | S03 | R1 | An admin removes access or disables a user; the unchanged browser cookie and unchanged bearer token immediately lose the affected rights | Actual framework credentials + real resource policies |
 | S04 | R1 | A user issues/lists/revokes a token; metadata never exposes it again; logout and token revocation have explicitly different effects | UI + unchanged client token; CSRF/return-origin negatives |
 | S05 | R1/R2 | Viewer cannot enqueue/edit; project developer cannot administer fleet or sibling project; service account cannot exceed its grants | Shared native/compatible policy probes + one UI negative |
-| S06 | R0 | Operator prepares/starts/attaches/runs/resets/stops one owned local stack with PG/storage and sees required Workbench nodes | Same fixture via debug and Automation; actual cleanup |
+| S06 | R0 | Operator prepares/starts/attaches/runs/resets/stops one owned local Host + real separate Agent with PG/storage and sees required nodes/status | Same fixture via debug and Automation; actual process identity and cleanup |
 | S07 | R0 | Two settings editors race; stale CAS fails, secrets remain masked, valid Save applies on restart and keys/settings survive | Workbench UI + real restart/storage |
 | S08 | R2 | A pinned trusted C# catalog revision yields an immutable effective plan; invalid, timed-out or oversized evaluation keeps last good active state | Pure validation plus real separate evaluator |
 | S09 | R2 | Operator changes a supported parameter/requirement through UI or compatible REST; Git diff/revision explains the effective result and concurrent change conflicts | Actual Git + shared mutations, approved RF-05 representation |
@@ -43,6 +43,8 @@ TC requirement to its primary milestone and candidate scenarios; that is plannin
 | S33 | R6 | TeamCity/Vivarium coexist on isolated workspaces and one trigger/publisher owner; final delta/switch/family rollback have an explicit write boundary | Real local family/client rehearsal + operator runbook |
 | S34 | R6 | Candidate runs all accepted families and UI journeys after legacy stores/routes are removed; no hidden dependency on TeamCity survives | Full declared suite + offline source-independent historical reads |
 | S35 | R1/R5 | An administrator edits a built-in/custom role and its includes, assigns scoped roles through nested groups, and delegates only within their project; unchanged cookie/token reflects the resulting inherited rights | Cheap inheritance tests + real PG policies + actual Access UI and unchanged TeamCity CLI; shared-pool and denied sibling mutations |
+| S36 | R0.1 | Operator starts the prepared local Host/PG/Storage and a real Agent, enrolls/authorizes it normally, observes heartbeat and stable identity, attaches debugger and stops/resets only owned resources | Actual processes/PG/TLS/framework technical identity; no fake Agent or test-only management bypass |
+| S37 | R0.2/R0.3 | Unchanged CLI queues/watches/cancels seeded LocalSmoke; native/compatible views share the run, raw output/artifact bytes are inspectable and bounded restart/reconnect preserves truthful ownership/outcome | Real CLI profile, Host/PG/Storage/Agent and executable; byte hashes plus restart and cleanup receipts |
 
 Example shape (pending decisions intentionally do not choose the superuser model):
 

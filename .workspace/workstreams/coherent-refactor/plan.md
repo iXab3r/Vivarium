@@ -1,4 +1,4 @@
-# Coherent Vivarium refactor — plan v1.2
+# Coherent Vivarium refactor — plan v1.3
 
 Status: **draft for owner iteration, not an implementation authorization or accepted ADR**.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
@@ -6,6 +6,8 @@ Test Steward and Docs. Existing accepted decisions remain authoritative until ex
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately
 into main. D34/D35 now accept Depot authentication/superuser, TeamCity RBAC 1:1 in PG,
 Chiral-owned resource settings, and Depot's TypeScript/Vite Workbench UI. Remaining choices are draft.
+The owner clarified that UI technology is shared with Depot while current Vivarium/TeamCity UX is
+preserved. D36 moves deep REST decomposition before implementation and local Host+Agent proof into R0.
 
 ## Outcome and boundaries
 
@@ -102,18 +104,18 @@ ControlPlane and SQLite only after named consumers/data have a verified replacem
 | Mechanism | Required specification/output | Delivery owner |
 |---|---|---|
 | Host readiness/settings | Node IDs, dependencies, init/migrate/run order, masked schema/CAS, restart application, persisted key paths | R0 |
-| Login/current authority | OIDC issuer+sub mapping, normal Identity login/logout, superuser lifecycle, current account/grants, token issuance/revoke, CSRF | P0 decisions, R1 |
+| Login/current authority | OIDC issuer+sub mapping, normal Identity login/logout, superuser lifecycle, current account/grants, token issuance/revoke, CSRF | P0 contracts; minimal final technical identity R0, full R1 |
 | C# catalog | Trusted settings revision vs source revision, pinned evaluator inputs, bounded separate process, immutable semantic plan, inheritance/provenance, last-good activation | R2 |
 | Editing desired configuration | Exact REST/UI-editable C# representation, generated/user-owned boundaries, Git CAS/review/activation and unsupported expression behavior | P0 decision, R2 |
 | VCS/workspaces | Exact checkout/submodules/rules, branch selection, private credentials, caches and OS isolation | R2 |
-| Scheduling | Status transition table, atomic dequeue/claim, session/assignment fences, restart/re-adoption, cancellation acknowledgment and ambiguous-capacity quarantine | R2 |
+| Scheduling | Status transition table, atomic dequeue/claim, session/assignment fences, restart/re-adoption, cancellation acknowledgment and ambiguous-capacity quarantine | P0 model; minimal real loop R0, full catalogue-aware R2 |
 | Agent policy | Reported vs custom facts, requirement operators, compatible/incompatible reasons, pools/auth/enabled/connected axes, maintenance vs stop | R2/R3 |
 | Build graphs | Dependency selection/reuse key, exact revisions/artifacts, failure propagation, same-Agent policy, locks and release ordering | R3 |
 | Runners | Process/C#/.NET/script/container mappings for observed jobs, environment/parameter/service-message semantics, termination and exit classification | R2/R3 |
 | Triggers | VCS/finish/schedule state, deduplication, branch rules/timezones/quiet period, restart and coexistence ownership | R3 |
 | Logs/results | Bounded durable segments and cursor/gap contract, redaction, service-message parser, TRX/JUnit normalization, test identities/occurrences/history | R2 basics, R4 completion |
 | Artifacts/storage | Immutable manifest/hash/streaming, dependency mapping, retention/pins/GC, interrupted upload, package feed disposition via Depot | R2 basics, R3/R4 completion |
-| Native/compatible API | Auth, IDs, locators/fields, JSON/XML/text, deterministic paging, files, mutations/idempotency, errors and events | R1 onward, R5 conformance |
+| Native/compatible API | Auth, IDs, locators/fields, JSON/XML/text, deterministic paging, files, mutations/idempotency, errors and events | Deep P0 breakdown, first real subset R0; each domain slice; cumulative R5 |
 | Import | Authoritative bounded inventories, stable source IDs, unit-of-conflict/dependency rules, resume/checkpoints, history vs desired C# activation, final cumulative delta | P0 sizing, R6 |
 | Recovery/delivery | Owned fixtures, repeatable backup/restore including keys/settings/blobs, canary/rollback/write boundary, supported OS evidence | R0 contour, R6 acceptance |
 
@@ -124,22 +126,27 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 
 | ID | Observable increment | Exit evidence |
 |---|---|---|
-| P0 | A reviewable and agreed replacement contract | Mechanism/decision ledger resolved; source disposition, scoped client census, history sizing and scenario/requirement routing; no implementation gaps disguised as decisions |
-| R0 | An operator can prepare, start, inspect, restart and reset an isolated Host | Pinned Chiral/Storage/Automation APIs; real PG and storage; Workbench nodes; debug attach and closed execution share fixtures; clean owned teardown |
+| P0 | REST-driven structural contracts agreed before implementation | Resource/ID/state/command model, protocol and C# mutation/authority proof reviewed; discovered variants classified by owner/milestone, source/data obligations explicit; no unknown structural mapping hidden behind a route count |
+| R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 actual PG/Storage/Host/Agent enrollment and debug lifecycle; R0.2 unchanged CLI enqueue/watch/cancel/artifact; R0.3 restart/reconnect/regressions/owned cleanup. Minimal final-framework technical identity and seeded Git configuration; no disposable lab engine |
 | R1 | An ordinary user can sign in and an administrator can grant/revoke current access | Approved superuser model; UI login/access/token journeys; same existing cookie and token reflect revocation; keys/session continuity across Host restart |
-| R2 | A user runs a source-based C# Compile on a real local Agent and inspects its result | Git/C# catalog, exact checkout, requirements/reasons, durable queue/fences/cancel, output/TRX-or-JUnit/artifact links, UI and native/compatible run path; PG restart/race evidence |
+| R2 | A user authors a full C# catalogue and runs a genuine source-based Compile | Extend R0 catalogue/execution with full C# evaluation/editing/inheritance, exact checkout, requirements/reasons and report/artifact provenance; same existing PG scheduler, Agent and compatible/native run services |
 | R3 | Existing build families can express and execute their complete chains | Parameters/inheritance, all observed runners/features, chain/artifact policies, counters/locks/triggers, paused jobs and publish gating; representative Windows/Linux workflows |
 | R4 | A developer diagnoses a failure and compares historical tests/logs/artifacts | Persistent logs/tail/search/download/gaps, TRX+JUnit identities/history/duration, problems/investigations/mutes/statistics, permissions and retention/GC; real UI workflows |
-| R5 | Existing TeamCity clients operate Vivarium without rewrites | Frozen method/path/variant inventory and executable conformance, files/auth/reads/writes and negative cases; no facade-only state/services; all selected clients proven |
+| R5 | Existing TeamCity clients pass cumulative cross-family conformance | Finish agreed remaining operations and all method/path/variant/client/negative/files checks built since P0/R0; this is not the first REST analysis or adapter implementation |
 | R6 | A local full migration rehearsal supports independent operation and final switch | All 97 dispositions and 120 requirements evidenced; full history+bytes/import replay+diff choices, coexistence ownership, final delta, encrypted restore, real family/OS tests; old implementation removed |
 
-Dependencies: P0 → R0 → R1 → R2 → R3 → R4 → R5 → R6 is the conservative acceptance order.
-Import inventory/sizing and REST census start in P0; storage/history identities and UI diagnostics start
-in R0/R2. Domain-compatible REST and scenarios grow with each domain milestone. R5 is the final
+Dependencies: P0 structural REST/representation gates → R0 → R1 → R2 → R3 → R4 → R5 → R6.
+P0 includes resource/ID/state/authority schemas, protocol fixtures, C# mutation proof and per-operation
+milestone allocation, not just counting routes. See [REST breakdown](rest-breakdown.md) and
+[local lab](local-lab.md). Full historical byte transfer and every late source-property value do not
+block local Host/Agent development; they retain explicit owners/gates before affected migration.
+Storage/history identities, UI diagnostics and the compatible execution profile start in R0.
+Domain-compatible REST and scenarios grow with each domain milestone. R5 is the final
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Published draft: **8 milestones, 8 parent issues and 22 native sub-issues**. Start at
+Published plan: **8 milestones, 8 milestone parent issues and 29 native sub-issues** (37 issues total).
+The REST breakdown #12 also parents five focused P0 tasks. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are
 [R0 #3](https://github.com/iXab3r/Vivarium/issues/3),
 [R1 #4](https://github.com/iXab3r/Vivarium/issues/4),
@@ -150,12 +157,35 @@ Published draft: **8 milestones, 8 parent issues and 22 native sub-issues**. Sta
 [R6 #9](https://github.com/iXab3r/Vivarium/issues/9).
 All issues remain open. `issues.json` records exact links and hierarchy.
 
+Early concrete tasks: [REST breakdown #12](https://github.com/iXab3r/Vivarium/issues/12),
+[resource/state model #32](https://github.com/iXab3r/Vivarium/issues/32),
+[protocol #33](https://github.com/iXab3r/Vivarium/issues/33),
+[mutation/C# proof #34](https://github.com/iXab3r/Vivarium/issues/34),
+[conformance design #35](https://github.com/iXab3r/Vivarium/issues/35),
+[variant/milestone allocation #36](https://github.com/iXab3r/Vivarium/issues/36),
+[local Host+Agent #37](https://github.com/iXab3r/Vivarium/issues/37) and
+[first unchanged-CLI run #38](https://github.com/iXab3r/Vivarium/issues/38).
+
 Each milestone has a parent issue and bounded child deliverables. GitHub mirrors this workstream;
 the [ledger](ledger.md), [phase state](phases.md) and [handover](handover.md) remain authoritative for
 evidence/status. Target counts are not coverage. Do not close implementation issues because this
 plan was written or code was committed: close after their own gate passes and their milestone has
 been accepted in main. Preserve verified evidence while that milestone remains integration-pending;
 completed earlier milestones do not wait for R6 to close their issues.
+
+### Earliest hands-on checkpoints
+
+R0.1 is the first usable new-stack local lab: real server + Agent, PG/Storage, normal enrollment and
+authorization, current-style UI and debugger attach. R0.2 adds unchanged teamcity-cli against a
+seeded real configuration: enqueue/watch/cancel/download; R0.3 proves bounded restart/reconnect
+and cleanup. These are concrete internal checkpoints, not runtime already delivered by the plan.
+The lab can be exercised on its milestone branch before all R0 acceptance is complete; merge still
+requires the declared regression/review gates and existing-feature disposition. R2 is the first full
+source-based C# Compile, not the first occasion on which a real Agent may run locally.
+
+The current legacy process entry points/protocol tests exist today; the exact SDK is missing locally
+and the new-stack reproducible lab is not delivered. Do not equate those facts with an end-user local
+deployment claim or invent calendar estimates before the preparation and port work are measured.
 
 ## Development and test contract proposed for this workstream
 
@@ -222,6 +252,7 @@ report that separately from replacement savings. A final “cleanup later” bac
 Superuser/authentication, TeamCity RBAC/PG authority and Depot UI composition are now accepted in
 D34/D35. Review remaining choices, especially C# editing, exact wire variants, storage integration and
 history conflict units; refine milestone scenarios and issue acceptance. Only after those choices
-are recorded as accepted ADR updates should the first executable R0 milestone branch begin.
+affecting the R0 structure are recorded as accepted contracts should the executable R0 branch begin;
+late-family capture/variant work keeps its own explicit gate and must not silently expand that prerequisite.
 The old [migration phases](../teamcity-migration/phases.md) are discovery scaffolding; this draft
 proposes a coordinated replacement sequence without yet overriding the accepted roadmap.

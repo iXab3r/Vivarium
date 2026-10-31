@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Planned**
 > Maintainer roles: Vivarium REST, TeamCity, Git/Versioning, User Roles, Results/Artifacts, Logs, Test Steward
-> Related architecture: [D24, D32-D33](../ARCHITECTURE.md)
+> Related architecture: [D24, D32-D36](../ARCHITECTURE.md)
 
 ## Goal and acceptance
 
@@ -22,6 +22,15 @@ server API. The installed CLI README reports 449 unique REST method/path pairs, 
 mutations. That is a source-reported discovery baseline, not Vivarium coverage, a complete TeamCity
 API count or proof that every payload variant was exercised live. Generate and reconcile the exact
 route/variant census before implementing or estimating the facade.
+
+D36 requires the [shared resource/state/command model](teamcity-rest-domain.md) and
+[early operation breakdown](../../.workspace/workstreams/coherent-refactor/rest-breakdown.md) before
+structural implementation. A reproducible initial census now extracts 456 synthetic fixture request
+rows from same-version reference source b158fe03eab3c31982a21b36c278f690f6b541d9, plus a separate hash
+of the installed runtime. It is neither full route reconciliation nor executed/live conformance;
+npm metadata lacks release gitHead and inline tests/full Swagger/other clients remain inputs.
+R0 delivers the first real compatible local run; R1–R4 grow matching endpoints with their domains.
+R5 is cumulative conformance and agreed remaining operations, not the first facade implementation.
 
 ## One application model, two HTTP projections
 

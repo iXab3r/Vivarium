@@ -1,0 +1,108 @@
+# REST-driven shared domain contract
+
+> Status: **Accepted direction — D36; detailed P0 contracts remain open**
+> Implementation: **TeamCity facade not implemented**
+> Owners: TeamCity, REST, Scheduling, Git, Persistence, Identity, Results/Logs, Test Steward
+
+## Purpose
+
+TeamCity wire compatibility constrains the resource model and command semantics from the beginning.
+Design shared services from those contracts, then expose native /api/v1 and compatible /app/rest
+projections. Do not first build an unrelated Vivarium model and discover its incompatibilities in R5.
+Do not mirror every wire DTO as a table or put business rules in HTTP handlers either.
+
+The [wire contract](teamcity-rest-compatibility.md) owns protocol acceptance. The
+[workstream breakdown](../../.workspace/workstreams/coherent-refactor/rest-breakdown.md) owns current
+discovery evidence, open mappings and milestone allocation; no source/fixture count is API coverage.
+
+## Resource identities and relations
+
+The shared model must represent the following observable concepts without facade-only shadow state:
+
+- Project hierarchy with stable external ID, parent/root identity and visibility/delegation boundaries.
+- BuildType/configuration versus reusable template, ordered steps and identified settings collections:
+  parameters, requirements, VCS entries, triggers, features and snapshot/artifact dependencies.
+- Declared/owned settings versus inherited/effective values; stable item identities and template links.
+- Build with immutable effective definition/settings revision, selected VCS revisions, runtime overrides,
+  Agent provenance, step runs, queue/running/terminal state and independent outcome/problem data.
+- Queue membership/admission/position/reason, cancellation/approval and history as views of execution,
+  not unrelated opaque objects whose IDs cannot be reconciled across queue/watch/cancel/history.
+- Build-chain/snapshot edges and artifact selection, composites/matrix membership and retry/reuse lineage.
+- Stable Agent identity, connection/authorized/enabled/activity axes, facts/custom parameters and pools.
+- VCS root configuration versus resolved VCS root instance, changes/revisions and checkout selection.
+- Test identity versus per-build occurrence, build problem identity versus occurrence, mute/investigation
+  scope, statistics and associations to exact retained runs.
+- Artifact/log/source references, path trees, metadata and streamed bytes; identity/roles/groups/scoped
+  assignments; audit and supported server operations.
+
+P0 explicitly resolves the current native MatrixBuild/child UUID model into compatible Build and
+composite identities. It must define what a one-cell run returns, which ID a client polls/cancels,
+and whether a composite parent is independently visible. Existing project/configuration strings are
+not sufficient persisted catalogue identities. Do not defer either mapping until imported history.
+
+## IDs, state and protocol facts that shape persistence
+
+Different IDs have different wire types. The installed CLI's enqueue parser accepts a positive safe
+integer JSON Build.id; some test IDs exceed JS integer precision and must remain exact strings.
+Project/configuration external IDs, numeric internal IDs, mutable build numbers and occurrence locators
+are distinct. Native and imported origins require collision-free persisted mappings and valid local
+hrefs, with compatible JSON representation per resource. Never apply a universal stringify-all rule.
+
+Queue/running/finished state is separate from SUCCESS/FAILURE/other outcome and cancellation/failure
+details. Native TEST/CRASH/INFRA taxonomy must project truthfully into those contracts, including
+failed-to-start, muted test failures and incomplete reports. Resource identity and terminal provenance
+remain stable after configuration rename/edit, reconnect, import and retention changes.
+
+Locators need parsed nested structure and resource-specific resolvers, not split-on-comma strings.
+The real client uses nested id dimensions and base64url-encoded branch value conditions. Fields
+projection, collection wrappers, counts/empty pages and numeric continuation affect query/projection
+contracts. Use shared bounded query primitives only where observed contracts require them; no generic
+OData/GraphQL engine or dynamically generated business model is needed.
+
+## Command and authority contract
+
+Classify each endpoint before implementing it:
+
+- Versioned desired build/fleet settings: validate/edit the approved C# representation, commit to Git,
+  activate the exact revision and project to PG. Preserve owned versus inherited/reset semantics.
+- Identity/roles/groups/grants: authorized/audited live PG transactions under D34.
+- Queue/run/cancel/reorder/approve/Agent runtime actions/triage: durable domain transactions and current
+  policy, with delivery/ack/fence behavior in their owning services.
+- Host/resource settings: Chiral schema/CAS/apply lifecycle under D35; no second settings authority.
+- Bytes: authenticated bounded Storage transfer with PG-owned references and retention/access checks.
+
+HTTP method alone does not determine authority, sensitivity or retry safety. Freeze absent/null/empty,
+single-field versus collection replacement, inherited override/reset, ordering, create/copy/move/delete,
+permission denial and read-after-write behavior per operation. TeamCity property bags identify real
+runner/feature settings; accepting arbitrary names is not implementation of their semantics.
+
+Git commit and PG activation are not one SQL transaction. Define operation identity, durable outcome,
+failure/retry observation and the exact success boundary. An endpoint expecting 200/201 cannot silently
+become native 202. Do not report an unapplied/rejected candidate as success. Existing clients need not
+send new mandatory headers, and repeated intentional run requests cannot be deduplicated by body hash.
+
+## C# authoring is a pre-implementation gate
+
+The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
+clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.
+P0 must prove the managed/user-owned representation, precedence and supported computed-field rules.
+All required mutable fields must have a real path to deterministic validated source changes; otherwise
+the affected compatibility remains an explicit blocker. Do not hide a DB/JSON override or introduce a
+general C# AST rewriter to claim 1:1 behavior.
+
+## Earliest implementation and verification
+
+R0 delivers the first thin compatible execution path together with the actual local Host/Agent lab.
+R1 supplies identity/access variants; R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
+R4 tests/logs/history/files; R5 cumulative client/variant conformance and remaining agreed operations.
+Provider, server-internal, licensing, Kotlin and plugin-specific calls need early explicit dispositions;
+no false successful license/cluster/JVM response or silent omission can close full compatibility.
+
+Use independently authored reference fixtures, actual unchanged CLI processes, real PG/Storage and
+normal credentials. Simulator faults exercise transport/delivery boundaries; they do not validate a
+second implementation against itself. Source API metadata, actual server observations, synthetic
+client fixtures and Vivarium execution evidence are four different evidence classes.
+
+P0 exit requires resource/identity/state/authority decisions and a reviewed endpoint/variant allocation,
+including the exact R0 smoke profile. It does not require downloading all historical artifact bytes.
+Every domain milestone refines and proves its wire cases before merge; R5 is not a late adapter project.

@@ -119,3 +119,8 @@ The role baseline was also read from the real source with teamcity-cli roles lis
 definitions, including RESTRICTEDBOT and TOOLS_INTEGRATION, with actual permission/included-role
 responses saved privately. Exact editable IDs/scopes/inheritance and both standard/custom definitions
 are now the D34 target. No TeamCity roles, users, memberships or permissions were changed.
+
+Owner UI clarification: the shared technology/integration does not require copying Depot's layout.
+Current Vivarium and TeamCity already provide the desired CI workflow baseline. Workbench controls,
+Host packaging, Identity integration and schema settings are reused while useful pages/navigation/
+tables/build tabs remain familiar. A forced outline/inspector redesign is not part of this migration.

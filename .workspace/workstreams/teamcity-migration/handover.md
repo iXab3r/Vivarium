@@ -56,6 +56,9 @@
   TeamCity role/permission/group/scope behavior 1:1 with live PG identity/RBAC, Chiral resource settings
   and Depot's actual TypeScript/Vite Workbench UI. Old Git-RBAC/claim/React targets are superseded;
   operational SQLite/password/Git-RBAC/Blazor source remains unchanged until verified replacement.
+- D36 subsequently brings REST resource/identity/state/mutation/protocol breakdown into P0 and a
+  real local Host+Agent lab/unchanged-CLI smoke into R0. Preserve current TeamCity/Vivarium UX while
+  sharing Depot UI technology. See the coordinated plan, rest-breakdown.md and local-lab.md.
 - Before every family cutover, recover exact live script/settings values through a supported safe
   export/source path and prove observed semantics; current CLI intentionally redacts many values.
 - Large chat diff explanation: fast-forward 0999792 -> 09dd40b brought 263 pre-existing files,
