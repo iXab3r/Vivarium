@@ -1,0 +1,182 @@
+{
+  "purpose": "Independent cold-start documentation usability exercise; not implementation, milestone acceptance or Security/Adversarial sign-off",
+  "baseline": "30013376c85e0b0ff5f8088054998d754e5240f4",
+  "agent": "/root/cold_start_plan",
+  "context": "fork_turns=none; repository and live GitHub tasks only; no conversation expectations supplied",
+  "raw_report": "artifacts/depot-refactor-study/cold-start-audit/agent-plan-3001337.md (ignored local artifact, preserved unchanged by the agent)",
+  "core_plan": "Recovered executable-first P0, subsystem-led implementation, honest evidence accounting, focused verification and final zero-debt milestone review",
+  "comparison": [
+    {
+      "id": "E01",
+      "expectation": "Implement coherent subsystem lifecycles and integrations; REST constraints/tests are linked evidence, not route-by-route code units.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Section 2 groups work by complete subsystem tasks and attaches REST children."
+    },
+    {
+      "id": "E02",
+      "expectation": "Begin P0 with verified reference cases, minimal test composition and genuine current-product RED; do not wait for new PG/Chiral Host+Agent.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "First-session steps and P0 table start #35 on the current product before PG/Chiral replacement."
+    },
+    {
+      "id": "E03",
+      "expectation": "No guessed oracle: pinned source/client profile and raw HTTP/effects evidence; version-mismatched docs/source and synthetic fixtures have explicit limits.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Reference profile/source/client limits are explicit; unknown facts become evidence blockers."
+    },
+    {
+      "id": "E04",
+      "expectation": "Full ledger preserved; separate discovery, normalized variants and runtime evidence; one primary owner/collaborators and subsystem/slice/milestone/global rollups, unknown denominator stays unknown.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Section 4 preserves distinct discovery/case units, one owner, joins and unknown global denominator."
+    },
+    {
+      "id": "E05",
+      "expectation": "Depot Identity/OpenIddict/OIDC/installation user and TeamCity editable roles/groups/scopes 1:1, not legacy auth, Git RBAC or immutable role floors.",
+      "result": "direction-recovered-not-exhaustively-restated",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "R1 follows #16/#17 Identity, current rights, same-cookie/token revocation and accepted framework choices.",
+      "coverage_limit": "The plan does not enumerate every role, authority, layout or node-count invariant; this exercise does not validate those details independently."
+    },
+    {
+      "id": "E06",
+      "expectation": "In-process Chiral, PG structured business/runtime data, Git desired settings, Storage bytes/PG references; Depot UI technologies without mandatory layout redesign.",
+      "result": "direction-recovered-not-exhaustively-restated",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "R0 and decision section reuse the accepted Chiral/PG/Storage/Identity/TypeScript/Workbench stack.",
+      "coverage_limit": "The plan does not enumerate every role, authority, layout or node-count invariant; this exercise does not validate those details independently."
+    },
+    {
+      "id": "E07",
+      "expectation": "Import retained history/tests/logs/artifacts into Vivarium; explicit repeatable one-way diff with simple whole-entity choices and coexistence, not bidirectional sync.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "R6 plan retains full historical graph/bytes, explicit diff/resume/coexistence and fresh restore."
+    },
+    {
+      "id": "E08",
+      "expectation": "Cheap deterministic tests use actual owning code and controlled external actors; WireMock replay is not product proof or a second TC/Vivarium.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "First-session composition and evidence section explicitly reject replay-as-product and a general simulator."
+    },
+    {
+      "id": "E09",
+      "expectation": "Focused TDD; broader checks batched for meaningful checkpoints; no full suite or formal reviews per task/status, preserve required root checks and valid evidence.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Focused cases, coherent checkpoint/root checks, valid reused evidence and no status-triggered suites are explicit."
+    },
+    {
+      "id": "E10",
+      "expectation": "Final milestone independent aggregate correctness/simplicity plus explicit Security/Adversarial review at exact candidate, not every-PR review.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Final exact-revision independent aggregate and explicit Security/Adversarial verdicts are explicit."
+    },
+    {
+      "id": "E11",
+      "expectation": "Fix all actionable milestone findings/debts before next milestone implementation; each verified milestone may separately merge main; no wait for R6 and no scope relabel waiver.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Same-milestone fixes, zero debt, verified main delivery and separate milestone merges precede next implementation."
+    },
+    {
+      "id": "E12",
+      "expectation": "Preserve current proven behavior while replacing code; Bootstrap changes need actual design discussion; no broad rewrite/delete based on age/line count.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Legacy paths/tests/invariants are classified before deletion; Bootstrap changes require explicit discussion."
+    },
+    {
+      "id": "E13",
+      "expectation": "Resolve ordinary implementation/reference questions from existing authorization/evidence; distinguish actual product-policy changes and production/merge/cutover authority from routine local choices.",
+      "result": "direction-recovered-escalation-wording-clarified",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Routine choices are autonomous; the material-decision paragraph could over-escalate internal alternatives, clarified by CSA-09."
+    },
+    {
+      "id": "E14",
+      "expectation": "Logical subsystem list does not imply 16 nodes/projects; owner issue milestone cannot defer already required earlier-slice cases.",
+      "result": "direction-recovered-not-exhaustively-restated",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Required early integration variants are not delayed to later full-owner tasks; related owners do not force all collaborators first.",
+      "coverage_limit": "The plan does not enumerate every role, authority, layout or node-count invariant; this exercise does not validate those details independently."
+    },
+    {
+      "id": "E15",
+      "expectation": "Current state remains UNVERIFIED, not accepted: ledger validator/result binding, new tests and genuine RED are still future work; planning graph closure is not runtime proof.",
+      "result": "recovered",
+      "assessment": "Parent comparison with the independent report; not independent validation of these expectations or runtime behavior",
+      "observed_in_agent_plan": "Existing NUnit versus future bindings, unverified ledger and no runtime acceptance are explicit."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CSA-01",
+      "classification": "stale-instruction",
+      "severity": "high",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-02",
+      "classification": "authority-ambiguity",
+      "severity": "medium",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-03",
+      "classification": "routing-drift",
+      "severity": "medium",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-04",
+      "classification": "broken-reference",
+      "severity": "low",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-05",
+      "classification": "architecture-ambiguity",
+      "severity": "high",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-06",
+      "classification": "gate-ambiguity",
+      "severity": "medium",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-07",
+      "classification": "implicit-owner",
+      "severity": "medium",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-08",
+      "classification": "target-versus-current-wiring",
+      "severity": "low",
+      "status": "corrected-not-runtime-acceptance"
+    },
+    {
+      "id": "CSA-09",
+      "classification": "decision-escalation-ambiguity",
+      "severity": "medium",
+      "status": "corrected-not-runtime-acceptance"
+    }
+  ],
+  "limits": [
+    "One cold-start planning path, not exhaustive documentation coverage.",
+    "The corrected documents have not been subjected to a second independent cold-start run.",
+    "Runtime corpus, validator/result binding, exact reference cases and unresolved material P0 contracts are still future work.",
+    "No product tests/builds, security probes, code implementation, merge/cutover or milestone closure were performed."
+  ],
+  "graph_changed": false,
+  "raw_report_sha256": "259b6679ecafeeac1696c663c03e62061881ea8daba473b920e2f46976be537f"
+}

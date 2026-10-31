@@ -10,8 +10,13 @@ business AC with separate model/wire/component evidence and roles.
 D38 accepts the first executable P0 REST corpus/replay/real-RED slice and a minimal deterministic
 production-code composition/cost proof before bulk expansion. That slice is ready for scoped
 execution; unresolved reference facts are not new owner policy choices or a whole-API prose barrier.
-Resolve each by recording the owner decision, updating the affected numbered decisions/designs in
-the same change, and assigning positive/negative scenarios. Do not implement both alternatives.
+Resolve each in its owning task, record the concrete contract/implementation decision, update the
+affected numbered decisions/designs in the same change and assign positive/negative scenarios.
+Do not implement both alternatives. An open row is not automatically a request for user approval:
+within accepted observable contracts, choose routine implementation details from evidence and the
+current assignment. Ask the owner only when a material product/scope/contract decision remains
+unresolved and cannot be inferred, or actual action authority is missing. Present concrete evidence
+and alternatives; reference facts are research tasks, not new policy choices.
 
 | ID | Decision and recommendation | Alternative / consequence | Affected contract |
 |---|---|---|---|

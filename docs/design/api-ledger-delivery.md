@@ -45,7 +45,8 @@ The delivered ledger must mechanically enforce:
   source/profile and applicability. Source operation IDs survive splits; duplicates/orphans fail.
 - One primary subsystem/variant owner and its implementation/REST tasks per milestone slice, with
   collaborators and cross-slice links; no duplicate counting. Global/subsystem/milestone rollups agree.
-  No unallocated required item at P0 exit; unknown source behavior remains visible and blocking.
+  No unallocated required item at P0 exit; unknown source behavior remains visible and blocks its
+  affected contract/acceptance gate. Use the [P0 gate distinctions](teamcity-rest-test-first.md#which-gaps-block-which-work), not an automatic stop of independent sound cohorts.
 - Independently frozen scope per slice and cumulative delivered scope. Scope changes have explicit
   reason/history; a failing required case cannot move to a later milestone or disappear to pass.
 - Case-to-test binding and ordinary raw result provenance: candidate/base, fixture/reference/client

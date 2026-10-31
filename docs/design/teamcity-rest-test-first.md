@@ -271,6 +271,21 @@ carryover. P0 baseline acceptance is not product API-complete.
 
 ## First executable checkpoints inside P0
 
+### Which gaps block which work
+
+Keep these gates distinct; a visible blocker is not automatically a whole-project stop:
+
+| Gate | Required before proceeding | Other unknowns |
+|---|---|---|
+| First verified cohort | Independent expectations and real readiness/bindings for that cohort, with honest control/product results | Other reference/product gaps remain visible; do not wait for whole-API prose or the replacement stack |
+| P0 exit / R0 structural start | Executable P0 baseline/ledger controls and existing P0 reconciliation/allocation gates; canonical R0 resource/ID/state/authority/mutation/protocol contracts resolved | Explicit later-domain reference gaps retain owners/due gates and block their affected claims; they cannot conceal unfinished P0 census gates or an R0 structural dependency |
+| Owning subsystem acceptance | Frozen due scope, real required GREEN and current prior-base evidence, no required reference/binding/product/harness/stale blockers or milestone debt | Planned later functionality remains separately allocated; no scope relabel or automatic waiver |
+
+When a gap may affect shared identity/schema/state/authority or the R0 journey, establish that
+dependency before treating it as later-domain detail. This clarification does not reduce the P0
+exit scope or permit a missing required contract to pass; it prevents unrelated late unknowns from
+blocking the first sound executable cases. P0 acceptance still does not mean product API-complete.
+
 | Checkpoint | Concrete output and exit evidence |
 |---|---|
 | P0.REST.1 | Freeze a broad, cross-family, independently sourced case corpus and reviewed applicability ledger; stable case IDs/provenance, exact first positive/negative expectations, missing-reference entries explicit |

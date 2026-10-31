@@ -17,6 +17,11 @@ storage claims require those real boundaries. Each milestone runs affected check
 cumulative implemented TeamCity base suite with relevant extension-neutrality checks. Keep long
 correctness, ordinary feedback and cost diagnostics distinct, with explicit commands and gaps.
 
+Current wiring: `Vivarium.Tests` uses NUnit/Test SDK. Reusing Automation/Reqnroll describes the
+pinned external consumer integration to be delivered through #15/#40, not existing executable
+Vivarium Gherkin bindings. P0 #35 starts on the current NUnit stack; specified features remain
+unbound until their actual integration and evidence exist.
+
 ## API ledger, review and verification cadence (D39)
 
 Follow [task-backed API delivery](design/api-ledger-delivery.md). Under D40, implement finished

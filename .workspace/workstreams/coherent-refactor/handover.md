@@ -76,6 +76,14 @@
   task graph; api-blocks.tsv is milestone aggregation. Proto has no exclusive top-level resource;
   native/non-REST requirements still apply. Classification is planning ownership, not verified
   reference semantics, frozen allocation or API acceptance. No product/tests/reviews were run.
+- Cold-start documentation exercise: /root/cold_start_plan independently reconstructed a start-to-
+  delivery plan from baseline 3001337 with fork_turns=none. Core order matched: executable-first
+  P0, coherent subsystems, honest ledgers, focused tests and final zero-debt milestone/security
+  review. Nine wording/routing/gate findings were corrected; cold-start-audit.tsv/json record the
+  parent comparison and limits. Original report is ignored/local at
+  artifacts/depot-refactor-study/cold-start-audit/agent-plan-3001337.md, SHA256
+  259b6679ecafeeac1696c663c03e62061881ea8daba473b920e2f46976be537f.
+  No product tests/implementation, new authorization, milestone sign-off or second blind recheck.
 - Next: execute #35's verified cohorts immediately, with #12/#32–#34/#36/#39 supplying the affected
   model/protocol/mutation/reference evidence alongside tests; see plan.md's immediate execution order.
   Do not require whole-API prose completion before the first sound test cohort. #40 grows

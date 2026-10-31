@@ -29,8 +29,9 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-authorized = "Read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
-not_in_this_task = "Product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
+planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
+planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
+interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
 delivery_model = "RF-10 accepted by owner on 2026-10-31: each verified milestone may merge separately into main; its issues close after its own main acceptance. Replacement cleanup belongs to the replacing milestone; production cutover is separate."
 
 [status_authority]

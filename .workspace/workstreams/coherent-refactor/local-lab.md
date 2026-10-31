@@ -75,6 +75,11 @@ run IDs/state and raw output. No real publisher/trigger or production credential
 
 ## R0.3 proof and replacement discipline
 
+Task ownership: #14 owns the Host/Agent recovery integration; #15 supplies owned fixtures, #38 the
+unchanged-client journey and #40 the canonical bindings. #44 explicitly verifies R0.3 REST/native
+consistency and restart/cleanup evidence. R0.3 is an existing R0 exit obligation, not an unowned
+future milestone or a requirement to create another runner/epic.
+
 Focused real PG/protocol tests cover concurrent admission, queue wait, exact ownership/session fences,
 cancel intent and duplicate/stale result rejection. A small actual process journey covers disconnect/
 reconnect and Host restart while work is owned; it must preserve a truthful terminal outcome and avoid
