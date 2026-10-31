@@ -10,6 +10,12 @@ This document is the focused design for centralized TeamCity-style build/test re
 If implementation requires a contradictory choice, the architecture decision must be updated in the
 same change before code lands.
 
+D32's [behavioral parity contract](teamcity-parity.md#9-tests-and-individual-test-history) makes
+individual test history, durations, details/attachments, first/new/fixed failures, triage and retained
+imported timelines required migration surfaces. JUnit for the current nextest/Node/Vitest/Playwright
+producers is required alongside .NET/TRX. The existing TRX-only implementation does not close those
+gates. PostgreSQL is the new business-persistence target; SQLite passages describe current foundations.
+
 The goal is a durable chain of evidence:
 
 ```text

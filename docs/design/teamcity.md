@@ -7,6 +7,16 @@
 
 Numbered architecture decisions remain authoritative.
 
+## D32 parity refinement
+
+[TeamCity behavioral parity](teamcity-parity.md) is the required build-product acceptance contract,
+including human diagnostic workflows and historical import/diff-import. D32 adopts C# Git definitions,
+in-process Chiral composition and PostgreSQL as the new target; the SQLite/YAML sections below retain
+the implemented foundation and earlier design detail until their explicit migration. New catalog
+authoring must not create a competing YAML authority. Reusable catalog queueing supports visible
+waiting for compatible Agents even when none are currently known; the current payload-matrix
+fail-fast rule remains a named transitional API behavior.
+
 ## Purpose
 
 Vivarium uses the proven TeamCity work model for reusable automation that can run on heterogeneous

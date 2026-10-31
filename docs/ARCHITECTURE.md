@@ -3,6 +3,9 @@
 > This document holds the *shape* of the system; [`AGENTS.md`](../AGENTS.md) holds the *rules* for working on it.
 > Status: **Phase 1 implementation** — decisions describe the target shape; the roadmap records which
 > slices are running. When a decision changes, this file changes in the same commit.
+> D32 adopts TeamCity behavioral parity as the immediate build-product goal, with C# definitions,
+> in-process Chiral composition and PostgreSQL as the new target. SQLite/YAML remain implemented
+> transitional components; the persistence and authoring migration is not yet implemented.
 
 ## 1. Problem and goals
 
@@ -13,19 +16,23 @@ start from pristine versioned VM state; enrolled physical machines remain first-
 
 Goals, in priority order:
 
-1. **Reproducible machine state.** An image-backed scenario is a versioned, sealed snapshot; a
+1. **Replace the owner's TeamCity without functional loss.** Preserve configuration, execution,
+   dependency, Agent compatibility, log, test-history, artifact, publication and operator workflows
+   on Vivarium's C#/Chiral/PostgreSQL foundation (D32).
+2. **Reproducible machine state.** An image-backed scenario is a versioned, sealed snapshot; a
    pristine build always starts from it. Physical scenarios trade reproducibility for realness —
    deliberately (D16).
-2. **Central control.** One controller with REST and a web panel: projects, builds, queue, hosts,
+3. **Central control.** One controller with REST and a web panel: projects, builds, queue, hosts,
    operations, image registry, and results. Monitoring a farm by hand does not scale.
-3. **Payload-agnostic builds.** NUnit/.NET is the default test vehicle, but the runner contract must fit anything — Rust test binaries, plain scripts, one-off commands.
-4. **Cheap scenario authoring.** Adding "Win10 19044 + product X v1.2" is a small recipe diff plus one build command, not an afternoon of clicking.
+4. **Payload-agnostic builds.** NUnit/.NET is the default test vehicle, but the runner contract must fit anything — Rust test binaries, plain scripts, one-off commands.
+5. **Cheap scenario authoring.** Adding "Win10 19044 + product X v1.2" is a small recipe diff plus one build command, not an afternoon of clicking.
 
 Non-goals:
 
 - Not a hosted SCM, code-review, or general CD suite. Vivarium's TeamCity mode is the execution farm:
   external CI may call it, but it can also build, test, and report on its own configurations.
-- Not container-based. Real OS installs are the point: patch levels, drivers, services, interactive desktop sessions, macOS.
+- Not restricted to containers. Real OS installs remain necessary for patch levels, drivers, services,
+  interactive desktop sessions and macOS; CI steps may also use the existing fleet's container wrappers.
 - Not a general infrastructure manager. AgentExplorer manages only enrolled agents and the explicitly
   advertised, policy-enabled host capabilities.
 
@@ -62,11 +69,15 @@ on one, as is.
 
 One controller process, thin drivers, deliberately dumb guests.
 
+D32's target co-hosts logical Chiral nodes in that process with PostgreSQL business persistence.
+The current controller still uses SQLite. Remote Agents retain the reverse gRPC/HTTP execution seam;
+co-hosted nodes do not turn every local call into a remote message.
+
 ```mermaid
 flowchart LR
     CLI["viv-cli / automation"] -- "REST /api/v1" --> C
     UI["React + EyeAuras Workbench"] -- "REST + SSE" --> C
-    C["Controller<br/>ASP.NET Core: REST + gRPC AgentHub + HTTP blobs + scheduler + Git projection + SQLite"]
+    C["Controller<br/>ASP.NET Core + in-process Chiral<br/>REST + AgentHub + blobs + scheduler + Git plans + PostgreSQL"]
     C -- "create pool VM / checkpoint / revert / destroy" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
     subgraph Clone ["Agent: pool VM or enrolled physical host"]
         B["Bootstrap (frozen, baked into image / installed once)"] --> A["Agent (pulled + auto-upgraded)"]
@@ -78,7 +89,8 @@ flowchart LR
 
 - **Controller** (`Vivarium.Controller`): Git reconciliation, REST management, build queue, AgentExplorer
   operations, image registry, scheduler, machine providers, agent rendezvous (gRPC), blob store, and
-  operational/result store (SQLite). One Kestrel host serves the API and built React assets.
+  operational/result store (PostgreSQL target; SQLite currently). One Kestrel host serves the API and
+  built React assets; Chiral composes logical resource owners in the same initial process (D32).
 - **Machine providers** (D15): supply Agents to the queue — a static pool of enrolled Agents (physical boxes, hand-managed VMs), hypervisor providers that maintain pools of pristine VMs per `ImageVersion` (host drivers live here), and later cloud providers for short-living instances.
 - **Host driver** (per hypervisor): `CreatePoolVm(imageVersion)`, `Start`, `Stop`, `TakeCheckpoint`, `RestoreCheckpoint`, `Destroy`, `GetConsoleEndpoint`. Nothing else — no guest file copy, no guest exec (see D1). In-process .NET implementations first; if third-party drivers ever appear, garm's external-executable provider contract is the sanctioned escape hatch.
 - **Bootstrap** (`Vivarium.Bootstrap`): the only thing baked into images. Frozen contract (§7).
@@ -148,7 +160,8 @@ the authority; REST/UI presentation and broader adapter support remain separate 
 
 - **Default payload — NUnit on .NET**, published **self-contained** per RID, executed as a plain exe
   producing TRX (Microsoft.Testing.Platform route; NUnitLite is the classic fallback). No SDK or runtime
-  is ever installed in guests — a "pristine customer machine" stays pristine.
+  is installed just to run these payloads in pristine test guests. CI build Agents may deliberately
+  advertise installed SDKs/toolchains; requirements select the appropriate environment (D32).
 - **Rust** plugs into the same pipe: `cargo nextest archive` + the static nextest binary shipped inside
   the payload, JUnit XML out.
 - Tests that drive an arbitrary SUT treat it as just another payload artifact. Phase 1 exports
@@ -533,6 +546,10 @@ snapshot in place of an `ImageVersion` (§6).
 
 ### D17. Repository build configurations are code
 
+**D32 refinement:** new catalog definitions use trusted Git-owned C# and a validated immutable plan.
+`vivarium.yaml` below describes the implemented transitional submission path, not a second authoring
+authority for new catalog definitions. The migration must name its compatibility/removal gate.
+
 `vivarium.yaml` lives next to the code it tests; `viv-cli run` submits it together with payload blobs
 (sha256-deduped upload). Automation-first means a repository-owned run definition versions with the
 product, GitHub-Actions-style, rather than living in hidden server-side state. The controller may also
@@ -701,6 +718,11 @@ the Build protocol they negotiated; they never receive AgentExplorer mutations o
 and provider-managed agents upgrade before readiness.
 
 ### D23. Git is the source of truth for mutable desired configuration
+
+**D32 resource-settings refinement:** Git remains authoritative for build definitions, fleet desired
+policy and current RBAC declarations. Private Host/resource settings, including database connections
+and their secret values, move through Chiral's managed settings and restart lifecycle. They are not
+duplicated in Git or a second product settings store. This target exception is not yet implemented.
 
 Every durable setting or property becomes effective from a validated Git revision: Projects and Build
 Configurations, fleet/pool policy, agent names/custom properties/enablement policy, RBAC assignments,
@@ -979,6 +1001,72 @@ provider or operator reconciliation. The detailed failure catalogue, implementat
 release evidence are maintained in
 [`docs/design/agent-lifecycle-recovery.md`](design/agent-lifecycle-recovery.md).
 
+### D32. TeamCity behavioral parity is the immediate build-product contract
+
+The owner intends to replace the existing TeamCity installation without losing its used configuration,
+execution, observation or operational behavior. The stable requirements and acceptance IDs are in
+[`design/teamcity-parity.md`](design/teamcity-parity.md). This includes build and individual test
+history, test details/durations/triage, Agent requirements with compatibility reasons, durable searchable
+live/historical logs, parameters, dependency graphs, artifact rules, triggers, publication and automation.
+Command execution or a translated definition alone does not close a migrated configuration.
+
+The new implementation target is ordinary C# authoring over pinned SDK/dependencies, one initial Host
+with logical in-process EyeAuras.Chiral nodes, and PostgreSQL business persistence. C# definitions are
+validated into immutable Git-derived execution plans. Basic private resource settings use Chiral's
+managed store/readiness/restart lifecycle; business queue/build/lease/result/history/audit state stays
+with Vivarium's PostgreSQL owner. Chiral InMemory messaging is neither durable business storage nor a
+replacement for workload idempotency. Remote Agents keep their authenticated execution/data plane and
+do not receive controller business-database credentials. This refines D17, D23, the SQLite target in
+§3/§6 and the serialized-SQLite implementation mechanics of D27 without weakening their durability,
+authorization, audit, immutable-provenance or Git build-definition guarantees. SQLite/YAML remain
+current implementation until explicitly migrated; fleet/RBAC authority is not silently relocated.
+
+Reusable CI configurations may wait in the queue when no currently known Agent satisfies requirements,
+with visible reasons and bounded queue policy. D14's existing fail-fast, all-or-nothing payload-matrix
+submission remains a transitional behavior; it must not prevent TeamCity-style catalog queueing.
+Pristine payload guests and SDK-equipped CI Agents are both supported machine roles. Typed artifact
+archive/mapping operations and declared service-message metadata/report imports must cover the existing
+drivers under their owning result/security contracts; they cannot silently disappear in translation.
+
+TeamCity and Vivarium may coexist. Import all retained historical builds, tests, logs and artifacts,
+then support explicit repeatable one-way diff-import: add new, skip unchanged and choose either the
+whole existing Vivarium snapshot or the whole TeamCity snapshot for changed matches. No field-level
+merge or bidirectional synchronization is required. Source cleanup never deletes imported target
+history. Import identity/provenance and current native execution are distinct; import does not enable
+triggers, enroll Agents, grant roles or replay publication effects. Each live trigger/publisher has one
+system owner during coexistence. Verified final delta, selected conflict dispositions and standalone
+historical reads/restored reads gate TeamCity shutdown.
+
+CI parity and phased real-family migration now take precedence over provider/image and expanded
+AgentExplorer work. Raw reports remain authoritative for final test projection under D3/D14; any
+service-message-only test producer needs an explicit retained ingestion contract or verified report
+adapter before migration. JUnit for the currently used Rust/Node/Vitest/Playwright producers is an
+immediate parity requirement alongside .NET/TRX, not a deferred platform nicety.
+
+### D33. Existing TeamCity REST clients are a compatibility target
+
+Vivarium must expose a TeamCity-compatible HTTP management facade so existing `teamcity-cli` and
+other inventoried consumers work after normal server-URL and credential setup, without client
+rewrites. The native `/api/v1` remains the canonical Vivarium API. `/app/rest` and the used version,
+file/log and context-path variants project the same application services, identities, authorization,
+Git activation, audit, execution and result data; they do not create another scheduler or settings
+authority. This refines D24's single-surface wording into one application model with two public HTTP
+contracts. The existing gRPC ControlPlane remains unrelated transitional compatibility.
+
+Compatibility includes locators/escaping, field projection, DTO/media-type shapes, JSON/XML/text,
+paging/continuation, error/status semantics, credential handling, bulk bytes and both read and mutation
+behavior. TeamCity-shaped settings mutations still use the C# Git mutation/validation/activation path;
+legacy requests cannot bypass policy or require every existing caller to add native-only headers.
+Source-specific server/Kotlin/license internals need explicit mappings or unresolved dispositions,
+never fabricated success or a false claim that Vivarium runs JetBrains software.
+
+The reference profile is the observed TeamCity 2026.1.3 installation and pinned actual client versions.
+Generate the method/path/request-variant inventory from client source/tests, reference API metadata
+and other consumers. The required conformance gate uses unchanged clients and isolated mutation
+fixtures, not production TeamCity writes. See
+[`design/teamcity-rest-compatibility.md`](design/teamcity-rest-compatibility.md) and the stable
+`TC-WIR-*` requirements in the parity catalog. This facade is planned, not implemented.
+
 ## 5. Protocol sketch
 
 ```proto
@@ -1154,13 +1242,14 @@ snapshot of the resolved definition. Submitted `vivarium.yaml` bytes are authori
 than presented as a reproducible Git revision. Names remain display metadata; later Git or UI edits
 never rewrite historical identity.
 
-Storage: a Git control repository for desired configuration; SQLite in WAL mode with **one serialized
-writer channel** for applied projections, runtime work, observations, audit metadata, and immutable
-provenance; plus a blob directory. REST, agent streams, the scheduler, and reconciliation all funnel
-writes through application services; streamed build logs land in the
-blob store as chunked files. The Phase 1 build core stores the serialized assignment, owning agent,
-lifecycle state, cancellation reason, and terminal result; in-memory waiters are projections, never
-the source of truth. No external services.
+Storage target under D32: Git-owned build/fleet/RBAC definitions, private Chiral resource settings,
+PostgreSQL for applied projections and durable business state, and object/blob storage for bytes.
+The current implementation still uses SQLite WAL with one serialized writer channel for projections,
+runtime work, observations, audit and provenance. Its transaction/ownership guarantees must survive
+the PostgreSQL migration; the writer channel itself is not a new target constraint. All adapters
+continue to write through application services. Durable chunked build logs are required target work;
+current `BuildTracker` output is bounded in memory. In-memory waiters and Chiral discovery/messages are
+projections/coordination aids, never the source of truth for accepted execution history.
 
 ## 7. Bootstrap contract (D30 target; freeze after process evidence)
 
@@ -1349,7 +1438,7 @@ project invites strangers.
   mechanism, not values-in-yaml.
 - **Agent self-protection** — an elevated test can kill or replace the agent and bootstrap mid-build.
   Accepted for now (the machine is reverted or disposable); revisit for physical machines.
-- **Controller operations** — backup/restore of SQLite + blob store, migration backup policy and
+- **Controller operations** — backup/restore of the business database + blob store, migration backup policy and
   operator recovery procedures, and the honest caveat that a dev machine doubling as controller
   sleeps, reboots, and hibernates. Ordered checksummed startup migrations and newer-schema refusal now
   exist; operational backup/restore remains unresolved.

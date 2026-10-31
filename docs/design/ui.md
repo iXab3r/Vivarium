@@ -8,6 +8,11 @@
 This design specializes the React and EyeAuras Workbench target adopted in D25. Numbered architecture
 decisions remain authoritative.
 
+D32's [behavioral parity contract](teamcity-parity.md) defines the required TeamCity build experience:
+configuration history/requirements, full build tabs, searchable durable logs, individual test history
+and triage, artifacts, parameters, dependencies, statistics and imported history. These are migration
+gates for each family, not optional screens after its command runner works.
+
 ## Purpose
 
 Vivarium has two user-facing products over one agent fleet:

@@ -1,6 +1,6 @@
 # Vivarium Project Notes
 
-Vivarium is an OSS TeamCity-style test farm plus AgentExplorer fleet manager. One cross-platform agent runs
+Vivarium is an OSS TeamCity-style CI build server and test farm plus AgentExplorer fleet manager. One cross-platform agent runs
 jobs and safe remote operations on user-provided physical machines first and on snapshot-managed VMs
 later, producing centralized test × scenario results across Windows, Linux, and macOS.
 
@@ -18,6 +18,13 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 `AGENTS.md` with narrower rules once code exists.
 
 ## Project status
+
+The immediate product priority is replacing the owner's TeamCity infrastructure without functional
+loss, including individual test history, Agent requirements/compatibility, durable logs and operator
+workflows. [Architecture D32](docs/ARCHITECTURE.md#d32-teamcity-behavioral-parity-is-the-immediate-build-product-contract)
+and [the behavioral parity contract](docs/design/teamcity-parity.md) adopt C# definitions, in-process
+Chiral nodes and PostgreSQL as the new target. This migration is not implemented; the current
+SQLite/YAML foundation described below remains real implementation evidence.
 
 Phase 1 in progress; the Phase 0 pinned-TLS session loop is complete. Persistent TeamCity-style agent
 registrations and status axes, heartbeats, separately managed reported/custom parameters,
@@ -88,8 +95,8 @@ platform evidence remain release-quality gates.
 - All committed content — docs, code, comments, commit messages — is in **English**.
 - Target stack: **.NET 10 / C#** for controller, agent, bootstrap, CLI; protocol in **proto3**
   (`Vivarium.Contracts`). React + EyeAuras Workbench for the panel, built to static assets and served
-  by the controller. SQLite + a blob directory for operational storage — no external service
-  dependencies.
+  by the controller. The new D32 target uses one initial Host with in-process EyeAuras.Chiral nodes,
+  PostgreSQL business storage and object/blob bytes. SQLite is the current transitional persistence.
 - Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned React sources,
   `tests/Vivarium.Tests`, `docs/`, plus `images/` for image recipes (later).
 - Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
@@ -136,12 +143,18 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   Projects, build configurations, fleet policy, agent custom properties, RBAC policy, and non-secret
   server settings become effective only from a validated Git revision. REST, UI, and CLI writes use one
   Git mutation/reconciliation service; they never patch a hidden SQLite authority.
+  D32 refines this for private Host/resource settings: use Chiral's managed settings/restart lifecycle
+  for connections and resource secrets. Build definitions, fleet policy and existing RBAC declarations
+  remain Git-backed; do not create competing authorities or move RBAC implicitly.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.
 - `/api/v1` REST is the canonical public management surface for both TeamCity and AgentExplorer. The React
   UI and CLI consume it. AgentHub remains reverse-streaming gRPC, blob bytes remain on the authenticated
   HTTP data plane, and the existing gRPC ControlPlane is a transitional compatibility adapter only.
+  D33 additionally requires a TeamCity-compatible `/app/rest` facade for existing clients. Both HTTP
+  contracts use the same application services, authorization, Git activation and audit; compatibility
+  never grants a separate state authority or permission bypass.
 - Every state-changing request carries actor, correlation/idempotency identity, target, outcome, and,
   when configuration-derived, the Git revision. Logs and audit records must be bounded and redacted.
 

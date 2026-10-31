@@ -1,7 +1,43 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D29) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D33) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+## Immediate priority — replace TeamCity without functional loss (D32)
+
+The accepted build-product contract is [TeamCity behavioral parity](design/teamcity-parity.md).
+The [REST compatibility contract](design/teamcity-rest-compatibility.md) is also required: existing
+`teamcity-cli` and other clients must work through the TeamCity-shaped API without client rewrites.
+C# catalog definitions, in-process Chiral composition and PostgreSQL are the new target; current
+SQLite/YAML execution remains transitional. This priority governs the next unimplemented slices;
+the older Phase-1 sequence below records foundation progress and remaining scope, not a competing
+instruction to finish AgentExplorer/provider work first.
+
+1. Establish the Chiral/PostgreSQL/C# build foundation while preserving queue, identity, ownership,
+   cancellation, audit and result guarantees. Prove a real source-checkout Compile with durable logs,
+   reports and artifacts.
+2. Deliver reusable projects/configurations, inherited/typed run parameters, VCS branches/revisions,
+   requirements and per-Agent compatibility reasons, trigger/queue policy and operational build UI.
+3. Deliver dependency graphs, exact upstream artifact/output selection, build counters/numbers,
+   resource locks and verified publication for the existing real build families.
+4. Deliver .NET/TRX and the currently used JUnit producers, individual test history/duration/details,
+   failure comparison, investigation/mute workflows, structured log search/tail/download and retained
+   statistics. These are migration gates, not optional polish after command execution.
+5. Migrate each family with its API/UI/operator workflow and known failure behavior proven. Preserve
+   paused configurations and rare release paths until explicit disposition.
+6. Import all retained TeamCity build/test/log/artifact history; support repeatable one-way diff-import
+   with whole-entity keep-Vivarium/use-TeamCity choices during coexistence. Close final-delta,
+   standalone history-read and backup/restore gates before shutting TeamCity down.
+
+The checklist in [the parity contract](design/teamcity-parity.md) owns stable acceptance IDs; the
+workstream inventory/ledger owns per-configuration verification. No stage is closed by translating
+files alone. Complete slices should supply usable diagnostics early; the order above is not permission
+to postpone all logs/tests/UI until the final migration. VM/image and expanded AgentExplorer work
+remain later priorities unless an inventoried build requires them.
+
+Implement compatible read and mutation endpoints alongside the corresponding native domain slices.
+Freeze client method/path/variant coverage, then run unchanged-client conformance on isolated fixtures;
+neither matching route names nor native OpenAPI coverage alone closes D33.
 
 ## Phase 0 — Design & skeleton *(complete)*
 
@@ -243,7 +279,8 @@ credentials), provisioning `expected-reboot` resume (requires a durable step cur
 
 ## Phase 4 — More platforms
 
-- Linux guests: same agent, `linux-x64` publish; JUnit adapter for `cargo nextest` payloads.
+- Linux guests: same agent, `linux-x64` publish; extend native payload coverage over the JUnit
+  normalization already required for the current nextest/Node/Vitest/Playwright CI migration (D32).
 - QEMU/KVM driver for a dedicated Linux host.
 
 ## Phase 5 — macOS

@@ -7,6 +7,12 @@
 
 This design specializes observability behavior without replacing numbered architecture decisions.
 
+D32's [behavioral parity contract](teamcity-parity.md#8-build-logs) requires durable live/historical
+log viewing, step/block/flow hierarchy, search and filters, timestamp modes, raw download and stable
+test/problem anchors. An in-memory tail or a stored artifact link alone does not satisfy log parity.
+PostgreSQL is the new business-persistence target; current SQLite details remain implementation
+evidence until migration. Output bytes remain outside business tables under their storage owner.
+
 ## 1. Purpose and scope
 
 Vivarium coordinates long-running builds and remote operations across physical agents, managed VMs,

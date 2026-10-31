@@ -8,6 +8,14 @@
 Numbered architecture decisions remain authoritative; any conflict requires an architecture update in
 the same change.
 
+**D32 target refinement:** new business persistence is PostgreSQL; logical in-process Chiral nodes
+own their private resource settings and readiness. SQLite schemas/writer-channel details below
+describe the current implementation and the guarantees to preserve, not a requirement to keep SQLite
+or its serialization mechanism in the new target. Git build/fleet/RBAC authority, durable ownership,
+idempotency, audit and historical provenance remain; Chiral InMemory is not their durable store.
+Imported source IDs, test timelines, log/artifact references and repeatable diff-import also follow
+the [TeamCity parity requirements](teamcity-parity.md).
+
 ## Purpose
 
 Vivarium must recover a build farm after a controller restart without duplicating work, losing an

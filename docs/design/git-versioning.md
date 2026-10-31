@@ -7,10 +7,18 @@
 
 ## 1. Decision
 
-Git is Vivarium's day-one source of truth for all mutable **desired configuration and properties**.
-A configuration edit made through REST, the UI, or the CLI is a Git mutation with the same schema,
+Git is Vivarium's day-one source of truth for mutable **build/fleet desired configuration and properties**
+and existing RBAC declarations. D32 makes private Host/resource settings a bounded exception: use
+Chiral's managed store and restart lifecycle for database/resource connections and their secrets,
+without duplicating those settings in Git or a hidden business-DB override.
+An edit to those Git-owned definitions through REST, the UI, or the CLI is a Git mutation with the same schema,
 validation, concurrency, commit, and reconciliation behavior as a human-authored repository change.
 The controller does not keep a second authoritative copy in SQLite.
+
+New catalog definitions use C# under D32; YAML below describes current/transitional definitions.
+PostgreSQL replaces SQLite as the business-persistence target without changing Git's authority for
+these definitions. A translated imported configuration still follows validated commit-before-activate;
+historical import alone never activates its triggers or grants a principal new authority.
 
 Operational actions are deliberately different. Running or cancelling a build, refreshing inventory,
 authorizing a one-time login, restoring a VM snapshot, or eventually executing an AgentExplorer command
@@ -24,7 +32,8 @@ Two Git authorities are expected:
    AgentExplorer policies, agent custom properties and enablement, RBAC, providers, image catalog and
    recipes, and controller policy.
 2. A **tested product repository** owns the build configurations that test that product, preserving
-   D17's `vivarium.yaml`-next-to-code model. A submitted build pins that repository's commit, config
+   D17/D32's definitions-next-to-code model: C# for the new catalog, YAML for the transitional API.
+   A submitted build pins that repository's commit, config
    path, config blob hash, and resolved immutable definition.
 
 The repositories may physically be the same repository for a small installation. Their authority and

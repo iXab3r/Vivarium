@@ -1,6 +1,6 @@
 # Vivarium
 
-**A test farm and AgentExplorer fleet manager for real operating systems.** Vivarium uses one cross-platform agent for
+**A self-hosted CI build server, test farm and AgentExplorer fleet manager for real operating systems.** Vivarium uses one cross-platform agent for
 TeamCity-style jobs and for safe fleet inspection/operations across physical machines and, later,
 snapshot-managed VMs. Test runs become one centralized *test × OS-configuration* matrix.
 
@@ -16,6 +16,12 @@ A vivarium is an enclosure that keeps organisms under controlled conditions for 
 > upgrade path (immutable packages, authenticated delivery, drain/health/rollback, REST/CLI). Install
 > one-liners, fleet rollout UI/policy, broader result presentation/adapters, and provider integrations are still in
 > progress; this is not an end-user release yet.
+> **Next product goal:** replace the owner's TeamCity without losing build/test history, Agent
+> requirements, logs, dependencies or publication workflows. The accepted target uses C# definitions,
+> in-process Chiral nodes and PostgreSQL; these changes are planned, not implemented. See the
+> [behavioral parity contract](docs/design/teamcity-parity.md) and [roadmap](docs/ROADMAP.md).
+> Existing TeamCity clients are also a target through the planned
+> [REST compatibility facade](docs/design/teamcity-rest-compatibility.md), over the same application services.
 > The design is documented in
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the shape), [`docs/ROADMAP.md`](docs/ROADMAP.md) (the order),
 > [`docs/design/README.md`](docs/design/README.md) (focused subsystem designs),
@@ -41,7 +47,7 @@ flowchart LR
     CLI["viv-cli / your CI"] --> REST
     UI["React + Workbench panel"] --> REST
     REST["REST + SSE management plane"] --> C
-    C["Controller<br/>Git desired state + scheduler + results<br/>AgentHub gRPC + blob store + SQLite"]
+    C["Controller + in-process Chiral<br/>Git build plans + scheduler + results<br/>AgentHub + blobs + PostgreSQL target"]
     C -- "checkpoint / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]
     D --> VM["Pool VM / enrolled physical machine"]
     VM -- "reverse-connect gRPC<br/>hello / builds / logs / results" --> C
@@ -70,8 +76,8 @@ flowchart LR
 
 ## Non-goals
 
-- Not a source-control pipeline orchestrator — Vivarium can be called by CI, but its TeamCity-style job
-  runner is also useful directly for tests and future builds.
+- Not an SCM or code-review host — Vivarium owns build orchestration and integrates with the existing
+  source repositories and forges.
 - Not container-based — the whole point is real OS installations: patch levels, drivers, desktop sessions, macOS.
 - Not an unrestricted RMM/configuration-management system — AgentExplorer exposes only explicit,
   capability-negotiated, authorized, audited operations.

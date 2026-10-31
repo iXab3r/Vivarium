@@ -3,13 +3,15 @@
 > Status: **Accepted**
 > Implementation: **Partial — reads, Agent enablement/deployment, build/blob mutations, build SSE, and CLI flows implemented**
 > Maintainer role: [Vivarium REST Expert](../roles/vivarium-rest-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D30
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D30, D32-D33
 
 ## 1. Purpose
 
-Vivarium needs one automation-grade management surface from day one. The React panel, `viv-cli`,
-CI integrations, operators, and third-party clients should manage both product domains through the
-same REST API:
+Vivarium needs one automation-grade management model. The React panel and `viv-cli` use native
+`/api/v1`; D33 additionally requires a [TeamCity-compatible facade](teamcity-rest-compatibility.md)
+for unchanged existing clients. Both HTTP contracts call the same application services and current
+authorization/Git/audit rules. The facade is planned; it is not provided by the current ControlPlane
+adapter. Both product domains remain managed through this shared model:
 
 - **TeamCity:** projects, build configurations, builds, queue, cancellation, artifacts, and results.
 - **AgentExplorer:** agents/hosts, inventory, status, processes, network endpoints, and later remote
