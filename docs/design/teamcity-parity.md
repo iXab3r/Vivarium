@@ -91,7 +91,7 @@ must remain visibly failed; a migration cannot manufacture green results by omit
 
 | ID | Required observable behavior | Acceptance example | Basis |
 |---|---|---|---|
-| TC-AG-01 | Connected, authorized, enabled, activity, health and maintenance facts remain independently visible. | A disabled connected Agent completes current work but receives none; quarantine never appears idle. | O/C |
+| TC-AG-01 | Connected, authorized, enabled, activity, health and maintenance facts remain independently visible. | Disable preserves current work and blocks ordinary automatic assignment; explicit suitable-agent custom runs follow the reference contract without enabling ordinary work. Quarantine never appears idle. | O/C |
 | TC-AG-02 | Preserve reported facts, custom parameters, environment/tool discovery and stable historical Agent identity. | Later rename/tool changes do not rewrite which Agent/environment executed an old build. | O |
 | TC-AG-03 | Explicit and runner-implied requirements compose with inherited requirements using AND. | A .NET/Docker step cannot be assigned to an Agent lacking its tools even when explicit OS conditions pass. | O/C |
 | TC-AG-04 | Preserve observed `exists`, `equals`, `does-not-equal` and `contains`, including missing/empty value semantics. | Missing property and empty property produce the same match decisions as TeamCity, especially negative operators. | O |

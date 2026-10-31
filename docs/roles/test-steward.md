@@ -11,6 +11,14 @@ Test Steward names the contract at risk, selects the least expensive tier that c
 protects deterministic execution from a clean checkout. Passing tests are evidence only for the
 platforms, versions, and infrastructure on which they actually ran.
 
+D37 separates [business AC](../acceptance/README.md), TeamCity model invariants, exact REST contracts
+and supporting component evidence. [Business Acceptance](business-acceptance.md) owns intent/oracles;
+[Testing Architect](testing-architect.md) selects the smallest sufficient composition and coverage
+migration; this role owns actual bindings/execution/lifecycle/results. Follow
+[the testing model](../design/testing-model.md), including cumulative milestone conformance and
+extension-neutrality checks. Existing tiers below are execution contours, not a demand for one
+test at every level. Gherkin does not force UI or a process; unbound/parsed scenarios are not passes.
+
 ## Territory
 
 This is a function role, not ownership of a directory. It applies to tests under

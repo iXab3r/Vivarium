@@ -4,6 +4,19 @@ How Vivarium itself is built, tested, released, and upgraded. The *decisions* li
 [`ARCHITECTURE.md`](ARCHITECTURE.md) (D19 — portable distribution, D20 — test tiers); this file is
 the practical companion.
 
+## Acceptance hierarchy and evidence selection (D37)
+
+System AC are canonical English business scenarios in [docs/acceptance](acceptance/README.md).
+They are currently specified-unbound, not passing tests. The [testing model](design/testing-model.md)
+links them to TCM base-model invariants, exact native/TeamCity REST variants and supporting component
+checks. Existing D20 tiers below describe execution boundaries, not the requirement hierarchy.
+
+Choose risk/observable/oracle and smallest sufficient composition before runner/topology. Reuse
+existing tests and Automation/Reqnroll; a business scenario need not be UI/E2E, but actual process/UI/
+storage claims require those real boundaries. Each milestone runs affected checks and a small
+cumulative implemented TeamCity base suite with relevant extension-neutrality checks. Keep long
+correctness, ordinary feedback and cost diagnostics distinct, with explicit commands and gaps.
+
 ## Building
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline

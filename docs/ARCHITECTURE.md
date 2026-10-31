@@ -315,6 +315,11 @@ pending agent may reuse that proof only to complete authorization delivery after
 
 ### D8. Agent status is TeamCity's; provider lifecycle is Vivarium's
 
+D37 requires exact admission semantics, including exceptions: disabled blocks ordinary automatic
+queue assignment, but TeamCity's explicit suitable-agent diagnostic/custom-build assignment must be
+specified and tested separately. The current normal-queue predicate is not a universal ban on every
+targeted build. This variant is open/unimplemented, not proof that the compatibility contract passed.
+
 Two separate layers, deliberately.
 
 **Agent status — TeamCity 1:1.** Four independent axes: *connected/disconnected* (a network fact),
@@ -644,6 +649,10 @@ automation and hand-rolled setups the scriptable form still exists (`viv-agent e
 interactively in a console is a first-class mode for debugging.
 
 ### D20. Four test tiers; the hypervisor is faked until it can't be
+
+D37 refines the evidence model: these are useful execution boundaries, not the hierarchy of
+requirements or a mandate to test every behavior at every tier. Highest-level system AC use business
+language and stay independent of implementation; model/wire/component checks support them.
 
 (1) **Logic tests** — NUnit on Microsoft.Testing.Platform, the same stack payloads use: scheduler and
 compatibility matching, matrix expansion, adapters against golden files, blob GC, fencing — with
@@ -1131,6 +1140,34 @@ OIDC and TeamCity scoped access; R2 adds full C# catalog authoring/evaluation an
 See [REST domain contract](design/teamcity-rest-domain.md), the workstream REST breakdown and local
 lab gates. Current legacy session tests/manual process entry points are prior evidence, not proof
 that the new PG/Chiral local environment has already been delivered.
+
+### D37. Business acceptance and continuous TeamCity superset conformance govern every milestone
+
+Accepted owner direction, 2026-10-31. Vivarium's Build/Agent model preserves TeamCity semantics
+throughout development and adds explicit capabilities on top. Extensions cannot silently reinterpret
+base identities, states, requirements, roles, workflows or admitted API behavior. Define stable TCM
+model invariants and verify affected base behavior and extension neutrality in each task/milestone,
+not only at R5. Unknown variants remain open; a wider native feature set is not a parity waiver.
+
+Highest-level requirements are English business-language system Acceptance Criteria, without database,
+Chiral, endpoint, class or fixture topology details. Canonical AC-* Gherkin lives in docs/acceptance and
+is consumed by the existing Automation/Reqnroll integration when bound. Model contracts and exact
+REST wire tests provide supporting evidence, with domain/component/process/platform checks below.
+A parsed/unbound/ignored feature, green HTTP response or scripted success alone is not acceptance.
+
+Adapt PoeBane.Rust's Testing Architect principles: choose risk/observable/existing coverage/minimal
+real composition and an independent oracle first; classify environment, process placement, runner and
+execution cost separately. Gherkin does not mandate E2E. Reuse actual services/infrastructure at the
+claimed boundary, real Agent execution for execution claims, and controlled external failures where
+that is the claim. Do not build another runner/scheduler/simulator or import Rust-specific budgets.
+
+Each milestone proves its affected business/model/wire contracts plus a small cumulative implemented
+base suite and relevant extension-neutrality checks. Preserve unique assertions when replacing tests;
+do not weaken expected behavior to make a refactor pass. Later AC remain visibly specified-unbound,
+not false passes or a demand to run undelivered features. R5/R6 add full admitted cumulative gates.
+Business Acceptance owns intent/oracles, Testing Architect evidence design, Test Steward execution,
+and TeamCity/REST owners the baseline semantics. Co-held roles do not constitute independent review.
+See [testing model](design/testing-model.md) and [system AC](acceptance/README.md).
 
 ## 5. Protocol sketch
 

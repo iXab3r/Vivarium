@@ -4,11 +4,12 @@
 - Frozen/pushed checkpoint: `cbb285a55701e0be0c726c57d9daccd8bfb529e7`, annotated tag
   `checkpoint/pre-refactor-2026-10-31`; runtime remains `09dd40b`.
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
-  Plan v1.3 remains draft for unresolved choices; RF-10 delivery and D34/D35/D36 directions are accepted.
+  Plan v1.4 remains draft for unresolved choices; RF-10 delivery and D34–D37 directions are accepted.
   No implementation milestone is complete.
 - GitHub: P0/roadmap #2, implementation parents #3–#9, original children #10–#31, REST sub-children
-  #32–#36 under #12 and local-lab tasks #37/#38 under #3: eight milestones, 37 open issues,
-  29 native child relationships with matching milestones.
+  #32–#36 under #12, local-lab #37/#38 and first business bindings #40 under #3, AC baseline #39
+  under #2 and explicit disabled-Agent variant #41 under #5: eight milestones, 40 open issues,
+  32 native child relationships with matching milestones.
 - Owner accepted RF-10 on 2026-10-31: each milestone may merge separately into main after its own
   acceptance/review, and its issues close after that delivery. Use milestone integration branches where
   useful; remove obsolete code with its replacement. R6 is cumulative acceptance, not the first main merge.
@@ -36,10 +37,22 @@
   source-owner checkout is older 0.4.1 and was not changed. Separate source copy is ignored/private.
   Generator extracted 456 synthetic fixture rows; not normalized route count or executed conformance.
   npm metadata lacks gitHead; full Swagger/inline/other-client union and binary provenance are open.
+- D37 requires a continuous TeamCity semantic superset, with highest-level business-language AC.
+  Read docs/acceptance/*.feature, docs/design/testing-model.md and the Business Acceptance/Testing
+  Architect roles. Thirty-one AC are specified-unbound, not parsed/executed passes. S01–S38 are
+  supporting technical candidates; acceptance-map.tsv and requirement-routing.tsv are initial
+  family-level traceability, not coverage. Reuse exact feature files in future bindings.
+- Fresh PoeBane source 2984e1f (Testing Architect change 48a4735, 2026-10-27) was read remotely;
+  its older dirty source-owner checkout was untouched. poebane-testing-study.md records transferred
+  evidence/selection/oracle principles; no Rust-specific budgets/permissions/new runner imported.
+- TCM-GAP-001/#41: disable blocks ordinary automatic queue work, not the documented explicitly
+  targeted suitable-agent diagnostic/custom run. TC-AG-01 and AC-AG-02/06 clarified; reference
+  2026.1.3 variant and actual replacement behavior still open. No source TeamCity write performed.
 - Depot UI reference: apps/depot-mock is the production frontend at the frozen commit; main.ts,
   session.ts, management-api.ts, nodes-api.ts/node-settings.ts and Access list/inspector were inspected.
 - Read-only source role census captured seven definitions and their permissions/includes, including
   RESTRICTEDBOT and TOOLS_INTEGRATION, under ignored artifacts/depot-refactor-study/teamcity-role-*.json.
-- Next: execute the concrete #12/#32–#36 contract work and refine S01–S07/S35–S37; bounded P0 discovery for
+- Next: execute #12/#32–#36/#39 contract work and refine the business/model/wire mapping; #40 grows
+  the real R0 base suite and #41 the targeted-run case. Continue bounded P0 discovery for
   exact C# mutation representation, wire/client universe, retained-history volume and old-runtime data.
   Do not begin R0 by silently selecting unresolved alternatives.

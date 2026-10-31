@@ -1,7 +1,13 @@
-# Acceptance scenario catalogue — draft v1
+# Technical scenario and evidence catalogue — S* candidates
+
+D37 clarification: this S* table is the **technical evidence/candidate-check catalogue**, not the
+highest-level business AC. Canonical business language is in docs/acceptance/*.feature and linked
+by acceptance-map.tsv. Preserve these S* IDs and useful assertions; do not rewrite business AC to
+match PostgreSQL/Chiral/HTTP/fencing details here. Gherkin does not force every supporting check
+through a browser or process. No current table row or feature-file parse is an executed pass.
 
 Write executable English `.feature` files as each approved mechanism is implemented; this table is
-the planning catalogue, **not 37 implemented/passing scenarios**. Each case is independently selected
+the planning catalogue, **not 38 implemented/passing scenarios**. Each case is independently selected
 and owns a fresh fixture where isolation is needed. Scenario outlines cover named variants, not a
 Cartesian product of every OS, role, runner and fault. `requirement-routing.tsv` assigns every existing
 TC requirement to its primary milestone and candidate scenarios; that is planning coverage only.
@@ -45,6 +51,7 @@ TC requirement to its primary milestone and candidate scenarios; that is plannin
 | S35 | R1/R5 | An administrator edits a built-in/custom role and its includes, assigns scoped roles through nested groups, and delegates only within their project; unchanged cookie/token reflects the resulting inherited rights | Cheap inheritance tests + real PG policies + actual Access UI and unchanged TeamCity CLI; shared-pool and denied sibling mutations |
 | S36 | R0.1 | Operator starts the prepared local Host/PG/Storage and a real Agent, enrolls/authorizes it normally, observes heartbeat and stable identity, attaches debugger and stops/resets only owned resources | Actual processes/PG/TLS/framework technical identity; no fake Agent or test-only management bypass |
 | S37 | R0.2/R0.3 | Unchanged CLI queues/watches/cancels seeded LocalSmoke; native/compatible views share the run, raw output/artifact bytes are inspectable and bounded restart/reconnect preserves truthful ownership/outcome | Real CLI profile, Host/PG/Storage/Agent and executable; byte hashes plus restart and cleanup receipts |
+| S38 | R2/R5 | Explicit suitable-agent diagnostic assignment can run on a connected/authorized disabled Agent while normal automatic queue assignment remains blocked and its disabled state is retained | Frozen targeted-run/permission wire contract, cheap admission tests plus actual Agent/API case; documentation input is not an executed reference pass |
 
 Example shape (pending decisions intentionally do not choose the superuser model):
 

@@ -1,4 +1,4 @@
-# Coherent Vivarium refactor — plan v1.3
+# Coherent Vivarium refactor — plan v1.4
 
 Status: **draft for owner iteration, not an implementation authorization or accepted ADR**.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
@@ -8,6 +8,9 @@ into main. D34/D35 now accept Depot authentication/superuser, TeamCity RBAC 1:1 
 Chiral-owned resource settings, and Depot's TypeScript/Vite Workbench UI. Remaining choices are draft.
 The owner clarified that UI technology is shared with Depot while current Vivarium/TeamCity UX is
 preserved. D36 moves deep REST decomposition before implementation and local Host+Agent proof into R0.
+D37 adds continuous TeamCity Build/Agent superset checks and a separate business-AC → model/wire →
+component evidence hierarchy. See docs/acceptance and the focused testing model; all new AC are
+specified-unbound, not runtime acceptance.
 
 ## Outcome and boundaries
 
@@ -145,7 +148,7 @@ Domain-compatible REST and scenarios grow with each domain milestone. R5 is the 
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Published plan: **8 milestones, 8 milestone parent issues and 29 native sub-issues** (37 issues total).
+Published plan: **8 milestones, 8 milestone parent issues and 32 native sub-issues** (40 issues total).
 The REST breakdown #12 also parents five focused P0 tasks. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are
 [R0 #3](https://github.com/iXab3r/Vivarium/issues/3),
@@ -165,6 +168,12 @@ Early concrete tasks: [REST breakdown #12](https://github.com/iXab3r/Vivarium/is
 [variant/milestone allocation #36](https://github.com/iXab3r/Vivarium/issues/36),
 [local Host+Agent #37](https://github.com/iXab3r/Vivarium/issues/37) and
 [first unchanged-CLI run #38](https://github.com/iXab3r/Vivarium/issues/38).
+
+D37 work: [business AC/model baseline #39](https://github.com/iXab3r/Vivarium/issues/39),
+[first canonical bindings/base suite #40](https://github.com/iXab3r/Vivarium/issues/40), and
+[explicit disabled-Agent custom-run variant #41](https://github.com/iXab3r/Vivarium/issues/41).
+The last finding corrects an over-broad normal-queue rule; TC-AG-01 retains its ID and the total
+technical requirement count stays 120. Reference execution and replacement implementation remain open.
 
 Each milestone has a parent issue and bounded child deliverables. GitHub mirrors this workstream;
 the [ledger](ledger.md), [phase state](phases.md) and [handover](handover.md) remain authoritative for
@@ -188,6 +197,13 @@ and the new-stack reproducible lab is not delivered. Do not equate those facts w
 deployment claim or invent calendar estimates before the preparation and port work are measured.
 
 ## Development and test contract proposed for this workstream
+
+D37's [testing model](../../../docs/design/testing-model.md) is authoritative for evidence selection.
+The canonical [business AC](../../../docs/acceptance/README.md) contain no implementation detail;
+acceptance-map.tsv connects their 31 stable IDs to TCM invariants, the original TC requirements and
+S* supporting candidates. These initial family-level links are planning traceability, not coverage.
+Highest-level words stay stable through architecture changes. Gherkin does not mandate E2E, and the
+table below describes possible evidence boundaries rather than one mandatory test per pyramid level.
 
 Write the English Gherkin/user examples and cheapest meaningful public-contract test before the
 implementation. A product failure is RED; missing binding, selector error or absent SDK is a test/setup
@@ -227,6 +243,13 @@ cleanup. No blanket all-platform/chaos rerun per tiny edit. Before each mileston
 suite and relevant existing regressions, independent affected-domain/security review and an independent
 simplicity review against the exact candidate revision. R6 additionally proves the full cumulative
 acceptance suite. These are future gates, not reviews claimed by this planning session.
+
+Every such merge includes affected business/model/wire cases plus a small cumulative implemented
+TeamCity base suite and relevant extension-neutrality checks. A new native capability is not a waiver
+for changing an existing Build/Agent meaning. Keep later unbound AC visibly open; preserve useful
+assertions on test migration and an independent oracle. R5 remains cumulative conformance, not the
+first checkpoint for model drift. Business Acceptance/Testing Architect/Test Steward have distinct
+intent/selection/execution responsibilities and may be co-held without claiming independent review.
 
 ## Simplicity and replacement acceptance
 

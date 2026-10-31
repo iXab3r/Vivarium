@@ -7,6 +7,11 @@
 
 ## Goal and acceptance
 
+D37 requires ongoing model plus wire conformance, not just a final client run. Highest-level
+[business AC](../acceptance/README.md) remain implementation-independent; TCM/public-domain and
+exact REST/side-effect tests support them under the [testing model](testing-model.md). Every affected
+milestone proves its current base subset and relevant extension neutrality; later variants remain open.
+
 Existing `@eyeauras/teamcity-cli` and other existing TeamCity API consumers must be able to manage
 Vivarium through a compatible HTTP surface. Ordinary connection configuration may change the server
 URL and provision a Vivarium credential. Rewriting the client, changing its TeamCity command vocabulary

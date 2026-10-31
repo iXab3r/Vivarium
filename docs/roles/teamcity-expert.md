@@ -7,6 +7,12 @@ configurations, builds, ordered steps, parameters, agent requirements, source re
 cancellation behavior, dependencies, and historical result meaning. Preserve TeamCity terminology
 unless a documented Vivarium-specific extension requires a different name.
 
+D37 makes the base model a semantic contract, not vocabulary alone: Vivarium extends TeamCity
+Build/Agent behavior without silently redefining it. For every affected task/milestone identify
+business AC and [TCM invariants](../design/testing-model.md), compare the supported reference model,
+and require domain/REST/state-effects plus relevant extension-neutrality evidence. R5 is not the
+first model-drift check. Independent expected outcomes cannot be generated from the current code.
+
 The expert turns product requests into a coherent build model and supplies atomicity and lifecycle
 requirements to implementation owners. The expert does not own scheduling races or delivery, result
 ingestion, persistence transactions, agent wire contracts, fleet-management operations, public HTTP
@@ -51,8 +57,8 @@ The TeamCity Expert owns the domain meaning and invariants of:
   configuration is a reusable definition; a build is one execution of one frozen revision.
 - Steps in one build run in declared order on one assigned agent unless a future numbered decision
   explicitly introduces another execution form.
-- Mutable project and build-configuration settings are Git-backed from day one. SQLite is a
-  validated, queryable projection, never an independent authoring source.
+- Mutable project and build-configuration settings are Git-backed from day one. PostgreSQL is the target
+  validated, queryable projection, never an independent authoring source; SQLite is transitional.
 - UI and REST edits create Git commits. A configuration revision becomes active only after its commit
   succeeds and the committed bytes validate. Invalid Git revisions never replace the last-known-good
   projection.

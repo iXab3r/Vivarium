@@ -5,6 +5,8 @@ RF-10 permits separate milestone merges into main. Detailed API/package bindings
 are still open P0 work. Accepted targets are not implemented runtime behavior.
 D35 UI clarification preserves current Vivarium/TeamCity UX while sharing technology. D36 accepts
 REST-first structural gates and the early R0 local Host/Agent/compatible-run checkpoints.
+D37 accepts continuous TeamCity Build/Agent superset conformance and implementation-independent
+business AC with separate model/wire/component evidence and roles.
 Resolve each by recording the owner decision, updating the affected numbered decisions/designs in
 the same change, and assigning positive/negative scenarios. Do not implement both alternatives.
 
@@ -22,6 +24,7 @@ the same change, and assigning positive/negative scenarios. Do not implement bot
 | RF-10 | **ACCEPTED 2026-10-31:** each milestone may merge into main after its own acceptance/review gate; milestone integration branches/root PRs may be used | Keep each merged increment coherent and tested; close its issues after milestone delivery in main. Remove replaced code with its replacement; temporary adapters need an owner and removal milestone. R6 proves cumulative parity/cleanup, not a mandatory first main merge. Production cutover is separate | Delivery; all milestones |
 | RF-12 | **ACCEPTED — D35, clarified:** reuse Depot TypeScript/Vite/Workbench technology, Host/Identity integration and schema settings; preserve useful current Vivarium/TeamCity layout/workflows | No mandatory Depot split inspector or forced product redesign. Adapt controls to CI and scoped Access; prove ordinary-user UI parity and remove Blazor by replacement milestone | D25/D35; S01–S07/S22–S27/S35 |
 | RF-13 | **ACCEPTED direction — D36:** deep REST resource/identity/state/protocol/mutation decomposition precedes structural implementation; R0.1 is local Host+real Agent and R0.2 the first unchanged-CLI run | P0 must resolve canonical matrix/Build mapping, per-resource ID wire types, editable C# representation and authority/success boundaries. Full endpoint/variant reconciliation remains open; R5 is cumulative conformance | D36; REST work packages; S36/S37 |
+| RF-14 | **ACCEPTED direction — D37:** TeamCity Build/Agent semantics remain the base throughout; Vivarium is an explicit superset. Highest system AC are business-language Gherkin, supported by model/REST/component evidence | Every milestone preserves affected/cumulative delivered base and relevant extension neutrality. Independent oracles and minimum sufficient composition; no copied Rust budgets, per-layer quota or new runner. Specified/unbound is not GREEN | D37; AC/TCM trace map; #39/#40/#41 |
 | RF-11 | Preserve all currently working invariants; classify every old product path and baseline test before deleting mechanisms | Do not equate “vibecoded” with disposable behavior. Decide any intentional retirement, legacy matrix/YAML/ControlPlane/AgentExplorer reach and existing-data obligations explicitly | D20/D22/D24/D31/D32; source disposition |
 
 RF-01/RF-02 and the framework/UI/storage direction are accepted. RF-05/RF-07/RF-08/RF-09

@@ -1,0 +1,2 @@
+id	invariant	expected	evidence	source	business_ac	checks	owner	milestone	state
+TCM-GAP-001	TCM-03/TCM-04/TCM-08	Disabled excludes normal automatic assignment; explicit suitable-agent diagnostic/custom assignment remains possible without changing enabled state	Official TeamCity 2026.2 documentation; frozen 2026.1.3 request/permission variant still needs confirmation	https://www.jetbrains.com/help/teamcity/install-and-start-teamcity-agents.html	AC-AG-02/AC-AG-06	S38	TeamCity/Scheduling/REST	R2/R5	open-unimplemented-unverified; issue #41

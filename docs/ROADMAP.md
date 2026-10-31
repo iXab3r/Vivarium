@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D36) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D37) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
@@ -19,6 +19,11 @@ with restart/cleanup proof at R0 exit. R2 adds full source-based C# Compile; R5 
 conformance. See the [concrete local gates](../.workspace/workstreams/coherent-refactor/local-lab.md)
 and [early REST breakdown](../.workspace/workstreams/coherent-refactor/rest-breakdown.md).
 UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.
+
+D37 makes Build/Agent semantics a continuously tested TeamCity superset. The
+[business AC](acceptance/README.md) are stable implementation-independent requirements;
+[model/wire/component evidence](design/testing-model.md) supports them. Every milestone preserves
+its implemented base suite and relevant extension neutrality; this check does not wait until R5.
 
 ## Immediate priority — replace TeamCity without functional loss (D32)
 

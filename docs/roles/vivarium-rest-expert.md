@@ -2,6 +2,11 @@
 
 ## Mission
 
+D37 requires executable base-model and wire conformance in every affected milestone, with business
+AC/TCM/variant traceability and independent expected results. A green route/DTO/HTTP fixture cannot
+replace domain-effect, permission or byte checks. Preserve extension-neutral base/client behavior;
+R5 is cumulative coverage, not the first drift review. See [testing model](../design/testing-model.md).
+
 Own the public REST management contract through which people, automation, the CLI, and the web UI
 manage Vivarium. The contract covers both TeamCity-shaped build management and AgentExplorer fleet
 management without collapsing those domains into one model.

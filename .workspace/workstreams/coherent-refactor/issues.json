@@ -332,6 +332,33 @@
       "milestone": "R0",
       "parent": 3,
       "state": "open"
+    },
+    {
+      "key": "business_acceptance_baseline",
+      "number": 39,
+      "title": "P0: Review business AC and TeamCity superset test baseline",
+      "url": "https://github.com/iXab3r/Vivarium/issues/39",
+      "milestone": "P0",
+      "parent": 2,
+      "state": "open"
+    },
+    {
+      "key": "first_business_bindings",
+      "number": 40,
+      "title": "R0: Bind business AC and cumulative TeamCity model checks",
+      "url": "https://github.com/iXab3r/Vivarium/issues/40",
+      "milestone": "R0",
+      "parent": 3,
+      "state": "open"
+    },
+    {
+      "key": "disabled_agent_custom_run",
+      "number": 41,
+      "title": "R2: Preserve explicit custom runs on disabled agents",
+      "url": "https://github.com/iXab3r/Vivarium/issues/41",
+      "milestone": "R2",
+      "parent": 5,
+      "state": "open"
     }
   ],
   "milestones": [

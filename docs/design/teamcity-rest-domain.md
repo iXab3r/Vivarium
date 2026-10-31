@@ -6,6 +6,11 @@
 
 ## Purpose
 
+D37 requires this model and its wire projection to be continuously proved as a TeamCity superset.
+Link changes to [business AC](../acceptance/README.md), TCM invariants and exact variant tests;
+validate real state effects as well as responses. Every milestone preserves its implemented base
+and checks relevant extension neutrality. See [evidence hierarchy](testing-model.md).
+
 TeamCity wire compatibility constrains the resource model and command semantics from the beginning.
 Design shared services from those contracts, then expose native /api/v1 and compatible /app/rest
 projections. Do not first build an unrelated Vivarium model and discover its incompatibilities in R5.
