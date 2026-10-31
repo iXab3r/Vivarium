@@ -38,7 +38,7 @@ The architecture already accepts the target shape:
 - D15-D16 define provider acquisition, static physical capacity, revert-pool and clone-per-build
   lifecycle modes, and capacity one per Agent.
 - D19 defines controller-distributed agent/bootstrap packages; D20 names FakeMachineProvider and real-
-  hypervisor test tiers. D22-D28 add shared coordination, Git, REST, React UI, RBAC, audit, and the
+  hypervisor test tiers. D22-D28 add shared coordination, Git, REST, TypeScript UI, RBAC, audit, and the
   stable Agent/provider-instance identity split.
 
 Implementation evidence is intentionally smaller:

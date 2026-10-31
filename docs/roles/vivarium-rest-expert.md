@@ -56,7 +56,7 @@ role file become a second architecture document.
   Expert; this expert owns their public HTTP contract.
 - Log retention and sink design. Those belong to the Logs Expert; this expert owns log retrieval,
   correlation, and bounded streaming contracts.
-- React and Workbench implementation. Those belong to the UI Expert, which must consume this API.
+- TypeScript and Workbench implementation. Those belong to the UI Expert, which must consume this API.
 - OS-specific collectors and process/network/file semantics. Those belong to the Platform Expert.
 - Direct database schema design. REST must call application services and never become a SQLite API.
 

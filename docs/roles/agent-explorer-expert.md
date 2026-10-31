@@ -127,7 +127,7 @@ For each slice, the expert requires:
   credential-replacement tests for probes and durable operations;
 - proof that an exclusive AgentExplorer lease and a TeamCity build cannot overlap on one capacity-one
   Agent;
-- REST tests that do not depend on the React UI;
+- REST tests that do not depend on the TypeScript UI;
 - bounded payload, log, and retention measurements for large hosts;
 - documentation updates in the same change as accepted structural decisions.
 

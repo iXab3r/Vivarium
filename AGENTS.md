@@ -36,7 +36,7 @@ payload archives are also implemented. The transport-independent management kern
 ordered checksummed SQLite migration ledger, fail-closed schema validation, a minimal append-only audit
 journal, shared actor/correlation context, and one authorization evaluator beneath the
 ControlPlane, panel, and blob boundaries. The current Blazor panel is transitional: the accepted target
-is a React panel built on the vendored EyeAuras Workbench and the public REST management API. The
+  follows Depot's TypeScript/Vite panel on pinned EyeAuras Workbench and the public REST management API (D35). The
 read-only REST foundation now publishes system, Agent, audit, build, and queue resources plus a
 deterministic OpenAPI document. AgentHub now negotiates an additive v1 capability contract, persists
 durable credential/connection generations, and publishes bounded typed static host facts and
@@ -94,10 +94,10 @@ platform evidence remain release-quality gates.
 
 - All committed content — docs, code, comments, commit messages — is in **English**.
 - Target stack: **.NET 10 / C#** for controller, agent, bootstrap, CLI; protocol in **proto3**
-  (`Vivarium.Contracts`). React + EyeAuras Workbench for the panel, built to static assets and served
+  (`Vivarium.Contracts`). TypeScript/Vite + EyeAuras Workbench for the panel (D35), built to static assets and served
   by the controller. The new D32 target uses one initial Host with in-process EyeAuras.Chiral nodes,
   PostgreSQL business storage and object/blob bytes. SQLite is the current transitional persistence.
-- Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned React sources,
+- Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned TypeScript sources,
   `tests/Vivarium.Tests`, `docs/`, plus `images/` for image recipes (later).
 - Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
 - The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
@@ -126,7 +126,7 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   leases, fencing, and recovery. **AgentExplorer Expert** owns independent fleet observation and remote
   operation semantics.
 - **Vivarium REST Expert** reviews every public management resource or mutation. **UI Expert** reviews
-  every web UI change and the React/EyeAuras Workbench integration.
+  every web UI change and the TypeScript/EyeAuras Workbench integration.
 - **Git/Versioning Expert** reviews every desired setting/property change. **User Roles** and
   **Admin/SuperUser** experts own authorization and first-run administration; **Security Expert** reviews
   trust-boundary changes.
@@ -139,21 +139,24 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 
 ## Configuration and management contracts
 
-- Git is the source of truth for mutable **desired configuration** from its first implementation.
-  Projects, build configurations, fleet policy, agent custom properties, RBAC policy, and non-secret
-  server settings become effective only from a validated Git revision. REST, UI, and CLI writes use one
-  Git mutation/reconciliation service; they never patch a hidden SQLite authority.
-  D32 refines this for private Host/resource settings: use Chiral's managed settings/restart lifecycle
-  for connections and resource secrets. Build definitions, fleet policy and existing RBAC declarations
-  remain Git-backed; do not create competing authorities or move RBAC implicitly.
+- Git is the source of truth for versioned **desired configuration**: projects/build definitions,
+  fleet policy and agent desired properties use one Git validation/mutation/reconciliation path.
+  D34 explicitly replaces Git identity/RBAC authority with PostgreSQL application data: users,
+  groups, editable TeamCity roles/permissions and scoped grants use common authorized/audited services.
+  D35 uses Chiral's managed settings/restart lifecycle for private Host/DB/OIDC/storage configuration;
+  do not create a second settings authority. Other structured business/runtime data lives in PostgreSQL;
+  Storage owns large bytes with PostgreSQL references. Current SQLite/Git-RBAC remains transitional.
+- D34 adopts Depot's stock Identity/OpenIddict OIDC, normal cookie and installation-user lifecycle.
+  TeamCity role/permission IDs, editability, scopes, groups and inheritance must match 1:1; do not
+  retain the superseded immutable role floor or reinterpret TeamCity grants as narrower fleet grants.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.
-- `/api/v1` REST is the canonical public management surface for both TeamCity and AgentExplorer. The React
+- `/api/v1` REST is the canonical public management surface for both TeamCity and AgentExplorer. The TypeScript
   UI and CLI consume it. AgentHub remains reverse-streaming gRPC, blob bytes remain on the authenticated
   HTTP data plane, and the existing gRPC ControlPlane is a transitional compatibility adapter only.
   D33 additionally requires a TeamCity-compatible `/app/rest` facade for existing clients. Both HTTP
-  contracts use the same application services, authorization, Git activation and audit; compatibility
+  contracts use the same application services, authorization, appropriate Git/PG/Chiral authority and audit; compatibility
   never grants a separate state authority or permission bypass.
 - Every state-changing request carries actor, correlation/idempotency identity, target, outcome, and,
   when configuration-derived, the Git revision. Logs and audit records must be bounded and redacted.

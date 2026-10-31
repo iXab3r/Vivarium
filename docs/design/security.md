@@ -224,7 +224,7 @@ Mutations start disabled by default:
 - Browser sessions use `Secure`, `HttpOnly`, restrictive `SameSite` cookies, bounded lifetime, login
   throttling, and logout/revocation behavior. Cookie-authenticated mutations require CSRF protection.
 - CORS is denied by default. If enabled later, origins, methods, and credentials are explicit; `*`
-  with credentials is forbidden. A restrictive CSP and output escaping protect React/Workbench and
+  with credentials is forbidden. A restrictive CSP and output escaping protect TypeScript/Workbench and
   any legacy server-rendered surface.
 - Bearer tokens are accepted in the Authorization header, never query strings. Responses and errors
   omit secrets and do not reveal whether an inaccessible object exists.
@@ -236,12 +236,14 @@ Mutations start disabled by default:
 - The User Roles Expert owns the TeamCity-compatible permission catalog and role templates. Security
   requires deny-by-default evaluation, global vs project scope, explicit agent-pool/AgentExplorer target
   scope, and no privilege derived from display names or Git authorship.
-- A SuperUser/bootstrap token may be printed to the controller log only while no administrator account
-  exists. It is short-lived or claim-once, grants only the first-admin ceremony, is rate-limited, and
-  is revoked after successful claim. It is not the permanent admin REST/gRPC token.
-- Service tokens are first-class principals, not anonymous shared strings. Creation reveals plaintext
-  once; the controller stores a verifier and metadata. Rotation can overlap briefly and revocation is
-  immediate for new operations.
+- D34 replaces the custom claim/recovery credential model with Depot's reserved Identity installation
+  user: startup password generation/reset through the framework, private intended log disclosure
+  after persistence, normal sign-in, and current enabled/authority checks. There is no second verifier
+  store or setup-only token engine in the target. Ordinary credentials use Identity/OpenIddict stores
+  and lifecycle; required TeamCity token semantics are proven against actual clients.
+- D34 requires TeamCity authorization 1:1, including editable roles and permissions, project/group
+  inheritance and compatible mutations; current rights live in PostgreSQL, not Git or token claims.
+  AgentExplorer-only permissions extend the catalogue without silently changing TeamCity grants.
 - Long-lived build/CI credentials cannot authorize AgentExplorer exec, file access, software management,
   agent authorization, Git credential changes, role changes, or secret reveal unless those permissions
   are separately and explicitly granted.
@@ -326,7 +328,7 @@ The following is evidence in the repository at the date above, not a claim about
 | Agent update | Durable per-Agent drain/operation, Agent-scoped package reads, exact-session health acceptance/confirmation, LKG rollback, restart recovery, and cross-Agent denial are implemented/tested | Initial installer trust, release signing, Windows process evidence, previous-version CI, and fleet rollout policy remain |
 | API scopes | One evaluator maps current `agent`, `submit`, and `admin` bearer principals beneath gRPC, panel, and blob handlers without widening their legacy authority | No users, project RBAC, durable service-principal metadata, token expiry/rotation, or REST API |
 | Panel | Secure/HttpOnly/SameSite-strict cookie auth and ASP.NET authorization are enabled | The permanent admin token is printed at every start; first-admin bootstrap separation and login throttling are absent |
-| CSRF | ASP.NET antiforgery middleware protects the component surface | Login/logout explicitly disable antiforgery; the future React REST surface needs a deliberate CSRF contract |
+| CSRF | ASP.NET antiforgery middleware protects the component surface | Login/logout explicitly disable antiforgery; the future TypeScript REST surface needs a deliberate CSRF contract |
 | Blobs | SHA-256 names are validated and PUT bodies are hash-verified before atomic commit | Any valid bearer can GET/PUT any known hash; there are no body/quota/rate bounds |
 | Payloads | Extraction rejects traversal, rooted paths, duplicate/type conflicts, Windows aliases/devices, and link pivots | No archive entry/expanded-byte/compression-ratio bound; post-execution artifact link escape needs a separate guarantee |
 | Execution | Structured program/args, relative cwd checks, timeouts, cancellation, and whole-process-tree kill exist | Submitted code inherits the agent account; no physical-agent trust-class authorization exists yet |

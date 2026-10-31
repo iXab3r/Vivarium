@@ -370,7 +370,7 @@ Requirements for the REST Expert:
 - asynchronous operation resources instead of keeping an HTTP request open for long work;
 - correlation IDs linking REST requests, agent requests, operations, audit, and bounded logs;
 - cookie plus anti-forgery protection for UI writes and bearer-token scopes for API clients;
-- no requirement to load React in order to test or use the API.
+- no requirement to load TypeScript in order to test or use the API.
 
 ## 10. Permissions, audit, and logs
 

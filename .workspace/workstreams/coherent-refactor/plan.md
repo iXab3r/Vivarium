@@ -1,10 +1,11 @@
-# Coherent Vivarium refactor — plan v1.1
+# Coherent Vivarium refactor — plan v1.2
 
 Status: **draft for owner iteration, not an implementation authorization or accepted ADR**.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately
-into main. Other pending design choices remain draft.
+into main. D34/D35 now accept Depot authentication/superuser, TeamCity RBAC 1:1 in PG,
+Chiral-owned resource settings, and Depot's TypeScript/Vite Workbench UI. Remaining choices are draft.
 
 ## Outcome and boundaries
 
@@ -79,17 +80,20 @@ Do not introduce a distributed Chiral PostgreSQL transport just because business
 
 Git owns trusted build definitions and desired fleet configuration. Chiral's private file storage owns
 resource settings and their restart/CAS contract. Credentials and runtime state stay out of Git.
-The proposed Depot-style local RBAC authority is an explicit decision, not a silent exception to D23.
+D34 explicitly makes current users, groups, editable TeamCity roles and scoped grants PostgreSQL data;
+the old Git-RBAC authority is retired by the replacement, not retained alongside it.
 No parallel YAML/C# authoring authorities survive final acceptance.
 
-Use real EyeAuras.Chiral, EyeAuras.Storage and Workbench contracts. Use ASP.NET Core Identity,
-OpenIddict and EF stores for the authentication mechanisms that are approved. Depot is an example,
+Use real EyeAuras.Chiral, EyeAuras.Storage and Workbench contracts. D34 selects ASP.NET Core Identity,
+OpenIddict and EF for Depot-style authentication; TeamCity supplies the exact authorization semantics.
+D35 selects pinned Workbench + TypeScript/Vite, without requiring React or a frontend runtime server.
+Depot is an example,
 not a dependency that must run beside Vivarium, and it does not expose a ready-made shared Identity
 package. Copying its complete Host or inventing a shared platform prematurely would retain complexity.
 See [reuse evidence and limits](depot-study.md) and [pending decisions](decisions.md).
 
-`/api/v1`, React UI, CLI and `/app/rest` call the same domain services, authorization and Git mutation
-path. No separate TeamCity database, alternate scheduler or permissive compatibility administrator.
+`/api/v1`, Workbench UI, CLI and `/app/rest` call the same domain services, authorization and appropriate
+Git/PG/Chiral mutation path. No separate TeamCity database, alternate scheduler or permissive compatibility administrator.
 Preserve old-agent protocol compatibility at the frozen protocol boundary; retire transitional
 ControlPlane and SQLite only after named consumers/data have a verified replacement or disposition.
 
@@ -215,8 +219,9 @@ report that separately from replacement savings. A final “cleanup later” bac
 
 ## Next iteration
 
-Review the P0 decision alternatives first, especially superuser, RBAC authority, C# editing and exact
-wire scope. Then refine milestone boundaries/scenarios and issue acceptance. Only after those choices
+Superuser/authentication, TeamCity RBAC/PG authority and Depot UI composition are now accepted in
+D34/D35. Review remaining choices, especially C# editing, exact wire variants, storage integration and
+history conflict units; refine milestone scenarios and issue acceptance. Only after those choices
 are recorded as accepted ADR updates should the first executable R0 milestone branch begin.
 The old [migration phases](../teamcity-migration/phases.md) are discovery scaffolding; this draft
 proposes a coordinated replacement sequence without yet overriding the accepted roadmap.

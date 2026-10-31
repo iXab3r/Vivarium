@@ -26,7 +26,7 @@ route/variant census before implementing or estimating the facade.
 ## One application model, two HTTP projections
 
 ```text
-React / viv-cli ------> /api/v1 -----------+
+Workbench / viv-cli --> /api/v1 -----------+
                                          +--> shared application services
 teamcity-cli / clients -> /app/rest ------+     authorization / Git / audit / execution / results
 ```

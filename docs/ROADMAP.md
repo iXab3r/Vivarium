@@ -1,12 +1,17 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D33) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D35) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
 iterated, Depot-informed replacement plan before implementation. The [draft coordinated plan](../.workspace/workstreams/coherent-refactor/plan.md)
 contains milestone gates, pending decisions, scenarios and issue routing. It does not yet supersede
 accepted decisions or claim that the new implementation exists. Resolve P0 before starting it.
+
+Owner clarifications: D34 accepts Depot authentication/superuser and TeamCity authorization 1:1;
+D35 accepts Chiral configuration ownership, PostgreSQL business state and Depot's actual
+TypeScript/Vite Workbench UI. RF-10 permits each verified milestone to merge separately into main.
+These target decisions are recorded; their runtime replacement is not implemented.
 
 ## Immediate priority — replace TeamCity without functional loss (D32)
 
@@ -170,14 +175,14 @@ Phase 1 delivery sequence (completed and remaining):
      setup/recovery UI and local CLI, and removal of legacy credential adapters.
    Dynamic process/network/environment refresh waits for policy, fleet authorization, operation
    persistence, and observation fencing.
-7. **Partial:** complete deployment and release UX, then port the proven flows to React/EyeAuras Workbench.
+7. **Partial:** complete deployment and release UX, then port the proven flows to TypeScript/EyeAuras Workbench.
    The D30 per-Agent central upgrade core is implemented: exact Server-release package import, authenticated
    delivery, pre/post-handoff cancellation semantics, durable drain/restart/probation/two-sided
    commit/rollback history, bounded singleton child supervision, strict local package evidence,
    exact prior/deadline binding, durable failure quarantine, bounded session outboxes, supervised-
    bootstrap capability gating, skew-safe watchdogs, CLI, restart recovery, two-Agent isolation, and real bootstrap success/rollback
    process evidence. Remaining work is installer/stamped archives,
-   fleet rollout/channels, release signing/packaging, previous-version/Windows gates, and the React UI
+   fleet rollout/channels, release signing/packaging, previous-version/Windows gates, and the TypeScript UI
    (D2, D19-D21, D25, D30).
 
 Static typed facts deliberately precede the first Git-backed mutation because they are observed state,
@@ -195,8 +200,8 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   implemented. General identity/RBAC management, runtime operations, remaining configuration mutations,
   and detailed result resources remain. The live CLI build flow now consumes REST/SSE; the gRPC ControlPlane is frozen
   transitional compatibility only (D24, D28).
-- React + EyeAuras Workbench panel as a clean replacement for the current Blazor prototype. Vendor the
-  reviewed core/React/router built packages with exact source commit, license, notice, and reproducible
+- TypeScript + EyeAuras Workbench panel as a clean replacement for the current Blazor prototype. Vendor the
+  reviewed core/TypeScript/router built packages with exact source commit, license, notice, and reproducible
   sync metadata; serve static assets from Kestrel and consume REST/SSE only. The shell uses a narrow
   TeamCity/AgentExplorer/Administration switch rail plus one expandable context pane; Agents is a
   dedicated collection route and every Agent has a separate detail route with Agent-local tabs (D25).
@@ -207,9 +212,11 @@ contracts. The checklist below records the remaining acceptance scope; it does n
 - TeamCity Project and Build Configuration catalog over Git-backed definitions, including ordered
   steps, requirements, parameters, VCS bindings, immutable definition/source revisions, and compatible/
   incompatible-agent explanations (D14, D17, D23).
-- TeamCity-compatible RBAC plus separate fleet/AgentExplorer permissions; one-time local first-admin claim,
-  managed-local Git baseline, durable resumable setup, and explicit bounded Superuser recovery. Migrate
-  coarse admin/submit tokens without widening their authority (D26).
+- Depot-style Identity/OpenIddict OIDC and normal installation-user login; TeamCity role/permission
+  IDs, editability, project/group inheritance and REST behavior 1:1, persisted in PostgreSQL (D34).
+  Replace custom setup/recovery/password/Git-RBAC paths with verified framework composition; migrate
+  existing users and coarse admin/submit consumers under an explicit disposition. Native AgentExplorer
+  extension actions keep distinct permission IDs without changing TeamCity grants.
 - Durable structured audit journal and bounded/redacted diagnostic, build, and AgentExplorer output with
   correlation/idempotency/Git revision linkage (D27).
 - Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
@@ -248,7 +255,7 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   and immutable build snapshots for the earlier parameter model already exist (D8, D16, D23).
 - Live service-message parsing/streaming remains deferred; step status + heartbeats suffice for the
   Phase-1 core (D14).
-- React panel: port the implemented agent/build/result views, then expose the durable TRX-derived
+- TypeScript panel: port the implemented agent/build/result views, then expose the durable TRX-derived
   per-test projection through public REST and add live log tail (plain durable build/cell details and
   artifact downloads exist in the transitional Blazor panel; the full test × scenario view with
   history comes later).

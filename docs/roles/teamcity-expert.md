@@ -162,7 +162,7 @@ Do not independently change:
 - SQLite schema, migrations, serialized-writer implementation, or transaction boundaries;
 - AgentExplorer process, network, environment, file, software, or remote-command operations;
 - common REST conventions or authentication primitives;
-- React/Workbench components or navigation;
+- TypeScript/Workbench components or navigation;
 - Git credential storage or repository implementation;
 - platform-specific collectors or process-launch primitives;
 - global role definitions or log-retention infrastructure.

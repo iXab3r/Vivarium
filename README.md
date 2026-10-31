@@ -22,6 +22,9 @@ A vivarium is an enclosure that keeps organisms under controlled conditions for 
 > [behavioral parity contract](docs/design/teamcity-parity.md) and [roadmap](docs/ROADMAP.md).
 > Existing TeamCity clients are also a target through the planned
 > [REST compatibility facade](docs/design/teamcity-rest-compatibility.md), over the same application services.
+> D34/D35 refine the target: Depot-style Identity/OIDC and installation user, TeamCity roles and
+> permissions 1:1 in PostgreSQL, Chiral-owned resource settings, and Depot-style TypeScript/Vite
+> Workbench UI. Current custom login/Git-RBAC/Blazor remains transitional code.
 > The design is documented in
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the shape), [`docs/ROADMAP.md`](docs/ROADMAP.md) (the order),
 > [`docs/design/README.md`](docs/design/README.md) (focused subsystem designs),
@@ -45,7 +48,7 @@ Answering those requires real OS installations with versioned, restorable state 
 ```mermaid
 flowchart LR
     CLI["viv-cli / your CI"] --> REST
-    UI["React + Workbench panel"] --> REST
+    UI["TypeScript + Workbench panel"] --> REST
     REST["REST + SSE management plane"] --> C
     C["Controller + in-process Chiral<br/>Git build plans + scheduler + results<br/>AgentHub + blobs + PostgreSQL target"]
     C -- "checkpoint / revert / start / stop" --> D["Host driver<br/>Hyper-V · QEMU/KVM · Tart"]

@@ -7,7 +7,13 @@
 
 ## 1. Purpose
 
-Vivarium needs one automation-grade management model. The React panel and `viv-cli` use native
+D34/D35 refine the target below: Depot-style Identity/OpenIddict and installation user, TeamCity
+authorization 1:1 with live PostgreSQL identity/RBAC, Chiral-owned private resource settings, and
+TypeScript/Vite Workbench UI. Existing setup/recovery/Git-RBAC endpoints are legacy implementation
+evidence to replace. Only versioned desired settings use Git activation; identity/role mutations use
+the common PG authorization/audit path, and resource configuration uses Chiral.
+
+Vivarium needs one automation-grade management model. The TypeScript panel and `viv-cli` use native
 `/api/v1`; D33 additionally requires a [TeamCity-compatible facade](teamcity-rest-compatibility.md)
 for unchanged existing clients. Both HTTP contracts call the same application services and current
 authorization/Git/audit rules. The facade is planned; it is not provided by the current ControlPlane
@@ -99,7 +105,7 @@ ambiguous behavior.
   `activate` or `rollback` directive after handoff. `viv-cli` consumes the public management resources for
   package publication and upgrade/status commands.
 - General identity/RBAC management, all other desired-configuration mutations, generic AgentExplorer
-  runtime operations, detailed result resources, and the React client remain planned.
+  runtime operations, detailed result resources, and the TypeScript client remain planned.
 
 ### Target
 
@@ -699,14 +705,14 @@ share infrastructure but are distinct records with different retention and acces
   idempotency and precondition requirements, examples, and enum descriptions.
 - Schemas document sensitivity and redaction. Secret plaintext response fields carry an explicit
   one-time-delivery extension, are absent from replay schemas, and never appear in examples.
-- CLI and React UI consume generated types/clients from the reviewed OpenAPI contract. Handwritten
+- CLI and TypeScript UI consume generated types/clients from the reviewed OpenAPI contract. Handwritten
   wrappers may add UX behavior but may not invent endpoints or response shapes.
 - UI and CLI integration tests run against a real Kestrel REST host. In-process method calls do not
   count as public contract coverage.
 - External integrations may use plain HTTP without the Vivarium CLI. `curl` examples remain a design
   acceptance test for non-streaming operations.
 
-The React/Workbench UI uses REST for data and mutations and SSE for live projections. The CLI build
+The TypeScript/Workbench UI uses REST for data and mutations and SSE for live projections. The CLI build
 flow now implements the following coherent path:
 
 1. `viv-cli login` stores REST trust/credentials using the same pinned-controller identity rules; no CLI
@@ -774,7 +780,7 @@ release note rather than being hidden as a compatibility change.
 Before declaring the first REST slice complete, provide:
 
 1. A numbered architecture update reconciling D4, component descriptions, protocol sketch, and the
-   React/public-API panel model.
+   TypeScript/public-API panel model.
 2. OpenAPI snapshot validation and a breaking-change check in CI.
 3. Tier-2 Kestrel tests for authentication, anti-forgery, authorization, validation, and problem
    details.
@@ -793,7 +799,7 @@ Before declaring the first REST slice complete, provide:
 10. Endpoint/permission matrix tests supplied with User Roles review.
 11. Audit tests correlating HTTP request, Git change or runtime operation, agent dispatch, and terminal
     outcome while proving secret redaction and bounded log volume.
-12. CLI and React smoke tests that use REST rather than database or private in-process shortcuts,
+12. CLI and TypeScript smoke tests that use REST rather than database or private in-process shortcuts,
     including `viv-cli run` upload/submit/watch, local Ctrl+C, and explicit `viv-cli cancel` semantics.
 13. Blob discovery/staging tests proving cross-principal non-disclosure, hash verification, immutable
     build references, fenced assignment download, owned artifact upload, reconnect, cancellation
@@ -836,7 +842,7 @@ Before declaring the first REST slice complete, provide:
 6. Complete first-run administration and RBAC, then implement restart-safe runtime actions such as
    Agent inventory refresh with idempotency, durable operation state, AgentHub dispatch, fencing, and
    audit. Dynamic sensitive inventory does not ride on the static-facts shortcut.
-7. Expand TeamCity and AgentExplorer surfaces and port proven views to React only after their experts
+7. Expand TeamCity and AgentExplorer surfaces and port proven views to TypeScript only after their experts
    approve each lifecycle and the Agent API/SDK Expert supplies the required capabilities.
 8. Remove the transitional gRPC ControlPlane after CLI migration and before the first supported public
    release; keep AgentHub and the object-authorized blob data plane.

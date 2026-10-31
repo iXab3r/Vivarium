@@ -76,7 +76,7 @@ co-hosted nodes do not turn every local call into a remote message.
 ```mermaid
 flowchart LR
     CLI["viv-cli / automation"] -- "REST /api/v1" --> C
-    UI["React + EyeAuras Workbench"] -- "REST + SSE" --> C
+    UI["TypeScript + EyeAuras Workbench"] -- "REST + SSE" --> C
     C["Controller<br/>ASP.NET Core + in-process Chiral<br/>REST + AgentHub + blobs + scheduler + Git plans + PostgreSQL"]
     C -- "create pool VM / checkpoint / revert / destroy" --> D["Host drivers<br/>Hyper-V · QEMU/KVM · Tart"]
     subgraph Clone ["Agent: pool VM or enrolled physical host"]
@@ -90,7 +90,7 @@ flowchart LR
 - **Controller** (`Vivarium.Controller`): Git reconciliation, REST management, build queue, AgentExplorer
   operations, image registry, scheduler, machine providers, agent rendezvous (gRPC), blob store, and
   operational/result store (PostgreSQL target; SQLite currently). One Kestrel host serves the API and
-  built React assets; Chiral composes logical resource owners in the same initial process (D32).
+  built TypeScript/Workbench assets; Chiral composes logical resource owners in the same initial process (D32/D35).
 - **Machine providers** (D15): supply Agents to the queue — a static pool of enrolled Agents (physical boxes, hand-managed VMs), hypervisor providers that maintain pools of pristine VMs per `ImageVersion` (host drivers live here), and later cloud providers for short-living instances.
 - **Host driver** (per hypervisor): `CreatePoolVm(imageVersion)`, `Start`, `Stop`, `TakeCheckpoint`, `RestoreCheckpoint`, `Destroy`, `GetConsoleEndpoint`. Nothing else — no guest file copy, no guest exec (see D1). In-process .NET implementations first; if third-party drivers ever appear, garm's external-executable provider contract is the sanctioned escape hatch.
 - **Bootstrap** (`Vivarium.Bootstrap`): the only thing baked into images. Frozen contract (§7).
@@ -187,7 +187,7 @@ host (`GET/PUT /blobs/{sha256}`): idempotent and retryable, deduplicated by cons
 with curl, and free of gRPC message-size ceilings. Implemented blob endpoints carry the same bearer
 tokens as gRPC; planned bootstrap/setup endpoints must also be authenticated, with initial trust as
 specified by D21. The Phase-1 **agent**, **submit**, and **admin** tokens are a coarse implementation
-baseline; the target user/service-account permission model and first-run claim are D26. A CI secret
+baseline; the target user/service-account model and Depot-style sign-in are D34. A CI secret
 must not be able to perform AgentExplorer remote execution on a dev box. And the blob store defends
 itself: the server verifies that a `PUT /blobs/{sha256}`
 body actually hashes to its name — a content-addressed cache an agent can poison is worse than none.
@@ -717,23 +717,25 @@ epoch is stale evidence and cannot update the current Agent projection. Legacy a
 the Build protocol they negotiated; they never receive AgentExplorer mutations or general work leases,
 and provider-managed agents upgrade before readiness.
 
-### D23. Git is the source of truth for mutable desired configuration
+### D23. Git is the source of truth for versioned desired configuration
 
-**D32 resource-settings refinement:** Git remains authoritative for build definitions, fleet desired
-policy and current RBAC declarations. Private Host/resource settings, including database connections
+**D34/D35 refinement:** Git remains authoritative for build definitions and versioned fleet desired
+policy. Local users, roles, groups and grants are PostgreSQL application data, not Git declarations.
+Private Host/resource settings, including database connections
 and their secret values, move through Chiral's managed settings and restart lifecycle. They are not
 duplicated in Git or a second product settings store. This target exception is not yet implemented.
 
-Every durable setting or property becomes effective from a validated Git revision: Projects and Build
-Configurations, fleet/pool policy, agent names/custom properties/enablement policy, RBAC assignments,
-retention and non-secret server settings, provider/image recipes, and other desired state. Repository-
+Versioned desired settings become effective from a validated Git revision: Projects and Build
+Configurations, fleet/pool policy, agent names/custom properties/enablement policy,
+retention policy, provider/image recipes, and other declared desired state. Host/resource settings
+use Chiral instead of a second Git schema. Repository-
 owned `vivarium.yaml` remains with the product (D17); controller-owned desired state lives in a control
 repository initialized or adopted during first-run administration (D26).
 
 The first-release control repository is managed-local Git with direct commits on its authoritative
 branch, so an air-gapped first run is deterministic. A Project may explicitly bind a product/settings
 repository and path; that repository owns its Build Configuration definitions and source revision,
-while the control repository owns Project identity/metadata, repository bindings, fleet/RBAC/server
+while the control repository owns Project identity/metadata, repository bindings, versioned fleet
 policy, and allowed paths. Every Build records the resulting revision set. Remote Git authority and
 review branches are opt-in and require private credential references plus verified HTTPS CA/SPKI or SSH
 host-key trust. Security-sensitive external commits are accepted only under attested identity or an
@@ -747,8 +749,9 @@ projection active and visible as stale/degraded; it never triggers a fallback mu
 Concurrent edits carry an expected base revision. Rollback is a forward-moving revert commit, never
 history rewriting.
 
-SQLite remains authoritative for runtime facts and durable execution state and may cache materialized
-Git projections. Credentials, secret values, enrollment/session/heartbeat state, observations, builds,
+SQLite is the transitional implementation; PostgreSQL owns target runtime/business state and
+materialized Git projections. Users, role/group definitions and grants, credentials, secret values,
+enrollment/session/heartbeat state, observations, builds,
 operations, results, audit events, and high-volume logs stay outside Git. Git stores stable secret
 references only. Runtime actions are authorized and audited (D27), not manufactured into meaningless
 configuration commits. Detailed contract: [`design/git-versioning.md`](design/git-versioning.md).
@@ -760,7 +763,7 @@ existing surfaces: versioned storage migrations, D27's minimal durable audit jou
 and correlation context, and D26's common authorization evaluator. This foundation is transport-
 independent and does not create a competing management API.
 
-`/api/v1` is the public management contract for both TeamCity and AgentExplorer. The React panel, `viv-cli`
+`/api/v1` is the public management contract for both TeamCity and AgentExplorer. The Workbench panel, `viv-cli`
 CLI, automation, and external integrations call the same application services through REST; no client
 gets an in-process or direct-database mutation path. Resource representations expose stable IDs,
 separate configuration/observation/runtime revisions, optimistic concurrency, cursor pagination,
@@ -781,61 +784,26 @@ object visibility. Build submission dedupe is scoped by principal plus client re
 upload plans replace `MissingBlobs` without revealing cross-project presence, and object grants bind
 staging, assignment GET, owned-work PUT, result manifests, and human downloads to their Project/Build.
 
-### D25. The web panel is React on the vendored EyeAuras Workbench
+### D25. The web panel uses EyeAuras Workbench (refined by D35)
 
-The Phase-1 Blazor panel is transitional. The target panel is a TypeScript/React application built on
-EyeAuras UI Workbench and served as static assets by the controller's Kestrel host. Vivarium vendors a
-reviewed built package set with its exact source commit, license, notice, and reproducible sync metadata;
-the initial runtime set is Workbench core, React adapter, and React Router adapter. Tauri integration is
-not shipped, and the Monaco editor adapter waits until a file/editor workflow needs it (the Workbench
-core's required `monaco-editor` peer remains).
+The Blazor panel is transitional. D35 replaces the earlier React-adapter/vendoring prescription with
+Depot's demonstrated TypeScript/Vite and pinned Workbench package composition, served by the same
+ASP.NET Core Host. REST remains the browser management boundary and SSE carries live projections.
+CI entity pages retain stable IDs/deep links, compact actions, tables and tabs. The UI Expert owns
+the adapted workspace; [`design/ui.md`](design/ui.md) defines the target and replacement gates.
 
-The browser uses REST for reads/mutations and SSE for live projections. Configuration forms show the
-base/applied Git revision and reviewable diff and submit through the D23 mutation path. Information
-architecture begins with TeamCity-shaped Projects/Builds/Queue/Results and AgentExplorer Agents/Agent Details;
-Files and Commands may appear as clearly disabled planned surfaces before their agent capabilities ship.
-The Workbench shell has a compact top application bar, a narrow activity rail that switches TeamCity,
-AgentExplorer, and Administration, one adjacent resizable/expandable/auto-hide context pane for the
-selected workspace, and one canonical routed page.
-AgentExplorer's Agents collection is a dedicated page; selecting a name navigates to a separate stable
-Agent page whose Summary, Build History, Compatible Configurations, Environment, Processes, Network,
-Metrics, Logs, and Parameters are Agent-local tabs/deep links rather than global pane entries. Entity
-routes use immutable IDs rather than mutable names. Main pages follow
-modern TeamCity's compact breadcrumbs, object headers, actions, tabs, and operational tables rather than
-decorative dashboard cards.
-Every UI change routes through UI Expert. Detailed contract: [`design/ui.md`](design/ui.md).
+### D26. Authentication and authorization (refined by D34)
 
-### D26. Authorization follows TeamCity roles; first run is a one-time local claim
+D34 supersedes the original one-time-claim/setup saga, Git-owned users/RBAC and immutable built-in
+permission floors. The accepted target is Depot-style standard Identity/OpenIddict authentication
+plus TeamCity-compatible roles, permissions, scopes, groups and inheritance, stored in PostgreSQL.
+The existing SQLite/local-password/setup/recovery code is current implementation evidence only.
 
-Vivarium starts with TeamCity's recognizable built-in roles and additive inheritance: **System
-Administrator**, **Project Administrator**, **Project Developer**, **Project Viewer**, and **Agent
-Manager**. Project permissions follow the project tree; fleet permissions follow a separate fleet/pool
-tree so project access never implies sensitive AgentExplorer inventory, remote command, process control,
-file write, software mutation, secret-value, or global agent-management permission. Absence of a grant
-is denial; the first model has no explicit deny entries. Service accounts and personal tokens are
-attenuated identities under the same evaluator, and authorization is enforced below REST/UI/CLI
-adapters.
-
-Built-in role IDs and their minimum permission bundles are product schema/code; Git stores bindings,
-custom roles, and permitted additive customization, so a hostile or old commit cannot strip the
-security floor. Effective agent authorization is `applied desired authorization ∧ valid current
-credential generation ∧ no suspend overlay`. Durable enabled/maintenance policy is Git-backed;
-immediate drain/suspend is a persisted, audited operational overlay with precedence, reason, actor, and
-explicit release/expiry semantics. Ordinary unauthorize stops new work but preserves a fenced completion
-lane for an already running Build; deletion waits for quiescence and then atomically revokes/tombstones
-credentials. Git rollback never resurrects revoked credentials.
-
-An unclaimed controller generates a bounded single-use bootstrap token and emits it exactly once to a
-local protected startup channel (or an explicitly mounted secret file for noninteractive/container
-deployment). The token opens only the setup API. Exchange creates a durable resumable setup operation,
-so browser loss, restart, session expiry, or an explicitly configured remote review cannot strand the
-controller. The operation creates the first durable administrator, initializes/adopts the managed-local
-Git control repository and its baseline, assigns System Administrator, consumes the token, and moves the
-controller to active state. Host-local status/rotate/reissue/abandon/recover controls are explicit and
-audited; late results from an abandoned proposal cannot reactivate it. Normal restarts never
-regenerate a standing super-user credential. Explicit host-local recovery may mint a short-lived,
-single-use **Superuser** session, but it still cannot bypass Git activation, leases, audit, or secret
-redaction. Detailed contracts: [`design/authorization-model.md`](design/authorization-model.md) and
+Machine identity remains separate from human authentication. Existing Agent credential generations,
+assignment/session fences, audited suspension, quiescent deletion and the fenced completion lane for
+already running work remain required. Durable fleet desired settings follow D23; current credentials
+and operational safety overlays live in PostgreSQL and cannot be resurrected by Git rollback.
+Detailed contracts: [`design/authorization-model.md`](design/authorization-model.md) and
 [`design/first-run-administration.md`](design/first-run-administration.md).
 
 ### D27. Actions are auditable; logs are structured, redacted, and bounded
@@ -853,8 +821,9 @@ transaction. Automatic heartbeat, queue, scheduler, and conveyor transitions rem
 metrics, build annotations, or selective diagnostics rather than flooding the security audit stream.
 
 Bearer values, cookies, passwords, environment secrets, Git credentials, request bodies, and raw remote
-commands are not ordinary log fields. The only plaintext bootstrap-token exception is the single local
-first-run delivery required by D26; it is never repeated through REST/UI or forwarded diagnostic logs.
+commands are not ordinary log fields. D34 permits the installation user's newly generated startup
+password only in its intended private server-log disclosure; it is never returned by REST/UI reads
+or forwarded into ordinary diagnostic/audit streams. Legacy setup-token handling remains transitional.
 Audit and terminal execution history are crash-safe; retention/GC never silently changes the meaning of
 a retained Build. A terminal agent result carries immutable final sequence watermarks for every output
 stream. Result and output acknowledgements may be independent, but Agent release/reuse or provider
@@ -1019,7 +988,8 @@ replacement for workload idempotency. Remote Agents keep their authenticated exe
 do not receive controller business-database credentials. This refines D17, D23, the SQLite target in
 §3/§6 and the serialized-SQLite implementation mechanics of D27 without weakening their durability,
 authorization, audit, immutable-provenance or Git build-definition guarantees. SQLite/YAML remain
-current implementation until explicitly migrated; fleet/RBAC authority is not silently relocated.
+current implementation until explicitly migrated; D34 explicitly moves identity/RBAC to PostgreSQL,
+while versioned fleet desired configuration remains Git-owned.
 
 Reusable CI configurations may wait in the queue when no currently known Agent satisfies requirements,
 with visible reasons and bounded queue policy. D14's existing fail-fast, all-or-nothing payload-matrix
@@ -1066,6 +1036,69 @@ and other consumers. The required conformance gate uses unchanged clients and is
 fixtures, not production TeamCity writes. See
 [`design/teamcity-rest-compatibility.md`](design/teamcity-rest-compatibility.md) and the stable
 `TC-WIR-*` requirements in the parity catalog. This facade is planned, not implemented.
+
+### D34. Reuse Depot authentication and match TeamCity authorization
+
+Accepted owner direction, 2026-10-31; implementation is pending. Reuse Depot's framework composition:
+ASP.NET Core Identity/EF in PostgreSQL, stock OpenIddict OIDC code/PKCE, a local user keyed by trusted
+issuer plus opaque subject, the normal application cookie, persistent framework keys, and framework
+token issuance/validation/revocation. OIDC authenticates identity; provider role claims are not the
+authorization authority. Email matching never links users or promotes the first visitor.
+
+Use Depot's reserved technical installation Identity user and ordinary password sign-in. Its fresh
+startup password is committed through Identity before its intended private log disclosure. Enabled
+state/current authority is checked on requests; ordinary OIDC users can receive administrator access
+online. This replaces the custom setup/recovery saga as the target, not the installed code today.
+Do not recreate a custom password verifier, token database, session epoch or parallel superuser API.
+Reuse framework code/patterns without requiring the Depot service or copying its package-domain policy.
+
+Above authentication, match TeamCity's authorization model 1:1: external role/permission IDs,
+editable role definitions, included roles, global/project assignments, project-tree and nested-group
+inheritance, effective permission queries, delegation/shared-Agent-pool rules, and corresponding
+REST reads/mutations. Include the source server's custom roles. The reference is the captured owner
+server (2026.1.3), pinned CLI and documented API; do not substitute new internal names or immutable
+minimum role bundles. Simple/per-project modes and optional guest/All Users policy belong to the
+compatibility inventory; guest access is not implicitly enabled by migration or OIDC login.
+
+Identity users, external links, account eligibility, roles, groups, memberships, grants and framework
+token state are PostgreSQL application data, edited through common authorized/audited services. This
+explicitly retires Git RBAC authority under D23. Recheck current effective permissions for browser
+and API credentials; no stale role-claim authority. Native `/api/v1` and TeamCity `/app/rest` share
+that evaluator and persistence. New AgentExplorer-only actions use separate permission IDs/scopes
+without weakening or restricting the copied TeamCity permission semantics.
+
+Ordinary identity lifecycle and compatible token/user endpoints must be specified from actual clients;
+Depot's deferred account deletion/linking and package token scopes are not automatically Vivarium
+limits. Adoption of the framework does not prove wire compatibility. Required evidence includes
+unchanged-token/cookie withdrawal, nested and project inheritance, editable roles, project-limited
+delegation, and unchanged CLI role/group/user mutations. See the focused Identity/authorization designs.
+
+### D35. Use Depot's node/configuration boundaries and Workbench UI composition
+
+Accepted owner direction, 2026-10-31; implementation is pending. One initial Host composes logical
+Chiral resource owners with explicit schemas, dependencies/readiness and configuration lifecycle.
+Git stores versioned desired configuration, never operational state. PostgreSQL stores all structured
+business/runtime data and Git projections; SQLite is retired after verified replacement/data handling.
+Chiral's private managed settings hold resource configuration such as DB/OIDC/storage connections,
+including masked secrets, with CAS and saved-versus-active restart semantics. Do not invent a second
+settings service. Large log/artifact bytes use EyeAuras.Storage where its contract fits; PostgreSQL
+owns references, manifests, authorization, retention and import lineage. Framework keys/settings need
+private durable storage and backup; “PostgreSQL for state” does not mean binary artifacts inside SQL.
+
+Follow Depot's actual production UI: TypeScript/Vite plus the pinned `@eyeauras/workbench` package
+(reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
+adapters, a frontend runtime server, and an extra application framework are not required. Workbench
+provides the shell, rail, tree/list, split inspector and controls; native Identity pages keep stock
+handlers and share product styling/navigation. Server-supplied account/antiforgery bootstrap contains
+no bearer secret. UI queries/mutations use same-origin authorized REST, with server-side current rights.
+
+Adapt Depot's composition, not its repository/package model: Vivarium needs Projects/Builds,
+Queue, Agents, Nodes and Access, with build-local logs/tests/artifacts/dependencies and stable deep
+links. Nodes reuse schema forms, masked secret replacement, stale-edit handling and saved/active
+state. Access exposes TeamCity roles/groups/project assignments, not package Read/Write/Delete grants.
+Remove Blazor surfaces at their proven replacement milestone; do not build screens twice indefinitely.
+Real ordinary-user UI journeys run through EyeAuras.Automation/Reqnroll/Playwright against actual
+Host/PG/storage, with independently selectable cases and guarded credential diagnostics.
 
 ## 5. Protocol sketch
 
@@ -1199,7 +1232,7 @@ only the local watch and never changes remote build state.
 
 All new management capabilities are REST-first. REST must cover blob discovery/upload staging,
 durable build watch/cancel, agents/hosts, Git configuration changes, authorization, audit, and
-AgentExplorer operations before the CLI or React panel depends on them. Secret-producing endpoints never
+AgentExplorer operations before the CLI or Workbench panel depends on them. Secret-producing endpoints never
 persist or replay plaintext as an idempotency response; replay proves the original side effect and
 returns only non-secret metadata after rechecking current authorization. Blob access is object-scoped:
 an agent may fetch only assignment-referenced payloads and publish only for its owned work; human and
@@ -1216,8 +1249,9 @@ service-message projection, outcome classification, and provider epilogues remai
 
 TeamCity's entities plus the provider/image layer:
 
-Desired `Project`/`BuildConfiguration` and fleet/RBAC/server settings are committed Git trees (D23),
-materialized into controller projections. Operational entities are:
+Desired `Project`/`BuildConfiguration` and versioned fleet settings are Git trees (D23), materialized
+into PostgreSQL projections. Identity/RBAC is live PostgreSQL application data (D34); private resource
+settings are Chiral-owned (D35). Operational entities are:
 
 `Project` → `BuildConfiguration` (steps, requirements, parameters, artifact rules, matrix axes) →
 `Build` (state, failure class per D9, log, `TestOccurrence`s, artifacts; a matrix build is a composite
@@ -1242,7 +1276,7 @@ snapshot of the resolved definition. Submitted `vivarium.yaml` bytes are authori
 than presented as a reproducible Git revision. Names remain display metadata; later Git or UI edits
 never rewrite historical identity.
 
-Storage target under D32: Git-owned build/fleet/RBAC definitions, private Chiral resource settings,
+Storage target under D32/D34/D35: Git-owned build/fleet definitions, private Chiral resource settings,
 PostgreSQL for applied projections and durable business state, and object/blob storage for bytes.
 The current implementation still uses SQLite WAL with one serialized writer channel for projections,
 runtime work, observations, audit and provenance. Its transaction/ownership guarantees must survive
@@ -1405,7 +1439,7 @@ orchestrator — is the reference for that driver.
 
 ## 11. Web panel
 
-React + EyeAuras Workbench, built to static assets and served by the controller (D25). The browser is
+TypeScript + EyeAuras Workbench, built to static assets and served by the controller (D25/D35). The browser is
 an ordinary `/api/v1` client and uses SSE for live projections; it does not call controller services or
 SQLite directly. A narrow activity rail switches the three explicit workspaces; one expandable context
 pane shows the selected workspace's tree/navigation and the main area contains a canonical routed page
@@ -1419,8 +1453,9 @@ with breadcrumbs, object header/actions, and local tabs. Initial product navigat
 
 **Administration** includes Agent deployment/enrollment and pending authorization, Images/providers,
 Downloads, Users/Roles, Git
-configuration/reconciliation, and Audit. Every desired-setting form shows its base/applied Git revision,
-diff, validation, and direct-commit or review status. Authentication follows D26; the browser's one-time
+configuration/reconciliation, and Audit. Versioned desired-setting forms show their Git revision/diff
+and apply state; resource forms show Chiral saved/active revisions; Access edits live PG authority.
+Authentication follows D34; the browser's one-time
 self-signed-certificate warning remains expected and documented.
 
 ## 12. Prior art
@@ -1442,10 +1477,10 @@ project invites strangers.
   operator recovery procedures, and the honest caveat that a dev machine doubling as controller
   sleeps, reboots, and hibernates. Ordered checksummed startup migrations and newer-schema refusal now
   exist; operational backup/restore remains unresolved.
-- **Authorization rollout** — D26's first local claim, named first administrator, built-in role floor,
-  Git User/RoleBinding projection, and explicit recovery session are implemented. Legacy admin/submit
-  credentials remain migration adapters, and groups, service accounts, PATs, custom roles, project-tree
-  inheritance, and general user/role management must land without widening those legacy scopes.
+- **Authorization rollout** — custom local login/setup/recovery and Git User/RoleBinding projections
+  are implemented legacy mechanisms. D34's Depot-style Identity/OIDC/installation account and exact
+  TeamCity editable roles/groups/project inheritance are pending replacement in PostgreSQL. Inventory
+  existing users and admin/submit consumers before retiring them; framework reuse alone is not API parity.
 - **Git bootstrap and credentials** — D23 accepts a managed-local repository as the deterministic
   first-run default; remote authority still needs proven SSH/HTTPS host trust, private credential
   references, branch protection/review behavior, and failure recovery.

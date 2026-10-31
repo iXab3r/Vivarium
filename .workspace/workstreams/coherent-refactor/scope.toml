@@ -15,7 +15,8 @@ source_configurations = 97
 accepted_configurations = 0
 behavioral_requirements = 120
 implementation_milestones_accepted = 0
-planning_gate = "P0 remains open; draft decisions do not replace D20/D23/D26/D32/D33."
+planning_gate = "P0 remains open for unresolved choices; D34/D35 accept Depot authentication, TeamCity RBAC in PG, Chiral state ownership and TypeScript Workbench UI. RF-10 accepts separate milestone merges."
+accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12"]
 
 [authority]
 authorized = "Read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."

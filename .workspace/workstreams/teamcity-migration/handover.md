@@ -52,6 +52,10 @@
 - Owner's next step is now coordinated refactor planning and iteration, before product implementation.
   See `../coherent-refactor/plan.md` and its decision/scenario/issue ledgers. The earlier small Compile
   slice is retained as an R2 acceptance journey inside that draft, not an instruction to start coding.
+- Subsequent owner choices are accepted as D34/D35: Depot-style Identity/OIDC/installation user,
+  TeamCity role/permission/group/scope behavior 1:1 with live PG identity/RBAC, Chiral resource settings
+  and Depot's actual TypeScript/Vite Workbench UI. Old Git-RBAC/claim/React targets are superseded;
+  operational SQLite/password/Git-RBAC/Blazor source remains unchanged until verified replacement.
 - Before every family cutover, recover exact live script/settings values through a supported safe
   export/source path and prove observed semantics; current CLI intentionally redacts many values.
 - Large chat diff explanation: fast-forward 0999792 -> 09dd40b brought 263 pre-existing files,

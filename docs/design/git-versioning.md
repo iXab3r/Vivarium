@@ -8,8 +8,9 @@
 ## 1. Decision
 
 Git is Vivarium's day-one source of truth for mutable **build/fleet desired configuration and properties**
-and existing RBAC declarations. D32 makes private Host/resource settings a bounded exception: use
-Chiral's managed store and restart lifecycle for database/resource connections and their secrets,
+only. D34 explicitly moves users/groups/roles/grants to PostgreSQL application data; the existing
+Git identity/RBAC schemas below are transitional implementation evidence, not target authority.
+D35 uses Chiral's managed store and restart lifecycle for database/resource connections and their secrets,
 without duplicating those settings in Git or a hidden business-DB override.
 An edit to those Git-owned definitions through REST, the UI, or the CLI is a Git mutation with the same schema,
 validation, concurrency, commit, and reconciliation behavior as a human-authored repository change.
@@ -29,7 +30,7 @@ they also change desired state.
 Two Git authorities are expected:
 
 1. A **controller configuration repository** owns fleet-wide desired state: project catalog,
-   AgentExplorer policies, agent custom properties and enablement, RBAC, providers, image catalog and
+   AgentExplorer policies, agent custom properties and enablement, providers, image catalog and
    recipes, and controller policy.
 2. A **tested product repository** owns the build configurations that test that product, preserving
    D17/D32's definitions-next-to-code model: C# for the new catalog, YAML for the transitional API.
@@ -44,7 +45,7 @@ revision provenance remain distinct in the model.
 | Resource | Controller configuration repository | Tested product repository |
 |---|---|---|
 | Controller settings, retention, feature and distribution policy | Owns | Does not own |
-| Users, groups, roles, bindings, project access policy | Owns | Does not own credentials or RBAC |
+| Users, groups, roles, bindings, project access | Neither owns: PostgreSQL authority under D34 | Does not own credentials or RBAC |
 | Project catalog entry, display metadata, repository identity and allowed config paths | Owns | Is referenced by the catalog |
 | Build configurations, ordered steps, requirements, parameters, triggers, matrix, artifact and failure rules | References and materializes | Owns in committed `vivarium.yaml` |
 | Agent desired name, authorization/enablement, custom parameters and operation/deployment policy | Owns | Does not own |

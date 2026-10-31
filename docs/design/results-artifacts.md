@@ -565,7 +565,7 @@ states for a TeamCity-shaped experience:
   cancellation states, and child-build drill-down.
 - Composite: child status/provenance without flattening child evidence.
 
-The API, not React components, owns status rollup and identity. The UI Expert owns Workbench parts,
+The API, not TypeScript components, owns status rollup and identity. The UI Expert owns Workbench parts,
 routes, commands, accessibility, virtualized tables, colors, icons, and responsive behavior. Result
 states must always have textual labels; color alone is insufficient.
 
@@ -832,7 +832,7 @@ model additively.
 4. What are the first-release artifact/report/log quotas and inherited retention defaults?
 5. Does sensitive-artifact classification require per-entry ACLs, or is a separate project-level
    permission sufficient initially?
-6. Which fields are frozen in the public v1 REST representation before the React UI begins consuming
+6. Which fields are frozen in the public v1 REST representation before the TypeScript UI begins consuming
    it?
 7. How long are raw reports retained after normalized occurrences, and may metadata survive deliberate
    artifact expiration?

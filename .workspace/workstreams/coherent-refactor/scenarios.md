@@ -1,7 +1,7 @@
 # Acceptance scenario catalogue — draft v1
 
 Write executable English `.feature` files as each approved mechanism is implemented; this table is
-the planning catalogue, **not 34 implemented/passing scenarios**. Each case is independently selected
+the planning catalogue, **not 35 implemented/passing scenarios**. Each case is independently selected
 and owns a fresh fixture where isolation is needed. Scenario outlines cover named variants, not a
 Cartesian product of every OS, role, runner and fault. `requirement-routing.tsv` assigns every existing
 TC requirement to its primary milestone and candidate scenarios; that is planning coverage only.
@@ -42,6 +42,7 @@ TC requirement to its primary milestone and candidate scenarios; that is plannin
 | S32 | R6 | Cumulative diff adds new, skips unchanged and previews changed entities; keep/replace choices are whole-entity, source cleanup never deletes imported history | Simulator deltas + captured data, stable lineage/hash reconciliation |
 | S33 | R6 | TeamCity/Vivarium coexist on isolated workspaces and one trigger/publisher owner; final delta/switch/family rollback have an explicit write boundary | Real local family/client rehearsal + operator runbook |
 | S34 | R6 | Candidate runs all accepted families and UI journeys after legacy stores/routes are removed; no hidden dependency on TeamCity survives | Full declared suite + offline source-independent historical reads |
+| S35 | R1/R5 | An administrator edits a built-in/custom role and its includes, assigns scoped roles through nested groups, and delegates only within their project; unchanged cookie/token reflects the resulting inherited rights | Cheap inheritance tests + real PG policies + actual Access UI and unchanged TeamCity CLI; shared-pool and denied sibling mutations |
 
 Example shape (pending decisions intentionally do not choose the superuser model):
 

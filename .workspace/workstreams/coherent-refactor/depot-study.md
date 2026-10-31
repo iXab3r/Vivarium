@@ -51,7 +51,7 @@ Reuse the task shape, not its milestone numbers, package-domain features or 101-
 | Object storage | Host pins `EyeAuras.Storage` to `0.1.0-depot.73.1`; `Storage/*`, configuration modules | Use streaming/object contracts where fit; CI manifests, dependency mapping, retention and GC policy remain Vivarium responsibilities |
 | Identity | `Identity/DepotIdentityRegistration.cs`, `DepotExternalUsers.cs`, `DepotSignInManager.cs`; `docs/architecture/authentication.md` | Stock Identity/EF + OpenIddict code/PKCE and persistent keys. These are app-owned composition, not an existing reusable Depot Identity NuGet |
 | Current access | `Access/DepotCurrentAccess.cs`, resource handlers; `docs/architecture/roles.md` | Reuse policy pattern and same-cookie/JWT tests. Package Read/Write/Delete and default-public repositories are not appropriate CI defaults |
-| Superuser | `tests/scenarios/Superuser.feature`, authentication/roles designs | Normal Identity installation account with rotated startup password. Conflicts with Vivarium D26; explicit RF-01 decision required |
+| Superuser | `tests/scenarios/Superuser.feature`, authentication/roles designs | Normal Identity installation account with rotated startup password; accepted as Vivarium target in D34, replacing legacy D26 claim/recovery |
 | Tokens | `Tokens/*`, `tests/scenarios/Tokens.feature` | Framework issuance/list/revoke, no custom verifier/epochs. Confirm TeamCity-client bearer behavior and service-account needs before selecting profile |
 | Workbench | `UI/WorkbenchShell.cs`, node configuration schemas, `tests/scenarios/Workbench.feature` | Shared workbench/node forms plus Vivarium-specific projects/agents/builds/results UI. Workbench alone is not the CI product |
 | Automation | Gitlink `submodules/EyeAuras.Automation` at `c09facd10b413e6a3ebfd117379009e11c00b4b4` | Pinned development source dependency; do not assume published integration packages |
@@ -85,3 +85,37 @@ Read source: `docs/practices/issue-development.md`, `build-and-verification.md`,
 Depot's existing autonomous merge/deployment authority applies to Depot, not to this task. This study
 does not import its permissions, its business grants, optional role sync or an entire infrastructure
 copy. Standard framework composition is transferable; domain policy requires a Vivarium contract.
+
+## Follow-up: actual UI and storage integration (2026-10-31)
+
+Owner accepted D34/D35 after the initial study. The frontend dependency/source inspection corrects
+the earlier generic React assumption: Depot uses TypeScript/Vite, Workbench 0.2.6, codicons and the
+required Monaco peer, with no React runtime. apps/depot-mock is now production source despite its
+historical name; no parallel synthetic mode is present. Some older UI prose still describes mock
+states, so actual modules and server-backed acceptance are the implementation evidence.
+
+- main.ts: createWorkbench, compact account header, shallow section rail, page registration/disposal
+  and local navigation; Workbench provides native controls/split/tree behavior.
+- UI/WorkbenchShell.cs: same-origin static shell with encoded current account and antiforgery token;
+  no browser credential engine or EF access. Host csproj packages Vite dist into wwwroot.
+- Identity/Pages: standard Razor login/external-login/logout handlers, styled consistently with
+  Workbench. Identity owns authentication; browser UI owns presentation.
+- session.ts/management-api.ts: typed minimal account bootstrap, same-origin cookie requests and
+  antiforgery headers, safe error presentation. The server remains current authority.
+- nodes.ts/nodes-api.ts/node-settings.ts: node list/inspector, actual schemas, InstanceId/revision CAS,
+  saved/active/restart state, masked configured secrets, typed drafts and explicit Refresh/Reset.
+- access.ts: list/inspector composition useful for Vivarium Users/Groups/Roles/assignments; Depot's
+  package Read/Write/Delete and isAdmin gating are not the complete TeamCity permission model.
+- Nodes/DepotNodeRegistration.cs: one Host, explicit logical resource owners, local Chiral messaging,
+  shared managed FileStorage settings and Storage integration. Chiral is not business durability;
+  Depot roles/users/grants are PG data and package bytes use object storage.
+
+Vivarium adaptation: Git owns versioned build/fleet configuration; Chiral owns private resource
+settings/lifecycle; PG owns structured business/runtime state and identity/RBAC; Storage owns large
+bytes. Use common services and minimal app bindings, not a second settings service, generic admin
+framework, microservice topology or copy of Depot's package domain.
+
+The role baseline was also read from the real source with teamcity-cli roles list/show: seven role
+definitions, including RESTRICTEDBOT and TOOLS_INTEGRATION, with actual permission/included-role
+responses saved privately. Exact editable IDs/scopes/inheritance and both standard/custom definitions
+are now the D34 target. No TeamCity roles, users, memberships or permissions were changed.

@@ -11,10 +11,15 @@ the same change.
 **D32 target refinement:** new business persistence is PostgreSQL; logical in-process Chiral nodes
 own their private resource settings and readiness. SQLite schemas/writer-channel details below
 describe the current implementation and the guarantees to preserve, not a requirement to keep SQLite
-or its serialization mechanism in the new target. Git build/fleet/RBAC authority, durable ownership,
+or its serialization mechanism in the new target. Git build/fleet authority, durable ownership,
 idempotency, audit and historical provenance remain; Chiral InMemory is not their durable store.
 Imported source IDs, test timelines, log/artifact references and repeatable diff-import also follow
 the [TeamCity parity requirements](teamcity-parity.md).
+
+**D34/D35 refinement:** users, groups, editable TeamCity roles/permissions, assignments and framework
+Identity/OpenIddict state are PostgreSQL data, not Git projections. Private resource settings use
+Chiral's managed store; large bytes use Storage with PostgreSQL manifests/references. Legacy identity
+projections and SQLite details below describe the implementation to replace, not target authorities.
 
 ## Purpose
 
