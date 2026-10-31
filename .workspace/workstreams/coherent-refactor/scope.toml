@@ -20,7 +20,7 @@ planning_gate = "P0 remains open; draft decisions do not replace D20/D23/D26/D32
 [authority]
 authorized = "Read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 not_in_this_task = "Product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
-delivery_assumption = "One integration branch, independently verified internal milestones, one coherent final main switch; provisional until owner iteration."
+delivery_model = "RF-10 accepted by owner on 2026-10-31: each verified milestone may merge separately into main; its issues close after its own main acceptance. Replacement cleanup belongs to the replacing milestone; production cutover is separate."
 
 [status_authority]
 tracked = "plan.md, decisions.md, scenarios.md, ledger.md, phases.md, handover.md"

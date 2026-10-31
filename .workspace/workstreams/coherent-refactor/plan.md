@@ -1,8 +1,10 @@
-# Coherent Vivarium refactor — plan v1
+# Coherent Vivarium refactor — plan v1.1
 
 Status: **draft for owner iteration, not an implementation authorization or accepted ADR**.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
+Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately
+into main. Other pending design choices remain draft.
 
 ## Outcome and boundaries
 
@@ -14,11 +16,15 @@ tests, logs and artifact bytes must be usable inside Vivarium. Initial import an
 one-way diff-import support coexistence; conflict choice is whole-entity keep-Vivarium/use-TeamCity.
 Unchanged `teamcity-cli` and actual other clients are acceptance consumers.
 
-Working interpretation of “one slice”: one integration branch, executable internal checkpoints,
-one reviewed final main switch that removes replaced implementations. Milestones are acceptance
-boundaries inside that branch, not permission to leave two production architectures indefinitely.
-This is a large product replacement, not a promise of one giant unreviewed commit. Small dependent
-changes can be reviewed against their integration parent; production cutover is a later explicit action.
+Accepted delivery model (RF-10): each milestone may be reviewed and merged into main separately
+after its own acceptance gate passes. A milestone may use its own integration branch and root PR,
+with small dependent changes reviewed against that parent where useful; one global integration
+branch and a final all-at-once main merge are not required. Each merged increment must keep main
+coherent, buildable and covered by its declared regression/scenario checks. Document which new
+capabilities are usable at that point; a foundation milestone does not claim complete TeamCity parity.
+Remove replaced code in the milestone that completes its replacement. Any necessary temporary
+adapter must have a named owner, invariant and removal milestone, with one effective authority.
+Production cutover remains a later explicit action, separate from merging a milestone into main.
 
 Do not turn the refactor into a new generic orchestration framework, distributed microservices,
 provider/image implementation, universal workflow engine or comprehensive TeamCity plugin emulator.
@@ -143,8 +149,9 @@ All issues remain open. `issues.json` records exact links and hierarchy.
 Each milestone has a parent issue and bounded child deliverables. GitHub mirrors this workstream;
 the [ledger](ledger.md), [phase state](phases.md) and [handover](handover.md) remain authoritative for
 evidence/status. Target counts are not coverage. Do not close implementation issues because this
-plan was written or code was committed: close after their gate passes and final integrated delivery
-has been accepted in main. Preserve interim verified evidence while issues remain integration-pending.
+plan was written or code was committed: close after their own gate passes and their milestone has
+been accepted in main. Preserve verified evidence while that milestone remains integration-pending;
+completed earlier milestones do not wait for R6 to close their issues.
 
 ## Development and test contract proposed for this workstream
 
@@ -182,9 +189,10 @@ running every acceptance test would miss the most important access boundaries.
 
 At every checkpoint: root build/test on the exact prepared SDK; affected cheap tests; real PG contract
 tests; affected Gherkin/client/OS scenarios; existing regression invariants; safe evidence and owned
-cleanup. No blanket all-platform/chaos rerun per tiny edit. Before final integration: the whole declared
-suite, independent affected-domain/security review and an independent simplicity review against the
-exact candidate revision. These are future gates, not reviews claimed by this planning session.
+cleanup. No blanket all-platform/chaos rerun per tiny edit. Before each milestone merge: its declared
+suite and relevant existing regressions, independent affected-domain/security review and an independent
+simplicity review against the exact candidate revision. R6 additionally proves the full cumulative
+acceptance suite. These are future gates, not reviews claimed by this planning session.
 
 ## Simplicity and replacement acceptance
 
@@ -193,8 +201,9 @@ owner, invariant/scenario and replacement. Initially inspect SQLite migration/st
 bootstrap administration saga, duplicated auth/audit/mutation adapters, Git layer, page/CLI orchestration
 and custom blob lifecycle against real shared-library capabilities. No automatic deletion by filename.
 
-During final acceptance remove replaced stores, schema migrations for the retired engine, unused DTOs,
-adapters, UI/routes and tests that only specified removed internal structure. Retain behavior tests,
+At each milestone remove the stores, retired-engine migrations, unused DTOs, adapters, UI/routes and
+internal-structure tests that its replacement makes obsolete; R6 verifies cumulative completion.
+Retain behavior tests,
 protocol/security guarantees and any required one-time legacy-data reader with an explicit owner and
 retirement condition. No new general repository/unit-of-work facade over EF, generic workflow engine,
 speculative plugin architecture or one project/interface per service.
@@ -208,6 +217,6 @@ report that separately from replacement savings. A final “cleanup later” bac
 
 Review the P0 decision alternatives first, especially superuser, RBAC authority, C# editing and exact
 wire scope. Then refine milestone boundaries/scenarios and issue acceptance. Only after those choices
-are recorded as accepted ADR updates should the implementation branch and first executable R0 begin.
+are recorded as accepted ADR updates should the first executable R0 milestone branch begin.
 The old [migration phases](../teamcity-migration/phases.md) are discovery scaffolding; this draft
 proposes a coordinated replacement sequence without yet overriding the accepted roadmap.

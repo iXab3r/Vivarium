@@ -1,6 +1,7 @@
 # Decision ledger — P0 review
 
-All rows are **OPEN**. Recommendations are draft; no existing ADR is overridden here.
+**RF-10 is ACCEPTED** by the owner on 2026-10-31: each milestone may merge separately into main.
+All other rows remain **OPEN**. Their recommendations are draft; no product ADR is overridden here.
 Resolve each by recording the owner decision, updating the affected numbered decisions/designs in
 the same change, and assigning positive/negative scenarios. Do not implement both alternatives.
 
@@ -15,9 +16,9 @@ the same change, and assigning positive/negative scenarios. Do not implement bot
 | RF-07 | Freeze exact current CLI and other-client method/path/variant inventory; define required wire behavior against observed server. Existing CLI remains unchanged apart from URL/credentials | The CLI's reported 449 route pairs is discovery input, not an automatic coverage claim or permission to narrow required behavior. Inventory real other clients; explicitly decide unsupported third-party plugin endpoints. No silent scope reduction from D33 | D33; S29/S30 |
 | RF-08 | Use EyeAuras.Storage for bytes where its streaming/auth/lifecycle contract fits; retain domain-owned immutable manifests and references | A custom content-addressed adapter may still be needed for a measured gap. Determine hash/dedup/GC/retention/pins, range/download, backup consistency and TeamCity NuGet-feed consumers; prefer Depot for feeds | D32, results/storage designs; S18/S23/S28/S32 |
 | RF-09 | Full retained history+tests+logs+artifact inventory, resumable imports, source IDs as strings, explicit whole-entity conflict choices and preview | Specify conflict unit and relationships (build record vs logs/bytes/tests vs desired configuration), replace atomicity and immutable published-history semantics. Missing source bytes are unresolved gaps, never reconstructed or waived automatically. No background/bidirectional sync | D32, history-import design; S31/S32 |
-| RF-10 | One integration branch with milestone checkpoints and one final coherent main replacement; no production cutover implied | If the owner prefers milestone merges to main, redefine deployment/feature exposure and deletion gates explicitly. Do not infer final approval from elapsed time or a written plan | Delivery; all milestones |
+| RF-10 | **ACCEPTED 2026-10-31:** each milestone may merge into main after its own acceptance/review gate; milestone integration branches/root PRs may be used | Keep each merged increment coherent and tested; close its issues after milestone delivery in main. Remove replaced code with its replacement; temporary adapters need an owner and removal milestone. R6 proves cumulative parity/cleanup, not a mandatory first main merge. Production cutover is separate | Delivery; all milestones |
 | RF-11 | Preserve all currently working invariants; classify every old product path and baseline test before deleting mechanisms | Do not equate “vibecoded” with disposable behavior. Decide any intentional retirement, legacy matrix/YAML/ControlPlane/AgentExplorer reach and existing-data obligations explicitly | D20/D22/D24/D31/D32; source disposition |
 
-The first owner iteration can decide RF-01/RF-02/RF-10 without code. RF-05/RF-07/RF-08/RF-09
+The next owner iteration can decide RF-01/RF-02 without code. RF-05/RF-07/RF-08/RF-09
 need bounded discovery/prototypes or source inventories first; their issues must produce a concrete
 reviewable contract, not ask the owner to approve an unspecified abstraction.
