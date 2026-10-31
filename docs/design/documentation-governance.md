@@ -3,7 +3,7 @@
 > Status: **Accepted**
 > Implementation: **Implemented**
 > Maintainer role: [Docs Expert](../roles/docs-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D28
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D1-D37
 
 ## Purpose
 
@@ -36,6 +36,7 @@ Neither layer replaces the existing authoritative spine.
 | Source | Authoritative for | Not authoritative for |
 |---|---|---|
 | Root and scoped `AGENTS.md` files | Contribution rules and context routing within their filesystem scope | Product architecture or implementation status |
+| `docs/acceptance/**/*.feature` and acceptance index | Highest-level expected business behavior and stable system AC | Internal architecture, complete wire schemas or proof of a passing test |
 | `docs/ARCHITECTURE.md` numbered decisions | Adopted target shape and structural invariants | Proof that a target is implemented |
 | Accepted focused designs in `docs/design/` | Detail within the boundaries of cited decisions | Overriding a numbered decision |
 | `docs/ROADMAP.md` | Work order, phase boundaries, and implementation status | Structural design rationale |
@@ -48,7 +49,9 @@ Neither layer replaces the existing authoritative spine.
 Precedence is scoped, not a single universal ranking. When two sources appear to conflict:
 
 1. Apply the most specific repository rule from `AGENTS.md` to how work is performed.
-2. Use the numbered architecture decision for intended structural behavior.
+2. Use canonical business AC for expected actor-visible behavior, numbered decisions for adopted
+   structural shape, and current accepted focused contracts for detailed semantics and wire behavior.
+   Read the lifecycle review for unresolved variants rather than inventing an outcome.
 3. Use contracts, code, persisted schemas, and tests to determine what is actually implemented now.
 4. Use the roadmap to determine whether the difference is planned, partial, or an unexpected drift.
 5. Reconcile the contradiction in the same change: fix the implementation, refine/retire the decision,
@@ -57,6 +60,17 @@ Precedence is scoped, not a single universal ranking. When two sources appear to
 `walkthrough.md` is normative for UX, but an apparent conflict with architecture requires both owners to
 review it; neither document silently wins outside its scope. Prior art and draft designs never override
 an accepted decision.
+
+The new acceptance baseline and D32–D37 focused contracts are the starting point for replacement
+work. Older examples, role packs, historical delivery sequences and pre-refactor implementation
+sections cannot overrule them merely because they use words such as "must", "only" or "never".
+An actual contradiction is not resolved by a header disclaimer alone: repair the conflicting body,
+retain a clearly marked historical section if useful, and update the affected ADR in the same change
+when the decision itself changes. Never treat an unimplemented requirement as an implemented fact.
+
+The [documentation audit](../../.workspace/workstreams/coherent-refactor/documentation-audit.tsv)
+records reconciled claims and remaining review scope. It is not a claim that all repository prose
+has been exhaustively proven consistent. Each milestone rechecks its affected legacy documents.
 
 ## Focused design contract
 

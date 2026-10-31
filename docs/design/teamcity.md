@@ -78,7 +78,7 @@ TeamCity service messages remain target work.
 - Reimplementing the entire TeamCity plugin ecosystem or every runner in the first release.
 - Treating AgentExplorer remote commands, process control, cleanup, file browsing, or software management
   as builds.
-- Allowing SQLite, UI state, or an admin-only internal API to become a second configuration source.
+- Allowing database-only settings, UI state, or an admin-only internal API to become a second configuration source.
 - Storing Git, package, license, or signing credentials in versioned YAML.
 - Inferring authoritative test results from process exit codes or TeamCity service messages.
 - Requiring Git to record runtime actions. Runtime actions belong to the durable journal and audit log.
@@ -255,7 +255,7 @@ required.
 
 ### Desired state and projection
 
-Versioned files are desired state. SQLite holds last-known-good projections of controller control and
+Versioned files are desired state. PostgreSQL holds last-known-good projections of controller control and
 product settings for fast reads, compatibility calculation, scheduling, and history. Each projection
 retains its repository coordinates and content hashes and can be rebuilt from Git plus runtime
 history.
@@ -358,19 +358,20 @@ A Git VCS root defines:
 - credential reference;
 - server-observed repository identity.
 
-Source selection resolves each attached root to an immutable commit before a build is queued. Builds
-never execute an unpinned moving branch name.
+Retain the immutable source selections actually executed for every attached root. P0 freezes the
+reference timing for default branch selection, explicitly requested revisions, queued work and chain
+synchronization; do not turn the old "always resolve before queueing" example into a different
+TeamCity source-selection policy. Execution must not silently substitute a different revision.
 
-The first Git integration slice preserves the existing deterministic payload contract: `viv-cli run`
-supplies payload bytes plus a controller-resolved or verified source revision, and the controller
-stores both. Controller-managed Git fetch/archive is the next VCS slice. Agent-side checkout is not
-assumed because pristine machines may not have Git installed; if required later, the TeamCity Expert
-sends a versioned checkout-capability request to the Agent API/SDK Expert and obtains Platform Expert
-review.
+The current CLI payload/YAML path is legacy evidence. R0 may use its declared seeded payload to prove
+real execution. R2 must support the source-based C# Compile and the checkout modes/toolchains required
+by the inventoried configurations. SDK/Git-equipped CI agents and pristine payload-only agents are
+both valid machine roles. Agent-side checkout is not deferred merely because another machine lacks
+Git; requirements and capability negotiation make that distinction explicit.
 
-Multiple attached roots exist in the model. The first implementation may restrict a configuration to
-one primary source root, but must reject unsupported additional roots explicitly rather than silently
-dropping them.
+Multiple attached roots, checkout rules, submodules and large-file behavior follow the reference
+profile. A bounded early slice may reject cases not delivered yet, but cannot claim a migrated family
+accepted while required roots or checkout behavior remain unsupported. Never silently drop a root.
 
 ## Parameters
 
@@ -637,7 +638,7 @@ arbitration, claims, leases, expiry, assignment coordination, cancellation deliv
 resolution. The TeamCity domain supplies lifecycle semantics, priority/deadline policy, compatibility
 inputs, and the atomic outcomes that implementation must preserve.
 
-The Persistence Expert implements SQLite schema, serialized-writer operations, transaction boundaries,
+The Persistence Expert implements PostgreSQL schema, constraints, transaction boundaries,
 migrations, and restart restoration. The TeamCity domain declares which facts must become durable
 atomically; it does not prescribe repositories or SQL transaction layout.
 
@@ -662,7 +663,7 @@ the schema, validation rules, immutable revision requirements, and audit events.
 
 REST exposes the canonical behavior. UI builds TeamCity-like project/configuration/queue/build-results
 screens on that API and shows Git commit, pending reconciliation, conflict, and validation states. UI
-must not call internal repositories or SQLite directly.
+must not call internal repositories or business storage directly.
 
 ### Platform and Logs Experts
 

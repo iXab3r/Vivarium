@@ -5,6 +5,10 @@ numbered decisions in [`ARCHITECTURE.md`](../ARCHITECTURE.md). Each design disti
 from implemented state and names unresolved questions; [`ROADMAP.md`](../ROADMAP.md) remains the source
 of truth for delivery order and status.
 
+Start with the [business acceptance catalogue](../acceptance/README.md) for expected behavior and
+its [lifecycle review](../acceptance/lifecycle-review.md) for outstanding variants. Focused contracts
+below provide the technical details; legacy implementation sections describe evidence to replace.
+
 | Design | Maintainer role | Scope |
 |---|---|---|
 | [Agent API/SDK](agent-api-sdk.md) | Agent API/SDK Expert | AgentHub, capability negotiation, enrollment, deployment, upgrades, and SDK boundary |
@@ -26,7 +30,7 @@ of truth for delivery order and status.
 | [Documentation governance](documentation-governance.md) | Docs Expert | Authority, status, role packs, context loading, decisions, and same-change updates |
 | [Security](security.md) | Security Expert | Trust boundaries, secrets, remote-management safety, abuse limits, and negative evidence |
 | [Scheduling/coordination](scheduling-coordination.md) | Scheduling/Coordination Expert | Durable work, leases, fencing, cancellation, reconnect, rollback ordering, and capacity |
-| [Persistence](persistence.md) | Persistence/Migrations Expert | Git projections, SQLite/blob durability, migrations, recovery, retention, and backup |
+| [Persistence](persistence.md) | Persistence/Migrations Expert | PostgreSQL business/identity data, Git projections, Storage publication, migrations, recovery and complete backup; legacy SQLite inventory |
 | [Results/artifacts](results-artifacts.md) | Results/Artifacts Expert | Terminal results, artifacts, test adapters, occurrences, build problems, and matrix projection |
 
 Read [`documentation-governance.md`](documentation-governance.md) for precedence, status metadata,

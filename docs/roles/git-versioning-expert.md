@@ -37,10 +37,11 @@ Ask the Docs Expert to update the decision, or update it in the same change when
 
 ## Invariants to enforce
 
-- Mutable **desired configuration** is represented by a committed Git tree. SQLite and in-memory
-  objects are projections, never competing authorities.
+- Versioned **build/fleet desired settings** are represented by a committed Git tree. PostgreSQL
+  indexes of those settings are projections. Users/roles/grants are PostgreSQL authority; private
+  resource settings use Chiral. Neither belongs to the Git settings tree (D34/D35).
 - REST, UI, and CLI configuration writes use the same mutation service. There is no privileged
-  controller-internal shortcut that writes desired state directly to SQLite.
+  controller-internal shortcut that writes Git-owned desired settings directly to PostgreSQL.
 - Every object has an immutable stable ID. Display names and file paths may change without changing
   identity.
 - Every mutation supplies an expected base revision, validates the complete candidate tree, and

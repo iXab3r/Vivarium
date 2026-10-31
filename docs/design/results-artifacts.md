@@ -157,7 +157,7 @@ permission to read it.
 
 A finalization attempt first waits for the Logs Expert's store to durably seal contiguous ranges
 through every declared watermark. The returned immutable log-seal identity is then an input to one
-serialized SQLite transaction, which must:
+PostgreSQL transaction, which must preserve the same durable result boundary:
 
 1. establish that no different terminal result has already won;
 2. persist the verified log-seal identity, watermarks, and log references;
@@ -527,10 +527,12 @@ versioned resources from day one:
 | `GET /api/v1/builds/{buildId}/matrix` | For a composite/matrix `Build`, paged/sectioned stable-test × scenario projection with iteration summaries and child-build links. |
 | `GET /api/v1/builds/{buildId}/log` | Logs Expert-owned stream/read model used by semantic links. |
 
-Requirements common to these resources:
+Requirements common to these native `/api/v1` resources follow below. Compatible `/app/rest`
+resources share the domain evidence and authorization but retain their reference IDs, media,
+pagination/errors and completion behavior; do not impose these native envelopes or headers on them.
 
 - browser UI and external clients consume the same REST application service; the UI does not read
-  SQLite or internal singleton state directly;
+  business storage or internal singleton state directly;
 - project/build authorization is checked before lookup details can reveal resource existence;
 - stable opaque ids, additive schemas, consistent problem details, cursor pagination, sparse field or
   expansion support, and resumable/event resources where live data warrants them;

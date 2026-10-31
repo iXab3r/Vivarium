@@ -127,7 +127,7 @@ boundaries.
    independently.
 7. Have Platform validate every advertised driver/host/guest combination and its evidence.
 8. Put desired settings through Git and runtime actions through REST plus audit; never add a hidden
-   mutable SQLite configuration path.
+   mutable PostgreSQL configuration path.
 9. Prove the lifecycle with FakeMachineProvider before real-hypervisor tests.
 10. Update current-versus-target documentation and architecture decisions in the same change when the
     system shape moves.

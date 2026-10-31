@@ -204,7 +204,7 @@ Mutations start disabled by default:
   verification status and allowed signer identity for the applied revision. A signature does not
   replace Vivarium authorization or branch/revision policy.
 - A commit created outside Vivarium that changes security-sensitive desired configuration (including
-  RBAC, agent-pool/trust policy, AgentExplorer policy, repository trust, secret references, or server
+  agent-pool/trust policy, AgentExplorer policy, repository trust, secret references, or server
   security settings) is not applied merely because it is reachable from an allowed branch. The
   revision requires an attestation that maps its immutable commit ID to an authorized Vivarium actor
   or review decision. As an explicit alternative, a repository policy may declare every repository
@@ -215,7 +215,8 @@ Mutations start disabled by default:
 
 ### S8. REST and browser security from day one
 
-- REST uses versioned resource paths and the same authorization decisions as gRPC. Authentication is
+- Native REST uses versioned resource paths; compatible REST preserves its frozen TeamCity wire.
+  Both use the same current domain authorization decisions as any remaining gRPC adapter. Authentication is
   not enough: every request checks access to each addressed project, agent, build, artifact, Git
   repository, or operation.
 - Mutations accept caller idempotency keys where retry can duplicate effects and optimistic revision

@@ -4,7 +4,9 @@ Vivarium is an OSS TeamCity-style CI build server and test farm plus AgentExplor
 jobs and safe remote operations on user-provided physical machines first and on snapshot-managed VMs
 later, producing centralized test × scenario results across Windows, Linux, and macOS.
 
-> **Docs map:** this file (AGENTS.md) holds the *rules*; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+> **Docs map:** this file (AGENTS.md) holds the *rules*;
+> [`docs/acceptance/`](docs/acceptance/README.md) holds expected business behavior and lifecycle AC;
+> [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 > holds the *shape* (all adopted decisions, numbered D1…); [`docs/design/`](docs/design/README.md)
 > holds focused designs; [`docs/roles/`](docs/roles/README.md) routes expert context;
 > [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
@@ -157,7 +159,7 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D37 requires a TeamCity semantic superset for builds/agents throughout development. Every affected
   change/milestone names its business AC, TCM model invariants and wire cases, preserves the base
   behavior and proves relevant extension neutrality. Do not wait until R5 to check model drift.
-- Highest-level AC live in `docs/acceptance/*.feature` in business language, independent of internal
+- Highest-level AC live in `docs/acceptance/**/*.feature` in business language, independent of internal
   architecture. Business Acceptance owns intent; Testing Architect selects minimal evidence/oracles;
   Test Steward owns bindings/execution. Use the D37 hierarchy/pyramid; parsed/unbound features are
   not GREEN, Gherkin does not force E2E, and no new test framework is implied.

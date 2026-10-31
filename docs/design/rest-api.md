@@ -35,7 +35,7 @@ Browser / viv-cli / CI / integrations
    Controller application services
        |                  |
        v                  v
-Git desired state   SQLite runtime state
+Git desired state   PostgreSQL business state
        |                  |
        +--------+---------+
                 |
@@ -132,14 +132,14 @@ decisions remain authoritative.
 
 1. **One domain implementation.** REST, a transitional gRPC ControlPlane, background reconciliation,
    and controller UI hosting call the same application services and enforce the same invariants.
-2. **No direct storage access.** Clients and REST handlers never access SQLite, the Git working tree,
+2. **No direct storage access.** Clients and REST handlers never access PostgreSQL, the Git working tree,
    blob files, or live session objects directly.
 3. **Reverse connection stays.** Agent-backed requests are dispatched over the already established
    AgentHub stream. A REST request never makes the controller dial into a host.
 4. **Bulk bytes stay out of JSON.** REST describes payloads and artifacts by hash, size, media type,
    and authenticated link; bytes travel through `/blobs/{sha256}`.
 5. **Configuration is Git-backed.** A successful desired-state write identifies the resulting commit
-   or pending change. Applying a write only to SQLite is a defect.
+   or pending change. Applying a write only to PostgreSQL is a defect.
 6. **Secrets are not configuration files.** Token plaintext, password plaintext, private keys, and
    secret values never enter Git. Git may contain stable secret references and non-secret metadata.
 7. **Runtime history is immutable.** Builds retain exact definition and assigned-agent snapshots.
@@ -157,7 +157,13 @@ decisions remain authoritative.
 13. **A blob hash is not authority.** Logical staging, assignment, build ownership, or artifact
     visibility grants access to shared content-addressed bytes.
 
-## 4. Protocol and representation conventions
+## 4. Native protocol and representation conventions
+
+Sections 4–7 specify `/api/v1`. They do not prescribe `/app/rest` IDs, envelopes, media,
+error/status shapes, paging, headers or mutation completion. The compatible facade follows the
+[frozen wire contract](teamcity-rest-compatibility.md) and [early domain profile](teamcity-rest-domain.md)
+without requiring client changes. Both surfaces share domain effects and current authorization.
+
 
 ### 4.1 Base URL and media types
 
@@ -465,8 +471,7 @@ The following are desired configuration and must be Git-backed from their first 
 - Agent display names, enabled/disabled desired state, custom parameters, tags, and policy.
 - AgentExplorer collection and operation policy, including what sensitive inventory may be read.
 - Machine providers, pools, image recipes/references, scheduling policy, and retention settings.
-- Users, groups, project role assignments, and non-secret token policy metadata.
-- System configuration that is safe and meaningful to review as text.
+- Non-secret versioned build/fleet policy; resource connections/settings use Chiral instead.
 
 The following are not committed to Git:
 
@@ -474,20 +479,22 @@ The following are not committed to Git:
 - Connection, heartbeat, health observation, queue occupancy, build progress, agent inventory, and
   metrics.
 - Builds, runtime operations, results, logs, audit records, and idempotency records.
-- One-time authorization/enrollment ceremonies and emergency SuperUser bootstrap events.
+- One-time authorization/enrollment ceremonies and installation-account startup events.
+- Users, external bindings, groups, editable roles/permissions, scoped assignments and framework
+  credential metadata: PostgreSQL application authority.
+- Host/database/Identity/Storage resource configuration and private secrets: Chiral managed settings.
 
-Authorization is deliberately split: Git may state that a known Agent is desired/authorized
-and which policy applies, but credential issuance/revocation remains a security operation in the
-durable credential store and audit journal. The User Roles, Admin/SuperUser, Git/Versioning, and
-Reconciliation experts must ratify the exact atomic transition before implementation.
+Agent registration/credential authorization is an audited security action; desired enablement and
+custom properties are versioned settings. Define their shared concurrency/activation boundary without
+inventing a Git authority over users or credentials. Current authorization comes from PostgreSQL.
 
-`vivarium.yaml` in the tested source repository remains the authoritative submitted build snapshot
-under D17. A future controller catalog may index repository-backed configurations, but REST must not
-silently rewrite a product repository without an explicit configured Git workflow.
+C# replaces submitted YAML for the new catalog (D32). Existing `vivarium.yaml` snapshots are legacy
+evidence, not a permanent target schema. C# editability and compatible mutations must be settled in
+P0 before implementing the catalog; writes target the owning repository and its configured workflow.
 
 ### 5.2 Public change model
 
-A desired-state REST edit creates a `configuration-change` rather than mutating a SQLite projection:
+A desired-state REST edit creates a `configuration-change` rather than mutating a PostgreSQL projection:
 
 ```json
 {
@@ -635,39 +642,20 @@ Supported client forms:
 - Agent credentials: accepted only for AgentHub and explicitly agent-scoped blob operations, not the
   human management API unless a future reviewed use case says otherwise.
 
-The User Roles Expert owns TeamCity-like role definitions and permission inheritance. The REST API
-must map every operation to a canonical permission and publish/test that matrix. Representative
-canonical permissions include:
-
-```text
-project.view
-project.settings.propose
-build.run
-build.cancel
-fleet.summary.view
-fleet.inventory.view
-fleet.environment-names.view
-fleet.environment-values.view
-fleet.command.execute
-fleet.agent.authorize
-fleet.agent.manage
-git.repository.bind
-git.change.reconcile
-audit.view
-tokens.manage-all
-server.manage
-```
-
-These names are placeholders until User Roles review. They must not accidentally imply that a build
-submission token can obtain an interactive shell or read environment secrets.
+The [authorization model](authorization-model.md) owns exact TeamCity role/permission IDs,
+editable role includes, groups and project inheritance. Do not implement the old placeholder
+`project.view`/`build.run` catalog as a substitute for the reference permissions. AgentExplorer adds
+explicit permission IDs without narrowing existing TeamCity meanings. Both surfaces check the same
+current PostgreSQL account and effective permissions, not a Git RBAC snapshot or stale role claims.
 
 Authorization is resource-scoped where TeamCity semantics require project boundaries. Listing
 returns only visible resources and pagination remains correct after filtering by permission. The API
 does not reveal whether a hidden resource exists. The same current authorization and object-visibility
 checks run before an idempotency replay is disclosed. Token creation attempts plaintext delivery
 exactly once; only a hash, non-secret metadata, and the secret-free idempotency receipt remain durable.
-SuperUser first-login and recovery behavior is owned by the Admin/SuperUser Expert and must use the
-same audit/correlation boundary.
+Installation-account startup, ordinary OIDC, sessions and keys follow
+[first-run administration](first-run-administration.md) and the same audit/correlation boundary.
+There is no target setup-claim/recovery-token API or Git first-admin saga.
 
 ## 9. Audit and correlation
 
@@ -811,21 +799,27 @@ Before declaring the first REST slice complete, provide:
 
 - Replacing AgentHub gRPC with polling, inbound SSH, WinRM, or REST calls into agents.
 - Moving payload, artifact, or completed large-log bytes into JSON.
-- Exposing SQLite tables, generic CRUD, arbitrary SQL, or repository filesystem paths.
+- Exposing PostgreSQL tables, generic CRUD, arbitrary SQL, or repository filesystem paths.
 - Inventing a generic workflow language in the REST layer.
 - Defining TeamCity, AgentExplorer, platform, user-role, or agent capability semantics without their
   owning experts.
 - Storing runtime state, observations, audit records, generated status, or secrets in Git merely to
   say that everything is versioned.
-- Requiring GitHub, GitLab, or any other external service. A local repository and direct/change-branch
-  workflow must remain functional offline.
+- Requiring an external Git forge such as GitHub or GitLab. Managed-local Git and its direct/change-
+  branch workflow remain usable without a forge. The accepted PostgreSQL/Storage resource
+  prerequisites still apply; this is not a no-external-service server restriction.
 - Promising multi-controller clustering or cross-tenant isolation in the first release.
 - Shipping placeholder remote-file or remote-command APIs before their safety and agent contracts.
 - Treating SSE as permanent event sourcing or an exactly-once transport.
 
-## 15. Initial delivery sequence
+## 15. Historical native delivery sequence — superseded order
 
-1. Establish versioned SQLite migrations, the minimal D27 `audit_events` journal, request actor and
+The following records the earlier `/api/v1` slice order, not the new refactor schedule. D36 and the
+[active roadmap](../ROADMAP.md) require early wire/domain decomposition, R0 real Host+Agent and
+compatible seeded execution before the complete catalog. Use that schedule for new work.
+
+
+1. Establish versioned PostgreSQL migrations, the minimal D27 `audit_events` journal, request actor and
    correlation context, and one authorization evaluator beneath the existing ControlPlane, panel, and
    blob boundaries. Map legacy credentials without widening their authority.
 2. Establish shared HTTP conventions, Problem Details, authentication, deterministic OpenAPI, cursor

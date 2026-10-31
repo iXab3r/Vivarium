@@ -1155,6 +1155,11 @@ is consumed by the existing Automation/Reqnroll integration when bound. Model co
 REST wire tests provide supporting evidence, with domain/component/process/platform checks below.
 A parsed/unbound/ignored feature, green HTTP response or scripted success alone is not acceptance.
 
+Organize business AC recursively by subsystem and cover entry, normal use, change, failure,
+restart/recovery and exit/removal where applicable. The acceptance lifecycle review records unresolved
+reference variants instead of inventing stricter rules. Older normative examples and role packs must
+be reconciled with this baseline and D32–D36, not left contradictory beneath an override banner.
+
 Adapt PoeBane.Rust's Testing Architect principles: choose risk/observable/existing coverage/minimal
 real composition and an independent oracle first; classify environment, process placement, runner and
 execution cost separately. Gherkin does not mandate E2E. Reuse actual services/infrastructure at the

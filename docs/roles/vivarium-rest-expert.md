@@ -63,14 +63,16 @@ role file become a second architecture document.
   correlation, and bounded streaming contracts.
 - TypeScript and Workbench implementation. Those belong to the UI Expert, which must consume this API.
 - OS-specific collectors and process/network/file semantics. Those belong to the Platform Expert.
-- Direct database schema design. REST must call application services and never become a SQLite API.
+- Direct database schema design. REST must call application services and never become a PostgreSQL API.
 
 ## Non-negotiable invariants
 
 1. UI and CLI behavior available to external callers is backed by the same public REST contract.
-2. No REST handler writes SQLite, Git, the blob directory, or a live agent session directly. It calls
+2. No REST handler writes PostgreSQL, Git, the blob directory, or a live agent session directly. It calls
    a domain/application service that enforces the same invariant for every transport.
-3. Desired configuration changes are Git-backed and return their Git/change revision. Runtime facts,
+3. Versioned build/fleet desired-setting changes are Git-backed and identify their Git/change revision.
+   Identity/RBAC changes use PostgreSQL; private resource settings use Chiral. Compatible clients retain
+   their frozen wire/completion contract without new native headers or envelopes. Runtime facts,
    builds, operations, audit records, credentials, and secret values are not committed to Git.
 4. Every mutating request is authenticated, authorized, correlated, and auditable. Sensitive values
    never appear in URLs, problem details, audit records, or ordinary logs.
@@ -154,7 +156,7 @@ A REST change is not complete without evidence appropriate to its surface:
 - Cursor pagination and stream resume tests, including expired cursors.
 - Async operation cancellation and duplicate-cancel tests.
 - Audit correlation from incoming request through Git change or runtime operation to terminal result.
-- Verification that the CLI and UI use public REST and do not access SQLite or private controller
+- Verification that the CLI and UI use public REST and do not access PostgreSQL or private controller
   services directly.
 - Compatibility tests against the previous released `/api/v1` contract once releases exist.
 
@@ -172,14 +174,16 @@ Escalate a proposal when it:
   sufficient current authority.
 - Requires incompatible `/api/v1` semantics without a versioning and migration plan.
 
-Reject direct database endpoints, arbitrary SQL/filter passthrough, secrets in query strings,
-unversioned public routes, and UI-only management routes.
+Reject direct database endpoints, arbitrary SQL/filter passthrough, secrets in query strings and
+UI-only management routes. Native API routes follow `/api/v1`; compatible routes preserve the frozen
+TeamCity path/version conventions instead of being rejected as unversioned native routes.
 
 ## Current focus
 
-The immediate assignment is to establish the target REST conventions in
-[`../design/rest-api.md`](../design/rest-api.md), then drive a narrow vertical slice that exposes
-read-only agents/builds plus one Git-backed configuration mutation and one restart-safe runtime
-operation. Preserve the existing AgentHub and blob endpoints throughout that work.
+The immediate assignment is P0's [shared REST/domain decomposition](../design/teamcity-rest-domain.md):
+freeze required resources/IDs/states, authority, C# editability and wire variants early. R0 then proves
+a real local Host+Agent and unchanged-client seeded execution; domain families grow their public and
+compatible contracts together. Native conventions do not redefine TeamCity wire behavior. Preserve
+required AgentHub/blob consumers until their explicit replacement/disposition is proven.
 The gRPC ControlPlane is a frozen migration adapter, not a second public target; add no new management
 features to it and remove it after the current CLI is migrated to REST.

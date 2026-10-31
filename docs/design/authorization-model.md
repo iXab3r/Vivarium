@@ -109,7 +109,9 @@ The installation account's enabled maximum authority follows D34, not a new role
 
 ## Required evidence
 
-English Gherkin S01–S05 plus focused logic/PG/API checks must cover ordinary login, online Admin
+Canonical [authentication](../acceptance/authentication/sign-in.feature) and
+[access](../acceptance/access/roles.feature) business AC, supported by S01–S05/S35 and focused
+logic/PG/API checks, must cover ordinary login, online Admin
 assignment, same-cookie and same-token withdrawal, disabled users, included-role mutation, parent
 project and nested-group inheritance, no-grant/sibling isolation, project-limited delegation,
 shared-Agent pools, actual source role import, and positive/negative unchanged CLI role/group/user

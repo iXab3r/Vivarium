@@ -200,7 +200,7 @@ deployment claim or invent calendar estimates before the preparation and port wo
 
 D37's [testing model](../../../docs/design/testing-model.md) is authoritative for evidence selection.
 The canonical [business AC](../../../docs/acceptance/README.md) contain no implementation detail;
-acceptance-map.tsv connects their 31 stable IDs to TCM invariants, the original TC requirements and
+acceptance-map.tsv connects their 110 stable IDs across subsystem folders to TCM invariants, the original TC requirements and
 S* supporting candidates. These initial family-level links are planning traceability, not coverage.
 Highest-level words stay stable through architecture changes. Gherkin does not mandate E2E, and the
 table below describes possible evidence boundaries rather than one mandatory test per pyramid level.

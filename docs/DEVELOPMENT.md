@@ -203,6 +203,12 @@ SmartScreen/MOTW and macOS Gatekeeper friction remain documented limitations (§
 
 ## Upgrading a farm
 
+The controller package instructions immediately below describe the **current legacy SQLite
+prototype**, not the D35 replacement backup contract. The new Host uses PostgreSQL, Storage, private
+Chiral settings and durable authentication keys. Its supported release/restore procedure must prove
+the [complete backup boundary](design/persistence.md#backup-and-restore); copying `vivarium-data/`
+alone is insufficient when resources are external. Agent bootstrap freeze rules remain in force.
+
 - **Controller (Docker)**: back up the `vivarium-data` volume, then run
   `docker compose -f deploy/docker-compose.yml pull` followed by
   `docker compose -f deploy/docker-compose.yml up -d`. The replacement container reuses

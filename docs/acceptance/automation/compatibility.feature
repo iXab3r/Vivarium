@@ -1,5 +1,5 @@
 @business @automation
-Feature: Existing automation remains usable as Vivarium gains capabilities
+Feature: Existing automation remains usable
 
   @AC-AUTO-01
   Scenario: Existing TeamCity automation works without a client rewrite

@@ -52,8 +52,12 @@ TC requirement to its primary milestone and candidate scenarios; that is plannin
 | S36 | R0.1 | Operator starts the prepared local Host/PG/Storage and a real Agent, enrolls/authorizes it normally, observes heartbeat and stable identity, attaches debugger and stops/resets only owned resources | Actual processes/PG/TLS/framework technical identity; no fake Agent or test-only management bypass |
 | S37 | R0.2/R0.3 | Unchanged CLI queues/watches/cancels seeded LocalSmoke; native/compatible views share the run, raw output/artifact bytes are inspectable and bounded restart/reconnect preserves truthful ownership/outcome | Real CLI profile, Host/PG/Storage/Agent and executable; byte hashes plus restart and cleanup receipts |
 | S38 | R2/R5 | Explicit suitable-agent diagnostic assignment can run on a connected/authorized disabled Agent while normal automatic queue assignment remains blocked and its disabled state is retained | Frozen targeted-run/permission wire contract, cheap admission tests plus actual Agent/API case; documentation input is not an executed reference pass |
+| S39 | R0/R1/R6 | Prepared versus invalid resource startup; installation-password create/reset persistence/disclosure ordering, enabled/disabled/re-enabled sessions, reserved external identity, failed initialization, ordinary session/key continuity and incomplete restore | Actual Identity/PG/Chiral lifecycle composition, controlled resource failures and independent sink scan; real Host where startup is the claim |
+| S40 | R1/R2/R4/R5/R6 | Reference-backed remove/re-enable lifecycles for accounts/groups/roles/catalog/agent; destructive consequences, retained attribution, revoked authority, restore failure and owned uninstall/erasure | Frozen compatible request/effect cases plus actual owning service/PG/Git boundaries; erasure only in disposable owned fixtures; unresolved profile variants cannot pass |
+| S41 | R0/R1/R2/R4/R5 | Real panel journeys for initial login, grant, configure/run/watch/cancel, history/tests/output/files and agent views; protected direct links and interrupted live view | Existing Automation browser composition against actual Host/public API and real Agent for execution claims; no parallel feature copies or forced Depot layout |
 
-Example shape (pending decisions intentionally do not choose the superuser model):
+
+Illustrative technical examples (canonical business scenarios live in `docs/acceptance/`; D34 owns the chosen installation-account model):
 
 ```gherkin
 @access @current-credentials

@@ -14,29 +14,32 @@ Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## 0. Install the controller — one machine, once
 
-Any always-on box you own (your dev machine is fine to start):
+Use the supported Host package and provision PostgreSQL and Storage resources. Configure their
+connections, the trusted OIDC provider and private key locations through the same Chiral resource
+settings used by the Host. The [local lab](../.workspace/workstreams/coherent-refactor/local-lab.md)
+defines R0 preparation and real server/Agent checkpoints; this walkthrough is target UX, not an
+installer that exists today. A self-contained server needs no .NET SDK, but that does not eliminate
+its resource prerequisites.
 
-```
-viv-server.exe                 # self-contained; creates ./vivarium-data (SQLite + blobs)
-```
+Start the Host, check its reported readiness and open the panel on its HTTPS origin. If installation
+access is enabled, obtain the newly generated reserved account password from the intended private
+startup log and sign in normally. Let the intended administrator sign in through OIDC to create
+their ordinary unprivileged account; grant that account the standard system-administrator role
+through Access. The first visitor is never promoted automatically. Administrators then use their
+own accounts; the installation account can be disabled using its resource setting and documented
+restart lifecycle.
 
-First run prints the panel URL and an admin token:
+The startup password is refreshed on every enabled startup, not a one-time first-run admin token.
+It is never public status or an API response. Use the supported credential-management surface to
+issue a scoped automation credential; do not copy startup submit/admin bearer tokens from the old
+prototype. Configure the CLI's server URL, verified TLS trust and that credential. Unchanged
+TeamCity clients use the compatible API on the same installation with their own supported credentials.
 
-```
-Vivarium controller listening on https://192.168.1.10:8443
-Panel: https://192.168.1.10:8443  (admin token: k3v9…)
-Submit token: s7d2…
-TLS:   self-signed, fingerprint SHA256:9F3A…
-Enroll token (single-use): e5a1…
-Data:  ./vivarium-data
-```
-
-On your workstation, point the CLI at it once — the fingerprint is confirmed on first contact and
-pinned from then on:
-
-```
-viv-cli login https://192.168.1.10:8443
-```
+Missing/invalid resources explain their readiness failure. Operator-local repair uses the same
+settings modules; it does not create a database-independent superuser login or a public setup wizard.
+See [installation AC](acceptance/installation/server.feature),
+[authentication AC](acceptance/authentication/installation-account.feature) and
+[first-run administration](design/first-run-administration.md).
 
 ## 1. Connect three machines — five minutes each
 
@@ -128,8 +131,9 @@ configurations:
 
 ## 3. Build the payloads
 
-Tests are published **self-contained** — the target machines have no SDKs, no runtimes, and never will
-(D3). The SUT rides along inside the same folder:
+This example publishes tests **self-contained** so these test machines need no SDK/runtime for that payload.
+Other build configurations may require SDK-equipped agents, as ordinary TeamCity CI does. Do not turn
+this example into a system-wide ban on toolchains (D3/D32). The SUT rides along inside the same folder:
 
 ```
 dotnet publish tests/IntegrationTests -c Release -r win-x64   --self-contained -o out/win-x64

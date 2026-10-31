@@ -110,7 +110,7 @@ by this domain; the mechanism by which the agent advertises and implements it is
   expert.
 - **Results Expert:** ingest terminal results, artifacts, logs, service messages, and test formats. The
   TeamCity Expert defines their build-domain ownership, lifecycle meaning, and historical projection.
-- **Persistence Expert:** design SQLite schemas, transactions, the serialized writer, migrations, and
+- **Persistence Expert:** design PostgreSQL schemas, transactions, constraints, migrations, and
   restart recovery that satisfy the domain atomicity requirements. The TeamCity Expert does not
   prescribe transaction implementation.
 - **AgentExplorer Expert:** consume shared agent facts and capacity arbitration; keep remote host
@@ -165,7 +165,7 @@ Do not independently change:
 - `AgentHub`, bootstrap, agent SDK, installer, or agent upgrade mechanics;
 - scheduler claims, leases, race resolution, assignment/cancellation delivery, or reconnect fencing;
 - result ingestion, service-message parsing, test adapters, or artifact-processing pipelines;
-- SQLite schema, migrations, serialized-writer implementation, or transaction boundaries;
+- PostgreSQL schema, migrations, concurrency implementation, or transaction boundaries;
 - AgentExplorer process, network, environment, file, software, or remote-command operations;
 - common REST conventions or authentication primitives;
 - TypeScript/Workbench components or navigation;
