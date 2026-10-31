@@ -96,12 +96,16 @@ reviewable schemas/examples and state/command tables, not merely a resource clas
 | REST-DOMAIN | Resource/identity/relationship schema and state/command tables, native matrix mapping and import lineage | Enqueue/poll/cancel/history plus composite and inherited-settings worked examples |
 | REST-PROTOCOL | Locators/fields/media/paging/hrefs/status/error/auth profile | Nested/base64 branch, escaped paths, empty continuation page, long test ID and safe-integer Build.id fixtures |
 | REST-MUTATIONS | Per-operation authority, body omission/replacement/reset/order, Git/C# edit representation and activation/retry boundary | CLI create/change/read/reset/reorder example produces the expected revision/effective response; PG rights change visible with unchanged token |
-| REST-HARNESS | Reference fixtures and unchanged-client conformance design, independent semantic assertions and fault boundaries | Distinguish source observation/synthetic expectation/Vivarium result; no normalization of wrong shape/status/side effect |
+| REST-HARNESS | First executable P0 slice: independent corpus, strict WireMock.Net/client replay controls and actual Vivarium RED baseline (P0.REST.1–3) | Real requests/effects, source provenance, control GREEN versus product RED/blockers; no guessed oracle or skipped placeholders; prior GREEN cannot regress |
 | REST-ALLOCATION | Operation/variant ledger by milestone, exact R0 smoke subset and explicit unsupported/admin/provider blockers | No orphan discovered operation; critical model choices resolved before R0; detailed variants proved before their owning slice |
 
 P0 entry does not mean all 449 claims or whole TeamCity API are frozen. The current generator's
 discovered rows stay unverified. P0 exit requires reconciliation/disposition and the structural
-contracts above; R0 does not wait for downloading the full retained artifact archive. The current
+contracts plus the [executable D38 gate](../../../docs/design/teamcity-rest-test-first.md); a design-only
+REST-HARNESS does not satisfy it. Ordinary, replay-control, delivered-case and full raw RED targets
+remain distinguishable in required verification. Exact commands/results are the harness deliverable.
+
+R0 does not wait for downloading the full retained artifact archive. The current
 CLI has no dedicated Swagger export command; obtain metadata through an approved supported export
 path as a named follow-up, rather than silently substituting newer public docs or raw hidden requests.
 

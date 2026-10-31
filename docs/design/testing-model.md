@@ -1,6 +1,6 @@
 # Acceptance-first testing and TeamCity superset conformance
 
-> Status: **Accepted direction — D37; execution/bindings are not implemented**
+> Status: **Accepted direction — D37/D38; execution/bindings are not implemented**
 > Owners: Business Acceptance, Testing Architect, Test Steward, TeamCity, REST and affected domain owners
 
 ## Contract hierarchy
@@ -33,6 +33,13 @@ or launch a process. Use UI when the user interaction is itself the claim, an ac
 when machine execution/process behavior is the claim, and the cheapest sufficient composition otherwise.
 
 ## TeamCity base and extension invariants
+
+D38 requires [executable REST contracts and the initial RED baseline](teamcity-rest-test-first.md)
+as the first P0 execution slice. The corpus uses independent reference expectations, strict replay
+controls and the real Vivarium boundary with separate result claims. This intentionally broad suite
+can contain hundreds/thousands of focused variants; minimal composition does not mean minimal API
+coverage. Mandatory TDD/acceptance, known-RED progression and honest partial-milestone reporting are
+defined there. No actual new executable corpus or RED result is claimed by this specification.
 
 Vivarium is a semantic superset for builds and agents: preserved TeamCity behavior plus explicitly
 named extensions. More capabilities cannot redefine a base role, hide a state axis, reinterpret an

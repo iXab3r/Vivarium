@@ -115,6 +115,12 @@ general C# AST rewriter to claim 1:1 behavior.
 
 ## Earliest implementation and verification
 
+D38 places the executable REST expectation corpus/replay harness/actual RED baseline first in P0,
+before structural product replacement. Its [test-first gate](teamcity-rest-test-first.md) does not
+wait for the entire new persistence/catalog stack; it proves transport/target readiness separately
+and reports product-prerequisite blockers honestly. Each domain implementation then follows the
+corresponding pre-existing failing contracts and preserves the growing implemented suite.
+
 R0 delivers the first thin compatible execution path together with the actual local Host/Agent lab.
 R1 supplies identity/access variants; R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
 R4 tests/logs/history/files; R5 cumulative client/variant conformance and remaining agreed operations.

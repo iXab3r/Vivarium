@@ -19,6 +19,15 @@ correctness, ordinary feedback and cost diagnostics distinct, with explicit comm
 
 ## Building
 
+D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first
+P0 harness delivery: standard solution checks, reference-replay control, delivered conformance cases
+and the full raw product report. The implementation must publish exact commands and wire every
+target into required verification. Reuse current NUnit/Test SDK and standard result artifacts; no
+replacement runner is implied. A dedicated conformance target may remain outside the ordinary
+all-GREEN selection while required behavior is unfinished, but it must still build and execute.
+Raw full-suite RED remains visible/nonzero; passing a declared partial gate does not mean full
+compatibility. Setup failures and regressions in previously passing cases cannot be allowed RED.
+
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline
 (AGENTS.md → Verification). `global.json` pins the SDK, package references pin Cake.Frosting and
 application dependencies, and `toolchains.lock.json` pins downloaded cargo-nextest bytes.

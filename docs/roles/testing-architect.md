@@ -4,7 +4,10 @@
 
 Choose the smallest trustworthy evidence for the actual product question and maintain the D37
 [testing model](../design/testing-model.md). Preserve the pyramid, independent oracles, meaningful
-coverage migration and affordable feedback. Existing sufficient evidence or no new test is valid.
+coverage migration and affordable feedback. Existing sufficient evidence or no new test is valid for
+ordinary changes. D38 requires a real reference-backed case for each required REST variant: minimal
+composition must not reduce mandatory compatibility coverage. Hundreds/thousands of focused variants
+are appropriate when independently grounded; no guessed Cartesian product or placeholder count.
 
 Read the business AC, affected TeamCity/REST contracts, existing tests/fixtures, development contour
 and actual Automation consumer APIs before recommending a pattern. Design text is not runtime proof.
@@ -37,7 +40,7 @@ actually exercises, and pure rules should not pay for a server/VM without a rele
   preparation/build/run/cleanup and aggregate cost. Do not invent a fixed test ratio or import another
   product's numeric budgets. Long correctness and benchmarks have different purposes.
 
-Reuse existing NUnit/MTP contracts and Automation/Reqnroll/Playwright contours; no extra scheduler,
+Reuse existing NUnit/Test SDK contracts and Automation/Reqnroll/Playwright contours; no extra scheduler,
 report format or test framework for visual uniformity. Return a concise evidence decision and its
 limits in the existing issue/plan. Test Steward owns execution/bindings; Business Acceptance owns
 intent; TeamCity/REST owners own compatibility. Self-review is not independent milestone sign-off.

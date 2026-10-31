@@ -43,6 +43,10 @@ not an independent design choice. Internal implementation options remain proposa
 that contract. Unknown reference results still need independent evidence; no scope exemption is
 adopted. AC-CFG-03 is explicitly a version-checked extension, not a universal TeamCity stale-edit rule.
 
+D38 adds the [early executable REST gate](../design/teamcity-rest-test-first.md): source-backed
+technical cases, strict replay controls and actual product RED precede structural replacement.
+They support these business criteria rather than duplicate them. None is claimed executed today.
+
 The [tracked map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) connects every AC
 to milestones, TCM invariants, existing TC requirements, S* candidate checks and accepted contracts.
 Native installation/identity/resource lifecycles cite D34/D35 without inventing unrelated TC links.

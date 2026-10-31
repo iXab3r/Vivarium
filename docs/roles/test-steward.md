@@ -19,6 +19,13 @@ migration; this role owns actual bindings/execution/lifecycle/results. Follow
 extension-neutrality checks. Existing tiers below are execution contours, not a demand for one
 test at every level. Gherkin does not force UI or a process; unbound/parsed scenarios are not passes.
 
+D38 makes [executable REST conformance](../design/teamcity-rest-test-first.md) the first P0 execution
+slice. Deliver strict reference replay, a shared independent corpus and genuine Vivarium RED before
+structural replacement. Keep raw RED, product/reference blockers and harness failures distinct;
+previously GREEN cases are mandatory regressions. Broad compatibility coverage may contain hundreds
+or thousands of focused cases. Mock GREEN is not product acceptance, and hidden/ignored future tests
+or a guessed oracle are not a valid baseline.
+
 ## Territory
 
 This is a function role, not ownership of a directory. It applies to tests under

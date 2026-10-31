@@ -1,6 +1,6 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D37) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D38) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 **Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
@@ -18,6 +18,12 @@ The first new-stack local server + real Agent lab is R0.1; unchanged CLI smoke e
 with restart/cleanup proof at R0 exit. R2 adds full source-based C# Compile; R5 is cumulative
 conformance. See the [concrete local gates](../.workspace/workstreams/coherent-refactor/local-lab.md)
 and [early REST breakdown](../.workspace/workstreams/coherent-refactor/rest-breakdown.md).
+
+D38 makes executable REST compatibility tests the first P0 execution slice: P0.REST.1 freezes
+reference-backed cases, P0.REST.2 implements strict WireMock.Net replay and the shared conformance
+tests, and P0.REST.3 publishes actual Vivarium RED/GREEN/blockers before structural replacement.
+See [the mandatory TDD/acceptance gate](design/teamcity-rest-test-first.md). Broad coverage should
+produce hundreds/thousands of meaningful variants; no mock-only GREEN or guessed failing oracle.
 UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.
 
 D37 makes Build/Agent semantics a continuously tested TeamCity superset. The

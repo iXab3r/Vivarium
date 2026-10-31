@@ -19,6 +19,7 @@ below provide the technical details; legacy implementation sections describe evi
 | [REST-driven shared domain](teamcity-rest-domain.md) | REST + TeamCity + Scheduling + Git/Persistence | Early resource/ID/state/command/authority contracts, C# mutation gate and first compatible local execution (D36) |
 | [REST handling and implementation notes](teamcity-rest-recommendations.md) | Reconciliation + TeamCity/REST + Identity/Git/Results | **TeamCity handling required; implementation options proposed:** contract, tradeoffs and verification for all 36 REST-AC findings |
 | [Testing and continuous conformance](testing-model.md) | Business Acceptance + Testing Architect + Test Steward + TeamCity/REST | Business AC, TCM superset invariants, independent evidence pyramid and per-milestone drift/extension checks (D37) |
+| [Early REST test-first gate](teamcity-rest-test-first.md) | TeamCity/REST + Testing Architect + Test Steward | Executable P0 corpus, strict WireMock.Net replay, genuine RED baseline, mandatory TDD/acceptance and honest partial-milestone gates (D38) |
 | [AgentExplorer](agent-explorer.md) | AgentExplorer Expert | Host inventory, observation, remote operations, and fleet management |
 | [Machine providers/images](machine-providers-images.md) | Machine Providers/Images Expert | Provider hosts, pools, images, clone/revert/power/console, sealing, drift, and capacity |
 | [REST API](rest-api.md) | Vivarium REST Expert | Canonical `/api/v1` management surface, events, compatibility, and Git-aware mutations |

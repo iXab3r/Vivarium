@@ -210,5 +210,20 @@
       "AC-CFG-03: explicit version-checked extension"
     ],
     "canonical_feature_ids_preserved": 110
+  },
+  "early_rest_tdd_gate": {
+    "decision": "D38",
+    "checkpoints": [
+      "P0.REST.1",
+      "P0.REST.2",
+      "P0.REST.3"
+    ],
+    "status": "accepted-direction-implementation-not-started",
+    "new_conformance_cases_materialized": 0,
+    "new_conformance_cases_executed": 0,
+    "product_red_baseline_recorded": false,
+    "replay_library_preferred": "WireMock.Net",
+    "test_stack": "existing NUnit / Microsoft.NET.Test.Sdk",
+    "code_dependency_added": false
   }
 }

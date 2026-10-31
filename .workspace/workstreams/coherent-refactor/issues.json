@@ -300,7 +300,7 @@
     {
       "key": "rest_harness",
       "number": 35,
-      "title": "P0: Design independent REST reference and unchanged-client conformance",
+      "title": "P0: Implement REST conformance tests and the initial RED baseline",
       "url": "https://github.com/iXab3r/Vivarium/issues/35",
       "milestone": "P0",
       "parent": 12,

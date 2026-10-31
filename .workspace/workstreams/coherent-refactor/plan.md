@@ -1,6 +1,8 @@
-# Coherent Vivarium refactor — plan v1.4
+# Coherent Vivarium refactor — plan v1.5
 
-Status: **draft for owner iteration, not an implementation authorization or accepted ADR**.
+Status: **plan under owner iteration; D38's first executable REST test slice is accepted direction**.
+P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
+structural product work still follows the accepted P0 exit and milestone gates below.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately
@@ -67,8 +69,9 @@ Chiral/PG target, C# catalog, chains, full persistent logs/test history, import 
 See the [existing gap ledger](../teamcity-migration/ledger.md); none of the 97 jobs is migration-accepted.
 
 Local baseline verification currently stops before compilation: `global.json` requires SDK 10.0.303,
-but 10.0.103 is installed. Earlier build/test attempts are not green evidence. R0 must prepare the
-exact declared toolchain rather than quietly changing the pin or treating unavailable checks as passed.
+but 10.0.103 is installed. Earlier build/test attempts are not green evidence. D38 moves exact SDK/
+test-toolchain preparation into the first P0 REST execution slice; R0 inherits it. Do not lower the
+pin or treat unavailable checks as passed or as product RED.
 
 ## Target ownership and reuse
 
@@ -129,7 +132,7 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 
 | ID | Observable increment | Exit evidence |
 |---|---|---|
-| P0 | REST-driven structural contracts agreed before implementation | Resource/ID/state/command model, protocol and C# mutation/authority proof reviewed; discovered variants classified by owner/milestone, source/data obligations explicit; no unknown structural mapping hidden behind a route count |
+| P0 | Executable reference-backed REST contracts and a genuine RED baseline precede structural replacement | P0.REST.1–3 corpus/replay/product baseline executed with evidence and explicit blockers; resource/ID/state/command, protocol and C# mutation/authority proof reviewed; required variants allocated; no unknown mapping hidden behind a count |
 | R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 actual PG/Storage/Host/Agent enrollment and debug lifecycle; R0.2 unchanged CLI enqueue/watch/cancel/artifact; R0.3 restart/reconnect/regressions/owned cleanup. Minimal final-framework technical identity and seeded Git configuration; no disposable lab engine |
 | R1 | An ordinary user can sign in and an administrator can grant/revoke current access | Approved superuser model; UI login/access/token journeys; same existing cookie and token reflect revocation; keys/session continuity across Host restart |
 | R2 | A user authors a full C# catalogue and runs a genuine source-based Compile | Extend R0 catalogue/execution with full C# evaluation/editing/inheritance, exact checkout, requirements/reasons and report/artifact provenance; same existing PG scheduler, Agent and compatible/native run services |
@@ -138,8 +141,15 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 | R5 | Existing TeamCity clients pass cumulative cross-family conformance | Finish agreed remaining operations and all method/path/variant/client/negative/files checks built since P0/R0; this is not the first REST analysis or adapter implementation |
 | R6 | A local full migration rehearsal supports independent operation and final switch | All 97 dispositions and 120 requirements evidenced; full history+bytes/import replay+diff choices, coexistence ownership, final delta, encrypted restore, real family/OS tests; old implementation removed |
 
-Dependencies: P0 structural REST/representation gates → R0 → R1 → R2 → R3 → R4 → R5 → R6.
-P0 includes resource/ID/state/authority schemas, protocol fixtures, C# mutation proof and per-operation
+Dependencies: P0.REST.1–3 executable test-first gate + P0 structural/representation gates → R0 → R1 → R2 → R3 → R4 → R5 → R6.
+P0 starts with the [D38 executable REST suite and initial RED baseline](../../../docs/design/teamcity-rest-test-first.md).
+P0.REST.1 freezes independent expectations, P0.REST.2 runs strict WireMock.Net/client controls,
+and P0.REST.3 executes the same corpus against the healthy actual Vivarium boundary. Hundreds or
+thousands of reviewed variants are expected as coverage expands; missing reference/setup is not
+product RED. Preserve standard raw results and a monotonic known-RED/regression ledger; each main
+milestone accepts its declared delivered set while the remaining full-suite RED stays visible.
+
+P0 also includes resource/ID/state/authority schemas, protocol fixtures, C# mutation proof and per-operation
 milestone allocation, not just counting routes. See [REST breakdown](rest-breakdown.md) and
 [local lab](local-lab.md). Full historical byte transfer and every late source-property value do not
 block local Host/Agent development; they retain explicit owners/gates before affected migration.
@@ -164,7 +174,7 @@ Early concrete tasks: [REST breakdown #12](https://github.com/iXab3r/Vivarium/is
 [resource/state model #32](https://github.com/iXab3r/Vivarium/issues/32),
 [protocol #33](https://github.com/iXab3r/Vivarium/issues/33),
 [mutation/C# proof #34](https://github.com/iXab3r/Vivarium/issues/34),
-[conformance design #35](https://github.com/iXab3r/Vivarium/issues/35),
+[executable conformance and RED baseline #35](https://github.com/iXab3r/Vivarium/issues/35),
 [variant/milestone allocation #36](https://github.com/iXab3r/Vivarium/issues/36),
 [local Host+Agent #37](https://github.com/iXab3r/Vivarium/issues/37) and
 [first unchanged-CLI run #38](https://github.com/iXab3r/Vivarium/issues/38).

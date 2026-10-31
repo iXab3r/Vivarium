@@ -1,9 +1,14 @@
-# Local server + Agent lab — earliest executable milestone
+# Local server + Agent lab — first new-stack farm milestone
 
 Status: target contract under D36, **not delivered or launched by this planning task**.
 The existing legacy Host/Agent entry points and SessionLoopTests already demonstrate a protocol
 loop, but use SQLite/custom authentication and are not the new reproducible PG/Chiral environment.
 The currently missing pinned SDK 10.0.303 is an explicit preparation prerequisite, not a changed pin.
+
+D38 now places executable reference-backed REST tests and the first real conformance RED baseline
+in P0, before this new-stack farm milestone. Prepare the exact test toolchain there; do not make the
+early corpus wait for the full PG/Chiral/Agent lab. P0 HTTP/replay evidence is not a claim that R0's
+separate-Agent execution or operator deployment experience already exists.
 
 ## When it becomes usable
 

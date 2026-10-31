@@ -163,6 +163,12 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   architecture. Business Acceptance owns intent; Testing Architect selects minimal evidence/oracles;
   Test Steward owns bindings/execution. Use the D37 hierarchy/pyramid; parsed/unbound features are
   not GREEN, Gherkin does not force E2E, and no new test framework is implied.
+- D38 makes executable, reference-backed REST conformance and a genuine RED baseline the first P0
+  execution slice before structural replacement. Prefer WireMock.Net replay on the existing NUnit/
+  Test SDK stack; mock GREEN does not prove Vivarium behavior. Hundreds/thousands of real variants
+  are expected as coverage expands. Preserve implemented GREEN cases, execute/report remaining raw
+  RED explicitly, and distinguish missing reference/product prerequisites from harness/setup errors.
+  No guessed oracle, skipped placeholder, automatic RED allowance or product-derived expectation.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

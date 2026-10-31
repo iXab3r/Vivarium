@@ -153,6 +153,12 @@ they must work with TeamCity unavailable.
 
 ## Conformance and delivery
 
+D38 moves the **executable** reference corpus, strict WireMock.Net replay and genuine product-RED
+baseline to the first P0 execution slice, before structural replacement. This is more than writing
+a harness design. Follow [P0.REST.1–3](teamcity-rest-test-first.md), reference provenance, explicit
+result categories and mandatory TDD/regression gates. WireMock/client GREEN is control evidence;
+real Vivarium response/state/byte assertions establish conformance. R5 remains cumulative proof.
+
 1. Generate a method/path/variant inventory from the pinned CLI source/tests, the reference API
    metadata and other consumer calls. Keep generated census separate from human dispositions.
 2. Define golden semantic request/response fixtures. Normalize only true run-dependent IDs, origins

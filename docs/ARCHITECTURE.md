@@ -1186,6 +1186,36 @@ Business Acceptance owns intent/oracles, Testing Architect evidence design, Test
 and TeamCity/REST owners the baseline semantics. Co-held roles do not constitute independent review.
 See [testing model](design/testing-model.md) and [system AC](acceptance/README.md).
 
+### D38. Executable REST contracts and a genuine RED baseline precede structural replacement
+
+Accepted owner direction, 2026-10-31. TeamCity REST compatibility is mandatory acceptance and TDD
+evidence. The first P0 execution slice establishes independently sourced expectations, a reusable
+conformance suite and its actual failing Vivarium baseline before structural product replacement.
+Broad operation/variant coverage should naturally produce hundreds or thousands of focused cases;
+do not substitute route counts, invented expectations or deliberately failing test placeholders.
+
+Prefer WireMock.Net for strict local reference replay with the existing NUnit/Test SDK stack. The
+same independently established cases drive replay controls and the actual Vivarium boundary, with
+distinct claims/results. A GREEN stub/client run is not product equivalence. Pin source/profile
+provenance using TeamCity docs/models, installed metadata, version-appropriate code and real client
+evidence; resolve ambiguity through isolated reference observations rather than guesses. Verify
+responses, current permissions, real state effects and bytes. Do not build another TeamCity engine
+inside the mock or use production mutations merely to generate fixtures.
+
+Record executed product RED separately from product-blocked, reference-blocked/unbound and harness/
+environment failure. Missing SDK/startup, an unmatched stub or an empty run is not behavioral RED.
+TDD preserves the real failing assertion before implementation, or the existing GREEN baseline if
+the behavior already works. Implemented compatibility cases become permanent regression gates.
+Expected values never come from Vivarium or change merely to make a refactor pass.
+
+RF-10 still allows partial milestones in main: run explicit ordinary, replay-control, delivered-case
+and full-conformance targets. The raw full run remains visibly RED/nonzero while required failures
+remain; a limited milestone gate cannot claim full parity. Known RED is an exact reviewed case set,
+not automatic baseline expansion or skipped tests; previously GREEN cases cannot regress into it.
+Harness/environment failures always fail verification. Full family/API acceptance requires all
+required cases GREEN with no unresolved reference/binding/product blockers. See
+[the early test-first contract](design/teamcity-rest-test-first.md) for P0.REST.1–3 and reporting.
+
 ## 5. Protocol sketch
 
 ```proto
