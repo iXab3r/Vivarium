@@ -20,6 +20,13 @@ The [wire contract](teamcity-rest-compatibility.md) owns protocol acceptance. Th
 [workstream breakdown](../../.workspace/workstreams/coherent-refactor/rest-breakdown.md) owns current
 discovery evidence, open mappings and milestone allocation; no source/fixture count is API coverage.
 
+The [business gap review](../acceptance/rest-gap-review.md) additionally inspects 30 public resource
+pages and records 36 open decomposition findings. P0 must explicitly settle settings-freeze timing,
+manual status versus original evidence, Versioned Settings versus C# Git authority, required
+authentication forms, Agent compatibility policy, approvals and externally reported build lifecycle.
+API metadata is a discovery input, not proof of installed-version semantics or an exemption for
+licensing/plugin/cloud/node operations without an agreed product mapping.
+
 ## Resource identities and relations
 
 The shared model must represent the following observable concepts without facade-only shadow state:

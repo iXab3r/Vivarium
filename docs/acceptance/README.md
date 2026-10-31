@@ -32,6 +32,11 @@ the move. The [lifecycle review](lifecycle-review.md) separates specified behavi
 variants: this is an initial broad baseline, not a claim that every TeamCity operation is decomposed.
 Missing decomposition is work to do, not permission to drop the original requirements.
 
+The [REST-driven gap review](rest-gap-review.md) compares the 110-AC baseline with all 30 discovered
+public TeamCity API resource pages. It records 36 open decomposition findings and proposed business
+outcomes. Public documentation discovery is distinct from frozen-version behavior and runtime proof;
+these findings do not add duplicate features or mark existing criteria accepted.
+
 The [tracked map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) connects every AC
 to milestones, TCM invariants, existing TC requirements, S* candidate checks and accepted contracts.
 Native installation/identity/resource lifecycles cite D34/D35 without inventing unrelated TC links.

@@ -33,6 +33,13 @@ silently refresh the pin when regenerating. This is analysis tooling, not a new 
 
 ## Resource families and structural implications
 
+Subsequent [business acceptance review](../../../docs/acceptance/rest-gap-review.md) inspects all 30
+API pages in the public documentation sitemap. teamcity-official-rest-operations.tsv records 449
+documented operation headings, rest-resource-acceptance-review.tsv routes every resource, and
+rest-business-gaps.tsv contains 36 open findings. Counts are not normalized routes or coverage.
+See rest-business-review-census.json for source hashes/version limits. This supplements the pinned
+CLI fixtures; full installed Swagger/schema/variant reconciliation and reference effects remain open.
+
 | Family / representative routes | Shared concepts required | Authority / earliest useful slice |
 |---|---|---|
 | Root, apiVersion, info/version, server | Compatibility profile distinct from actual product identity, discovery, context roots, endpoint media | Chiral/runtime observations; R0 thin profile |

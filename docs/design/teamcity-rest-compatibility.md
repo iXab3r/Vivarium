@@ -37,6 +37,13 @@ npm metadata lacks release gitHead and inline tests/full Swagger/other clients r
 R0 delivers the first real compatible local run; R1–R4 grow matching endpoints with their domains.
 R5 is cumulative conformance and agreed remaining operations, not the first facade implementation.
 
+The [REST-driven business review](../acceptance/rest-gap-review.md) adds an independently sourced
+public-documentation inventory: 30 resource pages, 449 operation headings and 36 open business
+decomposition findings. These are different units from concrete fixture requests or normalized
+method/path/variant coverage, even where counts coincide. The rolling documentation is not frozen
+2026.1.3 Swagger; it cannot silently expand or exclude installed-version behavior. Allocate every
+required operation and business effect explicitly before claiming its family accepted.
+
 ## One application model, two HTTP projections
 
 ```text

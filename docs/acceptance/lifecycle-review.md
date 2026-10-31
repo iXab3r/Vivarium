@@ -4,6 +4,10 @@ Status: **Initial business baseline, not complete variant coverage or executed a
 Review by lifecycle prevents a happy-path catalogue from looking complete merely because every
 subsystem has a folder. Stable IDs live in the feature files; this table is a review index.
 
+Use the [REST-driven gap review](rest-gap-review.md) for the subsequent resource/operation audit:
+queue controls/approvals, source changes, Agent run policy, versioned settings, external reporting,
+bulk actions, deployments and administration need more than the initial lifecycle summary below.
+
 | Subsystem | Enter/use/change | Failure and recovery | Leave/remove/retire |
 |---|---|---|---|
 | Installation | INS-01/02/04 | INS-03/05/06 | INS-05; uninstall/data erasure procedure still to specify |
@@ -38,7 +42,7 @@ that family complete while its required variants remain unresolved.
 | Tests and retained bytes | Results/Logs: TRX/JUnit/service messages, attempts, identity, investigations/mutes, partial reports, gaps, archive/path downloads, dependency/pin cleanup and unavailable content. | P0 allocation; R4/R5 proof |
 | Import reconciliation | Migration/Identity/Git: stable source IDs, identities/roles, unavailable secrets, source changes during export, interrupted bytes, preview authority, whole-entity choices and absent-source objects. No field merge or source-cleanup deletion. | P0 inventory; R6 proof |
 | Backup, retirement and erasure | Platform/Persistence/Security: compatible backup boundary including private settings/keys, restore validation, uninstall, deliberate erasure and secret rotation. Database-only or blob-only copies are not complete recovery. | P0 allocation; R6 rehearsal |
-| Optional fleet and VM features | AgentExplorer/Providers: observations, remote operations, images and machine lifecycle need their own AC before implementation. These extensions cannot narrow Build/Agent semantics or become hidden prerequisites for TeamCity migration. | Before their feature slice; not evidence of migration parity |
+| Fleet and VM scope | AgentExplorer/Providers: additional observations/remote operations/images need their own AC before implementation and cannot narrow base semantics. Existing required TeamCity cloud/capacity workflows remain compatibility obligations; they are not exempt merely because Vivarium's additional VM features were planned later. | P0 distinguishes required reference operations from additional extensions and allocates their delivery before affected migration acceptance |
 
 P0 issue [#39](https://github.com/iXab3r/Vivarium/issues/39) owns baseline review and these decisions.
 R0 issue [#40](https://github.com/iXab3r/Vivarium/issues/40) owns binding the first delivered slice.

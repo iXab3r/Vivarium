@@ -1160,6 +1160,10 @@ restart/recovery and exit/removal where applicable. The acceptance lifecycle rev
 reference variants instead of inventing stricter rules. Older normative examples and role packs must
 be reconciled with this baseline and D32–D36, not left contradictory beneath an override banner.
 
+Use TeamCity REST resources, operations and model options as the discovery spine for missing business
+workflows, then supplement runner/feature/service-message/Agent behavior that REST metadata cannot
+describe. Public operation counts and umbrella compatibility AC are not business or runtime coverage.
+
 Adapt PoeBane.Rust's Testing Architect principles: choose risk/observable/existing coverage/minimal
 real composition and an independent oracle first; classify environment, process placement, runner and
 execution cost separately. Gherkin does not mandate E2E. Reuse actual services/infrastructure at the
