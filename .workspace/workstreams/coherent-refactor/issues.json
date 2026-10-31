@@ -1,0 +1,324 @@
+{
+  "issues": [
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/2",
+      "title": "P0: Agree replacement contracts and acceptance",
+      "state": "open",
+      "milestone": "P0",
+      "number": 2,
+      "key": "P0-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/3",
+      "title": "R0: Run and debug one isolated Chiral Host",
+      "state": "open",
+      "milestone": "R0",
+      "number": 3,
+      "key": "R0-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/4",
+      "title": "R1: Sign in and manage current access",
+      "state": "open",
+      "milestone": "R1",
+      "number": 4,
+      "key": "R1-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/5",
+      "title": "R2: Run a source-based C# Compile",
+      "state": "open",
+      "milestone": "R2",
+      "number": 5,
+      "key": "R2-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/6",
+      "title": "R3: Execute complete build families",
+      "state": "open",
+      "milestone": "R3",
+      "number": 6,
+      "key": "R3-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/7",
+      "title": "R4: Diagnose builds and historical tests",
+      "state": "open",
+      "milestone": "R4",
+      "number": 7,
+      "key": "R4-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/8",
+      "title": "R5: Prove unchanged TeamCity clients",
+      "state": "open",
+      "milestone": "R5",
+      "number": 8,
+      "key": "R5-parent"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/9",
+      "title": "R6: Rehearse full migration and coherent replacement",
+      "state": "open",
+      "milestone": "R6",
+      "number": 9,
+      "key": "R6-parent"
+    },
+    {
+      "parent": 2,
+      "url": "https://github.com/iXab3r/Vivarium/issues/10",
+      "title": "P0: Specify state owners and resolve architecture choices",
+      "state": "open",
+      "milestone": "P0",
+      "number": 10,
+      "key": "decisions"
+    },
+    {
+      "parent": 2,
+      "url": "https://github.com/iXab3r/Vivarium/issues/11",
+      "title": "P0: Classify legacy code and preserve behavioral invariants",
+      "state": "open",
+      "milestone": "P0",
+      "number": 11,
+      "key": "disposition"
+    },
+    {
+      "parent": 2,
+      "url": "https://github.com/iXab3r/Vivarium/issues/12",
+      "title": "P0: Freeze actual TeamCity client and HTTP variant scope",
+      "state": "open",
+      "milestone": "P0",
+      "number": 12,
+      "key": "clients"
+    },
+    {
+      "parent": 2,
+      "url": "https://github.com/iXab3r/Vivarium/issues/13",
+      "title": "P0: Inventory complete retained history and real build semantics",
+      "state": "open",
+      "milestone": "P0",
+      "number": 13,
+      "key": "data"
+    },
+    {
+      "parent": 3,
+      "url": "https://github.com/iXab3r/Vivarium/issues/14",
+      "title": "R0: Compose one Host with real PostgreSQL and shared storage",
+      "state": "open",
+      "milestone": "R0",
+      "number": 14,
+      "key": "host"
+    },
+    {
+      "parent": 3,
+      "url": "https://github.com/iXab3r/Vivarium/issues/15",
+      "title": "R0: Establish Automation and shared local debug fixtures",
+      "state": "open",
+      "milestone": "R0",
+      "number": 15,
+      "key": "automation"
+    },
+    {
+      "parent": 4,
+      "url": "https://github.com/iXab3r/Vivarium/issues/16",
+      "title": "R1: Implement approved ordinary and installation sign-in",
+      "state": "open",
+      "milestone": "R1",
+      "number": 16,
+      "key": "login"
+    },
+    {
+      "parent": 4,
+      "url": "https://github.com/iXab3r/Vivarium/issues/17",
+      "title": "R1: Enforce current project/fleet rights and token lifecycle",
+      "state": "open",
+      "milestone": "R1",
+      "number": 17,
+      "key": "access"
+    },
+    {
+      "parent": 5,
+      "url": "https://github.com/iXab3r/Vivarium/issues/18",
+      "title": "R2: Build the Git-owned C# catalog and safe editing contract",
+      "state": "open",
+      "milestone": "R2",
+      "number": 18,
+      "key": "catalog"
+    },
+    {
+      "parent": 5,
+      "url": "https://github.com/iXab3r/Vivarium/issues/19",
+      "title": "R2: Run exact source checkout and first real Compile on Agent",
+      "state": "open",
+      "milestone": "R2",
+      "number": 19,
+      "key": "checkout"
+    },
+    {
+      "parent": 5,
+      "url": "https://github.com/iXab3r/Vivarium/issues/20",
+      "title": "R2: Replace queue persistence and expose the complete run journey",
+      "state": "open",
+      "milestone": "R2",
+      "number": 20,
+      "key": "execution"
+    },
+    {
+      "parent": 6,
+      "url": "https://github.com/iXab3r/Vivarium/issues/21",
+      "title": "R3: Execute dependency DAGs and exact artifact inputs",
+      "state": "open",
+      "milestone": "R3",
+      "number": 21,
+      "key": "chains"
+    },
+    {
+      "parent": 6,
+      "url": "https://github.com/iXab3r/Vivarium/issues/22",
+      "title": "R3: Cover observed runners, templates and parameter semantics",
+      "state": "open",
+      "milestone": "R3",
+      "number": 22,
+      "key": "runners"
+    },
+    {
+      "parent": 6,
+      "url": "https://github.com/iXab3r/Vivarium/issues/23",
+      "title": "R3: Make triggers, locks, counters and publication ownership durable",
+      "state": "open",
+      "milestone": "R3",
+      "number": 23,
+      "key": "triggers"
+    },
+    {
+      "parent": 7,
+      "url": "https://github.com/iXab3r/Vivarium/issues/24",
+      "title": "R4: Deliver durable bounded build logs and service messages",
+      "state": "open",
+      "milestone": "R4",
+      "number": 24,
+      "key": "logs"
+    },
+    {
+      "parent": 7,
+      "url": "https://github.com/iXab3r/Vivarium/issues/25",
+      "title": "R4: Deliver TRX/JUnit test history and triage journeys",
+      "state": "open",
+      "milestone": "R4",
+      "number": 25,
+      "key": "tests"
+    },
+    {
+      "parent": 7,
+      "url": "https://github.com/iXab3r/Vivarium/issues/26",
+      "title": "R4: Complete build discovery, retention and artifact operations",
+      "state": "open",
+      "milestone": "R4",
+      "number": 26,
+      "key": "artifacts"
+    },
+    {
+      "parent": 8,
+      "url": "https://github.com/iXab3r/Vivarium/issues/27",
+      "title": "R5: Complete TeamCity REST variant conformance over shared services",
+      "state": "open",
+      "milestone": "R5",
+      "number": 27,
+      "key": "facade"
+    },
+    {
+      "parent": 8,
+      "url": "https://github.com/iXab3r/Vivarium/issues/28",
+      "title": "R5: Run unchanged CLI and actual other-client journeys",
+      "state": "open",
+      "milestone": "R5",
+      "number": 28,
+      "key": "native_clients"
+    },
+    {
+      "parent": 9,
+      "url": "https://github.com/iXab3r/Vivarium/issues/29",
+      "title": "R6: Import full retained history with resume and simple diff choices",
+      "state": "open",
+      "milestone": "R6",
+      "number": 29,
+      "key": "import"
+    },
+    {
+      "parent": 9,
+      "url": "https://github.com/iXab3r/Vivarium/issues/30",
+      "title": "R6: Rehearse every build family, coexistence and recoverable final delta",
+      "state": "open",
+      "milestone": "R6",
+      "number": 30,
+      "key": "rehearsal"
+    },
+    {
+      "parent": 9,
+      "url": "https://github.com/iXab3r/Vivarium/issues/31",
+      "title": "R6: Remove replaced implementations and accept one integrated product",
+      "state": "open",
+      "milestone": "R6",
+      "number": 31,
+      "key": "simplify"
+    }
+  ],
+  "milestones": [
+    {
+      "title": "P0: Agree replacement contracts and acceptance",
+      "key": "P0",
+      "number": 1,
+      "url": "https://github.com/iXab3r/Vivarium/milestone/1"
+    },
+    {
+      "key": "R0",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/2",
+      "title": "R0: Run and debug one isolated Chiral Host",
+      "number": 2
+    },
+    {
+      "key": "R1",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/3",
+      "title": "R1: Sign in and manage current access",
+      "number": 3
+    },
+    {
+      "key": "R2",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/4",
+      "title": "R2: Run a source-based C# Compile",
+      "number": 4
+    },
+    {
+      "key": "R3",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/5",
+      "title": "R3: Execute complete build families",
+      "number": 5
+    },
+    {
+      "key": "R4",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/6",
+      "title": "R4: Diagnose builds and historical tests",
+      "number": 6
+    },
+    {
+      "key": "R5",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/7",
+      "title": "R5: Prove unchanged TeamCity clients",
+      "number": 7
+    },
+    {
+      "key": "R6",
+      "url": "https://github.com/iXab3r/Vivarium/milestone/8",
+      "title": "R6: Rehearse full migration and coherent replacement",
+      "number": 8
+    }
+  ]
+}

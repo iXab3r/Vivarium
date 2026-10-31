@@ -35,7 +35,8 @@
   `0.1.0-depot.48.1` from `ca5e4582`, ahead of parts of the library main API; do not guess from main.
 - Reference-repository remote refs were refreshed; XAC uses remote `GH`, not `origin`.
 - Product implementation and TeamCity configuration were not edited. Documentation/routing changed;
-  no TeamCity writes/builds/imports, secret-value exports, publications, deployments or commits occurred.
+  no TeamCity writes/builds/imports, secret-value exports, publications or deployments occurred.
+  Requirements were subsequently committed and pushed in the owner-requested checkpoint.
 - Root `dotnet build` and `dotnet test` were attempted after updating the base. Both stopped before
   build/test execution: the pinned .NET SDK 10.0.303 is absent; installed .NET 10 is 10.0.103. The SDK
   pin was preserved. Logs are under `artifacts/teamcity-parity/`. Latest recorded Vivarium Windows CI
@@ -48,12 +49,12 @@
   add new, skip unchanged, and resolve changed matches by keeping the whole Vivarium snapshot or using
   the whole TeamCity snapshot. No field merge or continuous/bidirectional sync. Preserve imported data
   when TeamCity cleanup removes its source; importing never activates a duplicate trigger/publisher.
-- Next concrete delivery: bring the clean Vivarium checkout to the reviewed integration head, then
-  update conflicting architecture decisions and implement the small source-based Compile slice on
-  Chiral/PostgreSQL with C# definition evaluation, private checkout and durable logs/artifacts.
+- Owner's next step is now coordinated refactor planning and iteration, before product implementation.
+  See `../coherent-refactor/plan.md` and its decision/scenario/issue ledgers. The earlier small Compile
+  slice is retained as an R2 acceptance journey inside that draft, not an instruction to start coding.
 - Before every family cutover, recover exact live script/settings values through a supported safe
   export/source path and prove observed semantics; current CLI intentionally redacts many values.
 - Large chat diff explanation: fast-forward 0999792 -> 09dd40b brought 263 pre-existing files,
-  +59,966/-1,949 lines. The chat view includes that repository refresh. Uncommitted own changes are
-  documentation and analysis materials; `git diff --name-only -- src tests build` is empty. Do not
+  +59,966/-1,949 lines. The chat view includes that repository refresh. This workstream's own changes
+  are documentation and analysis materials; product sources were not edited. Do not
   revert the repository refresh or discard new documents just to change the chat's diff display.

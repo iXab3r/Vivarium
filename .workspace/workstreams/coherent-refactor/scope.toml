@@ -1,0 +1,27 @@
+id = "coherent-refactor"
+status = "draft-for-owner-iteration"
+captured_date = "2026-10-31"
+checkpoint_commit = "cbb285a55701e0be0c726c57d9daccd8bfb529e7"
+checkpoint_tag = "checkpoint/pre-refactor-2026-10-31"
+runtime_baseline = "09dd40bb8449261d54cf3bd6261b3b1d4227fee0"
+depot_reference = "20238384013326cddb3296963a6d101a0970efc0"
+automation_reference = "c09facd10b413e6a3ebfd117379009e11c00b4b4"
+working_branch = "bugfix/teamcity-behavior-parity"
+lead = "Reconciliation Lead"
+coheld_roles = ["TeamCity", "Platform", "Persistence", "Identity", "Test Steward", "Docs"]
+
+[universe]
+source_configurations = 97
+accepted_configurations = 0
+behavioral_requirements = 120
+implementation_milestones_accepted = 0
+planning_gate = "P0 remains open; draft decisions do not replace D20/D23/D26/D32/D33."
+
+[authority]
+authorized = "Read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
+not_in_this_task = "Product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
+delivery_assumption = "One integration branch, independently verified internal milestones, one coherent final main switch; provisional until owner iteration."
+
+[status_authority]
+tracked = "plan.md, decisions.md, scenarios.md, ledger.md, phases.md, handover.md"
+external = "GitHub issues mirror this tracked plan; synchronize them when scope changes."

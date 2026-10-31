@@ -3,6 +3,11 @@
 Ordered so that every phase ends with something usable. Decision references (D1…D33) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
+**Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
+iterated, Depot-informed replacement plan before implementation. The [draft coordinated plan](../.workspace/workstreams/coherent-refactor/plan.md)
+contains milestone gates, pending decisions, scenarios and issue routing. It does not yet supersede
+accepted decisions or claim that the new implementation exists. Resolve P0 before starting it.
+
 ## Immediate priority — replace TeamCity without functional loss (D32)
 
 The accepted build-product contract is [TeamCity behavioral parity](design/teamcity-parity.md).
