@@ -5,8 +5,9 @@ Feature: Existing automation remains usable
   Scenario: Existing TeamCity automation works without a client rewrite
     Given an operator has an existing TeamCity automation client
     When the operator points it to Vivarium and supplies Vivarium credentials
-    Then the agreed discovery, configuration, run, inspection, cancellation and download workflows work
+    Then discovery, configuration, run, inspection, cancellation and download follow the reference TeamCity behavior
     And the client does not need to be rewritten for Vivarium
+    And the same operation follows the same access rules and has the same business effects through every supported management surface
 
   @AC-AUTO-02
   Scenario: Additional fleet inspection preserves existing build workflows

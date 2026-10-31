@@ -198,6 +198,12 @@ deployment claim or invent calendar estimates before the preparation and port wo
 
 ## Development and test contract proposed for this workstream
 
+Owner clarification: TeamCity determines the handling of adopted model operations, not a new
+Vivarium policy choice. Freeze reference defaults, guards, permissions, transitions and effects;
+dispatch native and compatible requests through that same semantic processing. Internal C#/PG/
+Chiral/framework implementation options must satisfy the contract. Unknown results are verification
+work; no blanket scope exceptions are adopted. Optional extension controls must be neutral when absent.
+
 D37's [testing model](../../../docs/design/testing-model.md) is authoritative for evidence selection.
 The canonical [business AC](../../../docs/acceptance/README.md) contain no implementation detail;
 acceptance-map.tsv connects their 110 stable IDs across subsystem folders to TCM invariants, the original TC requirements and

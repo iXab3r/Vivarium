@@ -37,9 +37,11 @@ public TeamCity API resource pages. It records 36 open decomposition findings an
 outcomes. Public documentation discovery is distinct from frozen-version behavior and runtime proof;
 these findings do not add duplicate features or mark existing criteria accepted.
 
-[Proposed recommendations](../design/teamcity-rest-recommendations.md) cover all 36 findings. New
-authoring/framework/scope choices require explicit adoption before changing the canonical AC or
-numbered architecture decisions; reference results still need independent variant evidence.
+[Reference handling and implementation notes](../design/teamcity-rest-recommendations.md) cover all
+36 findings. Owner clarification requires adopted operations to follow TeamCity; public behavior is
+not an independent design choice. Internal implementation options remain proposals and must meet
+that contract. Unknown reference results still need independent evidence; no scope exemption is
+adopted. AC-CFG-03 is explicitly a version-checked extension, not a universal TeamCity stale-edit rule.
 
 The [tracked map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) connects every AC
 to milestones, TCM invariants, existing TC requirements, S* candidate checks and accepted contracts.

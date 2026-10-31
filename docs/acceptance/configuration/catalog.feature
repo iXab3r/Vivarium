@@ -22,9 +22,9 @@ Feature: Accepted build settings govern future work
     Then the change is explained and is not activated
     And the previously accepted configuration remains identifiable and usable
 
-  @AC-CFG-03
+  @AC-CFG-03 @extension
   Scenario: Expose a conflicting settings edit
-    Given two administrators edit the same version of build settings
+    Given two administrators edit the same version of build settings in a workflow that explicitly checks for intervening changes
     When one accepted edit makes the other's proposal stale
     Then the stale edit is reported as conflicting rather than silently replacing the accepted settings
 

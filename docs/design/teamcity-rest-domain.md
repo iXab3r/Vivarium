@@ -73,6 +73,12 @@ OData/GraphQL engine or dynamically generated business model is needed.
 
 ## Command and authority contract
 
+TeamCity defines the semantics of each adopted command, including default arguments, guards,
+permissions, replacement/reset, state transitions, repeat/reuse behavior and observable completion.
+Authority classification below determines how Vivarium persists that command; it cannot redefine its
+handling. Native and compatible adapters dispatch the same semantic operation. An implementation
+option is valid only if the reference response and resulting state remain consistent.
+
 Classify each endpoint before implementing it:
 
 - Versioned desired build/fleet settings: validate/edit the approved C# representation, commit to Git,

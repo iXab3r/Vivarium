@@ -46,6 +46,14 @@ required operation and business effect explicitly before claiming its family acc
 
 ## One application model, two HTTP projections
 
+For the adopted model, TeamCity determines operation handling. Match its defaults, validation,
+permissions, states, mutations, ordering, optimization/reuse, cancellation, side effects and response
+completion boundaries. Native DTOs may differ, but the same semantic operation with the same actor,
+inputs and starting state cannot produce different business effects because it arrived through a
+different route. Additional controls must be explicit and neutral when absent. Unknown reference
+results require evidence; neither a preferred native rule nor a framework default substitutes for
+the reference. Unmapped required operations remain open blockers, not accepted scope exceptions.
+
 ```text
 Workbench / viv-cli --> /api/v1 -----------+
                                          +--> shared application services

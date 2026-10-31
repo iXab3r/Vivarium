@@ -1046,6 +1046,14 @@ fixtures, not production TeamCity writes. See
 [`design/teamcity-rest-compatibility.md`](design/teamcity-rest-compatibility.md) and the stable
 `TC-WIR-*` requirements in the parity catalog. This facade is planned, not implemented.
 
+Owner clarification, 2026-10-31: adopted TeamCity operations inherit TeamCity's handling, including
+defaults, validation, permissions, state transitions, collection mutation, ordering, retry/reuse,
+cancellation, side effects and observable completion. Both HTTP projections use that same semantic
+processing; compatibility is not merely DTO translation around different Vivarium rules. C#, storage
+and framework choices must satisfy the reference contract. Unverified variants remain explicit
+evidence gaps, not policy choices or automatic scope exemptions. Additional explicit controls must
+preserve base behavior when absent. Verify responses and resulting state across both surfaces.
+
 ### D34. Reuse Depot authentication and match TeamCity authorization
 
 Accepted owner direction, 2026-10-31; implementation is pending. Reuse Depot's framework composition:

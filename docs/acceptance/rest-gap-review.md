@@ -43,10 +43,11 @@ accounts for every discovered API resource. Neither table measures runtime cover
 All 36 findings remain open. A nearby AC or a proposed business sentence is not an exact oracle.
 Implementation acceptance still needs the frozen variants and independent expected state effects.
 
-The [recommendations for all 36 findings](../design/teamcity-rest-recommendations.md) now separate
-reference-required behavior from proposed authoring, framework and scope decisions. These are owner
-discussion proposals, not adopted exceptions or newly passing AC. They also correct the earlier
-overly broad repeat-enqueue assumption: the reference can optimize equivalent queued work.
+The [handling notes for all 36 findings](../design/teamcity-rest-recommendations.md) follow the owner's
+clarification: adopted operation semantics come from TeamCity, not new Vivarium policy choices.
+Internal authoring/framework options must satisfy that contract. All variants still need evidence;
+no scope exemption or passing AC follows from an implementation proposal. The earlier overly broad
+repeat-enqueue assumption is corrected: the reference can optimize equivalent queued work.
 
 ## Missing or underspecified categories
 

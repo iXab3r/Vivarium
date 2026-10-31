@@ -172,6 +172,11 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   D33 additionally requires a TeamCity-compatible `/app/rest` facade for existing clients. Both HTTP
   contracts use the same application services, authorization, appropriate Git/PG/Chiral authority and audit; compatibility
   never grants a separate state authority or permission bypass.
+- For the adopted TeamCity model, operation handling comes from the reference TeamCity contract:
+  defaults, validation, states, permissions, side effects, replacement/merge, retry, cancellation and
+  completion behavior are not independent Vivarium policy choices. Native and compatible surfaces
+  share that processing. Unknown reference variants remain verification gaps; internal technology
+  choices, framework defaults or generic hardening do not justify a different observable result.
 - Every state-changing request carries actor, correlation/idempotency identity, target, outcome, and,
   when configuration-derived, the Git revision. Logs and audit records must be bounded and redacted.
 

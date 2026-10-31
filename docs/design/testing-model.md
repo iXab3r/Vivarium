@@ -66,6 +66,27 @@ claim that this behavior was executed against either server.
 
 ## Evidence pyramid and independent axes
 
+### Reference behavior precedes implementation policy
+
+For adopted TeamCity resources, derive exact positive/negative cases from the frozen reference
+profile: actor/grants, starting state, request/defaults, result/errors and subsequent visible state.
+Unknown results are reference-verification tasks, not choices for a more convenient Vivarium rule.
+Use prepared isolated reference fixtures for mutation evidence; no production mutation is implied.
+
+Replay corresponding scenarios through the compatible facade and native application surface. Verify
+both response contracts and effects: effective settings, queue/run identity, permissions, history,
+selected bytes and side effects. Native wire schemas may differ; semantic processing cannot. Allow
+only declared environment/identity mappings in comparisons, such as local URLs and mapped allocated
+IDs. Do not normalize away state, status/error differences, types, omitted/empty values, ordering,
+permission outcomes or duplicate execution. Expected results must not come from the tested facade.
+
+Explicit extension options need paired cases with the option absent and present. An optional native
+version check may reject a stale edit only in that opted-in workflow; it must not become a mandatory
+precondition or different default for a TeamCity operation. Apply this gate with each delivered
+family and the cumulative base suite, without adding a new test framework or mandatory E2E topology.
+
+### Evidence selection
+
 Use many small focused contracts, fewer composed/integration cases and a small set of decisive real
 client/UI/platform journeys. No fixed ratio, test-count quota or one-test-per-level requirement.
 

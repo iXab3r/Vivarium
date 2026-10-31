@@ -1,16 +1,27 @@
-# Recommendations for the 36 REST acceptance findings
+# TeamCity reference handling and implementation notes for the 36 findings
 
-Status: **Proposed for owner discussion; not adopted architecture or executable acceptance**.
+Status: **TeamCity behavior is required by owner clarification; implementation options remain proposals**.
 Baseline: [REST review](../acceptance/rest-gap-review.md), 110 canonical AC, installed reference
-2026.1.3 build 222742. Every REST-AC finding remains open. Writing a recommendation does not settle
-an unknown reference result, authorize production mutations or waive compatibility.
+2026.1.3 build 222742. Every REST-AC finding remains open until its exact reference variants and
+implementation evidence are established. No scope exception is approved by these notes.
 
-## Recommended direction
+## Required direction — owner clarification, 2026-10-31
 
-Use TeamCity's observable semantics for ordinary build, Agent, project, test and permission behavior.
-Store that model through the accepted Git/PG/Chiral/Storage authorities. Keep one domain implementation
-and two HTTP projections. Most questions need reference examples rather than a new product policy.
-The actual design choices are authoring, native integration and scope boundaries described below.
+For the adopted TeamCity model, TeamCity defines operation handling: defaults, validation, states,
+permissions, side effects, ordering, inheritance, replacement/merge, retries, cancellation, cleanup
+and completion boundaries. These are reference facts to establish, not independent Vivarium policy
+choices. The compatible API must remain consistent with that behavior and its wire contract.
+
+Both native and compatible HTTP surfaces call the same semantic operations. Their wire projections
+may differ as already documented; the same actor, target, state and inputs must not acquire different
+business effects merely from the route used. Explicit additional controls remain extensions whose
+absence preserves the base behavior. Unknown reference results remain verification gaps; native
+defaults or framework defaults cannot fill them by assumption.
+
+The earlier recommendations are constrained accordingly below. Git/PG/Chiral/Storage, C# and
+Identity/OpenIddict remain implementation choices under the accepted architecture. A required
+operation without a faithful mapping is an unresolved compatibility blocker, not an optional feature
+or a proposed automatic exemption. Counts and declarations never establish conformance.
 
 ### Editable C# settings and arbitrary C# work
 
@@ -25,29 +36,29 @@ may generate managed definitions before commit; they cannot silently override fi
 REST. Prove this boundary with an actual template/parameter/step edit and unchanged-client read-back
 before choosing the final authoring API. Arbitrary repository C# must not execute inside the privileged
 Host merely to inspect settings; use constrained declarative reading or a proven restricted evaluation
-boundary. This proposal trades unrestricted dynamic catalog authoring for predictable compatible edits;
-it does not restrict ordinary C# workload code. It needs an explicit owner decision before adoption.
+boundary. This representation is an implementation proposal and is acceptable only if every required
+TeamCity edit still has its reference effect. It cannot justify read-only configurations, rejected
+mutations or altered inheritance. The C# authoring shape must be proved against those operations;
+ordinary C# workload code remains separate.
 
 ### Git authority and Versioned Settings
 
-Keep every effective configuration tied to accepted Git revisions. Distinguish Vivarium's internal
-versioning from project synchronization with the configured product/settings repository. Disabling
-that synchronization can leave the accepted revision fixed without moving authority into PG.
-Current-settings versus selected-VCS settings then chooses the appropriate accepted revision/plan.
-Inherited synchronization, affected projects, load/commit/status and edit permissions remain real
-operations. Prove the mapping for all three build-settings modes, not just the default.
+Keep every effective configuration tied to accepted Git revisions while preserving the reference
+Versioned Settings workflow. Internal Git history is distinct from synchronization with a selected
+project/settings repository. Implement disabled/inherited synchronization, current/VCS/default build
+settings choice, load/commit/status, affected projects and edit permissions with their actual effects.
+The revision mapping is engineering work; it is not permission to rename these modes or flatten them.
 
-Recommend direct, validated commit-and-activate for the standard compatible editing path. Return its
-reference success only once the corresponding read/new-build behavior is observable. Native reviewed
-proposals may remain pending explicitly; an old synchronous TeamCity edit must not secretly turn into
-a pull request. Source-dialect-specific Kotlin/XML execution is a proposed explicit exception unless
-the owner chooses to fund a real translator/runtime. Do not report that dialect as executed when the
-actual source is C#. Basic project/configuration mutations remain compatibility requirements.
+A compatible settings mutation reaches the same observable completion boundary as TeamCity. Native
+pending/reviewed proposals stay explicit extensions and cannot silently replace a synchronous
+compatible edit. A no-change operation, rejected operation and accepted-but-still-running operation
+must remain distinguishable exactly where the reference distinguishes them.
 
-This proposed exception concerns repository authoring/evaluation, **not XML REST request/response
-support**, which remains required. Prefer a lossless static settings translator where the actual
-clients need it and the supported model permits it; do not promise arbitrary Kotlin execution or
-round-tripping computed programs. The owner must decide the exact repository-format boundary.
+C# is the accepted source-language direction. Required repository-format and dialect-specific calls
+still need a faithful mapping and proof. No blanket Kotlin/XML exception is adopted; an unimplemented
+mapping remains a named blocker. HTTP XML request/response support is independently required. Do not
+claim that code or a dialect executed when it did not, or turn an API compatibility requirement into
+an invitation to choose a different operation result.
 
 ### Identity, sessions and protected values
 
@@ -59,18 +70,18 @@ credentials belong to the exact run, include its detached phase, and never grant
 rights. Freeze their actual lifetime and post-finish behavior against the reference.
 
 Local logout, forced logout of all sessions, removal of remembered sign-in, token revoke and provider
-logout are separate actions. For forced session termination, recommend the normal Identity security
-stamp mechanism checked on every protected cookie request, with an explicit validation-interval choice
-and measured request cost. The stock interval is 30 minutes [S10]; resetting a stamp alone cannot prove
-next-request logout. This is a proposed option refinement: adopting per-request validation would also
-make startup password reset retire old installation-account cookies sooner. Do not claim it already
-follows from D34 or invent a custom session epoch. API token revocation remains a separate operation.
+logout follow their separate TeamCity contracts. The reference defines which credentials stop working
+and when. Configure the standard Identity/OpenIddict mechanisms to meet that boundary; their defaults
+do not redefine it. For example, the stock security-stamp interval is 30 minutes [S10], so a stamp reset
+alone does not prove next-request rejection. Per-request validation is a possible implementation where
+the reference requires it, not a new user-selectable logout meaning. Do not claim the option or its
+effects on old installation-account cookies are already implemented or verified. Keep D34's single
+framework authority; no custom session epoch or fallback verifier is implied.
 
-Server authentication-module settings map to the Identity Chiral node and supported adapters. A
-source-compatible write must reach its reference-observable apply boundary. Restart-required native
-resource settings cannot become a successful-but-not-effective compatible authentication change.
-Either implement the required hot apply or retain an explicit unsupported-operation/scope decision;
-unknown Java authentication modules cannot be accepted as fictitious working providers.
+Server authentication-module settings map through Chiral and real adapters. A compatible write must
+reach its reference-observable apply boundary. A hidden required restart cannot follow a successful
+reply where TeamCity already made the change effective. Implement the required apply behavior;
+an unmapped provider/module remains a compatibility gap rather than fictitious working configuration.
 
 Resource connection secrets stay in private Chiral settings. For reversible build/project secrets,
 recommend a small PG credential service using existing framework protection with an explicitly durable,
@@ -110,28 +121,25 @@ reference behavior rather than promise exactly-once effects without sufficient i
 
 ### Backup and product-specific scope
 
-Keep the accepted coordinated offline backup as the first recovery baseline. Full compatible REST
-backup control additionally needs a real durable backup job while its management API remains usable:
-recommend a maintenance/coordinated snapshot of PG, referenced Storage objects, retained Git revisions,
-private settings and authentication keys. State a consistency boundary and verify restore. This is
-additional work, not a ZIP-download alias for copying the Host directory. Before adoption, update the
-offline-only-first contract and allocate the online/coordinated job explicitly.
+Retain the accepted offline recovery baseline. Compatible backup control must additionally perform
+the actual reference-defined operation and expose its progress, errors and completion. A coordinated
+PG/Storage/Git/private-settings/key snapshot is an implementation option; a directory-copy alias or
+a successful no-op is not an equivalent backup job. Freeze what the client observes and verify that
+the produced Vivarium backup actually restores the supported installation.
 
-Report real Vivarium capabilities and actual product identity through native discovery. Compatible
-version fields may advertise the frozen compatibility profile, with real product/version separately
-available; never imply a JVM plugin or JetBrains binary is installed. Recommend explicit exceptions
-for evaluating repository Kotlin/XML settings, JetBrains license-key administration, JVM plugin execution and
-multi-server responsibility mutations until real equivalents exist. These are **scope proposals**,
-not accepted exclusions. A capability/error response is preferable to false success, but still leaves
-full parity incomplete. Truthful singleton-node reads and native capacity information need no cluster.
-Live read-only CLI discovery returned API version `2026.1` and REST plugin version `222742`; keep
-these distinct from server product version `2026.1.3` and from the actual Vivarium release version.
+Use real native product/capability identity and the frozen compatible discovery profile. Required
+source-specific repository, license, plugin, authentication, cloud and node calls need explicit
+semantic mappings. The earlier proposed blanket exceptions are withdrawn as the default resolution.
+An operation without an equivalent remains open and cannot pass its family acceptance. Do not
+fabricate a JVM runtime, installed plugin or completed action, and do not count unsupported responses
+as positive conformance. The already accepted C# and initial single-Host architecture still applies;
+any genuine incompatibility must be demonstrated concretely rather than silently redefining scope.
 
-On 2026-10-31, read-only CLI pages for cloud profiles and instances each returned zero visible entries
-with `hasMore=false`. This is current-credential visibility, not proof about hidden/historical capacity.
-Recommend prioritizing the observed physical-agent migration while separately tracking cloud write
-compatibility. Deferring an unused adapter must be an explicit scope/delivery decision; it cannot
-silently turn the complete REST goal into only the owner's currently observed subset.
+Observed discovery remains API version `2026.1`, REST plugin version `222742` and server product
+version `2026.1.3`; none is the actual Vivarium release version. Read-only cloud profile/instance
+pages returned zero visible entries with `hasMore=false`. That observation can guide sequencing but
+does not waive required calls or prove hidden/historical absence. Milestones may deliver explicitly
+partial slices; they cannot redefine an unfinished required operation as already compatible.
 
 ## Recommendations for every finding
 
@@ -175,8 +183,8 @@ reads. Password inputs must not become ordinary output parameters [S8].
 **Use the editable C# and revision mapping above.** Synchronization-disabled does not disable internal
 Git history. Implement current/VCS/default choice, parent inheritance, load/commit/status, affected
 projects and configured editability with real effects. Prove the full round trip before catalog code.
-Keep Kotlin/XML execution as an explicit owner scope decision; do not return successful synchronization
-for a source dialect that was never executed [S6].
+A source-dialect mapping that is not implemented remains an open blocker; do not return successful
+synchronization for code that never executed or assume a blanket dialect exemption [S6].
 
 ### REST-AC-06
 
@@ -368,11 +376,11 @@ must not acquire an unnecessary machine-provider prerequisite.
 
 ### REST-AC-28
 
-**Keep protocol coverage separate from required provider adapters.** Empty visible lists should stay
-truthful; start/stop/force-stop need real operations, permissions, quotas and observed outcomes before
-being supported. Current-credential cloud reads were empty, so recommend prioritizing physical-agent
-cutover and explicitly scheduling unused adapters later if the owner accepts that scope distinction.
-Check historical/hidden profiles and client usage first. No successful no-op or blanket cloud exemption.
+**Match cloud operations through real provider adapters.** Empty visible lists stay truthful;
+start/stop/force-stop must retain reference permissions, transitions, quotas, errors and observed
+outcomes. Current empty reads can guide implementation sequencing, not compatibility scope. Check
+historical/hidden profiles and required clients. Missing adapters remain open until implemented and
+verified; neither unsupported nor no-op success closes positive operation coverage.
 
 ### REST-AC-29
 
@@ -393,12 +401,12 @@ from the action journal; heartbeat noise does not require an audit row per messa
 
 ### REST-AC-31
 
-**Advertise compatibility truthfully and keep unmapped operations explicit.** Use a truthful singleton
-node and real native capability/version information, plus the frozen compatible discovery profile.
-Recommend no JetBrains license enforcement/key installation, JVM plugin runtime or multi-server
-responsibility changes in the initial C# Host; request an explicit scope decision rather than pretend
-they exist. Report configured actual capacity with the profile's valid unlimited representation where
-applicable. Test old-client discovery and error handling; unsupported effects remain parity gaps.
+**Match required discovery and administration behavior with truthful product mappings.** Preserve
+the reference protocol version selection, global settings, capability, licensing/plugin/node queries
+and required mutations. Map them to actual Vivarium concepts without inventing installed JetBrains
+software or effects. Initial single-Host topology and C# remain architectural constraints to satisfy,
+not automatic exceptions for these API resources. Unmapped operations remain blockers. Verify exact
+positive/negative client behavior; listing a gap or returning unsupported is not acceptance.
 
 ### REST-AC-32
 
@@ -457,12 +465,18 @@ above today's largest imported ID is not sufficient while TeamCity continues cre
 Preserve original IDs/provenance and required old-client lookups with explicit mappings. Keep numeric
 Build IDs and exact long test-ID strings in their resource-specific wire representations.
 
-## What needs an owner decision, and what needs measurement
+## What remains implementation work and reference verification
 
-The proposed editable C# authoring boundary, dialect/runtime scope exceptions, per-request cookie
-stamp validation, reversible build-secret storage, coordinated REST backup and any deferred unused
-cloud adapter affect architecture or scope. Present them for adoption explicitly; do not silently
-rewrite D32–D35 or declare all 449 operations covered. They can be decided independently.
+The owner has resolved the behavioral choice: adopted TeamCity operations follow TeamCity. Do not
+ask whether to keep a reference default, permission or lifecycle merely because another implementation
+would be easier. Internal authoring/storage/framework/backup/provider options remain proposals until
+their contract and architecture fit is proven. They cannot narrow the required API or add implicit
+new defaults, preconditions, approval steps or delays.
+
+No scope waiver is accepted here. If an architectural constraint truly prevents an equivalent,
+document the exact operation, reference evidence and observable difference as a blocker with concrete
+implementation alternatives. An unknown result is first a reference-verification task, not a request
+for the user to invent TeamCity behavior. All 36 findings stay open until their proof exists.
 
 Template precedence, status updates, queue selection/optimization, concrete replacement semantics,
 pool permission intersections, delete behavior, session endpoints and all HTTP shapes are reference

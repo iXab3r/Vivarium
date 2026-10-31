@@ -170,11 +170,11 @@
   "installed_cli": "@eyeauras/teamcity-cli 0.5.2; server status/rest-info read only; no Swagger-export command exposed",
   "source_server_mutations": 0,
   "recommendations": {
-    "status": "proposed-not-adopted",
+    "status": "reference-behavior-required-implementation-options-proposed",
     "count": 36,
     "reference_findings_remain_open": true,
     "document": "docs/design/teamcity-rest-recommendations.md",
-    "canonical_features_changed": false,
+    "canonical_features_changed": true,
     "api_version_observed": "2026.1",
     "rest_plugin_version_observed": "222742",
     "cloud_scope_read": {
@@ -196,6 +196,19 @@
       "not_installed_version_proof": true
     },
     "runtime_conformance_executed": false,
-    "source_mutations": 0
+    "source_mutations": 0,
+    "owner_clarification": {
+      "date": "2026-10-31",
+      "behavior_authority": "TeamCity 2026.1.3 reference profile",
+      "shared_native_and_compatible_processing": true,
+      "blanket_scope_exceptions_accepted": false,
+      "unknown_reference_results_are_policy_choices": false,
+      "runtime_conformance_executed": false
+    },
+    "canonical_feature_changes": [
+      "AC-AUTO-01: shared reference behavior",
+      "AC-CFG-03: explicit version-checked extension"
+    ],
+    "canonical_feature_ids_preserved": 110
   }
 }
