@@ -17,6 +17,7 @@ below provide the technical details; legacy implementation sections describe evi
 | [TeamCity behavioral parity](teamcity-parity.md) | TeamCity + Results + Logs + Scheduling + REST/UI | Required configuration, execution, test history, requirements, logs, automation and historical-import parity for replacing TeamCity (D32) |
 | [TeamCity REST compatibility](teamcity-rest-compatibility.md) | Vivarium REST + TeamCity + Test Steward | Unchanged-client `/app/rest` compatibility, locators, media types, paging, errors, mutations and conformance (D33) |
 | [REST-driven shared domain](teamcity-rest-domain.md) | REST + TeamCity + Scheduling + Git/Persistence | Early resource/ID/state/command/authority contracts, C# mutation gate and first compatible local execution (D36) |
+| [REST acceptance recommendations](teamcity-rest-recommendations.md) | Reconciliation + TeamCity/REST + Identity/Git/Results | **Proposed, not adopted:** preferred resolution, tradeoffs and verification for all 36 REST-AC findings |
 | [Testing and continuous conformance](testing-model.md) | Business Acceptance + Testing Architect + Test Steward + TeamCity/REST | Business AC, TCM superset invariants, independent evidence pyramid and per-milestone drift/extension checks (D37) |
 | [AgentExplorer](agent-explorer.md) | AgentExplorer Expert | Host inventory, observation, remote operations, and fleet management |
 | [Machine providers/images](machine-providers-images.md) | Machine Providers/Images Expert | Provider hosts, pools, images, clone/revert/power/console, sealing, drift, and capacity |

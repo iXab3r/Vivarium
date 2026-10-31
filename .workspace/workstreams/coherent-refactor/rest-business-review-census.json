@@ -168,5 +168,34 @@
   "review_rows": 36,
   "classification_meaning": "Specification gaps relative to discovered operations, not implementation/test coverage",
   "installed_cli": "@eyeauras/teamcity-cli 0.5.2; server status/rest-info read only; no Swagger-export command exposed",
-  "source_server_mutations": 0
+  "source_server_mutations": 0,
+  "recommendations": {
+    "status": "proposed-not-adopted",
+    "count": 36,
+    "reference_findings_remain_open": true,
+    "document": "docs/design/teamcity-rest-recommendations.md",
+    "canonical_features_changed": false,
+    "api_version_observed": "2026.1",
+    "rest_plugin_version_observed": "222742",
+    "cloud_scope_read": {
+      "date": "2026-10-31",
+      "profiles": {
+        "visible_count": 0,
+        "hasMore": false
+      },
+      "instances": {
+        "visible_count": 0,
+        "hasMore": false
+      },
+      "limit": "Current credential-visible pages only; not proof about hidden or historical resources"
+    },
+    "public_rest_java_source": {
+      "revision": "fc730e618ccd4b57dbbaf03425bb79a9580d19d2",
+      "commit_date": "2024-03-04",
+      "files_inspected": 6,
+      "not_installed_version_proof": true
+    },
+    "runtime_conformance_executed": false,
+    "source_mutations": 0
+  }
 }

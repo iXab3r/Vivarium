@@ -37,6 +37,10 @@ public TeamCity API resource pages. It records 36 open decomposition findings an
 outcomes. Public documentation discovery is distinct from frozen-version behavior and runtime proof;
 these findings do not add duplicate features or mark existing criteria accepted.
 
+[Proposed recommendations](../design/teamcity-rest-recommendations.md) cover all 36 findings. New
+authoring/framework/scope choices require explicit adoption before changing the canonical AC or
+numbered architecture decisions; reference results still need independent variant evidence.
+
 The [tracked map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) connects every AC
 to milestones, TCM invariants, existing TC requirements, S* candidate checks and accepted contracts.
 Native installation/identity/resource lifecycles cite D34/D35 without inventing unrelated TC links.

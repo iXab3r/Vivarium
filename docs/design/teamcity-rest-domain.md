@@ -93,6 +93,11 @@ failure/retry observation and the exact success boundary. An endpoint expecting 
 become native 202. Do not report an unapplied/rejected candidate as success. Existing clients need not
 send new mandatory headers, and repeated intentional run requests cannot be deduplicated by body hash.
 
+This does not prohibit TeamCity's reference queue optimization or suitable-build reuse. Keep those
+domain rules distinct from transport retry identity; an unkeyed repeated request does not establish
+either exactly-once intent or an obligation to create a different Build every time. See the
+[proposed resolution of all 36 findings](teamcity-rest-recommendations.md).
+
 ## C# authoring is a pre-implementation gate
 
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
