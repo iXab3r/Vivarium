@@ -1,9 +1,10 @@
-# Coherent Vivarium refactor — plan v1.12
+# Coherent Vivarium refactor — plan v1.13
 
 **Current planning graph:** [all 18 story-led task packets are active](story-task-migration.md).
 Implementation/contract/acceptance #110–#163 now own the existing slices; all 25 goals have explicit
-contribution links. Source text/discussion is preserved, 62 old cards are labelled sources and the
-separate administrative cleanup is pending. Existing product cases/results, unfrozen scope and
+contribution links. [Source cleanup is complete](story-source-cleanup.md): 62 old cards are closed as
+superseded with original text/discussion retained, leaving 100 active Open issues. Existing product
+cases/results, unfrozen scope and
 P0/R0/PILOT gates remain. The [verification](story-task-migration-verification.md) includes the
 existing read-only accounting check with explicit historical-evidence reuse, not new runtime proof.
 
@@ -28,9 +29,9 @@ The 449 intent links are not a normalized API union or proof of coverage. See th
 cohort, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;
 conformance remains fifteen known cases / five RED / ten blocked / zero GREEN, denominator unknown.
 **Next:** [#85](https://github.com/iXab3r/Vivarium/issues/85) obtains one independent TC-server
-source/settings/dependency/selected-input receipt or a bounded typed-getter gap. Then #35 exact
-wire/control cases, #32 worked model, #34 actual C#/Git proof and #36 case freeze feed full P0 closure.
-**After that:** remaining P0/#77/final review/debt/main → real Host/Agent #37 and cheap Smoke #38 /
+source/settings/dependency/selected-input receipt or a bounded typed-getter gap. Then #111 exact
+wire/control cases, #32 worked model, #34 actual C#/Git proof and #110/#112 case freeze feed full P0 closure.
+**After that:** remaining P0/#77/final review/debt/main → real Host/Agent #113 and cheap Smoke #115 /
 R0 closure → first all-configuration/all-surface PILOT breadth preview. These steps do not waive
 remaining gates or accept the full chain. See the [goal/output/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
 The owner-selected whole-chain/default-publication scope and shared surface projections remain.

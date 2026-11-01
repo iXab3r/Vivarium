@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: story-led planning/task transition, source inventories, discussion preservation and existing read-only accounting. Task ownership is activated without product acceptance; source-card cleanup is a separate remaining step. No product/harness implementation, new runnable proof scripts, builds/tests, live reference/build execution or server/container lifecycle. Existing tooling/evidence keeps its original boundary."
+current_assignment = "2026-11-01: story-led planning/task transition, source inventories, discussion preservation and existing read-only accounting. Task ownership and administrative source supersession are complete without product acceptance; 62 superseded cards are closed with history retained. No product/harness implementation, new runnable proof scripts, builds/tests, live reference/build execution or server/container lifecycle. Existing tooling/evidence keeps its original boundary."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -53,7 +53,7 @@ targeted_addendum = "t3personal-pilot.md: three newly observed configurations, s
 breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real DAG/runners/artifact/launch/stage/default-publication -> fault/recovery/access/cumulative acceptance; no serial surface completion"
 
 [story_transition]
-assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. Planning only; no product/runtime work or old issue cleanup in this checkpoint."
+assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. All three planning stages complete; no product/runtime work. Historical stage counts below retain their original checkpoint meaning."
 catalogue = "stories.md"
 registry = "stories.tsv"
 inventory_preparation = "api-inventory-preparation.md"
@@ -69,7 +69,7 @@ dependency_records = 52
 old_issues_retained = 84
 old_native_child_links_retained = 75
 old_comments_retained = 12
-discussion_transfer = "PARTIAL: selected topics/five comments in task-transfer.tsv; source discussions remain authoritative; no cleanup clearance"
+discussion_transfer = "COMPLETE at planning boundary: 1497 source blocks and all twelve original comments retained; superseded sources closed administratively without deletion. See story-source-cleanup.md; no behavioral acceptance."
 verification = "story-stage1-verification.md"
 
 [source_union_continuation]
@@ -105,6 +105,21 @@ legacy_sources_labelled = 62
 retained_discussion_comments = 12
 intentional_evidence_helper_reparents = 9
 open_issues_at_readback = 162
-source_cleanup = "PENDING; original bodies/comments retained; no source issue closed/deleted"
+source_cleanup = "COMPLETE; 62 superseded sources closed not_planned with original bodies/comments/history retained; no deletion or product acceptance"
 normalized_denominator = "UNKNOWN"
 verification = "story-task-migration-verification.md"
+
+[source_cleanup]
+source_head = "b2551e8235c349929e35de8f9073bd0c6f4ffa41"
+summary = "story-source-cleanup.md"
+closure_register = "source-supersession.tsv"
+superseded_sources_closed = 62
+closure_reason = "not_planned"
+active_issues_open = 100
+total_issue_records = 162
+open_milestones = 9
+original_comments_unchanged = 12
+prior_timeline_entries_retained = 1349
+postclosure_timeline_entries = 1411
+product_acceptance = "NONE"
+source_deletion = "NONE"

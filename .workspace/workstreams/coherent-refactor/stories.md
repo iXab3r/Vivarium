@@ -14,7 +14,8 @@ work after checking that the discussion and decisions survive. This catalogue co
 planning catalogue and records the remaining inventory work. The
 [source-union continuation and first Stage 2 packet](story-transition-stage2.md) supplied additional
 source/scenario joins; [the current task migration](story-task-migration.md) expands and activates
-all 18 packets. Old source cards are labelled, with administrative cleanup still pending.
+all 18 packets. [Administrative cleanup](story-source-cleanup.md) closes 62 superseded sources with
+their original bodies and discussions retained; 100 active issues remain Open.
 
 Stories drive priority and useful outcomes. Every implementation contribution must trace upward to
 an actor goal; API discovery measures missing behavior. A story does not waive reference semantics

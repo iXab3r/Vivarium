@@ -1,5 +1,9 @@
 # API inventory preparation for story-driven work
 
+Current task navigation: [active packets](story-task-migration.md) and completed
+[source cleanup with discussion retention](story-source-cleanup.md). The inventory/normalization
+gaps below remain open; administrative task closure grants no API acceptance.
+
 Stage 1 planning checkpoint, 2026-11-01, source HEAD
 `9f5f36859f6a90309b117168db343abf14ae44df`. Start with the [story catalogue](stories.md).
 This is preparation for a normalized source union and exact variant allocation, not a replacement

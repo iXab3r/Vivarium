@@ -65,15 +65,16 @@ story/slice/source set. This is a text-preservation proof, not acceptance of eve
 
 The original bodies remain verbatim inside their GitHub cards. Sixty-two superseded implementation/
 contract/acceptance sources receive `state:legacy-source` and a short current-destination banner;
-the exact old body follows it. They remain Open for the later administrative cleanup and must not
-be executed alongside their replacement. #78 remains the priority actor-goal story, and #79–#81
+the exact old body follows it. The separate [administrative cleanup](story-source-cleanup.md) now
+closes these 62 sources as superseded (`not_planned`), preserving history. #78 remains the priority
+actor-goal story, and #79–#81
 remain its original UI/REST/CLI acceptance tracks. They are not relabelled legacy or replaced by
 three separate backend implementations.
 
 All twelve old comments retain exact IDs, URLs, authors, creation/edit times and bodies. A readable
 [retained discussion copy](retained-source-discussion.md) preserves them with original hashes and
 historical execution limits. The original conversations and attachment/external evidence links remain
-on GitHub; no card/comment/attachment is deleted, closed or hidden. This is not a complete downloaded
+on GitHub; no card/comment/attachment is deleted or hidden. Source closure preserves access. This is not a complete downloaded
 timeline/attachment archive, and permanent deletion is not cleared by text routing.
 
 [legacy-crosswalk.tsv](legacy-crosswalk.tsv) retains all 84 original sources, original body hashes/
@@ -114,8 +115,8 @@ implement the missing full story/source/variant/later-gap validator. Product acc
 15 known cases / five RED / ten product-prerequisite-blocked / zero GREEN, global denominator UNKNOWN.
 No build, test, new API conformance, independent final review or milestone acceptance is claimed.
 
-Next perform the separate administrative cleanup of the 62 labelled source cards after final delta/
-lineage reconciliation. Superseded closure/backlinks must preserve the original discussions and must
-not claim delivered code. Retain the still-useful goals, tracks, live evidence helpers and milestone
-gates. No product implementation follows automatically from a task-graph migration; the current
-assignment remains planning, and the next technical output remains #85's bounded reference proof.
+The separate [source cleanup](story-source-cleanup.md) is complete after final delta/lineage
+reconciliation: 62 superseded sources are closed, 100 active cards remain Open, and all twelve original
+comments and 1,349 prior source timeline entries are retained. Closure grants no product acceptance.
+No product implementation follows automatically from a task-graph migration; the current assignment
+remains planning, and the next technical output remains #85's bounded reference proof.

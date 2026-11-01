@@ -2,7 +2,15 @@
 
 ## Current state — 2026-11-01
 
-**Latest checkpoint: full story-led task ownership activated.** [Current index](story-task-migration.md)
+**Latest checkpoint: source cleanup completed with history retained.**
+[Cleanup and preservation proof](story-source-cleanup.md): 62 superseded source cards are closed with
+`not_planned`, while 100 active issues and nine milestones remain Open. All original bodies, twelve
+comments and 1,349 prior source timeline entries are retained; the 54 new packet bodies and active
+graph are unchanged. No issue/comment/attachment is deleted. The three-stage planning transition
+is complete, without product implementation or milestone acceptance. API normalization remains
+UNKNOWN; the next technical prerequisite is still #85/#32/#34 feeding P0.
+
+**Preceding checkpoint: full story-led task ownership activated.** [Current index](story-task-migration.md)
 and [verification](story-task-migration-verification.md): all 18 existing slices now have 54 active
 implementation/REST-contract/REST-acceptance tasks (#110–#163) under the 25 goals, with 61 primary/
 related links. Every story page has contribution links. The 449 API rows, 22 early contributions,

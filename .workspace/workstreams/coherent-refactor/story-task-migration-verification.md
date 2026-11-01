@@ -1,5 +1,8 @@
 # Active task-ownership verification — 2026-11-01
 
+Historical activation checkpoint. The subsequent [source cleanup](story-source-cleanup.md) records
+administrative closure and preservation checks; the activation-time counts below remain historical.
+
 Source HEAD: `1f0421357334be4330e7440b08b23fc12f56a598`, branch
 `bugfix/teamcity-behavior-parity`. Lead: Story Delivery; co-held Reconciliation, REST, Docs and
 Test Steward. This record verifies planning ownership and text preservation, not runtime behavior,
