@@ -1,5 +1,9 @@
 # Source-union continuation and first implementation-task packet
 
+Historical first-packet checkpoint. The [current story-task migration](story-task-migration.md)
+expands this proposal to all 18 slices and activates the reconciled ownership. The source/evidence
+limits below retain their original checkpoint meaning; no product acceptance followed from activation.
+
 Planning checkpoint, 2026-11-01, based on
 `defaffec72dc1718c937bc37c49b5362a7998f8f`. Lead: Story Delivery; co-held Reconciliation, REST,
 Docs and Test Steward perspectives. Start with the [25 actor goals](stories.md).

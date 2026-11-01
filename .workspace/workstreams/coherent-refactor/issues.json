@@ -73,7 +73,7 @@
       "key": "R6-parent"
     },
     {
-      "parent": 2,
+      "parent": 110,
       "url": "https://github.com/iXab3r/Vivarium/issues/10",
       "title": "P0: Specify state owners and resolve architecture choices",
       "state": "open",
@@ -82,7 +82,7 @@
       "key": "decisions"
     },
     {
-      "parent": 2,
+      "parent": 110,
       "url": "https://github.com/iXab3r/Vivarium/issues/11",
       "title": "P0: Classify legacy code and preserve behavioral invariants",
       "state": "open",
@@ -100,7 +100,7 @@
       "key": "clients"
     },
     {
-      "parent": 2,
+      "parent": 110,
       "url": "https://github.com/iXab3r/Vivarium/issues/13",
       "title": "P0: Inventory complete retained history and real build semantics",
       "state": "open",
@@ -262,7 +262,7 @@
       "key": "rehearsal"
     },
     {
-      "parent": 9,
+      "parent": 160,
       "url": "https://github.com/iXab3r/Vivarium/issues/31",
       "title": "R6: Remove replaced implementations and accept one integrated product",
       "state": "open",
@@ -271,7 +271,7 @@
       "key": "simplify"
     },
     {
-      "parent": 12,
+      "parent": 111,
       "url": "https://github.com/iXab3r/Vivarium/issues/32",
       "title": "P0: Adopt verified TeamCity Build/Agent identities and semantics",
       "state": "open",
@@ -289,7 +289,7 @@
       "key": "rest_protocol"
     },
     {
-      "parent": 12,
+      "parent": 111,
       "url": "https://github.com/iXab3r/Vivarium/issues/34",
       "title": "P0: Prove C# editing and REST mutation authority boundaries",
       "state": "open",
@@ -334,7 +334,7 @@
       "key": "local_rest_smoke"
     },
     {
-      "parent": 2,
+      "parent": 112,
       "url": "https://github.com/iXab3r/Vivarium/issues/39",
       "title": "P0: Review business AC and TeamCity superset test baseline",
       "state": "open",
@@ -676,7 +676,7 @@
       "key": "SS-DEP@R3-test"
     },
     {
-      "parent": 35,
+      "parent": 110,
       "url": "https://github.com/iXab3r/Vivarium/issues/77",
       "title": "P0: Make canonical Git document bytes independent of source line endings",
       "state": "open",
@@ -748,7 +748,7 @@
       "key": "reference-t3personal-pack"
     },
     {
-      "parent": 35,
+      "parent": 111,
       "url": "https://github.com/iXab3r/Vivarium/issues/85",
       "title": "Reference: capture server-resolved T3 inputs and dependency selection",
       "state": "open",
@@ -979,7 +979,7 @@
       "state": "open",
       "milestone": "P0",
       "number": 110,
-      "key": "story-US-013-P0-implementation"
+      "key": "story-US-013-SS-PROTO@P0-implementation"
     },
     {
       "parent": 110,
@@ -988,7 +988,7 @@
       "state": "open",
       "milestone": "P0",
       "number": 111,
-      "key": "story-US-013-P0-contract"
+      "key": "story-US-013-SS-PROTO@P0-rest-contract"
     },
     {
       "parent": 110,
@@ -997,7 +997,466 @@
       "state": "open",
       "milestone": "P0",
       "number": 112,
-      "key": "story-US-013-P0-acceptance"
+      "key": "story-US-013-SS-PROTO@P0-rest-acceptance"
+    },
+    {
+      "parent": 86,
+      "url": "https://github.com/iXab3r/Vivarium/issues/113",
+      "title": "US-001 / R0: Host, administration and observability — implementation",
+      "state": "open",
+      "milestone": "R0",
+      "number": 113,
+      "key": "story-US-001-SS-HOST@R0-implementation"
+    },
+    {
+      "parent": 113,
+      "url": "https://github.com/iXab3r/Vivarium/issues/114",
+      "title": "US-001 / R0: Host, administration and observability — REST contract",
+      "state": "open",
+      "milestone": "R0",
+      "number": 114,
+      "key": "story-US-001-SS-HOST@R0-rest-contract"
+    },
+    {
+      "parent": 113,
+      "url": "https://github.com/iXab3r/Vivarium/issues/115",
+      "title": "US-001 / R0: Host, administration and observability — REST acceptance",
+      "state": "open",
+      "milestone": "R0",
+      "number": 115,
+      "key": "story-US-001-SS-HOST@R0-rest-acceptance"
+    },
+    {
+      "parent": 78,
+      "url": "https://github.com/iXab3r/Vivarium/issues/116",
+      "title": "US-013 / PILOT: Queue, run lifecycle and build history — implementation",
+      "state": "open",
+      "milestone": "PILOT",
+      "number": 116,
+      "key": "story-US-013-SS-RUN@PILOT-implementation"
+    },
+    {
+      "parent": 116,
+      "url": "https://github.com/iXab3r/Vivarium/issues/117",
+      "title": "US-013 / PILOT: Queue, run lifecycle and build history — REST contract",
+      "state": "open",
+      "milestone": "PILOT",
+      "number": 117,
+      "key": "story-US-013-SS-RUN@PILOT-rest-contract"
+    },
+    {
+      "parent": 116,
+      "url": "https://github.com/iXab3r/Vivarium/issues/118",
+      "title": "US-013 / PILOT: Queue, run lifecycle and build history — REST acceptance",
+      "state": "open",
+      "milestone": "PILOT",
+      "number": 118,
+      "key": "story-US-013-SS-RUN@PILOT-rest-acceptance"
+    },
+    {
+      "parent": 89,
+      "url": "https://github.com/iXab3r/Vivarium/issues/119",
+      "title": "US-004 / R1: Identity, accounts and access — implementation",
+      "state": "open",
+      "milestone": "R1",
+      "number": 119,
+      "key": "story-US-004-SS-IAM@R1-implementation"
+    },
+    {
+      "parent": 119,
+      "url": "https://github.com/iXab3r/Vivarium/issues/120",
+      "title": "US-004 / R1: Identity, accounts and access — REST contract",
+      "state": "open",
+      "milestone": "R1",
+      "number": 120,
+      "key": "story-US-004-SS-IAM@R1-rest-contract"
+    },
+    {
+      "parent": 119,
+      "url": "https://github.com/iXab3r/Vivarium/issues/121",
+      "title": "US-004 / R1: Identity, accounts and access — REST acceptance",
+      "state": "open",
+      "milestone": "R1",
+      "number": 121,
+      "key": "story-US-004-SS-IAM@R1-rest-acceptance"
+    },
+    {
+      "parent": 91,
+      "url": "https://github.com/iXab3r/Vivarium/issues/122",
+      "title": "US-006 / R2: Projects and versioned C# catalog — implementation",
+      "state": "open",
+      "milestone": "R2",
+      "number": 122,
+      "key": "story-US-006-SS-CFG@R2-implementation"
+    },
+    {
+      "parent": 122,
+      "url": "https://github.com/iXab3r/Vivarium/issues/123",
+      "title": "US-006 / R2: Projects and versioned C# catalog — REST contract",
+      "state": "open",
+      "milestone": "R2",
+      "number": 123,
+      "key": "story-US-006-SS-CFG@R2-rest-contract"
+    },
+    {
+      "parent": 122,
+      "url": "https://github.com/iXab3r/Vivarium/issues/124",
+      "title": "US-006 / R2: Projects and versioned C# catalog — REST acceptance",
+      "state": "open",
+      "milestone": "R2",
+      "number": 124,
+      "key": "story-US-006-SS-CFG@R2-rest-acceptance"
+    },
+    {
+      "parent": 92,
+      "url": "https://github.com/iXab3r/Vivarium/issues/125",
+      "title": "US-007 / R2: VCS, changes and source checkout — implementation",
+      "state": "open",
+      "milestone": "R2",
+      "number": 125,
+      "key": "story-US-007-SS-VCS@R2-implementation"
+    },
+    {
+      "parent": 125,
+      "url": "https://github.com/iXab3r/Vivarium/issues/126",
+      "title": "US-007 / R2: VCS, changes and source checkout — REST contract",
+      "state": "open",
+      "milestone": "R2",
+      "number": 126,
+      "key": "story-US-007-SS-VCS@R2-rest-contract"
+    },
+    {
+      "parent": 125,
+      "url": "https://github.com/iXab3r/Vivarium/issues/127",
+      "title": "US-007 / R2: VCS, changes and source checkout — REST acceptance",
+      "state": "open",
+      "milestone": "R2",
+      "number": 127,
+      "key": "story-US-007-SS-VCS@R2-rest-acceptance"
+    },
+    {
+      "parent": 94,
+      "url": "https://github.com/iXab3r/Vivarium/issues/128",
+      "title": "US-009 / R2: Agent fleet, pools and compatibility — implementation",
+      "state": "open",
+      "milestone": "R2",
+      "number": 128,
+      "key": "story-US-009-SS-AGT@R2-implementation"
+    },
+    {
+      "parent": 128,
+      "url": "https://github.com/iXab3r/Vivarium/issues/129",
+      "title": "US-009 / R2: Agent fleet, pools and compatibility — REST contract",
+      "state": "open",
+      "milestone": "R2",
+      "number": 129,
+      "key": "story-US-009-SS-AGT@R2-rest-contract"
+    },
+    {
+      "parent": 128,
+      "url": "https://github.com/iXab3r/Vivarium/issues/130",
+      "title": "US-009 / R2: Agent fleet, pools and compatibility — REST acceptance",
+      "state": "open",
+      "milestone": "R2",
+      "number": 130,
+      "key": "story-US-009-SS-AGT@R2-rest-acceptance"
+    },
+    {
+      "parent": 109,
+      "url": "https://github.com/iXab3r/Vivarium/issues/131",
+      "title": "US-025 / R3: Provider and cloud capacity — implementation",
+      "state": "open",
+      "milestone": "R3",
+      "number": 131,
+      "key": "story-US-025-SS-CAP@R3-implementation"
+    },
+    {
+      "parent": 131,
+      "url": "https://github.com/iXab3r/Vivarium/issues/132",
+      "title": "US-025 / R3: Provider and cloud capacity — REST contract",
+      "state": "open",
+      "milestone": "R3",
+      "number": 132,
+      "key": "story-US-025-SS-CAP@R3-rest-contract"
+    },
+    {
+      "parent": 131,
+      "url": "https://github.com/iXab3r/Vivarium/issues/133",
+      "title": "US-025 / R3: Provider and cloud capacity — REST acceptance",
+      "state": "open",
+      "milestone": "R3",
+      "number": 133,
+      "key": "story-US-025-SS-CAP@R3-rest-acceptance"
+    },
+    {
+      "parent": 95,
+      "url": "https://github.com/iXab3r/Vivarium/issues/134",
+      "title": "US-010 / R2: Queue, run lifecycle and build history — implementation",
+      "state": "open",
+      "milestone": "R2",
+      "number": 134,
+      "key": "story-US-010-SS-RUN@R2-implementation"
+    },
+    {
+      "parent": 134,
+      "url": "https://github.com/iXab3r/Vivarium/issues/135",
+      "title": "US-010 / R2: Queue, run lifecycle and build history — REST contract",
+      "state": "open",
+      "milestone": "R2",
+      "number": 135,
+      "key": "story-US-010-SS-RUN@R2-rest-contract"
+    },
+    {
+      "parent": 134,
+      "url": "https://github.com/iXab3r/Vivarium/issues/136",
+      "title": "US-010 / R2: Queue, run lifecycle and build history — REST acceptance",
+      "state": "open",
+      "milestone": "R2",
+      "number": 136,
+      "key": "story-US-010-SS-RUN@R2-rest-acceptance"
+    },
+    {
+      "parent": 97,
+      "url": "https://github.com/iXab3r/Vivarium/issues/137",
+      "title": "US-012 / R3: Steps, runners, features and execution parameters — implementation",
+      "state": "open",
+      "milestone": "R3",
+      "number": 137,
+      "key": "story-US-012-SS-EXEC@R3-implementation"
+    },
+    {
+      "parent": 137,
+      "url": "https://github.com/iXab3r/Vivarium/issues/138",
+      "title": "US-012 / R3: Steps, runners, features and execution parameters — REST contract",
+      "state": "open",
+      "milestone": "R3",
+      "number": 138,
+      "key": "story-US-012-SS-EXEC@R3-rest-contract"
+    },
+    {
+      "parent": 137,
+      "url": "https://github.com/iXab3r/Vivarium/issues/139",
+      "title": "US-012 / R3: Steps, runners, features and execution parameters — REST acceptance",
+      "state": "open",
+      "milestone": "R3",
+      "number": 139,
+      "key": "story-US-012-SS-EXEC@R3-rest-acceptance"
+    },
+    {
+      "parent": 78,
+      "url": "https://github.com/iXab3r/Vivarium/issues/140",
+      "title": "US-013 / R3: Build chains and dependency selection — implementation",
+      "state": "open",
+      "milestone": "R3",
+      "number": 140,
+      "key": "story-US-013-SS-CHAIN@R3-implementation"
+    },
+    {
+      "parent": 140,
+      "url": "https://github.com/iXab3r/Vivarium/issues/141",
+      "title": "US-013 / R3: Build chains and dependency selection — REST contract",
+      "state": "open",
+      "milestone": "R3",
+      "number": 141,
+      "key": "story-US-013-SS-CHAIN@R3-rest-contract"
+    },
+    {
+      "parent": 140,
+      "url": "https://github.com/iXab3r/Vivarium/issues/142",
+      "title": "US-013 / R3: Build chains and dependency selection — REST acceptance",
+      "state": "open",
+      "milestone": "R3",
+      "number": 142,
+      "key": "story-US-013-SS-CHAIN@R3-rest-acceptance"
+    },
+    {
+      "parent": 98,
+      "url": "https://github.com/iXab3r/Vivarium/issues/143",
+      "title": "US-014 / R3: Triggers and release coordination — implementation",
+      "state": "open",
+      "milestone": "R3",
+      "number": 143,
+      "key": "story-US-014-SS-TRG@R3-implementation"
+    },
+    {
+      "parent": 143,
+      "url": "https://github.com/iXab3r/Vivarium/issues/144",
+      "title": "US-014 / R3: Triggers and release coordination — REST contract",
+      "state": "open",
+      "milestone": "R3",
+      "number": 144,
+      "key": "story-US-014-SS-TRG@R3-rest-contract"
+    },
+    {
+      "parent": 143,
+      "url": "https://github.com/iXab3r/Vivarium/issues/145",
+      "title": "US-014 / R3: Triggers and release coordination — REST acceptance",
+      "state": "open",
+      "milestone": "R3",
+      "number": 145,
+      "key": "story-US-014-SS-TRG@R3-rest-acceptance"
+    },
+    {
+      "parent": 99,
+      "url": "https://github.com/iXab3r/Vivarium/issues/146",
+      "title": "US-015 / R4: Build logs and service messages — implementation",
+      "state": "open",
+      "milestone": "R4",
+      "number": 146,
+      "key": "story-US-015-SS-LOG@R4-implementation"
+    },
+    {
+      "parent": 146,
+      "url": "https://github.com/iXab3r/Vivarium/issues/147",
+      "title": "US-015 / R4: Build logs and service messages — REST contract",
+      "state": "open",
+      "milestone": "R4",
+      "number": 147,
+      "key": "story-US-015-SS-LOG@R4-rest-contract"
+    },
+    {
+      "parent": 146,
+      "url": "https://github.com/iXab3r/Vivarium/issues/148",
+      "title": "US-015 / R4: Build logs and service messages — REST acceptance",
+      "state": "open",
+      "milestone": "R4",
+      "number": 148,
+      "key": "story-US-015-SS-LOG@R4-rest-acceptance"
+    },
+    {
+      "parent": 100,
+      "url": "https://github.com/iXab3r/Vivarium/issues/149",
+      "title": "US-016 / R4: Tests, problems, triage and statistics — implementation",
+      "state": "open",
+      "milestone": "R4",
+      "number": 149,
+      "key": "story-US-016-SS-RES@R4-implementation"
+    },
+    {
+      "parent": 149,
+      "url": "https://github.com/iXab3r/Vivarium/issues/150",
+      "title": "US-016 / R4: Tests, problems, triage and statistics — REST contract",
+      "state": "open",
+      "milestone": "R4",
+      "number": 150,
+      "key": "story-US-016-SS-RES@R4-rest-contract"
+    },
+    {
+      "parent": 149,
+      "url": "https://github.com/iXab3r/Vivarium/issues/151",
+      "title": "US-016 / R4: Tests, problems, triage and statistics — REST acceptance",
+      "state": "open",
+      "milestone": "R4",
+      "number": 151,
+      "key": "story-US-016-SS-RES@R4-rest-acceptance"
+    },
+    {
+      "parent": 102,
+      "url": "https://github.com/iXab3r/Vivarium/issues/152",
+      "title": "US-018 / R4: Artifacts, byte storage and retention — implementation",
+      "state": "open",
+      "milestone": "R4",
+      "number": 152,
+      "key": "story-US-018-SS-BLOB@R4-implementation"
+    },
+    {
+      "parent": 152,
+      "url": "https://github.com/iXab3r/Vivarium/issues/153",
+      "title": "US-018 / R4: Artifacts, byte storage and retention — REST contract",
+      "state": "open",
+      "milestone": "R4",
+      "number": 153,
+      "key": "story-US-018-SS-BLOB@R4-rest-contract"
+    },
+    {
+      "parent": 152,
+      "url": "https://github.com/iXab3r/Vivarium/issues/154",
+      "title": "US-018 / R4: Artifacts, byte storage and retention — REST acceptance",
+      "state": "open",
+      "milestone": "R4",
+      "number": 154,
+      "key": "story-US-018-SS-BLOB@R4-rest-acceptance"
+    },
+    {
+      "parent": 104,
+      "url": "https://github.com/iXab3r/Vivarium/issues/155",
+      "title": "US-020 / R3: Deployments and publication — implementation",
+      "state": "open",
+      "milestone": "R3",
+      "number": 155,
+      "key": "story-US-020-SS-DEP@R3-implementation"
+    },
+    {
+      "parent": 155,
+      "url": "https://github.com/iXab3r/Vivarium/issues/156",
+      "title": "US-020 / R3: Deployments and publication — REST contract",
+      "state": "open",
+      "milestone": "R3",
+      "number": 156,
+      "key": "story-US-020-SS-DEP@R3-rest-contract"
+    },
+    {
+      "parent": 155,
+      "url": "https://github.com/iXab3r/Vivarium/issues/157",
+      "title": "US-020 / R3: Deployments and publication — REST acceptance",
+      "state": "open",
+      "milestone": "R3",
+      "number": 157,
+      "key": "story-US-020-SS-DEP@R3-rest-acceptance"
+    },
+    {
+      "parent": 105,
+      "url": "https://github.com/iXab3r/Vivarium/issues/158",
+      "title": "US-021 / R6: Import, coexistence and recovery — implementation",
+      "state": "open",
+      "milestone": "R6",
+      "number": 158,
+      "key": "story-US-021-SS-MIG@R6-implementation"
+    },
+    {
+      "parent": 158,
+      "url": "https://github.com/iXab3r/Vivarium/issues/159",
+      "title": "US-021 / R6: Import, coexistence and recovery — REST contract",
+      "state": "open",
+      "milestone": "R6",
+      "number": 159,
+      "key": "story-US-021-SS-MIG@R6-rest-contract"
+    },
+    {
+      "parent": 158,
+      "url": "https://github.com/iXab3r/Vivarium/issues/160",
+      "title": "US-021 / R6: Import, coexistence and recovery — REST acceptance",
+      "state": "open",
+      "milestone": "R6",
+      "number": 160,
+      "key": "story-US-021-SS-MIG@R6-rest-acceptance"
+    },
+    {
+      "parent": 95,
+      "url": "https://github.com/iXab3r/Vivarium/issues/161",
+      "title": "US-010 / R5: REST protocol and conformance foundation — implementation",
+      "state": "open",
+      "milestone": "R5",
+      "number": 161,
+      "key": "story-US-010-SS-PROTO@R5-implementation"
+    },
+    {
+      "parent": 161,
+      "url": "https://github.com/iXab3r/Vivarium/issues/162",
+      "title": "US-010 / R5: REST protocol and conformance foundation — REST contract",
+      "state": "open",
+      "milestone": "R5",
+      "number": 162,
+      "key": "story-US-010-SS-PROTO@R5-rest-contract"
+    },
+    {
+      "parent": 161,
+      "url": "https://github.com/iXab3r/Vivarium/issues/163",
+      "title": "US-010 / R5: REST protocol and conformance foundation — REST acceptance",
+      "state": "open",
+      "milestone": "R5",
+      "number": 163,
+      "key": "story-US-010-SS-PROTO@R5-rest-acceptance"
     }
   ],
   "milestones": [
@@ -1066,8 +1525,8 @@
     }
   ],
   "snapshot": {
-    "recorded_utc": "2026-11-01T14:53:35.269874+00:00",
-    "source": "Stage 2 issue/task/body/comment/native-link readback; old content/assignments preserved; three proposed replacement tasks, no execution-graph activation",
-    "scope": "111 Open issues/nine milestones; 75 original native edges retained plus three new edges; 11 partial transfer units; no product acceptance"
+    "recorded_utc": "2026-11-01T15:57:12.474128+00:00",
+    "source": "Full story-led task packet/readback and retained-source activation; original bodies/comments retained; nine bounded evidence helpers intentionally reparented",
+    "scope": "162 Open issues/nine milestones; 25 goals/18 slices/54 active packet tasks; 62 labelled legacy sources, cleanup pending; no product acceptance"
   }
 }

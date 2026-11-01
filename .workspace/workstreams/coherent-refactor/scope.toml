@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: the owner is still iterating the plan. This slice is planning/reference analysis, authorized read-only source/reference metadata inspection and task maintenance; no product/harness implementation, new runnable proof scripts, builds/tests, live mutations/build execution or server/container lifecycle operations. Existing tooling/evidence remains accepted at its recorded boundary. 'Continue' within this assignment means continue that planning work."
+current_assignment = "2026-11-01: story-led planning/task transition, source inventories, discussion preservation and existing read-only accounting. Task ownership is activated without product acceptance; source-card cleanup is a separate remaining step. No product/harness implementation, new runnable proof scripts, builds/tests, live reference/build execution or server/container lifecycle. Existing tooling/evidence keeps its original boundary."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -45,9 +45,10 @@ status = "owner-selected-breadth-first-full-T3Personal; all-levels-NOT_AVAILABLE
 order = "accepted P0 -> accepted R0 -> PILOT; later business stories allocated before implementation after predecessor closure; R1-R6 full-scope completion backlog, not blanket prerequisites"
 integration_slice = "SS-RUN@PILOT"
 parent_issue = 78
+implementation_issue = 116
 story_issues = [79, 80, 81]
-contract_issue = 82
-acceptance_issue = 83
+contract_issue = 117
+acceptance_issue = 118
 targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"
 breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real DAG/runners/artifact/launch/stage/default-publication -> fault/recovery/access/cumulative acceptance; no serial surface completion"
 
@@ -83,9 +84,27 @@ agent_envelope_alternatives = 20
 surface_scenario_candidates = 160
 normalized_denominator = "UNKNOWN"
 proposed_task_issues = [110, 111, 112]
-task_activation = "PROPOSED_REPLACEMENT_PACKET_NOT_ACTIVATED; original ledger/slice ownership remains authoritative"
+task_activation = "Historical first packet; reconciled ownership is now active under story_task_ownership"
 partial_transfer_units = 11
 old_issue_bodies_and_assignments_retained = 108
 old_native_edges_retained = 75
 new_native_task_edges = 3
 verification = "story-stage2-verification.md"
+
+[story_task_ownership]
+source_head = "1f0421357334be4330e7440b08b23fc12f56a598"
+summary = "story-task-migration.md"
+state = "ACTIVE_PLANNING_OWNER; no runtime or milestone acceptance"
+actor_goals_linked = 25
+subsystem_slices = 18
+active_packet_tasks = 54
+story_contribution_links = 61
+source_body_count = 66
+source_block_occurrences = 1497
+legacy_sources_labelled = 62
+retained_discussion_comments = 12
+intentional_evidence_helper_reparents = 9
+open_issues_at_readback = 162
+source_cleanup = "PENDING; original bodies/comments retained; no source issue closed/deleted"
+normalized_denominator = "UNKNOWN"
+verification = "story-task-migration-verification.md"

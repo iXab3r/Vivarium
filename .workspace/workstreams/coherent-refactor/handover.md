@@ -2,7 +2,23 @@
 
 ## Current state — 2026-11-01
 
-**Latest checkpoint: source-union continuation and first Stage 2 packet.**
+**Latest checkpoint: full story-led task ownership activated.** [Current index](story-task-migration.md)
+and [verification](story-task-migration-verification.md): all 18 existing slices now have 54 active
+implementation/REST-contract/REST-acceptance tasks (#110–#163) under the 25 goals, with 61 primary/
+related links. Every story page has contribution links. The 449 API rows, 22 early contributions,
+case task pointers and ownership rollups now use that graph; exact variants remain unfrozen.
+All 1,497 source blocks from 66 issue bodies are routed/read back, with exact duplicates retained
+once in the same destination. Sixty-two old cards receive source labels/backlinks and keep the
+original bodies verbatim; all twelve comments remain unchanged and have a retained copy. Nine live
+evidence helpers are intentionally reparented to consuming tasks; #84 remains under #13. Nothing is
+closed/deleted. GitHub has 162 Open issues/nine milestones; counts/labels are not implementation progress.
+The existing read-only accounting command passes with an explicit unchanged-input reuse assessment:
+449 headings / fifteen cases / five RED / ten product-blocked / zero GREEN, 18 slices / 22 contributions.
+It checks supported joins, not the missing full story/source/variant validator. No build/test/runtime
+proof or independent final acceptance ran. Next is separate source-card cleanup after final delta/
+lineage reconciliation; technical execution still starts from #85/#32/#34 evidence feeding #111/#110/#112.
+
+**Preceding checkpoint: source-union continuation and first Stage 2 packet.**
 [Continuation](story-transition-stage2.md): all 456 CLI fixtures have ranked source/story/scenario
 candidates, retaining 125 multiple structural matches and 17 suffix-binding qualifications;
 40 current native HTTP declarations and 20 Agent envelope fields have pinned source/story links.
@@ -33,9 +49,9 @@ T3Personal remains the first product priority. The reference/evidence sequence b
 
 **Now:** [reference pack #84](t3personal-reference-pack.md) is available; replacement product
 NOT_AVAILABLE. **Next:** #85 server-reported resolved source/settings and actual selected dependency/
-artifact inputs, with exact typed-getter capability/bounds. Then #35 wire/control, #32 worked model,
-#34 actual C#/Git representation outputs and #36 case freeze feed the remaining P0/#42/#77/review/
-debt/main gate, before #37/#38/R0 and the first all-config/all-surface PILOT breadth preview.
+artifact inputs, with exact typed-getter capability/bounds. Then #110/#111 wire/control, #32 worked model,
+#34 actual C#/Git representation outputs and #110 case freeze feed the remaining P0/#112/#77/review/
+debt/main gate, before #113/#115/R0 and the first all-config/all-surface PILOT breadth preview.
 See the [goal/output/where/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
 #84's metadata/producer/provider facts do not close server selection, binary/platform, wire/access/
 cancel or causal-publication proof. These remain named handoffs, not frozen contract or GREEN.

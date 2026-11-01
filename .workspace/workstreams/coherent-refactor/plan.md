@@ -1,6 +1,13 @@
-# Coherent Vivarium refactor — plan v1.11
+# Coherent Vivarium refactor — plan v1.12
 
-**Current planning increment:** [source-union continuation and first Stage 2 task packet](story-transition-stage2.md).
+**Current planning graph:** [all 18 story-led task packets are active](story-task-migration.md).
+Implementation/contract/acceptance #110–#163 now own the existing slices; all 25 goals have explicit
+contribution links. Source text/discussion is preserved, 62 old cards are labelled sources and the
+separate administrative cleanup is pending. Existing product cases/results, unfrozen scope and
+P0/R0/PILOT gates remain. The [verification](story-task-migration-verification.md) includes the
+existing read-only accounting check with explicit historical-evidence reuse, not new runtime proof.
+
+**Preceding planning increment:** [source-union continuation and first Stage 2 task packet](story-transition-stage2.md).
 The additional finite source joins and 160 surface-scenario candidates do not freeze variants.
 #110/#111/#112 are proposed same-P0 implementation/contract/acceptance work under US-013; partial
 source transfer is recorded, old task/ledger ownership remains until reconciled activation, and no

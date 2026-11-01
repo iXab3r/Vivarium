@@ -10,6 +10,9 @@ relations, current native declarations, Agent envelope fields and surface-scenar
 records the first proposed implementation-task packet. The work list below still governs the
 remaining semantic/branch reconciliation and exact variant freeze.
 
+[Current task ownership](story-task-migration.md) now activates 18 packets under the stories;
+old task numbers below identify retained source context where noted, not a second execution backlog.
+
 ## Sources and stable identities
 
 | Source | Retained discovery | Identity and current limitation |
@@ -69,9 +72,9 @@ The T3 chain does not discharge general chain/reuse/matrix semantics or deployme
    API completeness. The normalized operation and full variant denominators remain UNKNOWN.
    No fraction of the 449 headings, 456 fixtures or issue counts measures compatibility.
 
-Existing #13/#36 own source/allocation work; #35 owns exact wire/control/effect evidence, #32 model,
-#34 C#/Git representation and #85 server-selected input evidence. These are retained source-task
-references; Stage 2 will create self-contained implementation work from the selected stories.
+Current #13/#110 own source/allocation work; #110/#111 own exact wire/control/effect work, #32 model,
+#34 C#/Git representation and #85 server-selected input evidence. The 18 story-led implementation/
+contract/acceptance packets carry the inherited obligations from the older source tasks.
 Open issue status does not invalidate an already available evidence pack such as #84.
 
 ## Preservation and evidence boundary

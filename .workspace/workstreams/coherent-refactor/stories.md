@@ -1,5 +1,10 @@
 # Actor-goal stories — Stage 1 catalogue
 
+Latest ownership: [18 active story-led task packets](story-task-migration.md), with implementation,
+REST contract and REST acceptance links for every existing slice. All 25 story pages now link their
+actual contributions; old source cards retain discussions and current-destination banners. This
+does not change the target availability or turn intent links into runtime acceptance.
+
 Current planning checkpoint: 2026-11-01, based on `9f5f36859f6a90309b117168db343abf14ae44df`.
 Lead: Story Delivery Lead; co-held Reconciliation, REST, Business Acceptance and Docs perspectives.
 
@@ -7,8 +12,9 @@ The owner chose three stages: establish stories, prepare the API inventory and a
 then create implementation tasks and transfer useful existing discussion; finally remove redundant
 work after checking that the discussion and decisions survive. This catalogue completes the first
 planning catalogue and records the remaining inventory work. The
-[source-union continuation and first Stage 2 packet](story-transition-stage2.md) now carry additional
-source/scenario joins and three proposed replacement tasks. Cleanup has not started.
+[source-union continuation and first Stage 2 packet](story-transition-stage2.md) supplied additional
+source/scenario joins; [the current task migration](story-task-migration.md) expands and activates
+all 18 packets. Old source cards are labelled, with administrative cleanup still pending.
 
 Stories drive priority and useful outcomes. Every implementation contribution must trace upward to
 an actor goal; API discovery measures missing behavior. A story does not waive reference semantics
@@ -56,8 +62,9 @@ through this catalogue.
 Every story has a dependency-basis row. `uses-ready-portion` names only the needed identity, contract,
 service or evidence; `contributes` names integration work; `uses-reference` can already be available
 while its issue is Open. `needs-ready-evidence` blocks only the stated freeze/proof stage when that
-output is absent. None is a reciprocal issue-closure edge. Their current owner references retain the
-legacy graph until Stage 2 assigns self-contained work. No native blocked-by edges are added.
+output is absent. None is a reciprocal issue-closure edge. The register retains legacy provenance
+beside current execution owners from the active packet/slice registers. No native blocked-by edges
+are added.
 
 ## Stories
 
