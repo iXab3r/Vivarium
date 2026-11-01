@@ -877,7 +877,12 @@ marker makes a ref-update/checkout crash recoverable; automatic checkout repair 
 the index and worktree exactly match the recorded expected or result tree. Human dirty state blocks
 writes and is never reset or overwritten. The adapter pins repository-local `core.autocrlf=false` and
 `core.eol=lf`; when adopting an older clean checkout it re-proves the prior tree before rematerializing
-canonical LF bytes, while any dirty checkout fails closed.
+its committed bytes under that policy, while any dirty checkout fails closed.
+
+New controller-rendered documents and commit messages use LF regardless of source checkout line
+endings. Reads also accept the exact uniformly CRLF-encoded form of the same canonical document for
+older Windows-generated trees, preserving its original committed bytes, hashes and provenance.
+Mixed/lone-CR endings, different spacing or fields remain invalid; opening never rewrites history.
 
 Git is a local runtime tool, not an external service or configuration authority. The adapter passes
 arguments without a shell, supplies bounded secret-free commit identity/metadata, does not put

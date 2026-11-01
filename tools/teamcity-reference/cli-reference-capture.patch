@@ -1,0 +1,189 @@
+--- a/integrations/teamcity/src/client.ts
++++ b/integrations/teamcity/src/client.ts
+@@ -1,3 +1,4 @@
++import { referenceOperation, referenceCapture } from "./reference-capture.js";
+ import { teamCityUrl } from "./server-url.js";
+ import * as triage from "./triage-models.js";
+ import * as admin from "./admin-models.js";
+@@ -3979,6 +3980,11 @@
+       this.#signal,
+     );
+   }
++  public async captureReference(name: string) {
++    const operation = referenceOperation(name);
++    const response = await this.#response("GET", operation.path, "fields" in operation ? { fields: operation.fields } : {}, undefined, operation.accept, operation.accept, true);
++    return referenceCapture(name, response, this.#token, this.#signal);
++  }
+   async #response(
+     method: HttpMethod,
+     path: string,
+@@ -3986,6 +3992,7 @@
+     body?: unknown,
+     mediaType = "application/json",
+     accept = mediaType,
++    rejectRedirects = false,
+   ): Promise<Response> {
+     const requestPath = this.#guest
+       ? path.replace(/^\/app\/rest(?=\/|$)/, "/guestAuth/app/rest")
+@@ -4003,7 +4010,16 @@
+     }
+     let response: Response;
+     try {
+-      response = await fetchWithRedirects(this.#fetch, url, {
++      const transport: typeof globalThis.fetch = rejectRedirects ? async (input, init) => {
++        if (new URL(String(input)).origin !== url.origin) throw new Error("Reference capture origin changed.");
++        const result = await this.#fetch(input, init);
++        if (result.status >= 300 && result.status < 400) {
++          void result.body?.cancel().catch(() => undefined);
++          throw new Error("Reference capture refuses redirects.");
++        }
++        return result;
++      } : this.#fetch;
++      response = await fetchWithRedirects(transport, url, {
+         method,
+         headers,
+         ...(body === undefined
+--- a/integrations/teamcity/src/system-commands.ts
++++ b/integrations/teamcity/src/system-commands.ts
+@@ -149,6 +149,8 @@
+     ),
+   ]);
+   const server = [
++    leaf("reference-capture <operation>", "Capture fixed read-only version/schema HTTP evidence", R,
++      (c, { args }) => c.captureReference(args.operation)),
+     leaf("rest-info", "Read relative REST landing metadata", R, (c) => c.getRestInfo()),
+     leaf("rest-plugin", "Read XML-only REST plugin metadata", R, (c) => c.getRestPlugin()),
+     command("authentication", "Replacing modules can lock out users", [
+--- /dev/null
++++ b/integrations/teamcity/src/reference-capture.ts
+@@ -0,0 +1,59 @@
++import { createHash } from "node:crypto";
++import { readResponseBody } from "@eyeauras/cli-factory";
++
++export const referenceOperations = {
++  "api-version": { path: "/app/rest/apiVersion", accept: "text/plain", maxBytes: 512 },
++  "rest-version": { path: "/app/rest/version", accept: "text/plain", maxBytes: 512 },
++  "server-version": { path: "/app/rest/server/version", accept: "text/plain", maxBytes: 512 },
++  "root-project": { path: "/app/rest/projects/id:_Root", accept: "application/json", maxBytes: 1024, fields: "id,name" },
++  schema: { path: "/app/rest/swagger.json", accept: "application/json", maxBytes: 8 * 1024 * 1024 },
++} as const;
++
++export function referenceOperation(name: string) {
++  if (!Object.hasOwn(referenceOperations, name)) throw new Error("Unknown reference capture operation.");
++  return referenceOperations[name as keyof typeof referenceOperations];
++}
++
++/** Fixed metadata only. Error bodies and session/credential headers are never retained. */
++export async function referenceCapture(name: string, response: Response, token?: string, signal?: AbortSignal) {
++  const operation = referenceOperation(name);
++  const headers: Record<string, string> = {};
++  const contentType = response.headers.get("content-type");
++  if (contentType) {
++    if ((token && contentType.includes(token)) || !/^[A-Za-z0-9.+-]+\/[A-Za-z0-9.+-]+(?:; ?charset=[A-Za-z0-9_-]+)?$/.test(contentType) || contentType.length > 200) throw new Error("Unsafe reference response media header.");
++    headers["content-type"] = contentType;
++  }
++  const metadata = {
++    tool: "@eyeauras/teamcity-cli",
++    version: "0.5.2+p0-reference-capture",
++    sourceRevision: "b158fe03eab3c31982a21b36c278f690f6b541d9",
++    command: `teamcity-cli --json server reference-capture ${name}`,
++    operation: name,
++    request: { method: "GET", path: operation.path, headers: { accept: operation.accept }, ...("fields" in operation ? { query: { fields: operation.fields } } : {}) },
++    response: { status: response.status, headers },
++  };
++  if (!response.ok) {
++    void response.body?.cancel().catch(() => undefined);
++    return { ...metadata, bodyOmitted: "non-success metadata capture; error payload is not exported" };
++  }
++  const bytes = await readResponseBody(response, { maxBytes: operation.maxBytes, signal });
++  const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
++  if ((token && (text.includes(token) || JSON.stringify(headers).includes(token))) || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(text))
++    throw new Error("Unsafe reference payload; export refused.");
++  if (name === "root-project") {
++    if (contentType?.split(";")[0]?.trim() !== "application/json") throw new Error("Expected projected JSON root project.");
++    const value: unknown = JSON.parse(text);
++    if (typeof value !== "object" || value === null || !("id" in value) || value.id !== "_Root" || !("name" in value) || typeof value.name !== "string" || Object.keys(value).some(key => !["id", "name"].includes(key)))
++      throw new Error("Expected minimal built-in root project projection.");
++  } else if (name === "schema") {
++    if (contentType?.split(";")[0]?.trim() !== "application/json") throw new Error("Expected JSON reference schema.");
++    const schema: unknown = JSON.parse(text);
++    if (typeof schema !== "object" || schema === null || !("paths" in schema) || !("swagger" in schema || "openapi" in schema))
++      throw new Error("Expected Swagger/OpenAPI reference schema.");
++  } else if (!/^[0-9][A-Za-z0-9 .()_-]{0,100}$/.test(text)) {
++    throw new Error("Unexpected reference version payload.");
++  }
++  return { ...metadata, bodyBase64: Buffer.from(bytes).toString("base64"), bodyBytes: bytes.length,
++    bodySha256: createHash("sha256").update(bytes).digest("hex"),
++    entityEncoding: "HTTP response entity after fetch content decoding; no JSON/XML reserialization" };
++}
+--- /dev/null
++++ b/integrations/teamcity/tests/reference-capture.test.ts
+@@ -0,0 +1,68 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { createHash } from "node:crypto";
++import { TeamCityClient } from "../src/client.js";
++import { createTestRuntime } from "./support.js";
++
++test("fixed operations preserve status/media/entity and omit credential headers", async () => {
++  const paths = ["apiVersion", "version", "server/version", "swagger.json", "projects/id:_Root?fields=id%2Cname"];
++  const operations = ["api-version", "rest-version", "server-version", "schema", "root-project"];
++  for (const [index, operation] of operations.entries()) {
++    const body = operation === "schema" ? '{"swagger":"2.0","paths":{}}' : operation === "root-project" ? '{"id":"_Root","name":"<Root project>"}' : "2026.1";
++    const client = new TeamCityClient({ baseUrl: "https://teamcity.test", token: "fixture-token",
++      fetch: async (input, init) => {
++        assert.equal(String(input), "https://teamcity.test/app/rest/" + paths[index]);
++        assert.equal(init?.method, "GET");
++        assert.equal(new Headers(init?.headers).get("authorization"), "Bearer fixture-token");
++        assert.equal(init?.redirect, "manual");
++        return new Response(body, { status: 201, headers: {
++          "content-type": (operation === "schema" || operation === "root-project") ? "application/json;charset=utf-8" : "text/plain",
++          "set-cookie": "secret-session", "x-token": "private-token",
++        } });
++      } });
++    const result = await client.captureReference(operation);
++    assert.equal(result.response.status, 201);
++    assert.ok("bodyBase64" in result);
++    assert.equal(Buffer.from(result.bodyBase64!, "base64").toString(), body);
++    assert.equal(result.bodySha256, createHash("sha256").update(body).digest("hex"));
++    assert.doesNotMatch(JSON.stringify(result), /fixture-token|secret-session|private-token/);
++  }
++});
++
++test("unknown operation makes no request; redirects never contact another destination", async () => {
++  let calls = 0;
++  const client = new TeamCityClient({ baseUrl: "https://teamcity.test", token: "fixture-token", fetch: async () => {
++    calls++;
++    return new Response(null, { status: 302, headers: { location: "https://elsewhere.test/leak" } });
++  } });
++  await assert.rejects(client.captureReference("/users/current"), /Unknown reference/);
++  assert.equal(calls, 0);
++  await assert.rejects(client.captureReference("api-version"));
++  assert.equal(calls, 1);
++});
++
++test("error body is omitted; oversized/secret/malformed entities are refused", async () => {
++  for (const [status, body] of [[403, "private-error"], [200, "x".repeat(513)], [200, "fixture-token"], [200, "<html>login</html>"]] as const) {
++    const client = new TeamCityClient({ baseUrl: "https://teamcity.test", token: "fixture-token", fetch: async () => new Response(body, { status }) });
++    if (status === 403) {
++      const result = await client.captureReference("api-version");
++      assert.equal(result.response.status, 403);
++      assert.equal("bodyBase64" in result, false);
++      assert.doesNotMatch(JSON.stringify(result), /private-error/);
++    } else await assert.rejects(client.captureReference("api-version"));
++  }
++});
++
++test("CLI ReadOnly gate runs before any network or credential lookup", async (t) => {
++  const fixture = await createTestRuntime(t, { profiles: [{ name: "default", url: "https://teamcity.test", permissions: [] }], tokens: {} });
++  let calls = 0;
++  fixture.runtime.fetch = async () => { calls++; throw new Error("must not call"); };
++  await assert.rejects(fixture.createCli().execute(["server", "reference-capture", "api-version"]), /Permission 'ReadOnly'/);
++  assert.equal(calls, 0);
++});
++
++test("secret-bearing response headers are refused even for non-success", async () => {
++  const client = new TeamCityClient({ baseUrl: "https://teamcity.test", token: "fixture-token", fetch: async () =>
++    new Response("private-error", { status: 403, headers: { "content-type": "text/fixture-token" } }) });
++  await assert.rejects(client.captureReference("api-version"), /Unsafe reference response media/);
++});

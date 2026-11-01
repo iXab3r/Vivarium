@@ -68,16 +68,16 @@ provenance, blobs, transitional UI/CLI and tests. Missing: a complete source-bas
 Chiral/PG target, C# catalog, chains, full persistent logs/test history, import and compatible REST.
 See the [existing gap ledger](../teamcity-migration/ledger.md); none of the 97 jobs is migration-accepted.
 
-Local baseline verification currently stops before compilation: `global.json` requires SDK 10.0.303,
-but 10.0.103 is installed. Earlier build/test attempts are not green evidence. D38 moves exact SDK/
-test-toolchain preparation into the first P0 REST execution slice; R0 inherits it. Do not lower the
-pin or treat unavailable checks as passed or as product RED.
+Exact SDK 10.0.303 has now been acquired and verified privately without changing `global.json`.
+The [first executable cohort](../../../docs/design/teamcity-rest-first-cohort.md) records current
+build/control/raw evidence. Earlier SDK failures remain historical setup failures, not product RED.
 
 ## Immediate execution order — status review, 2026-10-31
 
 The target direction is sufficiently settled to begin the D38 executable contract slice. Replacement
-code is not delivered: the compatible facade, new conformance corpus and actual RED baseline are
-absent; all 110 business AC remain specified-unbound. All 36 REST decomposition findings remain open.
+code is not delivered. The first read/create conformance cohort now has actual healthy product RED;
+the compatible facade and broad P0 conformance gates remain open. All 110 business AC remain
+specified-unbound, and all 36 REST decomposition findings remain open.
 Do not treat the remaining reference investigation as 36 product-policy questions for the owner.
 
 The next deliverable is executable REST evidence in #35, with #32–#34/#36 supplying the affected

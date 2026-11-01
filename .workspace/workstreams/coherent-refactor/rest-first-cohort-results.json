@@ -1,0 +1,487 @@
+{
+  "recorded_utc": "2026-11-01T01:21:47.327562+00:00",
+  "scope": "Incremental first materialized cohort only; P0 and all subsystem API-complete claims remain OPEN/false",
+  "candidate": {
+    "git_base": "992953c7f75b59288762524b209fc20b287867f1",
+    "state": "Uncommitted working tree; source bytes below, not a new commit or main delivery",
+    "source_fingerprint_sha256": "75be9599f34081b525c0a6e9bfc7b42240382d8e539e861cb5fa39eb0e4d0fbe",
+    "source_inputs": [
+      {
+        "path": "Directory.Build.props",
+        "sha256": "7f19a87890a4d93125d6a7f1bb3112027da17ab84d326e1bd43b52bb6ffa0d17"
+      },
+      {
+        "path": "global.json",
+        "sha256": "e43ef3bfdcacfa29ee23e2fd88d58f81df93490168702ba9b74f5216f25d4ccc"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/ConfigurationTreeValidator.cs",
+        "sha256": "d7f519e750e10bae03fc41517a98c710ab9a70749b745340a279c1f3589ee339"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/ManagedGitRepository.cs",
+        "sha256": "3d6abb0accb37bef8321e3e5d1073820a9c673332a2db9c488d106959fce6769"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/RawTeamCityTests.cs",
+        "sha256": "f5f5fe847d1debcc31793e646fe49c780afcba998328d32461f4dab34a216fd1"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj",
+        "sha256": "b1fef95f4a158fa4ef5431dfcad22c4fe96473f7d991a6c2e20cc14a057b4824"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentConfigurationReconciliationMonitorTests.cs",
+        "sha256": "55999e6d4f8496da98f6784fb2880052e814a7fd69ba8dbfd90017241f8f8fc7"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentDesiredConfigurationTests.cs",
+        "sha256": "6c8fbef45abcf53dccf760a006178a8edc109672545adebcea1a71abb9bc94fb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ManagedGitRepositoryTests.cs",
+        "sha256": "416889c489207667e92677c54124699a402208ef77f238659ec61de1900162a4"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/CurrentController.cs",
+        "sha256": "ef007c680ca1dfa8290f29361f024c7247dce9fbff1eed4836edab6c60b71f30"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProductionCompositionTests.cs",
+        "sha256": "fa307cd0db074281279570e15d288095f69fd9f0e20c7976182ac0911639a50f"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProjectCreationContract.cs",
+        "sha256": "b81f1386ba2690d95a9330752dc33516f311ad4906a4b402bc76cd99a9731cbe"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/api-version.json",
+        "sha256": "40eb42235522216140b4d6ffca53a805f4c476a2a7f6c549323945386ebbe891"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/project-create-schema-excerpt.json",
+        "sha256": "dcd840b3049b03ee53884edc4ddfea0ed8e822eef7547243cc1328005d41a63a"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/root-project.json",
+        "sha256": "0079aa0a8009ad1db3855af989e0ecbdf2752410ecd934cef5b425bae7c3630e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ReplayControlTests.cs",
+        "sha256": "be7a1a2d9833da92000b00e77f936580558f314bb152bb6cdb448c2a4a6d8a8c"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RestResponseAssert.cs",
+        "sha256": "4793f479c24ab35d065f03aaa97a02a9c8fe72a955541d3d8e6d0a6e901a06bb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/TeamCityCases.cs",
+        "sha256": "22fc2a6bc0b06ecac505836defb05538ddc25ef465be5bf494b8142cb6ff8e19"
+      },
+      {
+        "path": "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+        "sha256": "70780b116f05eac11831bff074b4c6b51b52d71b6f2911f8d136dae56bfea1f9"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-reference-capture.patch",
+        "sha256": "0ac38fa6a925472874870b8cc55844861438bcf3aec025279c9a03a22883b6c4"
+      }
+    ],
+    "assemblies": [
+      {
+        "path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+        "sha256": "11b8246d7c2a58ad3a759c0f5b9504368a45ad118fbc95add0854110d0719f52"
+      },
+      {
+        "path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+        "sha256": "fb6e376723c1a24ca2c7ba0ad0459aee89abbbf503f7160ba073807b3af1eab6"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+        "sha256": "5d79f238eaee2ee374dc0a82eac8ebb8285f8eb185d297203a32a791b150dbf5"
+      }
+    ]
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "sdk": "10.0.303",
+    "git": "git version 2.32.0.windows.1",
+    "tooling": "Private ignored official SDK, verified SHA512; process-local DOTNET_ROOT/DOTNET_ROOT_X64/PATH/CLI_HOME; pin unchanged"
+  },
+  "reference": {
+    "server": "2026.1.3 build222742",
+    "api": "2026.1",
+    "plugin": "rest-api222742 loaded/enabled",
+    "cli": "@eyeauras/teamcity-cli0.5.2 at b158fe03eab3c31982a21b36c278f690f6b541d9 plus bounded unpublished capture patch",
+    "schema_bytes": 562948,
+    "schema_sha256": "22e37bbaf8bdb48f5f67eade2cd3fe206a193eb8eb4de10178909386444104dc",
+    "schema_path_entries": 268,
+    "schema_http_operations": 449,
+    "variant_denominator": null,
+    "credentials": "Existing approved CLI profile/transport; actual values omitted; no TeamCity writes"
+  },
+  "product_cases": [
+    {
+      "id": "TCREST-SERVER-API-VERSION-TEXT-001",
+      "api_id": "TCREST:rootapi.getApiVersion",
+      "source_kind": "captured installed HTTP entity/status/media",
+      "result": "RED",
+      "expected_status": 200,
+      "actual_status": 404
+    },
+    {
+      "id": "TCREST-PROJECT-ROOT-FIELDS-JSON-001",
+      "api_id": "TCREST:projectapi.getProject",
+      "source_kind": "captured installed HTTP entity/status/media",
+      "result": "RED",
+      "expected_status": 200,
+      "actual_status": 404
+    },
+    {
+      "id": "TCREST-PROJECT-CREATE-READBACK-JSON-001",
+      "api_id": "TCREST:projectapi.addProject",
+      "source_kind": "installed schema plus documented explicit-input semantics; not a captured mutation",
+      "result": "RED",
+      "expected_status": 200,
+      "actual_status": 404,
+      "effect": "GET suppliedid/name assertion bound but not reached after failed POST; no independent cascade defect counted"
+    }
+  ],
+  "root_cause": "TeamCity-compatible facade absent on healthy current product; three failing cases are not three independently diagnosed product defects",
+  "boundary": "Real production Kestrel TLS-pin/auth/Git/transitional SQLite; valid native bearer200 and invalid-bearer401 prerequisites; no PG/Chiral/Agent execution claim",
+  "results": {
+    "initial_raw": {
+      "artifact": "artifacts/p0-rest-first/results/raw/raw-initial.trx",
+      "sha256": "31a5834fe0cce04ab850525865190ff40df5116eedbabe1739a98eb7f2ec74e3",
+      "command": "dotnet test tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj --no-build --no-restore --logger trx;LogFileName=raw-initial.trx --results-directory artifacts/p0-rest-first/results/raw",
+      "exit_code": 1,
+      "counters": {
+        "total": 2,
+        "executed": 2,
+        "passed": 0,
+        "failed": 2,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Failed": 2
+      },
+      "times": {
+        "creation": "2026-11-01T01:59:20.7280092+01:00",
+        "queuing": "2026-11-01T01:59:20.7280095+01:00",
+        "start": "2026-11-01T01:59:18.5221459+01:00",
+        "finish": "2026-11-01T01:59:20.7315390+01:00"
+      },
+      "failures": [
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-SERVER-API-VERSION-TEXT-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        }
+      ]
+    },
+    "current_raw": {
+      "artifact": "artifacts/p0-rest-first/results/raw/raw-verified.trx",
+      "sha256": "afa24e72a68c8040cc89837e8a1bb346f4d6dd1ca9157104913cb73512c01ffc",
+      "command": "dotnet test tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj --no-build --no-restore --logger trx;LogFileName=raw-verified.trx --results-directory artifacts/p0-rest-first/results/raw",
+      "exit_code": 1,
+      "counters": {
+        "total": 3,
+        "executed": 3,
+        "passed": 0,
+        "failed": 3,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Failed": 3
+      },
+      "times": {
+        "creation": "2026-11-01T02:16:12.0430984+01:00",
+        "queuing": "2026-11-01T02:16:12.0430989+01:00",
+        "start": "2026-11-01T02:16:09.7679963+01:00",
+        "finish": "2026-11-01T02:16:12.0478153+01:00"
+      },
+      "failures": [
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-SERVER-API-VERSION-TEXT-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        },
+        {
+          "name": "TCREST-PROJECT-CREATE-READBACK-JSON-001",
+          "message": "  installed addProject contract: explicit project creation\r\nAssert.That(created.StatusCode, Is.EqualTo(HttpStatusCode.OK))\r\n  Expected: OK\r\n  But was:  NotFound\r\n"
+        }
+      ]
+    },
+    "controls_and_git_before_legacy_refinement": {
+      "artifact": "artifacts/p0-rest-first/results/controls-git/controls-git-final.trx",
+      "sha256": "5d1752b2b2a26cd46f6b218fb24a05e1fb4be79972e37667c6a920287931c0c1",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --no-restore --filter TestCategory=TeamCityReplayControl|TestCategory=TeamCityCompositionControl|FullyQualifiedName~ManagedGitRepositoryTests --logger trx;LogFileName=controls-git-final.trx",
+      "exit_code": 0,
+      "counters": {
+        "total": 26,
+        "executed": 26,
+        "passed": 26,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 26
+      },
+      "times": {
+        "creation": "2026-11-01T02:09:29.6849180+01:00",
+        "queuing": "2026-11-01T02:09:29.6849184+01:00",
+        "start": "2026-11-01T02:09:26.4024952+01:00",
+        "finish": "2026-11-01T02:09:46.7971131+01:00"
+      },
+      "failures": []
+    },
+    "current_legacy_git": {
+      "artifact": "artifacts/p0-rest-first/results/legacy-compatibility/legacy-compatibility.trx",
+      "sha256": "7995fd8e679bfeeef88945c734e42d6c9b1feaa396926f40a62cf73d12b2ebd5",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --no-restore --filter FullyQualifiedName~ManagedGitRepositoryTests --logger trx;LogFileName=legacy-compatibility.trx",
+      "exit_code": 0,
+      "counters": {
+        "total": 15,
+        "executed": 15,
+        "passed": 15,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 15
+      },
+      "times": {
+        "creation": "2026-11-01T02:14:41.6344019+01:00",
+        "queuing": "2026-11-01T02:14:41.6344023+01:00",
+        "start": "2026-11-01T02:14:38.3529046+01:00",
+        "finish": "2026-11-01T02:15:00.7245869+01:00"
+      },
+      "failures": []
+    },
+    "ordinary_initial_red": {
+      "artifact": "artifacts/p0-rest-first/results/ordinary/ordinary-root.trx",
+      "sha256": "c3220f4bab1427387df8429667852914fa2c529026a10322207c94c6565adb3f",
+      "command": "dotnet test --logger trx;LogFileName=ordinary-root.trx --results-directory artifacts/p0-rest-first/results/ordinary",
+      "exit_code": 1,
+      "counters": {
+        "total": 361,
+        "executed": 349,
+        "passed": 347,
+        "failed": 2,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 347,
+        "NotExecuted": 12,
+        "Failed": 2
+      },
+      "times": {
+        "creation": "2026-11-01T01:59:36.0163235+01:00",
+        "queuing": "2026-11-01T01:59:36.0163237+01:00",
+        "start": "2026-11-01T01:59:32.6967010+01:00",
+        "finish": "2026-11-01T02:04:44.0616851+01:00"
+      },
+      "failures": [
+        {
+          "name": "Upsert_normalizes_committed_bytes_and_links_actor_and_revision_provenance",
+          "message": "System.ArgumentNullException : Value cannot be null. (Parameter 'revision')"
+        },
+        {
+          "name": "Reopen_repins_line_endings_and_rematerializes_a_clean_checkout",
+          "message": "  Assert.That(manifestBytes, Does.Not.Contain((byte)'\\r'))\r\n  Expected: not some item equal to 13\r\n  But was:  < 97, 112, 105, 86, 101, 114, 115, 105, 111, 110, 58, 32, 118, 105, 118, 97, 114, 105, 117, 109, 46, 105, 111, 47, 118, 49, 97, 108, 112, 104, 97, 49, 13, 10, 107, 105, 110, 100, 58, 32, 82, 101, 112, 111, 115, 105, 116, 111, 114, 121, 13, 10, 105, 100, 58, 32, 99, 111, 110, 116, 114, 111, 108, 45, 109, 97, 105, 110, 13, 10, 115, 112, 101, 99, 58, 13, 10, 32, 32, 115, 99, 104, 101, 109, 97, 86, 101, 114, 115, 105, 111, 110, 58, 32, 34, 49, 34, 13, 10, 32, 32, 100, 111, 99, 117, 109, 101, 110, 116, 75, 105, 110, 100, 115, 58, 13, 10, 32, 32, 32, 32, 45, 32, 65, 103, 101, 110, 116, 13, 10, 32, 32, 32, 32, 45, 32, 82, 111, 108, 101, 66, 105, 110, 100, 105, 110, 103, 13, 10, 32, 32, 32, 32, 45, 32, 85, 115, 101, 114, 13, 10 >\r\n"
+        }
+      ]
+    },
+    "ordinary_current": {
+      "artifact": "artifacts/p0-rest-first/results/ordinary/ordinary-root-verified.trx",
+      "sha256": "5eea3628cb88b663edc9c0d5daf2079867d690fde839679699666673abc4f4cf",
+      "command": "dotnet test --logger trx;LogFileName=ordinary-root-verified.trx --results-directory artifacts/p0-rest-first/results/ordinary",
+      "exit_code": 0,
+      "counters": {
+        "total": 371,
+        "executed": 359,
+        "passed": 359,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 359,
+        "NotExecuted": 12
+      },
+      "times": {
+        "creation": "2026-11-01T02:15:39.3343564+01:00",
+        "queuing": "2026-11-01T02:15:39.3343568+01:00",
+        "start": "2026-11-01T02:15:36.0600216+01:00",
+        "finish": "2026-11-01T02:20:27.5126626+01:00"
+      },
+      "failures": []
+    },
+    "build_current": {
+      "command": "dotnet build",
+      "artifact": "artifacts/p0-rest-first/results/root-build-verified.log",
+      "sha256": "e096640c96033be685f9df3168420bc080708ea48c40a8cd85f474fce935cac7",
+      "exit_code": 0
+    },
+    "aborted_diagnostic": {
+      "artifact": "artifacts/p0-rest-first/results/root-test-final.log",
+      "state": "ABORTED, no PASS; verified owned testhost96384/parent69360 stopped to add required legacy compatibility before final full run"
+    },
+    "earlier_control_failures": "replay-controls.trx/focused-final.trx are diagnostic TDD failures; current evidence is explicitly named above",
+    "current_controls": {
+      "source": "ordinary_current",
+      "passed": 16,
+      "cases": [
+        "Comparator_rejects_corruption(\"malformed-json\")",
+        "Production_queue_monitor_uses_controlled_timers_and_isolated_databases",
+        "Comparator_rejects_corruption(\"byte\")",
+        "Frozen_reference_read_replays_with_an_exact_request_and_journal(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+        "Frozen_case_matches_its_original_sanitized_capture(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+        "Comparator_rejects_corruption(\"field\")",
+        "Frozen_case_matches_its_original_sanitized_capture(TCREST-SERVER-API-VERSION-TEXT-001)",
+        "Comparator_rejects_corruption(\"status\")",
+        "Source_established_project_create_readback_replays_finite_sequence_and_resets_state",
+        "Comparator_rejects_corruption(\"type\")",
+        "Json_object_key_order_is_not_contractual",
+        "Comparator_rejects_corruption(\"order\")",
+        "Comparator_rejects_corruption(\"media\")",
+        "Strict_mapping_rejects_wrong_method_url_query_and_credentials_and_journals_every_request",
+        "Native_readiness_uses_real_auth_and_cleans_up_its_controller",
+        "Frozen_reference_read_replays_with_an_exact_request_and_journal(TCREST-SERVER-API-VERSION-TEXT-001)"
+      ]
+    },
+    "old_diagnostic_provenance_limit": "Original TRX/commands/base chronology retained; no contemporaneous complete source/assembly fingerprint was recorded for earlier diagnostic runs. They are not reused as current acceptance evidence. Current raw/ordinary are fresh executions bound to the source and assembly hashes above.",
+    "ordinary_console_vs_trx": "Current console:359Passed/11Skipped/370 total; TRX:371 result rows=359Passed+12NotExecuted, all existing platform prerequisite cases. Preserve both units; do not infer an internal adapter cause or omit the TRX rows."
+  },
+  "cost": {
+    "new_csharp_physical_lines": 571,
+    "new_csharp_bytes": 27048,
+    "new_product_hooks": 0,
+    "safe_fixture_data_bytes": 5217,
+    "raw_discovery_wall_ms": 878.823,
+    "raw_batch_metrics": [
+      "Current product: https://127.0.0.1:55566; production Kestrel/auth/Git/SQLite; setup 1731ms; process working set 117813248 bytes",
+      "Raw target total 1802ms"
+    ],
+    "supporting_control_metrics": [
+      "Production Kestrel/Git/SQLite setup/readiness: 1588ms; process working set 140967936 bytes",
+      "Including cleanup: 1628ms",
+      "Two isolated production SQLite monitors, 20 virtual seconds, setup/run/cleanup: 298ms"
+    ],
+    "memory_limit": "Process working-set snapshots, not per-case allocation or peak/bulk-scaling proof",
+    "remaining": "Representative Agent/PG/storage/concurrency/mutation variants, repeated-batch/scaling and maintenance growth remain P0.REST.2 gate work"
+  },
+  "status": {
+    "materialized": 3,
+    "executed": 3,
+    "green": 0,
+    "red": 3,
+    "harness_failures_in_current_raw": 0,
+    "delivered_teamcity_green": 0,
+    "delivered_nonempty_gate": "not yet applicable; no empty filter/native substitute",
+    "global_api_complete": false,
+    "compatibility_percent": null,
+    "required_variant_denominator": null,
+    "ledger_validator": "not implemented; #36",
+    "independent_final_review": "NOT_REVIEWED",
+    "same_P0_debt": "#77 locally fixed/verified, remains OPEN pending final P0 review/main delivery",
+    "reference_gaps": [
+      "authorized disposable mutation/denial actors for observed variants",
+      "controlled build/Agent/fault timeline",
+      "synthetic artifact bytes/unavailable/retention oracle"
+    ]
+  },
+  "evidence_decision": "Current raw/ordinary are fresh executions for listed source/assemblies. Original earlier receipts retain their own revisions/inputs; not relabelled as current. No main transfer or future reuse claimed.",
+  "advisories": [
+    {
+      "package": "Microsoft.OpenApi",
+      "version": "2.0.0",
+      "id": "GHSA-v5pm-xwqc-g5wc",
+      "severity": "high"
+    },
+    {
+      "package": "System.Security.Cryptography.Pkcs",
+      "version": "10.0.8",
+      "id": "GHSA-2fmv-rv2c-59x7",
+      "severity": "moderate"
+    },
+    {
+      "package": "System.Security.Cryptography.Pkcs",
+      "version": "10.0.8",
+      "id": "GHSA-846f-f764-76mx",
+      "severity": "high"
+    }
+  ],
+  "advisory_disposition": "Existing dependency warnings, not upgraded; reachability NOT_ASSESSED and no Security/Adversarial PASS claimed"
+}

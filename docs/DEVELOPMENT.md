@@ -39,6 +39,12 @@ No debts carried into next-milestone implementation; no security follow-up waive
 
 ## Building
 
+The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
+ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
+invoked `tests/Vivarium.TeamCity.Conformance` project; its raw three-case run remains nonzero while
+the compatible routes are missing. No delivered TeamCity GREEN selection exists yet, and broader
+P0 composition/accounting/acceptance gates remain open.
+
 D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first
 P0 harness delivery: standard solution checks, reference-replay control, delivered conformance cases
 and the full raw product report. The implementation must publish exact commands and wire every

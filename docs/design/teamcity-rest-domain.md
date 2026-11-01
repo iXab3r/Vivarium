@@ -11,10 +11,14 @@ Link changes to [business AC](../acceptance/README.md), TCM invariants and exact
 validate real state effects as well as responses. Every milestone preserves its implemented base
 and checks relevant extension neutrality. See [evidence hierarchy](testing-model.md).
 
-TeamCity wire compatibility constrains the resource model and command semantics from the beginning.
-Design shared services from those contracts, then expose native /api/v1 and compatible /app/rest
-projections. Do not first build an unrelated Vivarium model and discover its incompatibilities in R5.
-Do not mirror every wire DTO as a table or put business rules in HTTP handlers either.
+D32/D36/D37 adopt TeamCity's Build/Agent model. P0 reconstructs and adopts the verified frozen
+TeamCity reference semantics for identities, queue/running/history continuity, reuse, cancellation and
+independent Agent axes, then maps transitional Vivarium concepts onto that model. These are reference
+facts to establish, not independent domain-design choices. Internal C#/PostgreSQL/Chiral representation
+is implementation freedom only where observable behavior is preserved; extensions must remain neutral
+without explicit opt-in. Unknown reference behavior remains a verification gap, not invented policy.
+Native /api/v1 and compatible /app/rest project the same adopted model and services. Do not mirror
+every wire DTO as a table or put business rules in HTTP handlers.
 D40 makes the [subsystem lifecycle](subsystems.md) the implementation unit: use REST resources and
 subpaths to assign primary/collaborating owners, attach REST subtasks to the real subsystem work,
 then roll up subsystem, milestone and global evidence. Early REST constraints do not prescribe an

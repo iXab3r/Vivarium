@@ -1,6 +1,6 @@
 # Test-first TeamCity REST compatibility gate
 
-> Status: **Accepted direction — D38; corpus, harness and RED baseline not implemented yet**
+> Status: **Accepted direction — D38; first read/create replay/raw RED cohort implemented, broader P0 gates incomplete**
 > Owners: TeamCity/REST, Testing Architect, Test Steward, Business Acceptance, affected domain owners
 
 ## Outcome and timing
@@ -312,10 +312,13 @@ reach a number. First RED must cover meaningful reads/writes, protocol/error/per
 state effects and bytes where prerequisites exist, not only two discovery GETs. Product-blocked cases
 remain visible and grow into execution as their real prerequisites land.
 
-Current execution evidence: none for this replacement suite. Existing tests use NUnit 4.3.2 and
-Microsoft.NET.Test.Sdk 17.14.0; no WireMock package is currently referenced. The declared SDK 10.0.303
-is not installed in the inspected environment (10.0.103 is present; inspected 2026-10-31). No package
-was added or product code changed; no build, runtime test, release or fleet operation was run.
+Current execution evidence (2026-11-01): the [first-cohort record](teamcity-rest-first-cohort.md)
+binds two captured read cases and one source-established create/readback case, strict WireMock.Net 2.15.0 replay/assertion controls,
+supporting native HTTP/timer/isolation checks and genuine healthy current-Vivarium 404-versus-200 RED.
+The exact SDK 10.0.303 was acquired privately and verified; NUnit 4.3.2/Test SDK 17.14.0 are unchanged.
+The required root gate also exposed a deterministic canonical-Git-byte defect, corrected under #77.
+No compatible facade, structural replacement, release or fleet operation was performed. This
+increment does not close the broad P0.REST.1–3 corpus/composition/accounting/acceptance obligations.
 
 ## Sources
 

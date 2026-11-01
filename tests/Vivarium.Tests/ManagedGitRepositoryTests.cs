@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Vivarium.Controller.Configuration.Git;
@@ -105,7 +106,7 @@ public sealed class ManagedGitRepositoryTests
         var repository = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
         var initial = await repository.GetAuthoritativeHeadAsync();
         var mutableInput = Encoding.UTF8.GetBytes(AgentDocument("agent-one", enabled: true)
-            .Replace("\n", "\r\n", StringComparison.Ordinal));
+            .ReplaceLineEndings("\r\n"));
 
         var commitTask = repository.UpsertDocumentAsync(new ConfigurationDocumentMutation(
             initial,
@@ -383,6 +384,86 @@ public sealed class ManagedGitRepositoryTests
         return path;
     }
 
+    [Test]
+    public async Task Legacy_CRLF_tree_reopens_preserves_exact_bytes_and_hashes_and_accepts_new_LF_mutation()
+    {
+        var repositoryPath = NewRepositoryPath();
+        var repository = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        var manifestPath = Path.Combine(repositoryPath, ".vivarium", "repository.yaml");
+        var manifest = Encoding.UTF8.GetBytes((await File.ReadAllTextAsync(manifestPath)).ReplaceLineEndings("\r\n"));
+        await File.WriteAllBytesAsync(manifestPath, manifest);
+        var agentPath = Path.Combine(repositoryPath, ".vivarium", "agents", "legacy-agent.yaml");
+        Directory.CreateDirectory(Path.GetDirectoryName(agentPath)!);
+        var agent = Encoding.UTF8.GetBytes(AgentDocument("legacy-agent", true).ReplaceLineEndings("\r\n"));
+        await File.WriteAllBytesAsync(agentPath, agent);
+        await RunGitAsync(repositoryPath, "add", ".vivarium");
+        await CommitExternalAsync(repositoryPath, "Legacy CRLF tree");
+        var legacy = await repository.GetAuthoritativeHeadAsync();
+
+        var reopened = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        var validated = await reopened.ValidateRevisionAsync(legacy);
+        Assert.That(validated.IsValid, Is.True);
+        var legacyDocument = validated.Validated!.Documents.Single(item => item.Id == "legacy-agent");
+        Assert.That(legacyDocument.ContentHash, Is.EqualTo(Convert.ToHexStringLower(SHA256.HashData(agent))));
+        Assert.That(legacyDocument.Utf8Bytes.ToArray(), Is.EqualTo(agent), "retained bytes are the committed legacy bytes");
+        Assert.That(await reopened.GetAuthoritativeHeadAsync(), Is.EqualTo(legacy), "opening must not rewrite Git history");
+
+        var changed = await reopened.UpsertDocumentAsync(new ConfigurationDocumentMutation(
+            legacy, ".vivarium/agents/legacy-agent.yaml", Encoding.UTF8.GetBytes(AgentDocument("legacy-agent", false)),
+            CommitMetadata("legacy-edit")));
+        Assert.That(changed.Outcome, Is.EqualTo(ConfigurationCommitOutcome.Committed));
+        var written = await RunGitBytesAsync(repositoryPath, "show", $"{changed.ResultRevision!.Commit}:.vivarium/agents/legacy-agent.yaml");
+        Assert.That(written, Does.Not.Contain((byte)'\r'), "new mutations emit LF");
+        Assert.That(await RunGitBytesAsync(repositoryPath, "show", $"{changed.ResultRevision.Commit}:.vivarium/repository.yaml"), Is.EqualTo(manifest));
+        var restarted = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        Assert.That((await restarted.ValidateRevisionAsync(changed.ResultRevision)).IsValid, Is.True);
+        Assert.That((await restarted.ValidateRevisionAsync(legacy)).IsValid, Is.True, "historical byte provenance remains readable");
+    }
+
+    [TestCase("manifest", "mixed")]
+    [TestCase("manifest", "lone-cr")]
+    [TestCase("agent", "mixed")]
+    [TestCase("agent", "lone-cr")]
+    public async Task Legacy_line_ending_compatibility_rejects_nonuniform_documents(string kind, string endings)
+    {
+        var repositoryPath = NewRepositoryPath();
+        var repository = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        var relativePath = kind == "manifest" ? ".vivarium/repository.yaml" : ".vivarium/agents/legacy-agent.yaml";
+        var path = Path.Combine(repositoryPath, relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        var canonical = kind == "manifest" ? await File.ReadAllTextAsync(path) : AgentDocument("legacy-agent", true);
+        var invalid = endings == "mixed"
+            ? canonical[..canonical.IndexOf('\n')] + "\r" + canonical[canonical.IndexOf('\n')..]
+            : canonical.Replace('\n', '\r');
+        await File.WriteAllTextAsync(path, invalid, new UTF8Encoding(false));
+        await RunGitAsync(repositoryPath, "add", relativePath);
+        await CommitExternalAsync(repositoryPath, "Nonuniform line endings");
+        var validation = await repository.ValidateRevisionAsync(await repository.GetAuthoritativeHeadAsync());
+        Assert.That(validation.IsValid, Is.False, "legacy compatibility admits only the exact uniform CRLF encoding");
+    }
+
+    [Test]
+    public async Task Legacy_CRLF_commit_trailers_retain_controller_provenance()
+    {
+        var repositoryPath = NewRepositoryPath();
+        var repository = await ManagedGitRepository.OpenOrCreateAsync(repositoryPath, "control-main");
+        var messagePath = Path.Combine(rootDir, "legacy-message.txt");
+        await File.WriteAllTextAsync(messagePath, string.Join("\r\n",
+            "Legacy controller message", "", "Vivarium-Operation-ID: legacy-operation",
+            "Vivarium-Request-ID: legacy-request", "Vivarium-Correlation-ID: legacy-correlation",
+            "Vivarium-Actor-ID: legacy-user", "Vivarium-Actor-Type: user", ""));
+        await RunGitAsync(repositoryPath, "-c", "user.name=Legacy Controller",
+            "-c", "user.email=legacy@example.invalid", "commit", "--allow-empty", "--cleanup=verbatim",
+            "--file", messagePath);
+        var revision = await repository.GetAuthoritativeHeadAsync();
+        var message = await RunGitBytesAsync(repositoryPath, "show", "-s", "--format=%B", revision.Commit);
+        Assert.That(message, Does.Contain((byte)'\r'), "the legacy fixture must retain actual CRLF bytes");
+        var validation = await repository.ValidateRevisionAsync(revision);
+        Assert.That(validation.Validated!.Descriptor.ControllerProvenance, Is.EqualTo(
+            new ConfigurationCommitProvenance("legacy-operation", "legacy-request", "legacy-correlation",
+                "user", "legacy-user")));
+    }
+
     private static ConfigurationCommitMetadata CommitMetadata(string operationId) =>
         new(
             $"Update configuration for {operationId}",
@@ -403,7 +484,7 @@ public sealed class ManagedGitRepositoryTests
         spec:
           enabled: {enabled.ToString().ToLowerInvariant()}
 
-        """;
+        """.ReplaceLineEndings("\n");
 
     private static async Task CommitExternalAgentAsync(
         string repositoryPath,

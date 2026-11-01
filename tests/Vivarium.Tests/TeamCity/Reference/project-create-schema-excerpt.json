@@ -1,0 +1,131 @@
+{
+  "reference_profile": "TeamCity2026.1.3 build222742; API2026.1; rest-api222742",
+  "source_schema_sha256": "22e37bbaf8bdb48f5f67eade2cd3fe206a193eb8eb4de10178909386444104dc",
+  "source_schema_bytes": 562948,
+  "acquisition": "@eyeauras/teamcity-cli0.5.2 at b158fe03eab3c31982a21b36c278f690f6b541d9 plus bounded capture patch; GET /app/rest/swagger.json",
+  "evidence_kind": "Installed schema excerpt; contract-established create/readback, not an observed reference mutation",
+  "newProjectDescription_required_present": false,
+  "project_required_present": false,
+  "exact_pointer_values": {
+    "/paths/~1app~1rest~1projects/post": {
+      "tags": [
+        "Project"
+      ],
+      "summary": "Create a new project.",
+      "description": "",
+      "operationId": "addProject",
+      "consumes": [
+        "application/xml",
+        "application/json"
+      ],
+      "produces": [
+        "application/xml",
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "required": false,
+          "schema": {
+            "$ref": "#/definitions/newProjectDescription"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "successful operation",
+          "examples": {
+            "application/xml": "",
+            "application/json": ""
+          },
+          "schema": {
+            "$ref": "#/definitions/project"
+          }
+        }
+      }
+    },
+    "/paths/~1app~1rest~1projects~1{projectLocator}/get": {
+      "tags": [
+        "Project"
+      ],
+      "summary": "Get project matching the locator.",
+      "description": "",
+      "operationId": "getProject",
+      "produces": [
+        "application/xml",
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "name": "projectLocator",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "format": "ProjectLocator"
+        },
+        {
+          "name": "fields",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "successful operation",
+          "examples": {
+            "application/xml": "",
+            "application/json": ""
+          },
+          "schema": {
+            "$ref": "#/definitions/project"
+          }
+        }
+      }
+    },
+    "/definitions/newProjectDescription/properties/id": {
+      "type": "string",
+      "xml": {
+        "attribute": true
+      }
+    },
+    "/definitions/newProjectDescription/properties/name": {
+      "type": "string",
+      "xml": {
+        "attribute": true
+      }
+    },
+    "/definitions/newProjectDescription/properties/parentProject": {
+      "$ref": "#/definitions/project"
+    },
+    "/definitions/project/properties/id": {
+      "type": "string",
+      "example": "BuildCacheNodeJS",
+      "xml": {
+        "attribute": true
+      },
+      "description": "The public project ID. If not specified, TeamCity generates one by removing all non-alphanumeric characters from the project name."
+    },
+    "/definitions/project/properties/name": {
+      "type": "string",
+      "example": "Build Cache \u2014 NodeJS",
+      "xml": {
+        "attribute": true
+      },
+      "description": "The public project name."
+    },
+    "/definitions/project/properties/locator": {
+      "type": "string",
+      "xml": {
+        "attribute": true
+      }
+    }
+  },
+  "supporting_workflow": "https://www.jetbrains.com/help/teamcity/rest/create-and-delete-projects.html",
+  "limits": [
+    "No POST fields query parameter is declared",
+    "No required-property list permits default POST field assumptions",
+    "Permission denial/defaults/duplicates/cleanup statuses remain unresolved"
+  ]
+}

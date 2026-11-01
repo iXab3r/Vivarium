@@ -34,7 +34,8 @@ downloads and domain/Agent behavior supplement discovery; no denominator is froz
 
 P0 task #36 owns the small ledger validator/report binding. It must use ordinary structured files and
 existing test results, not add a scheduler, dashboard service, runner or recurring full-suite job.
-The initial report is explicitly UNVERIFIED; no conformance runner/report ingestion exists yet.
+The report remains partial/unverified. A [first-cohort NUnit target](teamcity-rest-first-cohort.md)
+now executes real raw cases; mechanical report ingestion, scope and reuse validation remain #36 work.
 The validator checks accounting, bindings and evidence provenance; it cannot infer that an arbitrary
 assertion is a correct TeamCity oracle. Reference contracts and actual state/byte checks still own
 that meaning. A populated receipt or a renamed test cannot turn self-consistency into parity.

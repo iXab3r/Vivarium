@@ -8,8 +8,9 @@
   No implementation milestone is complete.
 - GitHub: #2–#9 remain milestone closure parents. D40 reuses existing subsystem code tasks, moves
   REST contract/acceptance tasks under their same-milestone subsystem owner and adds #56–#76:
-  eight milestones, 75 open issues and 67 native child links. Exact graph is in issues.json and
-  subsystem-slices.tsv; do not restore the older flat per-milestone REST execution chain.
+  eight milestones, 75 open issues and 67 native child links in the historical planning snapshot.
+  Same-P0 debt #77 was later added under #35; GitHub owns current task state. The planning graph is
+  in issues.json and subsystem-slices.tsv; do not restore the older flat REST execution chain.
 - Owner accepted RF-10 on 2026-10-31: each milestone may merge separately into main after its own
   acceptance/review, and its issues close after that delivery. Use milestone integration branches where
   useful; remove obsolete code with its replacement. R6 is cumulative acceptance, not the first main merge.
@@ -21,8 +22,9 @@
   record a new census revision when comparing later, do not relabel it as the original baseline.
 - Depot main `2023838` equals fetched origin/main. Chiral main is not Depot's package API; pinned
   versions/source gitlink are in `depot-study.md`. No Depot/Chiral files were changed.
-- Local build/test execution is blocked before compilation by missing pinned SDK 10.0.303; this
-  planning change does not alter the SDK pin or claim runtime validation. Docs validation is separate.
+- The exact pinned SDK 10.0.303 is now verified in ignored private tooling. The first executable
+  [REST cohort](../../../docs/design/teamcity-rest-first-cohort.md) records real build/control/raw
+  evidence; the SDK pin is unchanged. It does not deliver the replacement stack or close P0.
 - D34 accepts Depot Identity/OpenIddict/OIDC/installation account plus TeamCity roles/permissions,
   editable definitions/includes/groups/project scopes 1:1, as PG data. Legacy Git-RBAC and custom
   claim/recovery/password paths are replacement targets, not ongoing authorities.
@@ -49,8 +51,12 @@
   current-Vivarium RED baseline before replacement. P0.REST.2 first proves cheap production-code
   composition, controlled timers/external actors, isolation and measured code/data/runtime cost.
   WireMock is an HTTP adapter, not a model simulator. Read teamcity-rest-test-first.md and
-  rest-conformance-checkpoints.tsv. All three checkpoints remain planned-unexecuted; no new corpus,
-  simulator, dependency, benchmark or RED execution exists. No production source/farm was mutated.
+  rest-conformance-checkpoints.tsv. Two installed-reference reads now have strict replay controls
+  and actual current-product RED (404 versus 200), with native HTTP/controlled-timer/isolation proof.
+  A third source-established project create/readback case now reaches real POST RED; its expected
+  semantics come from installed metadata and documented explicit inputs, not a live mutation capture.
+  Required checks exposed canonical Git byte/provenance defects tracked in same-P0 #77.
+  The broader checkpoints remain incomplete; no production TeamCity write/farm operation occurred.
   Inspection: current VivariumControllerHost.StartAsync directly constructs storage/TLS/services and
   wires Kestrel/background workers; no TestServer composition seam was found there. BuildScheduler
   has DispatchAvailableAsync, queue timeout monitor has SweepOnceAsync and a TimeProvider-backed

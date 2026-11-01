@@ -156,6 +156,11 @@ It is retained for source/data/consumer disposition, not as an alternative targe
   protect the repository boundary. Repository-local line-ending policy is pinned to
   `core.autocrlf=false` and `core.eol=lf`; adoption rematerializes only a checkout proven clean under
   its previous effective policy.
+  New rendered documents/commit messages use LF independently of source checkout EOL. The exact
+  uniformly CRLF-encoded form of the same canonical document remains readable for legacy Windows
+  trees, with original byte hashes/provenance retained and no ref/history rewrite. Mixed endings,
+  lone CR and noncanonical spacing/fields remain invalid; new mutations emit LF. Same-P0 #77 binds
+  old-tree open/read/mutate/restart, original hash/byte and negative-ending evidence.
 - SQLite migration v5 durably records revision sets/members, per-scope active and last-known-good
   pointers, idempotent mutation operations, and the Agent desired projection. Migration v6 adds bounded
   affected-target metadata, exact conflict revision/diff replay, and retryable repository-attempt
