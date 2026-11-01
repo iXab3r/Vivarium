@@ -16,6 +16,9 @@ The same target also runs `RecipeSourceTests`: a separate non-Docker C#/Git roun
 explicit declarations from the pinned T3 Kotlin fixture. Select `--filter FullyQualifiedName~RecipeSourceTests`
 for only that source-representation check. Its owned configuration candidate does not create a GitHub
 repository, modify workload scripts, launch an application, build T3 or publish anything.
+`ComputedSourceTests` separately checks typed C# edit readback and precedence over an untouched
+computed declaration; select `--filter FullyQualifiedName~ComputedSourceTests` for that bounded
+source study. Both source fixtures own fresh Git repositories and use the existing compiler.
 The root test project builds this assembly but does not execute these physical cases implicitly.
 The source fixture is created by `tools/definition-proof/probe.py`; its receipt records literal Git
 revisions and expected effective-plan hashes. The same exact committed C# is compiled by separate

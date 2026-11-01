@@ -121,6 +121,11 @@ now supplies bounded real reference editing/source effects and a compiled C#/Git
 experiment. It distinguishes demonstrated source editing/reevaluation from still-unproved real
 Host activation, authorization and recovery. The complete P0 gate below remains due; the experiment
 does not establish the final public SDK or all mode/collection semantics.
+The later [literal T3 recipe proof](../../.workspace/workstreams/coherent-refactor/us013-recipe-representation.md)
+and [computed-source study](../../.workspace/workstreams/coherent-refactor/us013-computed-source.md)
+extend that evidence to explicit recipe fields and a typed edit declaration read from compiled C#.
+They remain bounded representation candidates; neither establishes unobserved reference modes,
+current grants, concurrent mutation or production completion behavior.
 
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
 clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.

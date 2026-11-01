@@ -3,6 +3,13 @@
 ## Current state — 2026-11-01
 
 **Current assignment: execute US-013 autonomously, starting with its P0 gates.** The
+[computed-source study](us013-computed-source.md) now checks a single typed C# edit declaration over
+untouched user-owned computations, including readback of existing edits so unrelated mutations retain
+local-removal intent. This is a bounded candidate over the same compiler/model, not an adopted SDK
+or proof of reference modes/current grants/concurrent mutation/production activation. Continue the
+integrated P0 route and its remaining allocation/variant/review/debt/main obligations.
+
+**Preceding literal-recipe checkpoint:** The
 [literal T3 settings increment](us013-recipe-representation.md) fills explicit Docker/PowerShell/checkout/trigger
 omissions, with actual committed C# compilation, managed round-trip, owned configuration edits and
 old-revision reevaluation. The original smaller seed remains the computed/physical fixture. The

@@ -40,6 +40,15 @@ still require the separately recorded repository/tool-path/no-launch adaptations
 build. The original computed/inheritance and physical-recovery experiment continues to use its own
 smaller seed.
 
+`ComputedSourceTests` studies a second representation form over the same experimental model and
+compiler: untouched user-owned `UserCode.Declare()` plus one typed C# `Managed.Edits` declaration.
+The existing renderer emits only named scalar/parameter/step edits. The transient `declared`
+projection reads the actual compiled edit list so a subsequent mutation can retain prior local
+removals and unrelated overrides. The test covers later user computations, inherited reset,
+collection/scalar edits, author clearing of edits and cold old-commit evaluation. This is a bounded
+source-preservation candidate, not an adopted SDK, general patch language or proof of reference
+modes/current permissions. See [the P0 source study](../../.workspace/workstreams/coherent-refactor/us013-computed-source.md).
+
 Separate processes and deadlines are **not** an OS security sandbox. These are known trusted fixture
 sources; do not use this probe to evaluate untrusted repositories. The prototype neither authorizes
 mutations nor implements PG projection, Git-ref/PG atomicity, crash recovery, REST completion or a

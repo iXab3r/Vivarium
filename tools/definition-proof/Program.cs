@@ -16,7 +16,8 @@ string Resolve(Parameter p)
 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 if (args.SequenceEqual(new[] { "declared" }))
 {
-    Console.Write(JsonSerializer.Serialize(new { project, settings }, options));
+    var managedEdits = typeof(Managed).GetProperty("Edits")?.GetValue(null);
+    Console.Write(JsonSerializer.Serialize(new { project, settings, managedEdits }, options));
     return;
 }
 var effective = settings.Configurations.Select(c => new
