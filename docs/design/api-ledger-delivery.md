@@ -41,6 +41,15 @@ business AC, surface scenarios and subsystem delivery. Stories choose priority; 
 lifecycles remain implementation units. Keep the current full API ledger/variant universe and task
 owners, not one new issue per heading or an arbitrary story quota.
 
+Owner direction, 2026-11-01: the selected actor-goal story is the unit of ongoing work and reporting.
+Carry its connected planning, implementation and verification forward; technical cards identify
+contributions rather than becoming a queue of separate user handoffs. When the implementation route
+is unclear, resolve the story's plan, concrete outputs, real blockers and acceptance first. Routine
+receipt/card completion does not require another instruction to continue. Report meaningful story
+checkpoints and actual availability, with technical evidence in supporting links. Preserve D39
+milestone closure and D40 subsystem ownership; this changes work selection/cadence, not compatibility
+scope, state authority or the existing external-effect authorization boundaries.
+
 Use this compact story record; concrete UI/HTTP/CLI flows are projections of business intent:
 
 | Field | Required content |

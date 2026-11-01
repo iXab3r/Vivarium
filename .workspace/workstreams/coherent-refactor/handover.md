@@ -2,7 +2,18 @@
 
 ## Current state — 2026-11-01
 
-**Latest checkpoint: independent server-input receipt #85 is available.**
+**Active assignment: deliver US-013 as a story, with planning where the route is unclear.** The owner
+rejected leaf-by-leaf execution/handoffs. The [current story delivery plan](t3personal-pilot.md#current-story-delivery-plan)
+now connects preparation → runnable installation → full-chain visibility → actual chain/bytes →
+default publication/automation → acceptance, through existing owners and P0/R0/PILOT gates. Current
+work is the integrated definition/model/reference-case/evidence preparation block, not “do #32 and
+return.” It has explicit real proof outputs and remains open; authored planning is not its exit.
+Use #84/#85 immediately. Preserve the separate historical source/settings identities, literal
+dependency projection and consumed-byte gaps. No new stories/tasks, code/proof execution, milestone
+acceptance or product availability follows from this planning reconciliation. Continue connected
+work under #78; report story outcomes and real blockers rather than the next technical card.
+
+**Preceding checkpoint: independent server-input receipt #85 is available.**
 [Findings and raw-entity receipt](t3personal-server-inputs.md): five fixed read-only exchanges confirm
 source `7ff65cada…`, separate settings `7495b685…`, Windows→Prepare snapshot/artifact selection and
 Release→Windows snapshot plus Release→Windows/Prepare artifact selection. The settings file at the

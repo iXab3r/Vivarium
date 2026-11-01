@@ -1,5 +1,108 @@
 # First real product: the full T3Personal chain
 
+## Current story delivery plan
+
+Owner direction, 2026-11-01: work through actor-goal stories; when the route to a story is unclear,
+resolve its plan. **US-013 / #78 is the active unit of delivery.** Lead: Story Delivery; co-held
+TeamCity, Testing Architect, REST and Docs perspectives. Technical cards identify responsibilities
+inside this story. Completing a receipt or model card is not a handoff or a reason to ask the owner
+to choose the next leaf. Continue the connected work until a coherent story checkpoint or a real
+unresolved decision/external execution boundary is reached.
+
+The release operator must be able to sign in, inspect all three configurations and readiness,
+start the ordinary Release configuration through UI, compatible REST or unchanged CLI, follow its
+actual upstream work, retrieve launch-checked coherent Linux/Windows assets and identify the
+configured publication result. Denial, source/runner failure, waiting, cancellation and recovery
+must remain truthful. The full promise includes default publication and used trigger/coexistence
+behavior. Build-only/off is an intermediate result, not completion of US-013.
+
+### Assessment and immediate work
+
+**Planning is currently necessary before structural implementation.** The current controller still
+references SQLite and has the existing queue/Agent/Git/native-REST foundation, not the accepted
+C#/Chiral/PostgreSQL catalog and compatible full-chain product. #84/#85 give usable independent
+reference inputs; they do not supply a complete definition/editing/selection model or frozen
+entry/effect cases. P0's baseline/composition/allocation and final review/main gates remain open.
+This is an identified readiness gap, not a proposal to restart the already accepted architecture.
+
+**The current work block is the integrated US-013 preparation package**, spanning #110/#111/#112,
+#32/#34 and the existing story contract #117. Finish its definition, model, reference cases and
+evidence design together; do not return after each technical card. Its concrete exit output is an
+implementable full-chain recipe with a proved C#/Git representation, exact independent due cases,
+an executable honest baseline and a bound implementation/acceptance sequence. A prose plan alone
+does not satisfy this exit. Broader P0 obligations must also close before R0 implementation.
+
+| Story checkpoint | Concrete output the operator or implementer can inspect | Existing owning work and readiness |
+|---|---|---|
+| Ready to implement the whole chain | Three attributed definitions, selected-source/settings/Build model, due UI/REST/CLI scenarios and independent assertions; real definition/edit/evaluate/activate/recover proof and representative baseline/composition results | Current integrated preparation block; #110–#112 with #32/#34 and #117. P0 remains unaccepted. |
+| A runnable installation and cheap real run | Actual Host URL, login/current grants, Git catalog, PG/Storage and separate Agent; unchanged CLI can run, observe bytes, fail, cancel and recover LocalSmoke | Thin US-001/US-004/US-006/US-009/US-010 contributions through #113–#115. Accepted P0 precedes R0; full later stories are not prerequisites. Smoke does not accept T3. |
+| Whole-chain visibility | All three real configurations and their dependencies, Agent requirements/readiness, queue/build identities and diagnostics are visible across UI/REST/CLI | #116–#118 plus ten existing PILOT contributors. No serial UI-then-REST-then-CLI work order or fake runnable buttons. |
+| Real chain and bytes | Release-entered Prepare→Windows→Release work, exact selected inputs, Docker/PowerShell runners, real Linux/interactive Windows launch checks, common version, retained logs/manifests and actual staged/downloaded bytes | RUN/CFG/VCS/AGT/EXEC/CHAIN/LOG/BLOB contributions below. Off-mode evidence is labelled; publication remains due. |
+| Default publication and used automation | A causally attributable default-publication result, selected tag/assets, and controlled used trigger/quiet-period/exclusion/single-publisher behavior | SS-DEP #155 and SS-TRG #143 with #117/#118. Concrete external execution scope must be ready at execution; no production trigger activation follows from planning. |
+| Accepted story | Current-access denial and byte controls, upstream failure/cancel, selection/retry/restart and publication/recovery evidence; cumulative prior GREEN, zero due debt, independent milestone verdicts and verified main delivery | #118 and existing milestone gates. Report story availability separately from full subsystem/API completeness. |
+
+These are checkpoints within the existing P0 → R0 → PILOT and breadth levels, not new milestones,
+new stories, a second task graph or waivers of D37–D40. Once a checkpoint's implementation route is
+clear and its predecessors accepted, execute it continuously under this story. Do not wait for
+unrelated full IAM, general editing, every runner, providers or global history implementation.
+
+### Decisions grounded now
+
+The worked reference model starts from the independent [#85 receipt](t3personal-server-inputs.md):
+
+| Identity or relationship | Concrete reference and consequence for the story |
+|---|---|
+| Configuration versus Build | Release is `T3Personal_Release`; the observed run is 32726. Windows 32725 and Prepare 32724 are separate Builds. No composite parent, task ID or shared version is invented as their identity. |
+| Requested versus resolved run | The receipt observes completed runs, not the request that created them. Preserve the returned-request/reuse relation as a due controlled-reference case; do not infer a universal new-ID or reuse policy from this cohort. |
+| Source versus settings | All three source revisions are `7ff65cada…`; settings revisions are `7495b685…`. Keep distinct immutable historical fields and their root-instance/checkout provenance. Matching settings file bytes do not collapse these identities. |
+| Dependency selection | Windows reports snapshot/artifact Prepare 32724. Release reports snapshot Windows 32725 and artifact producers Windows 32725/Prepare 32724. Retain these literal results; the documented snapshot closure discrepancy is an independently testable wire/model gap. |
+| Produced versus consumed bytes | #84 proves the downloaded producer manifests, not every consumed file. Freeze the selected producer/rule/destination and compare actual producer→consumer bytes in the controlled and real-chain evidence. |
+| Historical versus current settings | Current effective mode is `alwaysUseCurrent`; the receipt does not establish the mode at execution or a settings-hash-to-revision mapping. Freeze the due timing/default variants from controlled reference effects. |
+
+Use the server-attributed `7495b685…` settings/source cohort as the known reference example.
+The later `041345f2…` trigger exclusions remain a named used-behavior delta due before total story
+acceptance; never attribute them retroactively to that older run or silently drop them. A future
+normal entry records its actual resolved versions rather than assuming the CLI has a revision flag.
+
+The three-definition representation must express the source checkout, literal Agent requirements
+with explicit owned-fixture mapping, actual ordered runner steps, timeouts, snapshot/artifact rules,
+counter/version/message effects, default `T3_PUBLISH=release`, and used trigger settings. Git owns
+these desired definitions; PG owns runtime identities/selection/queue/history/access; Chiral owns
+private Host connections/settings; Storage owns bytes with PG references. Both HTTP projections
+and UI use the same owning services. Exact C# API/file/editor/evaluator mechanics remain a required
+real #34 proof, not an assumed SDK hidden in a plan.
+
+### Remaining planning and proof inside the current block
+
+| Unclear part | Resolve it as one connected story output | Sufficient evidence and next implementation decision |
+|---|---|---|
+| Definition and input model | Work the three definitions through source/settings/Build identity, selected artifact mapping and edits into one effective immutable execution plan | Actual before/after C# files, evaluator invocation, Git revision/activation, invalid edit and recovery outputs; independently expected effective values. Then choose the smallest proved catalog/editor implementation. |
+| Entry, defaults and lifecycle | Establish selected UI/REST/unchanged-CLI entry, returned/resolved identities, permission checks, queue/start/terminal/cancel/reuse and source/settings collection boundaries | A bounded three-configuration owned reference fixture on the isolated TeamCity lab, current allowed/denied actors and exact request/response/effect/byte receipts. Use tiny workloads for semantics; no repeated T3 rebuild per negative case. Replay records HTTP and does not implement another scheduler/model. |
+| Test and delivery composition | Bind those due cases, real boundaries, fixtures/cleanup and prerequisite slices to the current ledger and owners; include the remaining P0 breadth/allocation obligations | Production-code composition with controlled time/external faults where sufficient; real Git/PG/Storage/Agent/OS where claimed. Prove isolation/cost and record real product RED or retained GREEN. Unknown cases remain gaps, never guessed expectations. |
+
+Missing historical per-file consumption does not force an endless search of the old run: independent
+controlled producer/consumer evidence can establish the due semantics, and actual PILOT bytes must
+still be proved. Unrelated full operation variants stay with their due owners; shared structural/R0
+unknowns and required cumulative behavior cannot be deferred to make this story appear ready.
+
+The evidence plan uses real entries from all three surfaces and the smallest sufficient causally
+attributed default-publication proof through the shared producer boundary, with explicit reuse and
+off-mode differences. Freeze the exact mapping before execution; do not assume that viewing one run
+three ways proves three entries, or that the three entries require three identical live publications.
+Use separately owned Linux and interactive Windows Agents, not Cvat/laptop-g15. Prepare private
+credential references and the exact external target/effect before any necessary operator approval;
+there is no new product approval state or hypothetical confirmation step in ordinary local work.
+
+**Reporting:** state the operator outcome now available, the story checkpoint reached, the remaining
+story blocker and verification. Put leaf IDs in supporting links. Current availability is still
+NOT_AVAILABLE; no new executable proof, milestone acceptance or product implementation is claimed
+by this planning reconciliation. The 25-story / 18-packet / 54-task graph is unchanged.
+
+## Reference and preserved detailed scope
+
+The detailed material below retains earlier scope/evidence context. Current work order and handoff
+come from the story plan above; historical “next #85” and superseded task IDs are not a leaf-work queue.
+
 **Now:** NOT_AVAILABLE in the replacement product. The owner chose **breadth-first**: preserve the
 whole actual Prepare → Windows → Release configuration and default-publication behavior across UI,
 direct compatible /app/rest and unchanged CLI. The earlier Prepare-first recommendation is superseded.

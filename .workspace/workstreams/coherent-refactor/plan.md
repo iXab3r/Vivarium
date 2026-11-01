@@ -1,4 +1,11 @@
-# Coherent Vivarium refactor — plan v1.14
+# Coherent Vivarium refactor — plan v1.15
+
+**Current delivery unit: US-013 / #78.** Follow the
+[whole-story delivery plan](t3personal-pilot.md#current-story-delivery-plan). The owner explicitly
+replaced leaf-card handoffs with story work; when the route is unclear, resolve the connected plan.
+The immediate block combines definition/model/reference cases and evidence design until it has
+implementable, proved outputs. Do not finish an assignment merely by completing #32, #34 or another
+supporting card. Existing P0/R0/PILOT gates, subsystem owners and full publication scope remain.
 
 **Current planning graph:** [all 18 story-led task packets are active](story-task-migration.md).
 Implementation/contract/acceptance #110–#163 now own the existing slices; all 25 goals have explicit
@@ -29,8 +36,10 @@ The 449 intent links are not a normalized API union or proof of coverage. See th
 [server-input receipt #85](t3personal-server-inputs.md) are available: one bounded three-build
 cohort, source/settings/dependency selection, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;
 conformance remains fifteen known cases / five RED / ten blocked / zero GREEN, denominator unknown.
-**Next:** consume #85 in #32's worked source/settings/selection model, #34's actual C#/Git proof and
-#111's exact wire/control cases; #110/#112 case freeze and remaining gates feed full P0 closure.
+**Next coherent block:** complete the integrated US-013 preparation package: actual C#/Git
+representation, worked source/settings/selection model, independent entry/effect cases and executable
+baseline/composition/allocation evidence. #32/#34/#110–#112/#117 are responsibilities inside that
+block, not separate user handoffs. All remaining P0 gates still apply.
 **After that:** remaining P0/#77/final review/debt/main → real Host/Agent #113 and cheap Smoke #115 /
 R0 closure → first all-configuration/all-surface PILOT breadth preview. These steps do not waive
 remaining gates or accept the full chain. See the [goal/output/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
@@ -40,12 +49,13 @@ No product output, recipe, exact new case or publication execution is claimed de
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
-Current assignment (2026-11-01): the owner continued from the announced #85 next step. Execute the
-bounded read-only source/settings/dependency acquisition, its necessary unpublished fixed getter
-and verification, then publish the receipt/gaps and consuming-task handoff. No product/conformance
-implementation, TeamCity mutation, build execution or server/container lifecycle follows. Earlier
-planning-only restrictions retain their historical scope; this is not a permanent implementation ban
-or a new future approval procedure.
+Current assignment (2026-11-01): work by actor-goal stories, planning when their delivery route is
+unclear. US-013 is selected. Continue its connected readiness/planning and, when the route and
+accepted predecessor gates permit, implementation and verification without leaf-card handoffs.
+Necessary technical work stays inside the story and existing subsystem ownership. This update
+reconciles the story plan; it executes no product/reference/fleet/publication work. Earlier narrow
+planning/getter assignments retain their historical scope, not a permanent implementation ban or
+a new approval procedure. Concrete external effects keep their actual authorization boundaries.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately

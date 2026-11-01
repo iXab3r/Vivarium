@@ -20,6 +20,9 @@ it does not replace domain ownership or make a new issue per operation.
   Link canonical business AC; keep concrete interactions separate from highest-level business text.
 - Publish honest availability, what can actually be opened/tried, evidence, blockers and next output.
   No invented working commands, story quota or completion from authored scenarios.
+- Work through the selected story across its connected technical contributions. Resolve an unclear
+  delivery route at story level, then continue the authorized work; routine leaf-task completion is
+  not a user handoff. Keep D39 milestone gates and D40 coherent subsystem implementation units.
 - Trace story → AC/TCM → applicable surface scenario → source operation/variant/case → primary
   subsystem/contribution → independent oracle, boundary, effect and observable completion.
   Reuse the existing ledger/task graph, never a second compatibility universe.

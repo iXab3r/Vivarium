@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: owner continuation from named next step #85 authorizes bounded read-only server-input acquisition, its necessary unpublished fixed getter and verification, receipt/gap publication and task handoff. Story-led transition/administrative supersession remain complete. No Vivarium product/conformance implementation, TeamCity mutation/build execution or server/container lifecycle. Historical evidence retains its original boundary."
+current_assignment = "2026-11-01: owner requires story-level work; plan when the route is unclear. Active US-013/#78 spans connected preparation, implementation and verification, with technical cards as internal contributions rather than leaf handoffs. Current integrated preparation remains open; D37-D40 predecessor/closure and actual external-effect authority apply. This planning reconciliation executes no code/reference/fleet/publication work; historical receipts retain original boundaries."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -51,6 +51,10 @@ contract_issue = 117
 acceptance_issue = 118
 targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"
 breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real DAG/runners/artifact/launch/stage/default-publication -> fault/recovery/access/cumulative acceptance; no serial surface completion"
+delivery_unit = "US-013/#78; selected actor-goal story, not individual technical card"
+current_work_block = "Integrated definition/model/reference-case/evidence preparation across existing P0 owners and #117; open, not satisfied by prose or #85 alone"
+delivery_plan = "t3personal-pilot.md#current-story-delivery-plan"
+unclear_route = "Resolve the story plan and required proof, then continue connected authorized work without leaf-card handoffs"
 
 [story_transition]
 assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. All three planning stages complete; no product/runtime work. Historical stage counts below retain their original checkpoint meaning."
