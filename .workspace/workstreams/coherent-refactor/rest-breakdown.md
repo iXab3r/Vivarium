@@ -110,7 +110,10 @@ isolation and measured code/runtime cost. WireMock is the HTTP adapter; no secon
 
 R0 does not wait for downloading the full retained artifact archive. The current
 CLI has no dedicated Swagger export command; obtain metadata through an approved supported export
-path as a named follow-up, rather than silently substituting newer public docs or raw hidden requests.
+path delivered by #35 under #33's acquisition contract and #42's controls (#36 binds provenance/gaps),
+rather than silently substituting newer public docs or raw hidden requests. The deliverable includes
+pinned installed schema bytes/hash and sanitized original HTTP status/headers/body plus exact tool/
+command/profile/fixture provenance. No supported command or ready fixture is claimed by this seed.
 
 ## Initial compatible R0 execution profile
 

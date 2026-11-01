@@ -90,3 +90,15 @@
   the real R0 base suite and #41 the targeted-run case. Continue bounded P0 discovery for
   exact C# mutation representation, wire/client universe, retained-history volume and old-runtime data.
   Do not begin R0 by silently selecting unresolved alternatives.
+
+## Cycle-1 planning repairs (2026-11-01)
+
+The 17 owning slices and 16 domains are unchanged. `subsystem-contributions.tsv` records 11 partial
+R0/R2 integration obligations under existing #14/#43/#44 and #20/#65/#66; exact variants remain
+unfrozen/unallocated in #36. AC-AG-07/AC-ART-01/03 now include their promised early partial gates.
+`api-ledger-delivery.md` defines evidence reuse/main transfer, discovery allocation versus due freeze,
+execution triggers and bounded finding classification. #33/#35/#36/#42 own concrete approved
+reference acquisition and controls. This is guidance/task repair, not delivered commands, fixtures,
+checker, SDK preparation, raw baseline, API completeness or milestone/security acceptance.
+Next implementation stays #35 with affected #33/#36 contracts, then actual P0 gates before R0.
+Run documents/task/ledger checks for these prose changes; no build/test/runtime check was run.

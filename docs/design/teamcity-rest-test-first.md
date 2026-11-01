@@ -159,9 +159,16 @@ fixture/cleanup requirements. Attach evidence at the level that supports the ass
   evidence for that decoder, not automatically the server's wire representation.
 - Where the result is unspecified or evidence conflicts, obtain an isolated reference observation
   or leave the case blocked on reference evidence. Do not select a convenient expected value.
-- Keep reference capture on the approved CLI; missing typed schema/contract export is named tooling
-  work. Do not substitute the removed CLI or hidden raw production requests. Mutation capture uses
-  prepared disposable reference fixtures, not the production farm during planning.
+- #33 owns the pinned reference acquisition contract; #35 delivers and demonstrates the supported
+  `@eyeauras/teamcity-cli` acquisition capability, and #42 verifies its controls. Required outputs are
+  exact installed schema bytes/profile/hash and sanitized raw HTTP status/relevant headers/original
+  body, command/tool version and fixture/permission provenance. Inspect actual supported capabilities;
+  if missing, deliver a bounded typed CLI export/capture increment under this same P0 work, rather
+  than inventing a command or bypass. #36 binds outputs and unresolved per-case reference gaps.
+  Keep capture on approved tooling; no removed CLI, hidden raw production requests or new authority.
+  Mutation observations require authorized disposable reference fixtures; if access is absent record
+  the exact missing prerequisite and continue grounded cases. No production capture mutation follows
+  from this planning repair; the commands, capability and fixtures remain implementation deliverables.
 - Keep real credentials, session cookies and production payloads out of committed fixtures. Use
   safe synthetic data and typed placeholders while preserving relevant formats and permission scope.
 
@@ -251,8 +258,11 @@ RF-10 still permits partial milestones in main. Use explicitly separated standar
 ordinary solution checks, replay control, delivered product-conformance cases and the full raw
 product-conformance report. A dedicated same-framework conformance entry point avoids putting
 intentionally unfinished product cases in an ordinary test command that claims to be all GREEN.
-It must still be built and executed by required verification; it must not disappear from CI because
-it is outside the ordinary solution selection. Exact commands belong to the first harness delivery.
+All targets must remain available/buildable in required verification; execute the full raw target
+for the first baseline and later when due under [checkpoint/reuse rules](api-ledger-delivery.md#valid-evidence-reuse-including-delivery-to-main).
+Due/cumulative acceptance always needs actual valid boundary evidence; wiring a target is insufficient.
+Do not infer a full future-known-RED rerun per ordinary handoff/task/status query. Exact commands,
+selections and triggers belong to #35's first harness delivery and do not exist in this seed.
 
 The full raw conformance run remains visibly RED/nonzero while required failures remain. A narrower
 milestone regression gate may pass only its declared delivered set plus no unexpected regressions;
@@ -285,6 +295,9 @@ When a gap may affect shared identity/schema/state/authority or the R0 journey, 
 dependency before treating it as later-domain detail. This clarification does not reduce the P0
 exit scope or permit a missing required contract to pass; it prevents unrelated late unknowns from
 blocking the first sound executable cases. P0 acceptance still does not mean product API-complete.
+The [allocation/freeze rule](api-ledger-delivery.md#p0-allocation-and-due-variant-freeze) distinguishes
+full known-discovery allocation from exact due-case freeze, including machine-readable later gaps
+and the mandatory structural/R0 impact assessment. It preserves all existing P0 gates.
 
 | Checkpoint | Concrete output and exit evidence |
 |---|---|

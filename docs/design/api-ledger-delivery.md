@@ -45,8 +45,9 @@ The delivered ledger must mechanically enforce:
   source/profile and applicability. Source operation IDs survive splits; duplicates/orphans fail.
 - One primary subsystem/variant owner and its implementation/REST tasks per milestone slice, with
   collaborators and cross-slice links; no duplicate counting. Global/subsystem/milestone rollups agree.
-  No unallocated required item at P0 exit; unknown source behavior remains visible and blocks its
-  affected contract/acceptance gate. Use the [P0 gate distinctions](teamcity-rest-test-first.md#which-gaps-block-which-work), not an automatic stop of independent sound cohorts.
+  P0 classifies/allocates every known discovery input; exact due variants freeze before their
+  implementation under the granularity rule below. Unknown source behavior remains visible and
+  blocks its affected contract/acceptance gate. Use the [P0 gate distinctions](teamcity-rest-test-first.md#which-gaps-block-which-work), not an automatic stop of independent sound cohorts.
 - Independently frozen scope per slice and cumulative delivered scope. Scope changes have explicit
   reason/history; a failing required case cannot move to a later milestone or disappear to pass.
 - Case-to-test binding and ordinary raw result provenance: candidate/base, fixture/reference/client
@@ -74,6 +75,28 @@ may pass with accurately recorded expected product RED, while **product API-comp
 Planned future functionality outside a frozen slice is not milestone debt; a missing behavior
 promised by that slice, a regression or its introduced/exposed technical tail is debt and blocks it.
 
+## P0 allocation and due-variant freeze
+
+P0 reconciliation covers the full known discovery union (449 headings, 456 client requests and
+supplemental schema/client/non-REST/native inputs), preserving lineage and explicit unresolved scope.
+Every known input needs a primary owner, authority, intended delivery/integration slice and task links,
+or a machine-readable gap with those accountable links. This is allocation completeness, not a
+claim that the global normalized denominator is known or that all late variants are frozen.
+P0 structural and exact R0 resource/identity/state/authority/mutation/protocol decisions remain blockers.
+An unknown possible shared-structure/R0 dependency is a P0 blocker until assessed, never an assumed
+late gap. Existing P0 census, executable baseline and model/editability gates are unchanged.
+
+#36 delivers later-gap records in ordinary structured files: stable gap ID, source IDs/profile,
+unknown dimensions/expected-value source, primary owner, authority, intended integration slice,
+owning contract/acceptance tasks, due freeze gate, shared-structure/R0 impact assessment with rationale
+and assessor, and unresolved/resolved state/evidence. This is ordinary classification during work;
+independent final milestone review judges it in aggregate, without a formal review per gap/cohort.
+Validate required fields and links; reject a
+later classification with unknown/positive structural or R0 impact. Each due slice normalizes and
+freezes its exact required variants/cases before implementation. Later gaps block their own due
+contracts/acceptance and remain in global unknowns; no missing due behavior is waived by allocation.
+This defines #36's deliverable, not an assertion that gap normalization/validation exists today.
+
 ## Affordable verification
 
 During TDD run the affected named cases and necessary regression neighbors. Reuse unchanged valid
@@ -89,6 +112,35 @@ full run from an aggregate report. A required full run stays visibly RED/nonzero
 Schedule a broad rerun for the first baseline, milestone closure or material cross-cutting changes
 when evidence requires it, not as automatic per-task ceremony. No auto-expanded RED allowlist.
 Normal root build/test obligations remain; a prose-only update needs document/ledger/task checks.
+
+### Valid evidence reuse, including delivery to main
+
+Retain each original receipt: executed revision/base/target identity, command/selection, result and
+artifact, reference/client/profile versions and fixture/oracle/environment inputs (hashes or immutable
+references where available). Never rewrite its revision to the new head or label reuse a fresh run.
+For each new candidate and verified main revision, record an explicit reuse/invalidate decision for
+affected case groups: from/to revisions, relevant production-code and shared-service changes,
+fixture/oracle/reference/client/environment impact, rationale, assessor and linked affected reruns.
+An identical tested tree with unchanged relevant inputs can transfer with that recorded rationale;
+a merge/cherry-pick requires checking its actual resulting tree and relevant environment, not its label.
+Unrelated prose need not invalidate runtime evidence. Changed auth/locator/state/serialization/storage,
+fixture, oracle or relevant environment invalidates affected evidence. Unknown impact is stale;
+rerun the affected selection and real boundary before counting it GREEN. Independent final reviewers
+judge sufficiency, retain exact reviewed revisions and renew affected verdicts; an old PASS is not
+automatically a new-head PASS. #36 validates records and stale accounting, not a dependency engine.
+#42 proves unchanged reuse, invalidation on shared semantics/fixture/oracle changes and unknown-impact
+rejection. Current seed receipts/checker remain unimplemented.
+
+All four verification targets must be available and buildable from first harness delivery. Execute
+the full raw target for the first D38 baseline; later execute the due/cumulative cases at coherent
+handoff/milestone gates, reusing explicitly valid unaffected evidence. A new full raw execution is due
+when required by the declared milestone's acceptance (including R5/R6 cumulative conformance), or
+material cross-cutting change/unknown impact makes the full selection necessary. Milestone closure
+records that decision and current evidence for every due/prior-delivered case; it is not an automatic
+full future-known-RED rerun. Ordinary code handoff still runs required root build/test plus affected
+checks. Status/prose-only updates execute no suites. #35 publishes exact commands and selections/
+triggers; wiring the raw target never excuses a required real run, and availability does not impose
+a full-suite/status/per-task tax.
 
 ## Review and zero-debt closure
 
@@ -110,7 +162,16 @@ their owner (or the parent for cross-cutting findings). Fix, run the smallest re
 then renew final aggregate verdicts for the changed revision, reusing unaffected evidence. No open
 findings, TODO tails, suppressed required tests, legacy authority leftovers or security follow-ups
 may be carried to the next milestone. Unrelated pre-existing work/new features need an explicit
-classification, not a renamed debt exemption. No arbitrary cleanup/LOC target.
+classification, not a renamed debt exemption. Record each disputed finding in the same-milestone
+owning task (ordinary task text/structured record, no new platform): stable finding ID, observation/
+evidence and revision, affected due AC/contract or reachable changed path, origin (introduced,
+pre-existing or unknown), relevance rationale, proposed classification, accountable owner/task,
+disposition/evidence and independent final reviewer judgment. A due-contract failure, regression,
+reachable vulnerability in the delivered flow, or a tail exposed by integration is milestone debt
+regardless of age. Unknown relevance stays unresolved and blocks closure until assessed. Only work
+with no due-contract or reachable delivered-path impact can be classified unrelated pre-existing
+work/new scope, with explicit rationale and final reviewer agreement. A reachable current
+vulnerability cannot be renamed old debt. No arbitrary cleanup/LOC target.
 A still-required tested compatibility path is current supported behavior; leftover code after its
 consumer/replacement is retired is milestone debt. An owner/removal label cannot excuse that debt.
 

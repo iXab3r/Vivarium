@@ -272,5 +272,12 @@
       "api_complete": "UNVERIFIED"
     }
   ],
-  "subsystem_slices": 17
+  "subsystem_slices": 17,
+  "integration_contributions": {
+    "register": "subsystem-contributions.tsv",
+    "rows": 11,
+    "scope_state": "unfrozen",
+    "materialized_cases": 0,
+    "note": "Explicit partial delivery obligations, not allocated wire cases or additional subsystem slices; unique primary owner retained."
+  }
 }

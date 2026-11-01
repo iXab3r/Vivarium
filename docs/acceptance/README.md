@@ -49,6 +49,10 @@ They support these business criteria rather than duplicate them. None is claimed
 
 The [tracked map](../../.workspace/workstreams/coherent-refactor/acceptance-map.tsv) connects every AC
 to milestones, TCM invariants, existing TC requirements, S* candidate checks and accepted contracts.
+Milestone lists include partial contributions: AC-AG-07 covers the R0 Agent approval boundary;
+AC-ART-01/03 cover R0 smoke and R2 Compile byte/access boundaries while retaining later full scope.
+The [contribution register](../../.workspace/workstreams/coherent-refactor/subsystem-contributions.tsv)
+links these obligations to existing integration tasks; it is not frozen cases or passing evidence.
 Native installation/identity/resource lifecycles cite D34/D35 without inventing unrelated TC links.
 The original 120 requirements
 remain in force; mapping is not coverage or a scope reduction. Test-specific expected values come

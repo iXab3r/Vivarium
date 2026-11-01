@@ -76,11 +76,13 @@ role file become a second architecture document.
    builds, operations, audit records, credentials, and secret values are not committed to Git.
 4. Every mutating request is authenticated, authorized, correlated, and auditable. Sensitive values
    never appear in URLs, problem details, audit records, or ordinary logs.
-5. Retried requests cannot accidentally create two builds, two commands, or two Git commits. A replay
-   re-authenticates and re-authorizes the caller before returning any stored outcome. Secret plaintext
-   is neither persisted nor replayed.
-6. Concurrent writers cannot silently overwrite each other. Git-backed `configurationRevision`,
-   agent `observationRevision`, and workflow `runtimeRevision` are distinct precondition domains.
+5. Retry, repetition and duplicate effects follow each frozen operation's TeamCity handling. Two
+   intentional unkeyed identical runs must remain two runs where the reference admits them. Explicit
+   native idempotency workflows honor their keys, re-authenticate/re-authorize stored outcome access
+   and never persist/replay secret plaintext; no blanket body-hash deduplication or exactly-once claim.
+6. Concurrent edits follow the frozen reference operation. Explicit native version-checked workflows
+   (AC-CFG-03) use the documented revision domain; absent opt-in preserves reference behavior.
+   Git `configurationRevision`, Agent `observationRevision` and `runtimeRevision` stay distinct.
 7. AgentHub remains the reverse-connect execution channel. REST never assumes the controller can
    dial directly into an agent.
 8. Payloads and artifacts remain SHA-256-addressed blob transfers. REST returns metadata and links,
@@ -142,13 +144,13 @@ and explicit subresources. Do not invent a second REST-only domain model.
 A REST change is not complete without evidence appropriate to its surface:
 
 - OpenAPI validation and a reviewed contract diff.
-- HTTP contract tests for success and RFC 9457 problem responses.
+- HTTP contract tests for success and frozen compatible errors; RFC 9457 applies to native errors only.
 - Endpoint/permission matrix tests, including denial and secret-redaction paths.
-- Persisted idempotency replay tests across controller restart for side-effecting POST requests,
-  including current-authorization rechecks and one-time-secret responses that never persist or replay
-  plaintext.
-- Optimistic-concurrency races proving that stale writers receive `412` rather than overwriting and
-  that a heartbeat observation cannot spuriously conflict with a configuration edit.
+- Operation-specific repetition/retry/concurrency evidence against frozen TeamCity behavior;
+  explicit native idempotency workflows prove restart/current-authorization/secret replay controls.
+- Explicit native version-checked workflows prove stale `412` and correct revision-domain races;
+  compatible operations prove their actual reference conflict/default behavior. No universal `412`,
+  `If-Match`, idempotency header or native ProblemDetails requirement is imposed on TeamCity calls.
 - Blob tests proving principal-scoped staging, cross-project non-disclosure, assignment/build
   ownership, reconnect fencing, and denial of raw hash possession as authority.
 - Git integration tests proving base-revision conflicts, commit/PR creation, validation failure, and
@@ -180,8 +182,10 @@ TeamCity path/version conventions instead of being rejected as unversioned nativ
 
 ## Current focus
 
-The immediate assignment is P0's [shared REST/domain decomposition](../design/teamcity-rest-domain.md):
-freeze required resources/IDs/states, authority, C# editability and wire variants early. R0 then proves
+The immediate execution deliverable is #35's [reference-backed corpus and real RED baseline](../design/teamcity-rest-test-first.md),
+with #32–#34/#36 supplying affected [shared contracts](../design/teamcity-rest-domain.md) alongside
+verified cohorts; do not wait for a whole-API prose freeze. Resolve structural/R0 identities/states,
+authority, C# editability and exact due wire variants before structural replacement. R0 then proves
 a real local Host+Agent and unchanged-client seeded execution; domain families grow their public and
 compatible contracts together. Native conventions do not redefine TeamCity wire behavior. Preserve
 required AgentHub/blob consumers until their explicit replacement/disposition is proven.

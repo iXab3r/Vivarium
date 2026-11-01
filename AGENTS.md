@@ -198,8 +198,10 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   completion behavior are not independent Vivarium policy choices. Native and compatible surfaces
   share that processing. Unknown reference variants remain verification gaps; internal technology
   choices, framework defaults or generic hardening do not justify a different observable result.
-- Every state-changing request carries actor, correlation/idempotency identity, target, outcome, and,
-  when configuration-derived, the Git revision. Logs and audit records must be bounded and redacted.
+- Every state-changing request has actor, internal correlation/operation identity, target, outcome,
+  and, when configuration-derived, the Git revision. Idempotency/preconditions follow the frozen
+  operation contract or explicit native opt-in workflow; do not require new compatible-client headers
+  or deduplicate intentional unkeyed runs. Logs and audit records must be bounded and redacted.
 
 ## Core implementation rules
 

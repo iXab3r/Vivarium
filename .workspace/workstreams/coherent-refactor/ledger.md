@@ -31,3 +31,9 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 
 RF-10 and D34–D40 direction are accepted; no product implementation, scenario execution or
 independent review is claimed. GitHub issue links are maintained in `issues.json`.
+
+Cycle-1 clarification: `subsystem-contributions.tsv` adds 11 unfrozen early R0/R2 contribution
+links without adding owning slices, native tasks or cases. Known-discovery allocation versus exact
+due freeze, evidence reuse/main transfer, broad-run triggers and finding classification are specified
+in `docs/design/api-ledger-delivery.md`; #36/#42 still implement/prove them. Approved schema/raw HTTP
+acquisition is an explicit #33/#35 deliverable. No execution/acceptance status changed.

@@ -216,15 +216,18 @@ Vivarium must not conflate:
    repositories and binds their project IDs, branches, paths, trust policy, and credential references
    to this controller. Fleet, agent, provider, and server-wide entries also belong to their owning
    domains in this repository; they are not TeamCity project settings.
-2. **Product settings repository:** product-owned `vivarium.yaml` definitions for projects, build
+2. **Product settings repository:** product-owned C# definitions (D32/D36) for projects, build
    configurations, steps, requirements, matrices, triggers, dependencies, and templates. This is the
    TeamCity Expert's versioned domain.
 3. **Source VCS roots:** Git repositories and immutable revisions checked out or packaged as build
    input.
 
-The product settings repository and a source VCS root may be the same repository, matching today's
-`vivarium.yaml` beside the tested code, or may be separate. The controller control repository remains
-separate so a product repository cannot register itself, replace its trust policy, or redirect its own
+The product settings repository and a source VCS root may be the same repository or separate.
+Today's Phase-1 `vivarium.yaml` beside tested code is transitional payload-submission evidence,
+not the target catalog schema. UI/native/compatible REST edits author supported C# settings through
+the same validation/Git activation path; exact runnable syntax/editability requires P0 #34's proof.
+The controller control repository remains separate so a product repository cannot register itself,
+replace its trust policy, or redirect its own
 credential reference.
 
 The Git/Versioning Expert owns the controller control repository mechanism and repository bindings;
@@ -729,14 +732,18 @@ The design borrows these specific behaviors from current official TeamCity docum
   collections:
   [TeamCity REST API](https://www.jetbrains.com/help/teamcity/rest/teamcity-rest-api-documentation.html).
 
-Vivarium deliberately strengthens TeamCity's optional versioned-settings behavior: once the catalog
-slice lands, all mutable TeamCity configuration is Git-backed, and no UI-only authoring mode exists.
+Internal Git persistence for mutable catalog configuration is an implementation choice. Externally
+observable TeamCity Versioned Settings modes and handling remain reference-compatible; internal Git
+storage does not require users to enable external repository synchronization. UI authoring uses the
+same C#/Git validation and activation path, without a separate UI-only database settings authority.
+Exact unresolved dialect and mode variants remain pinned-reference contract work.
 
 ## Open questions
 
-1. Does the first catalog use one `vivarium.yaml` per project, a root manifest plus per-configuration
-   files, or both through one normalized schema? The answer must preserve the existing Phase 1 file or
-   provide an explicit migration.
+1. Which proved C# file/managed-source representation supports the required UI/native/compatible
+   mutations and user-authored/computed fields? P0 #34 owns the edit/read-after-write proof. C# is
+   accepted; YAML-only catalog selection is superseded. Preserve transitional Phase-1 submission
+   behavior until its explicit migration/replacement is verified; it is not a second catalog authority.
 2. Which forge adapters, if any, implement the optional remote review-branch policy after the
    managed-local direct-commit baseline?
 3. What author/committer identity and signing policy is required for controller-created commits?

@@ -44,7 +44,11 @@ P0 harness delivery: standard solution checks, reference-replay control, deliver
 and the full raw product report. The implementation must publish exact commands and wire every
 target into required verification. Reuse current NUnit/Test SDK and standard result artifacts; no
 replacement runner is implied. A dedicated conformance target may remain outside the ordinary
-all-GREEN selection while required behavior is unfinished, but it must still build and execute.
+all-GREEN selection while required behavior is unfinished. All targets remain available/buildable;
+execute them at the [declared due checkpoints and reuse rules](design/api-ledger-delivery.md#valid-evidence-reuse-including-delivery-to-main),
+including the mandatory first raw baseline and required real milestone/cumulative acceptance.
+Ordinary handoff is root build/test plus affected checks; target availability imposes no automatic
+full future-known-RED run per task or status query.
 Raw full-suite RED remains visible/nonzero; passing a declared partial gate does not mean full
 compatibility. Setup failures and regressions in previously passing cases cannot be allowed RED.
 

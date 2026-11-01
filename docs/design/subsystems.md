@@ -89,6 +89,26 @@ or contributing code tasks use explicit links; native descendants keep the ownin
 The primary full-owner task's milestone does not postpone an already required earlier R0/R2 variant:
 bind that variant to the earlier real integration slice and the same shared subsystem logic.
 
+Use [subsystem-contributions.tsv](../../.workspace/workstreams/coherent-refactor/subsystem-contributions.tsv)
+for a partial contribution whose domain full-owner task is later. It links the primary domain owner
+to an existing accountable integration slice, its same-milestone implementation/contract/acceptance
+tasks and bounded business outcome. It does not create another slice, owner, service or duplicate
+case. R0 uses SS-HOST@R0 (#14/#43/#44); R2 Compile output uses SS-RUN@R2 (#20/#65/#66),
+with source checkout/Compile code and evidence from #19/#59/#60 and catalog inputs from #18.
+#19 and #20 develop their real integration incrementally; a related later full-owner task is not
+a finish-to-start prerequisite. The R2 contract names usable R0 runner/queue/Agent/Storage inputs
+and the additional exact checkout, parameters, report and output interfaces before changed behavior.
+
+Concrete lookup example (discovery, **not frozen wire cases**): resolve
+`TCREST:agentapi.getAgent` → primary SS-AGT/#56, `TCREST:buildqueueapi.getQueuedBuild` →
+SS-RUN/#20, and `TCREST:buildapi.downloadFileOfBuild` → SS-BLOB/#26. Their required R0
+variants join the corresponding contribution → SS-HOST@R0 → contract #43/implementation #14/
+acceptance #44, retaining source IDs and the later #61/#62, #65/#66 and #73/#74 full-owner links.
+#36 must materialize exact normalized variants/cases and delivery joins; blank seed delivery/case
+fields still mean unallocated, not that these example headings or all their variants are due in R0.
+Count each required case once by primary owner, with its earliest due slice and cumulative reuse;
+do not require full Agent/queue/artifact lifecycles to accept the thin R0 contribution.
+
 Publish implementation/lifecycle acceptance and API-complete separately for each subsystem slice,
 then the subsystem overall, milestone and global union. Scope, bindings, results, blockers/staleness,
 integration readiness and debts must stay visible. A closed issue or full ownership mapping is not

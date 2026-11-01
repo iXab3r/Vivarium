@@ -144,10 +144,12 @@ decisions remain authoritative.
    secret values never enter Git. Git may contain stable secret references and non-secret metadata.
 7. **Runtime history is immutable.** Builds retain exact definition and assigned-agent snapshots.
    Later Git or agent changes do not rewrite them.
-8. **Retries are safe.** A client timeout and retry cannot create duplicate side effects.
-   Authentication and object-level authorization are evaluated again on every replay; a stored
-   response is not an authorization grant. Secret plaintext is never persisted for replay.
-9. **Conflicts are visible.** A stale mutation fails; last-writer-wins is not accepted for settings.
+8. **Retry semantics are operation-specific.** Adopted TeamCity operations keep frozen repetition/
+   retry behavior, including two intentional unkeyed identical runs where admitted. Explicit native
+   idempotency workflows prevent keyed duplicates, recheck current authority and never persist secret
+   plaintext for replay. No blanket deduplication is added to the shared semantic processing.
+9. **Version checking is explicit.** Native version-checked workflows (AC-CFG-03) reject stale edits;
+   operations without that opt-in preserve the frozen TeamCity concurrency/default behavior.
 10. **Every action is attributable.** Mutations, denials, Git changes, dispatch, cancellation, and
     terminal outcomes share correlation and actor information.
 11. **Collections and streams are bounded.** Pagination, retention, and cursor expiry are part of the
@@ -163,6 +165,10 @@ Sections 4–7 specify `/api/v1`. They do not prescribe `/app/rest` IDs, envelop
 error/status shapes, paging, headers or mutation completion. The compatible facade follows the
 [frozen wire contract](teamcity-rest-compatibility.md) and [early domain profile](teamcity-rest-domain.md)
 without requiring client changes. Both surfaces share domain effects and current authorization.
+The native idempotency/version-check conventions below apply to explicitly declared native workflows;
+they do not redefine adopted TeamCity operation handling through either projection. Error envelopes
+may be native ProblemDetails; compatible errors retain exact reference status/media/body. An absent
+native option preserves the base behavior, and AC-CFG-03 is an opt-in version-checked workflow.
 
 
 ### 4.1 Base URL and media types
@@ -295,7 +301,7 @@ Rules:
 
 ### 4.4 Idempotency
 
-`Idempotency-Key` is required for non-idempotent requests that create side effects, including build
+For the explicitly keyed native workflows below, `Idempotency-Key` is required, including native build
 submission, inventory refresh, future remote command execution, token creation, and configuration
 change creation.
 
@@ -351,9 +357,9 @@ subresources return an observation ETag. Builds and operations return a runtime 
 resources may contain all three named revisions, but they are read-only aggregation points and do not
 offer an ambiguous aggregate `If-Match` mutation.
 
-Clients send `If-Match` for desired-state updates and destructive operations whose meaning depends on
-observed state. Missing preconditions return `428`; a stale precondition returns `412` with the
-current revision from that same domain but not a sensitive current representation. A new heartbeat
+Clients opting into a declared native version-checked workflow send `If-Match` in its documented
+revision domain. That workflow returns `428` for a missing required precondition and `412` for stale
+input, with the current revision from that same domain but not a sensitive current representation. A new heartbeat
 therefore cannot conflict with an agent settings edit, and a Git settings commit cannot pretend that
 a process snapshot is still current.
 
