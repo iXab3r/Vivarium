@@ -12,6 +12,8 @@ Owner clarifications: D34 accepts Depot authentication/superuser and TeamCity au
 D35 accepts Chiral configuration ownership, PostgreSQL business state and Depot's actual
 TypeScript/Vite Workbench UI. RF-10 permits each verified milestone to merge separately into main.
 These target decisions are recorded; their runtime replacement is not implemented.
+The [current workstream handover](../.workspace/workstreams/coherent-refactor/handover.md#current-state--2026-11-01)
+separates the existing product, accepted replacement, delivered P0 tooling and remaining gates.
 
 D36 brings resource/identity/state/mutation/protocol REST decomposition into P0 before implementation.
 The first new-stack local server + real Agent lab is R0.1; unchanged CLI smoke execution is R0.2,
@@ -33,8 +35,11 @@ D39 binds every milestone to contract → implementation → REST-acceptance tas
 closure gate. [Block register](../.workspace/workstreams/coherent-refactor/api-blocks.tsv) and
 [API-ledger delivery](design/api-ledger-delivery.md) define mechanical API-complete, focused tests,
 final independent aggregate and Security/Adversarial review and zero debt before the next milestone.
-The current ledger/status is an unverified discovery seed; #36 implements accounting, #42 verifies
-the initial baseline. No runtime API completeness or review PASS is claimed by creating these tasks.
+The [offline accounting foundation](design/api-ledger-accounting.md) now validates ledger/TRX joins,
+provenance and explicit reuse, with 47 accounting controls. Current assessment: 449 headings,
+15 known cases, five product RED, ten product-blocked and zero GREEN; variant denominator and
+compatibility percentage remain unknown, API-complete false. Full source allocation/due-scope freeze
+and #42 baseline acceptance remain open. No implementation milestone or final review PASS is claimed.
 
 D40 makes [coherent subsystems](design/subsystems.md) the implementation units. REST-contract and
 acceptance subtasks belong to their subsystem slice; milestone blocks aggregate their progress.

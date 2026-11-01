@@ -3,7 +3,8 @@
 Status: target contract under D36, **not delivered or launched by this planning task**.
 The existing legacy Host/Agent entry points and SessionLoopTests already demonstrate a protocol
 loop, but use SQLite/custom authentication and are not the new reproducible PG/Chiral environment.
-The currently missing pinned SDK 10.0.303 is an explicit preparation prerequisite, not a changed pin.
+Pinned SDK 10.0.303 has been acquired and verified in private tooling without changing the pin.
+The separate TeamCity reference sandbox is available; it does not deliver this Vivarium R0 lab.
 
 D38 now places executable reference-backed REST tests and the first real conformance RED baseline
 in P0, before this new-stack farm milestone. Prepare the exact test toolchain there; do not make the

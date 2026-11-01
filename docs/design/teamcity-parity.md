@@ -14,8 +14,9 @@ parameters, publication, permissions and automation are acceptance surfaces of t
 
 The target implementation uses C# definitions, one initial Host with logical in-process Chiral nodes,
 PostgreSQL business persistence, the existing reverse-connected Agent execution seam, and REST/SSE plus
-React/Workbench. These are implementation choices beneath the behavioral contract, not substitutes
-for it. Current code still uses SQLite and YAML; a requirement below is not a claim of implementation.
+TypeScript/Vite + EyeAuras Workbench (D35). These are implementation choices beneath the behavioral
+contract, not substitutes for it. Current code still uses SQLite and YAML; a requirement below is
+not a claim of implementation.
 
 This catalog is the durable acceptance contract. The reproducible census, per-configuration mappings,
 exact source revisions, verification state and migration decisions belong in

@@ -1,8 +1,55 @@
 # Handover
 
+## Current state — 2026-11-01
+
+Reviewed source: `faf45b1662efcdef4af25ce5b21a4cd8cbe06535` on
+`bugfix/teamcity-behavior-parity`. At this review, local `main` and verified remote `origin/main` both point
+to `09dd40b`; the branch is 24 commits ahead and zero behind. No refactor milestone has reached
+main, no milestone is accepted, and 0/97 source configurations are migration-accepted.
+
+| Area | Available now | Remaining boundary |
+|---|---|---|
+| Existing product | SQLite/YAML controller, reverse AgentHub enrollment/sessions/status, durable queue/build ownership, cancellation/reconnect fences, native REST/SSE and CLI, transitional Blazor UI/custom administration | This is the implemented foundation, not the accepted replacement stack. Product changes since main are the canonical Git byte/provenance fix in `8d3911d`; the broader work is contracts, reference tooling, tests and accounting. |
+| Execution evidence | Raw results/artifact blobs and protected downloads, internal durable TRX projection, live output and bounded controller log buffers, audit, managed-local Git reconciliation, Agent upgrade/rollback and restart foundations | Rich historical/searchable logs, public per-test/history UI/REST, JUnit/TEST/CRASH normalization, complete catalog/chains/triggers, history import/diff-import, fleet rollout/installers and machine providers remain incomplete. See the [product gap ledger](../teamcity-migration/ledger.md) and [results design](../../../docs/design/results-artifacts.md#current-state). |
+| Accepted replacement | D32–D40 and RF-10: C# definitions, in-process Chiral, PostgreSQL, Depot Identity/OpenIddict/OIDC, TeamCity roles 1:1 and TypeScript/Vite Workbench | Target implementation is not delivered. The TeamCity-compatible `/app/rest` facade and new-stack R0 Host + real Agent + unchanged-CLI smoke are absent. |
+| P0 acceptance tooling | Dedicated TeamCity reference lab/CLI captures, finite WireMock HTTP replay and production composition controls, raw current-product tests, offline ledger/TRX provenance validation | Partial foundation only: source-union allocation, exact frozen variants, broader Agent/bytes/PG/composition evidence, model/editability decisions and milestone closure remain open. |
+
+Latest offline assessment at the reviewed revision returned exit 0: 449 discovery headings,
+15 known cases (14 captured, one source-established), five product RED, ten product-prerequisite
+blockers, zero product GREEN and zero stale cases. Seven headings have any case binding; three
+have ready raw cases. The full variant denominator and compatibility percentage remain unknown;
+API-complete is false. Exit 0 validates accounting, not product compatibility. The checked-in
+`api-status.json` retains its historical candidate; current-head reuse uses the explicitly assessed
+ignored file `artifacts/p0-ledger/assessments/current.json` as described in
+[offline accounting](../../../docs/design/api-ledger-accounting.md).
+
+Verification receipts: [accounting checkpoint](rest-ledger-results.json) records the ordinary baseline
+(420 Passed, twelve existing TRX NotExecuted rows) and the later 77/77 focused run (46 ledger plus
+31 replay/composition controls). The [missing-evidence fix](rest-ledger-missing-evidence-results.json)
+then passed 47 ledger controls and root build, with explicit reuse of unchanged ordinary/raw/replay
+groups. There was no fresh full ordinary run after that fix. All 110 business AC remain
+specified-unbound; no final independent milestone/Security PASS or debt clearance exists.
+
+The isolated TeamCity 2026.1.3/build 222742/API 2026.1 lab is running on loopback port 18111 with
+profile `vivarium-teamcity-lab-202613`; last inventory verified zero Agents. Owned fixtures/PAT were
+removed and CLI write gates restored off. Dedicated new lab Agents and synthetic fixtures are
+authorized; production and existing fleet remain excluded. This reference lab is not Vivarium R0.
+GitHub owns live task state: the review found 76 open issues and zero closed; #2/#3/#12/#32–#36/
+#39/#42/#77 remain Open. Historical task/census snapshots below retain their original counts.
+
+Next: extend grounded P0 cohorts and resolve their #12/#32–#34 model/reference/representation gates;
+finish #36 allocation/freeze/accounting obligations and #42 baseline acceptance, including #77's
+milestone disposition. Then obtain final aggregate correctness/simplicity and Security/Adversarial
+review, resolve all P0 debt and deliver the accepted milestone to main before R0 implementation.
+No code-volume reduction is claimed: 48,402 product and 21,629 test C# lines below are the original
+checkpoint census, not current LOC measurements or a simplification result.
+
+## Reference and planning handoff
+
 - User requested checkpoint, a Depot-informed milestone/issue plan, then iteration before implementation.
 - Frozen/pushed checkpoint: `cbb285a55701e0be0c726c57d9daccd8bfb529e7`, annotated tag
-  `checkpoint/pre-refactor-2026-10-31`; runtime remains `09dd40b`.
+  `checkpoint/pre-refactor-2026-10-31`; that checkpoint's runtime baseline is `09dd40b`.
+  The current branch also includes the canonical Git byte/provenance correction noted above.
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
   Plan v1.8 remains draft for unresolved choices; RF-10 delivery and D34–D40 directions are accepted.
   No implementation milestone is complete.
@@ -82,10 +129,11 @@
   twelve actual project/configuration/permission workflows with readbacks and exact captured error
   JSON (including observed malformed-ID 500). Total known materialized cases: fifteen, fourteen
   captured and one source-established. Five ready product cases execute genuine RED; ten dependent
-  catalog/scoped-PAT variants remain product-prerequisite-blocked. Current receipt is
-  `rest-local-mutation-results.json`; the original receipt remains historical. Root build passed,
-  root ordinary tests passed (374 Passed/twelve existing NotExecuted rows), and focused controls
-  passed 31/31. `api-status.json` distinguishes seven headings with any bound reference/replay case,
+  catalog/scoped-PAT variants remain product-prerequisite-blocked. The reference workflows are in
+  `rest-local-mutation-results.json`; later accounting/raw and missing-evidence receipts supply the
+  current verification/reuse chain summarized above. The mutation checkpoint's 374 ordinary passes
+  and 31 controls remain historical. `api-status.json` distinguishes seven headings with any bound
+  reference/replay case,
   three with ready product cases, and 442 with no binding; full variant allocation/denominator stay unknown.
   The broader checkpoints remain incomplete; no production TeamCity write/farm operation occurred.
   Inspection: current VivariumControllerHost.StartAsync directly constructs storage/TLS/services and
@@ -103,10 +151,11 @@
 - Status review: corrected stale 31-AC entries in scope/ledger to canonical 110; no new AC or runtime
   evidence from that historical review. All 36 reference decomposition findings remain open; the
   current executable RED cohort is recorded above, while the compatible facade remains absent.
-- D39 (2026-11-01): 14 task issues #42–#55 added; all 54 issues/8 milestones synchronized and native
-  links verified. api-blocks.tsv is the task graph, api-ledger.tsv seeds 449 source headings, and
-  api-status.json is an explicitly unverified seed snapshot. #36 delivers mechanical accounting;
-  #42 verifies baseline/ledger. Formal reviews only at milestone end, including explicit independent
+- D39 (2026-11-01 planning snapshot): 14 task issues #42–#55 added; all 54 issues/8 milestones
+  synchronized and native links verified at that point. api-blocks.tsv is the task graph;
+  api-ledger.tsv retains 449 discovery headings. #36 now supplies partial executable offline
+  accounting and generated status; complete allocation/freeze and #42 baseline acceptance stay open.
+  Formal reviews only at milestone end, including explicit independent
   Security/Adversarial; resolve all milestone debts before next implementation. No current review,
   debt clearance or API-complete claim. Current bounded test evidence is recorded above; GitHub
   owns task state and the result ledger owns evidence.

@@ -41,6 +41,9 @@ unimplemented optional fleet expansion stays outside the critical path unless a 
 
 ## Frozen present state
 
+This section preserves the original checkpoint. The [current handover](handover.md#current-state--2026-11-01)
+records subsequent product corrections, executable P0 tooling and verification limits.
+
 The pushed tag `checkpoint/pre-refactor-2026-10-31` points to `cbb285a`: runtime from `09dd40b`
 plus the migration requirements. It is a recovery/reference point, not a release or backup of live
 operational data. Raw TeamCity captures remain private/ignored. No source infrastructure was changed.
@@ -71,9 +74,11 @@ See the [existing gap ledger](../teamcity-migration/ledger.md); none of the 97 j
 Exact SDK 10.0.303 has now been acquired and verified privately without changing `global.json`.
 The [first executable cohort](../../../docs/design/teamcity-rest-first-cohort.md) records current
 build/control/raw evidence. The later [local mutation cohort](../../../docs/design/teamcity-rest-local-mutations.md)
-and `rest-local-mutation-results.json` record the current fifteen known cases (fourteen captured,
+and `rest-local-mutation-results.json` established fifteen known cases (fourteen captured,
 one source-established), five ready product RED and ten product-prerequisite blockers, with 31 passing
-controls and a passing root build/test. Earlier SDK failures remain historical setup failures, not product RED.
+controls and a passing root build/test at that checkpoint. The later accounting and missing-evidence
+receipts add provenance validation, explicit reuse and 47 ledger controls; exact run boundaries are in
+the current handover. Earlier SDK failures remain historical setup failures, not product RED.
 
 ## Immediate execution order — status review, 2026-10-31
 

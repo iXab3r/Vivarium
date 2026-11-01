@@ -2,6 +2,7 @@
 
 Planning baseline: `cbb285a`; plan v1.8. All implementation gates are OPEN/unverified.
 The existing TeamCity ledger and inventories remain the source universe; do not duplicate/waive them.
+See [current state](handover.md#current-state--2026-11-01) for the reviewed branch/product boundary.
 
 | Gate | Status | Evidence now | Required closure |
 |---|---|---|---|
@@ -15,8 +16,8 @@ The existing TeamCity ledger and inventories remain the source universe; do not 
 | REST initial source discovery | DONE (not conformance) | Pinned same-version reference + installed runtime hash; 456 synthetic fixture rows from ten tables, safe receipt and generator | Full reference/runtime provenance, Swagger/inline/client union, normalized route/variant review and dispositions still open |
 | D36 priority/UI clarification | ACCEPTED, NOT IMPLEMENTED | REST-driven model before implementation; shared UI technology preserves current UX; local Host+Agent/CLI gates in R0 | P0 structural contracts and R0 actual process/client evidence |
 | D37 acceptance/conformance | ACCEPTED, NOT EXECUTED | 110 canonical business AC specified-unbound; 10 TCM invariants; 38 technical candidates; family-level trace map; fresh PoeBane Testing Architect study | #39 review/refine independent contracts/oracles; #40 bind real R0 evidence; cumulative per-milestone gates |
-| D38 executable-first slice | PARTIAL EXECUTABLE COHORT, GATES OPEN | #35: fifteen known materialized cases (fourteen captured, one source-established); five ready product cases executed RED/nonzero, ten dependent variants product-prerequisite-blocked; thirty-one strict replay/composition controls passed; current evidence in rest-local-mutation-results.json, original rest-first-cohort-results.json retained historically; root build/test passed | Broader verified corpus/Agent/bytes/PG/cost proof, all P0.REST.1–3 scope, #36 accounting and #42 acceptance remain open |
-| D39 task/ledger/closure | POLICY/SEED RECORDED, NOT EXECUTED | Eight milestone aggregates, now composed from D40 subsystem slices; 449 headings with variant/delivery allocation still open; API UNVERIFIED; debt NOT_ASSESSED; review NOT_REVIEWED | #36 mechanical ledger/result accounting, #42 baseline verification; each milestone final correctness/simplicity + Security/Adversarial PASS and zero debt before next implementation |
+| D38 executable-first slice | PARTIAL EXECUTABLE COHORT, GATES OPEN | #35: fifteen known cases (fourteen captured, one source-established); five genuine product RED/nonzero, ten product-prerequisite-blocked; 31 replay/composition controls; latest raw/accounting receipt rest-ledger-results.json, explicit reuse/fix follow-up rest-ledger-missing-evidence-results.json | Broader verified corpus/Agent/bytes/PG/cost proof, all P0.REST.1–3 scope and #42 acceptance remain open |
+| D39 task/ledger/closure | PARTIAL OFFLINE ACCOUNTING IMPLEMENTED, CLOSURE OPEN | Eight milestone aggregates/17 subsystem slices; 449 headings; exact case/TRX/provenance/reuse validation and 47 accounting controls; current assessment five RED/ten blocked/zero GREEN/zero stale, denominator unknown, API-complete false; debt NOT_ASSESSED, review NOT_REVIEWED | #36 full source-union allocation, due-variant freeze/history and later-gap/closure evidence; #42 baseline verification; each milestone final correctness/simplicity + Security/Adversarial PASS and zero debt before next implementation |
 | D40 subsystem ownership | TASK GRAPH/CLASSIFICATION, NOT IMPLEMENTED | 16 logical owners/17 slices; all 449 discovery rows have one primary subsystem, implementation/REST task links and collaborators; native REST children under subsystem slices | #36 joins subsystem/milestone/case evidence; prove complete lifecycles/integrations and API separately; exact variants/allocation remain open |
 | Cold-start documentation audit | CORE PLAN RECOVERED; PROSE CORRECTIONS RECORDED | Independent empty-context plan at 3001337; nine navigation/authority/gate findings in cold-start-audit.tsv; parent comparison in cold-start-audit.json | Corrected sources checked locally; no second independent post-fix run, exhaustive docs proof, runtime acceptance or Security/Adversarial PASS claimed |
 | TCM-GAP-001 | OPEN, UNIMPLEMENTED/UNVERIFIED | Explicit suitable-agent custom run on a disabled Agent documented by TeamCity; absolute normal-queue prohibition clarified in AC-AG-02/06 and TC-AG-01 | #41 freezes reference request/permission variant and proves normal-block/explicit-target behavior; docs are not runtime PASS |
@@ -54,12 +55,12 @@ Actual P0 reference/representation/harness/RED and ledger/control deliverables r
 ## Offline accounting foundation (2026-11-01)
 
 #36 now has a dependency-free C# read-only report over existing registers and standard TRX; #42 has
-46 isolated NUnit accounting controls. It checks IDs/ownership/task/slice joins, exact raw/replay
+47 isolated NUnit accounting controls after the missing-evidence fix. It checks IDs/ownership/task/slice joins, exact raw/replay
 bindings, byte/hash provenance and explicit candidate evidence decisions. `api-status.json` is now
 generated by that command. This is a partial foundation: full source-union allocation, exact frozen
 variants/history, model/editability contracts, later-gap records and final milestone review remain open.
 
-Current evidence is `rest-ledger-results.json`: 449 discovery rows; fifteen known cases; five genuine
+The accounting/raw checkpoint is `rest-ledger-results.json`: 449 discovery rows; fifteen known cases; five genuine
 product RED, ten product-blocked, zero GREEN; global denominator/percentage unknown and API-complete
 false. Seven headings have any bound case, only three have ready raw cases. Primary case counts are
 HOST 1 / CFG 10 / IAM 4; no collaborator or original-three double count. Seventeen slices and twelve
@@ -74,8 +75,14 @@ and the new receipt records all 164 tracked production file hashes plus nineteen
 inputs. Original receipts and captures are unchanged. Default/external status reads launch no suites;
 postcommit transfers use a separately assessed ordinary JSON file, avoiding a self-SHA cycle.
 
+The later `rest-ledger-missing-evidence-results.json` records the one-line absent-hash fix, its
+failing regression before the fix, 47 passing ledger controls and root build. It explicitly reuses
+unchanged ordinary/raw/replay groups; no fresh full ordinary/raw execution followed that fix.
+At `faf45b1`, a current-head external assessment validated with exit 0 and zero stale cases; the
+tracked status/receipts retain their historical candidates and do not become fresh runs.
+
 See `docs/design/api-ledger-accounting.md`. #36/#42 stay Open; no final independent aggregate/Security
-verdict, debt-closure, main delivery, commit or push is claimed by this checkpoint.
+verdict, debt-closure or main delivery is claimed by this accounting foundation.
 
 Current bounded cohort status (2026-11-01): `api-status.json` records seven headings with any bound
 reference/replay case and three with product-ready raw cases; 442 discovery headings have no bound

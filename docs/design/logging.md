@@ -37,16 +37,19 @@ Phase 1 has useful fragments but no complete logging contract:
 - agent and bootstrap diagnostics are unstructured console text;
 - the AgentHub protocol has `LogChunk { build_id, step_index, stream, data }`, but no sequence,
   acknowledgement, timestamp, resume cursor, compression, or explicit gap marker;
-- `BuildTracker` concatenates received output into an in-memory string; build-log durability, retention,
-  and quotas described by the architecture are not implemented yet;
+- `BuildTracker` retains the first 1,048,576 characters of each Build's live output in memory and
+  reports the dropped-character count through `GetLog`; this per-Build character bound does not
+  provide durable logs, retention or the byte/global quotas described by the architecture;
 - terminal build results and ownership are durable, but diagnostic and build logs are not part of the
   same crash-safe story;
 - the minimal append-only SQLite audit journal records current legacy authentication/authorization,
   enrollment, Agent administration, and caller-requested build submit/cancel actions. Required success
   records share the domain transaction, fields are bounded/redacted, retries avoid duplicate success,
   and automatic lifecycle activity remains outside the journal;
-- there is no public audit query/retention/export contract, REST request event policy, centralized
-  agent diagnostic surface, or AgentExplorer operation-output contract.
+- protected `GET /api/v1/audit-events` provides bounded cursor-paged reads with actor, action,
+  target, outcome and time filters; the current legacy `AgentManage` permission mapping admits
+  administrator principals. Full audit retention/export, REST request event policy, centralized
+  agent diagnostics and AgentExplorer operation-output contracts remain incomplete.
 
 Consequently, current console output is development evidence, not the target audit or historical-log
 system. Existing raw submit/enroll token printing must not be carried into the target design. The one
