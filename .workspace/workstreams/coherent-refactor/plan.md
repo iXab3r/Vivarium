@@ -70,15 +70,23 @@ See the [existing gap ledger](../teamcity-migration/ledger.md); none of the 97 j
 
 Exact SDK 10.0.303 has now been acquired and verified privately without changing `global.json`.
 The [first executable cohort](../../../docs/design/teamcity-rest-first-cohort.md) records current
-build/control/raw evidence. Earlier SDK failures remain historical setup failures, not product RED.
+build/control/raw evidence. The later [local mutation cohort](../../../docs/design/teamcity-rest-local-mutations.md)
+and `rest-local-mutation-results.json` record the current fifteen known cases (fourteen captured,
+one source-established), five ready product RED and ten product-prerequisite blockers, with 31 passing
+controls and a passing root build/test. Earlier SDK failures remain historical setup failures, not product RED.
 
 ## Immediate execution order — status review, 2026-10-31
 
 The target direction is sufficiently settled to begin the D38 executable contract slice. Replacement
-code is not delivered. The first read/create conformance cohort now has actual healthy product RED;
+code is not delivered. The current five-case ready conformance selection has actual healthy product RED;
 the compatible facade and broad P0 conformance gates remain open. All 110 business AC remain
 specified-unbound, and all 36 REST decomposition findings remain open.
 Do not treat the remaining reference investigation as 36 product-policy questions for the owner.
+The owner authorizes synthetic project/configuration/user/role fixtures and dedicated new test
+Agents on the separate verified local TeamCity playground without per-fixture approval. Production
+and existing fleet Agents remain excluded. Current owned mutation fixtures/PAT are cleaned up and
+the lab CLI write gates are restored off; subsequent authorized acquisition must re-verify the
+explicit lab target/profile and enable only its local gates.
 
 The next deliverable is executable REST evidence in #35, with #32–#34/#36 supplying the affected
 contracts alongside it. P0.REST.1–3 may progress by verified cohorts; do not finish a prose-only
@@ -86,7 +94,7 @@ whole-API specification or design a simulator platform before executing the firs
 
 | Order | Concrete work | Observable result / dependency |
 |---|---|---|
-| 1 | Prepare the pinned SDK 10.0.303 and reproduce existing build/test checks | Actual toolchain/baseline result; an SDK error is not product RED |
+| 1 | Reuse the verified pinned SDK 10.0.303 and required build/test baseline | Current root checks passed; retain exact receipt inputs and rerun only at required code checkpoints; an SDK error is not product RED |
 | 2 | Freeze first cross-family reference cases under the pinned server/client profile | Exact requests/responses/effects and per-assertion sources; uncertain values reference-blocked. Obtain missing installed-schema/raw-wire export through approved CLI tooling without blocking already grounded cases |
 | 3 | Prove the small NUnit composition and strict replay/assertion controls | Real requests, deliberate bad-response detection, independent readiness and owned reset/cleanup; controlled actors/time only where required; measured cost, no new test language |
 | 4 | Run that cohort against the actual current Vivarium HTTP boundary | Genuine RED/GREEN/product-blocked report and regression baseline before replacement; a healthy missing route is RED, repeated dependency failures are not independent semantic defects |
@@ -248,9 +256,12 @@ The [API ledger](api-ledger.tsv) preserves all 449 discovery headings and links 
 subsystem, related owners and REST/code tasks. Exact methods/variants, case bindings and delivery
 allocation remain open; the primary owner's milestone does not postpone earlier required cases.
 [Status](api-status.json) separates subsystem lifecycle/integration, API and milestone/global status.
-All remain UNVERIFIED/NOT_ACCEPTED, not a compatibility percentage or executable
-report. Task #36 implements the small mechanical validator/result binding; #42 verifies it and
-the actual RED baseline. No product API-complete, tests, review PASS or debt clearance is claimed.
+All remain UNVERIFIED/NOT_ACCEPTED, with no compatibility percentage or completed mechanical
+report. Seven discovery headings now have any bound reference/replay case (three have ready product
+cases); 442 have no binding. These partial first-variant bindings do not establish full allocation.
+Task #36 implements the small mechanical validator/result binding; #42 verifies it and
+the actual RED baseline. Current bounded tests are recorded above; no product API-complete,
+final review PASS or debt clearance is claimed.
 
 ### Earliest hands-on checkpoints
 
@@ -262,8 +273,8 @@ The lab can be exercised on its milestone branch before all R0 acceptance is com
 requires the declared regression/review gates and existing-feature disposition. R2 is the first full
 source-based C# Compile, not the first occasion on which a real Agent may run locally.
 
-The current legacy process entry points/protocol tests exist today; the exact SDK is missing locally
-and the new-stack reproducible lab is not delivered. Do not equate those facts with an end-user local
+The current legacy process entry points/protocol tests and exact verified SDK exist today;
+the new-stack reproducible lab is not delivered. Do not equate those facts with an end-user local
 deployment claim or invent calendar estimates before the preparation and port work are measured.
 
 ## Development and test contract proposed for this workstream

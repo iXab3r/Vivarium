@@ -1,15 +1,18 @@
 # First executable REST cohort
 
-> Status: **First read/create cohort executed RED; P0 gates remain incomplete**
+> Status: **Original three-case receipt preserved; local mutation increment adds two ready raw cases**
 > Lead: Test Steward; co-held TeamCity, Vivarium REST and Testing Architect perspectives
 > Tasks: [#33](https://github.com/iXab3r/Vivarium/issues/33), [#35](https://github.com/iXab3r/Vivarium/issues/35), [#36](https://github.com/iXab3r/Vivarium/issues/36), [#42](https://github.com/iXab3r/Vivarium/issues/42)
 
 This is an incremental D38 cohort before structural replacement. The actual current controller,
 authenticated through its real HTTP pipeline, returns 404 for two independently specified reads
 and the project-creation request. The compatible model/routes remain unimplemented. The materialized
-selection contains three cases; it is not the full known REST universe or completed P0.REST.1–3
+original selection contains three cases; it is not the full known REST universe or completed P0.REST.1–3
 acceptance. Required baseline checks also exposed a canonical-Git-byte defect, fixed under
 [#77](https://github.com/iXab3r/Vivarium/issues/77) without changing its accepted contract.
+The later [local mutation cohort](teamcity-rest-local-mutations.md) adds twelve actually observed
+reference workflows: two enter the product-ready raw selection, ten remain product-prerequisite-blocked.
+The original captures and receipt below retain their original request/profile/revision identity.
 
 ## Independent reference and cases
 
@@ -41,7 +44,7 @@ types, without a required-property list or POST `fields` parameter. The test the
 POST status/media/JSON-object, then observes supplied id/name through a real GET on success. It
 does not invent POST default fields, archived state, permission denial, cleanup status or duplicate
 semantics. The fixed synthetic ID is scoped to a fresh ephemeral Vivarium Host and removed with its
-directory. No project was created on TeamCity. The small installed source excerpt is retained beside
+directory. No reference mutation was observed for this original request. The small installed source excerpt is retained beside
 the [safe fixtures](../../tests/Vivarium.Tests/TeamCity/Reference/).
 
 Sanitized original capture records are retained with the tests:
@@ -113,14 +116,15 @@ dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --filter TestCategory=Tea
 # Native HTTP/timer/isolation fixture controls.
 dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --filter TestCategory=TeamCityCompositionControl
 
-# Full MATERIALIZED raw product cohort: currently three failures, process exit 1.
+# Full MATERIALIZED product-ready raw cohort: currently five failures, process exit 1.
 dotnet test tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj --logger "trx;LogFileName=raw.trx" --results-directory artifacts/p0-rest-first/results/raw
 ```
 
 The raw project is an ordinary NUnit/Test SDK project outside the solution's test selection. The
 ordinary test project has a build-only project reference so root build compiles it. Neither ignored
 cases, a default test filter nor an expected-failure allowance hides its assertions. An explicitly
-invoked raw command executes every materialized case and stays nonzero while they fail. Discovery
+invoked raw command executes every product-ready case and stays nonzero while they fail; dependent
+reference workflows are recorded separately as product-prerequisite-blocked. Discovery
 and execution counts are checked from standard TRX. There are **zero delivered TeamCity GREEN cases**;
 there is currently no nonempty delivered-compatibility gate. No empty filter or native readiness
 substitute claims that fourth target. Establishing its first real GREEN cases remains a gate gap.
@@ -136,7 +140,7 @@ The [first-cohort receipt](../../.workspace/workstreams/coherent-refactor/rest-f
 records final selected commands, hashes, candidate/source identity, costs and limits. Earlier
 development-control failures remain diagnostic artifacts, not current GREEN evidence.
 
-Final local checkpoint on Windows with SDK 10.0.303:
+Original local checkpoint on Windows with SDK 10.0.303 (new evidence is recorded separately):
 
 | Selection | Observed result |
 |---|---|
@@ -177,17 +181,18 @@ configured the new data directory, internal HSQL evaluation database, license an
 administrator/token bootstrap. Dedicated profile `vivarium-teamcity-lab-202613` is authenticated in
 process-local ignored lab `cli-state`: actual CLI reads confirmed 2026.1.3 / build 222742, API 2026.1,
 REST 222742 and canonical `webUrl=http://127.0.0.1:18111` after its normal Global Settings UI correction.
-Server/account/profile authentication is ready; local CLI gates remain ReadOnly on and
-Update/Admin/Credentials off. Dedicated mutation fixtures and least-privileged/denied actors remain
-pending, with no fixture mutation executed. CLI inventory confirms zero Agents; existing fleet Agent
-connections/execution still require separate explicit authorization. Local setup/container receipts
+Server/account/profile authentication was established before fixture acquisition. The owner subsequently
+authorized synthetic projects/configurations/users/roles and dedicated new test Agents on this separate
+local sandbox. Its isolated local CLI write gates were enabled for the bounded observed mutation cohort;
+the [new record](teamcity-rest-local-mutations.md) retains exact actor/fixture/effect provenance.
+Existing fleet Agent connections/execution still require separate explicit authorization. Local setup/container receipts
 live under ignored
 `artifacts/p0-rest-first/teamcity-lab/`. Historical read-only captures and receipts above remain
 unchanged and do not establish readiness of this new test instance.
 
 | Cohort / gate | Exact missing prerequisite / owner |
 |---|---|
-| Observed mutation variants, denial and compatible/native effects | The narrow source-established create/readback case is bound; separate 2026.1.3 / build 222742 server and explicit profile are authenticated with canonical URL verified, but local CLI write gates remain off, dedicated fixtures/least-privileged actors and observed mutation evidence are pending; #33/#35 and affected domain owners |
+| Observed mutation variants, denial and compatible/native effects | Twelve bounded mutation/permission reference workflows are now observed; two ready product workflows execute RED, ten depend on missing real compatible catalog/scoped-PAT prerequisites; native/compatible shared-effect evidence remains open; #33/#35 and affected domain owners |
 | Controlled Agent/lifecycle/fault composition | Disposable build + Agent and independent message/fault timeline and effects; #35/#42 plus Agent/Scheduling owners |
 | Artifact/download bytes | Synthetic reference build/artifact and status/header/byte/hash plus unavailable/retention oracle; #33/#35 and Results/Artifacts |
 | Target PG/Storage isolation and actual execution | Replacement resources and real Agent/workload; R0 and owning subsystem acceptance |

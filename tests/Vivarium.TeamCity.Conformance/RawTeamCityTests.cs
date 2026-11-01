@@ -47,4 +47,10 @@ public sealed class RawTeamCityTests
         TestContext.Out.WriteLine($"{ProjectCreationContract.Id}: real POST then GET through current product; no database state rewrite");
         await ProjectCreationContract.ExecuteAsync(controller.Http);
     }
+
+    [TestCaseSource(typeof(RecordedMutationCases), nameof(RecordedMutationCases.ProductReady))]
+    public async Task Current_product_matches_ready_local_reference_workflow(RecordedMutationCase testCase)
+    {
+        await testCase.ExecuteAsync(controller.Http, replay: false);
+    }
 }

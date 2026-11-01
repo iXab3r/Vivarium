@@ -46,9 +46,15 @@ The explicit profile `vivarium-teamcity-lab-202613` is **authenticated**: CLI re
 `http://127.0.0.1:18111`. The advertised URL was corrected through normal Administration → Global
 Settings UI because supported typed CLI global-setting keys exclude a URL setting.
 
-The lab account has server `SYSTEM_ADMIN` at global scope; the local CLI gates remain ReadOnly on,
-Update/Admin/Credentials off. Dedicated mutation/readback/denial fixtures and least-privileged actors
-are still pending; no fixture mutation has run. Process-local APPDATA/LOCALAPPDATA stay under the
+The lab account has server `SYSTEM_ADMIN` at global scope. The owner subsequently authorized
+synthetic projects/configurations/users/roles and dedicated new test Agents on this separate local
+sandbox; its isolated CLI write gates were enabled for the bounded actual mutation acquisition.
+The [local mutation record](../../docs/design/teamcity-rest-local-mutations.md) describes twelve
+observed workflows and the separately restricted PAT's raw permission provenance.
+After acquisition, the owned project/configuration and restricted PAT/local alias were removed;
+typed project/configuration reads confirmed absence. Current local gates are ReadOnly on and
+Update/Admin/Credentials off. The lab container and original administrator credential remain.
+Process-local APPDATA/LOCALAPPDATA stay under the
 ignored lab's `cli-state`; the production profile/default was not read. CLI Agent inventory confirmed
 zero Agents. Existing fleet Agent connections/execution still need separate explicit authorization.
 
@@ -81,3 +87,38 @@ The [first-cohort record](../../docs/design/teamcity-rest-first-cohort.md) binds
 product targets, standard results and remaining gates. Installed Swagger acquisition is documented by
 [JetBrains](https://www.jetbrains.com/help/teamcity/rest/teamcity-rest-api-documentation.html);
 the actual installed metadata supplies the pinned contract, rather than rolling help examples.
+
+## Fixed local mutation capture increment
+
+[`cli-lab-fixture-capture.patch`](cli-lab-fixture-capture.patch) applies **after** the original capture
+patch against the same pinned CliFactory revision. It changes four files: one fixed command, a
+170-line lab-only acquisition module, six guard/projection tests, and an optional existing typed token
+metadata projection. It accepts no arbitrary mutation request. The command requires the exact lab
+profile/URL, process-isolated lab APPDATA/LOCALAPPDATA, local ReadOnly/Update/Credentials gates,
+observed server/API/REST version and global synthetic administrator; it refuses an existing owned
+project before writing. All writes use existing typed client methods. Response entities are bounded
+to 32 KiB; capture headers exclude credentials; issued PAT values remain in the existing secret store.
+
+Invoke the patched source's normal entry point from this repository root only after preparing the
+authorized isolated lab and its explicit profile:
+
+```powershell
+teamcity-cli -p vivarium-teamcity-lab-202613 --json server fixture-capture
+```
+
+This command creates only its fixed synthetic project/configuration and restricted view PAT. Its
+captured role/permission reads, positive reads, rejected updates and actual readbacks are reference
+evidence; they do not claim Vivarium compatibility. The capture keeps per-exchange actor labels,
+omits absent GET bodies, rejects redirects and preserves original entities. Repeated-query/raw-order
+variants are outside this fixed request set. Archive prior captures before a deliberate fresh run;
+remove only the named owned fixture/PAT through typed commands between acquisitions.
+
+Clean patch application and tested-source identity were verified locally. All 662 pinned CLI tests
+passed, zero skipped (63.144 seconds); six focused acquisition controls took approximately 256ms.
+The final actual acquisition took 663ms for twelve workflows / 28 exchanges, 9,692 entity bytes,
+plus one raw permission-provenance exchange. Earlier incomplete guard/GET-metadata attempts remain
+ignored diagnostic artifacts and are not current reference fixtures.
+
+LF patch SHA-256: `9f855e9b2baf6d6eac71b4173463dfda5f48ec52c2d2d135de6364ea65098d84`.
+The [local mutation record](../../docs/design/teamcity-rest-local-mutations.md) and its separate receipt
+bind the safe fixture and product/replay claims. No external checkout or installed CLI was modified.

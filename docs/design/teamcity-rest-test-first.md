@@ -312,13 +312,17 @@ reach a number. First RED must cover meaningful reads/writes, protocol/error/per
 state effects and bytes where prerequisites exist, not only two discovery GETs. Product-blocked cases
 remain visible and grow into execution as their real prerequisites land.
 
-Current execution evidence (2026-11-01): the [first-cohort record](teamcity-rest-first-cohort.md)
+Initial execution evidence (2026-11-01): the [first-cohort record](teamcity-rest-first-cohort.md)
 binds two captured read cases and one source-established create/readback case, strict WireMock.Net 2.15.0 replay/assertion controls,
 supporting native HTTP/timer/isolation checks and genuine healthy current-Vivarium 404-versus-200 RED.
 The exact SDK 10.0.303 was acquired privately and verified; NUnit 4.3.2/Test SDK 17.14.0 are unchanged.
 The required root gate also exposed a deterministic canonical-Git-byte defect, corrected under #77.
 No compatible facade, structural replacement, release or fleet operation was performed. This
 increment does not close the broad P0.REST.1–3 corpus/composition/accounting/acceptance obligations.
+The later [local mutation cohort](teamcity-rest-local-mutations.md) adds twelve actual disposable
+reference workflows, including positive scoped access, 403 denials and unchanged/absent readbacks.
+Two additional independent project variants enter the ready raw target; ten dependent catalog/PAT
+variants remain explicitly product-prerequisite-blocked. The five-case raw target stays nonzero.
 
 ## Sources
 

@@ -13,5 +13,8 @@
     <Compile Include="..\Vivarium.Tests\TeamCity\CurrentController.cs" Link="CurrentController.cs" />
     <Compile Include="..\Vivarium.Tests\TeamCity\TeamCityCases.cs" Link="TeamCityCases.cs" />
     <Compile Include="..\Vivarium.Tests\TeamCity\ProjectCreationContract.cs" Link="ProjectCreationContract.cs" />
+    <Compile Include="..\Vivarium.Tests\TeamCity\RecordedMutationCases.cs" Link="RecordedMutationCases.cs" />
+    <None Include="..\Vivarium.Tests\TeamCity\Reference\local-mutations.json"
+          Link="TeamCity\Reference\local-mutations.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,283 @@
+diff --git a/integrations/teamcity/src/cli.ts b/integrations/teamcity/src/cli.ts
+--- a/integrations/teamcity/src/cli.ts
++++ b/integrations/teamcity/src/cli.ts
+@@ -13,6 +13,7 @@
+ } from "@eyeauras/cli-factory";
+ import { teamCityUrl, teamCityUrlHelp } from "./server-url.js";
+ import { TeamCityClient } from "./client.js";
++import { captureLabFixtures } from "./lab-fixture-capture.js";
+ import { createAuthoringCommands } from "./authoring-commands.js";
+ import { createOperatorCommands } from "./operator-commands.js";
+ import { createBulkConfigurationCommands } from "./bulk-configuration-commands.js";
+@@ -190,6 +191,7 @@
+       ["Triage", ["changes", "investigations", "mutes", "tests", "problems"]],
+     ], [
+       command("server", "Inspect the TeamCity server", [
++        command("fixture-capture", "Capture only the fixed isolated P0 mutation fixture", (_input, context) => captureLabFixtures(context, runtime?.profileStore), { permission: "Credentials" }),
+         ...admin.server,
+         ...infrastructure.server,
+         ...system.server,
+diff --git a/integrations/teamcity/src/client.ts b/integrations/teamcity/src/client.ts
+--- a/integrations/teamcity/src/client.ts
++++ b/integrations/teamcity/src/client.ts
+@@ -2620,11 +2620,11 @@
+     return { ...role, revoked: true };
+   }
+ 
+-  public async listCurrentUserTokens() {
++  public async listCurrentUserTokens(includePermissionRestrictions = false) {
+     const value = await this.#requestJson<{ token?: unknown[] }>(
+       "GET",
+       "/app/rest/users/current/tokens",
+-      { fields: `count,token(${admin.tokenFields})` },
++      { fields: `count,token(${admin.tokenFields}${includePermissionRestrictions ? ",permissionRestrictions(permissionRestriction(permission(id),project(id),isGlobalScope))" : ""})` },
+     );
+     return (value.token ?? []).map(admin.safeToken);
+   }
+diff --git a/integrations/teamcity/src/lab-fixture-capture.ts b/integrations/teamcity/src/lab-fixture-capture.ts
+new file mode 100644
+--- /dev/null
++++ b/integrations/teamcity/src/lab-fixture-capture.ts
+@@ -0,0 +1,170 @@
++import { createHash } from "node:crypto";
++import { writeFile, mkdir } from "node:fs/promises";
++import { resolve } from "node:path";
++import { CliError, HttpError, ProfileStore, readResponseBody, type CommandContext, type ProfileStoreContract } from "@eyeauras/cli-factory";
++import { TeamCityClient } from "./client.js";
++import { readIssuedToken } from "./admin-models.js";
++import { idPath } from "./locator.js";
++
++export const labUrl = "http://127.0.0.1:18111";
++export const labProfile = "vivarium-teamcity-lab-202613";
++export const prefix = "VivP0Second_20261101A";
++const project = prefix + "_Project", job = prefix + "_Build";
++const output = "artifacts/p0-rest-second/captured/transcripts.json";
++
++export function assertLabTarget(profile: string, url: string) {
++  if (profile !== labProfile || url !== labUrl) throw new Error("Fixture capture requires the exact isolated lab profile and URL.");
++}
++export function assertLabRequest(url: URL, method: string) {
++  if (url.origin !== labUrl || url.username || url.password || url.hash)
++    throw new Error("Fixture capture refuses non-lab targets.");
++  const p = decodeURIComponent(url.pathname);
++  if (!/^\/app\/rest\/(?:server|users\/current(?:\/tokens)?|users\/id:1\/roles|apiVersion|version)$/.test(p) &&
++      !(p === "/app/rest/projects" && method === "POST") &&
++      !(p === "/app/rest/buildTypes" && method === "POST") &&
++      !(p === "/app/rest/projects/id:_Root" && method === "GET") &&
++      !(p === `/app/rest/projects/${idPath(prefix + "_Bad-Project", "Project ID")}` && method === "GET") &&
++      !(p === `/app/rest/buildTypes/${idPath(prefix + "_Bad-Build", "BuildType ID")}` && method === "GET") &&
++      !new RegExp(`^/app/rest/(?:projects|buildTypes)/id:${prefix}_[A-Za-z0-9_-]+(?:/description)?$`).test(p))
++    throw new Error(`Fixture capture refuses unrelated lab resource: ${method} ${p.slice(0, 180)}`);
++}
++
++/** A single fixed disposable fixture workflow, using existing typed client methods only. */
++export async function captureLabFixtures(context: CommandContext, store?: ProfileStoreContract) {
++  assertLabTarget(context.profile.name, String(context.profile.values.url));
++  for (const [name, leaf] of [["APPDATA", "roaming"], ["LOCALAPPDATA", "local"]])
++    if (resolve(context.environment[name!] ?? "").toLowerCase() !== resolve(`artifacts/p0-rest-first/teamcity-lab/cli-state/${leaf}`).toLowerCase())
++      throw new Error("Fixture capture requires the process-isolated lab credential store.");
++  const permissions = await (store ?? new ProfileStore({ applicationId: "teamcity-cli", appArguments: context.appArguments })).getPermissions(labProfile);
++  for (const permission of ["ReadOnly", "Update", "Credentials"])
++    if (!(permissions ?? ["ReadOnly"]).includes(permission))
++      throw new CliError(`Permission '${permission}' is disabled for profile '${labProfile}'.`, { code: "permission.denied" });
++  const token = await context.secrets.require("token");
++  const secrets = [token];
++  let active: { id: string; actor: string; exchanges: unknown[] } | undefined;
++  const cases: unknown[] = [];
++  const receipt: Record<string, unknown> = {
++    tool: "@eyeauras/teamcity-cli", version: "0.5.2+p0-lab-fixture-capture",
++    sourceRevision: "b158fe03eab3c31982a21b36c278f690f6b541d9",
++    command: `teamcity-cli -p ${labProfile} --json server fixture-capture`,
++    profile: labProfile, target: labUrl, fixturePrefix: prefix,
++    observedAtUtc: new Date().toISOString(), cases,
++    entityEncoding: "Original HTTP response entity after fetch content decoding; no reserialization",
++  };
++  const save = async () => {
++    await mkdir(resolve("artifacts/p0-rest-second/captured"), { recursive: true });
++    await writeFile(resolve(output), JSON.stringify(receipt, null, 2) + "\n", { mode: 0o600 });
++  };
++  const transport: typeof fetch = async (input, init) => {
++    const url = new URL(String(input));
++    const method = init?.method ?? "GET";
++    assertLabRequest(url, method);
++    const response = await context.fetch(input, init);
++    if (response.status >= 300 && response.status < 400) {
++      void response.body?.cancel();
++      throw new Error("Fixture capture refuses redirects.");
++    }
++    if (active) {
++      const bytes = await readResponseBody(response, { maxBytes: 32768, signal: context.signal });
++      const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
++      const headers: Record<string, string> = {};
++      for (const name of ["content-type", "cache-control", "allow", "location"]) {
++        const value = response.headers.get(name);
++        if (value) headers[name] = value;
++      }
++      const requestHeaders = new Headers(init?.headers);
++      const request = { method, path: url.pathname, query: Object.fromEntries(url.searchParams),
++        headers: Object.fromEntries(["accept", "content-type"].flatMap(name => requestHeaders.has(name) ? [[name, requestHeaders.get(name)]] : [])),
++        ...(init?.body == null ? {} : { body: String(init.body) }) };
++      const recorded = JSON.stringify({ request, headers, text });
++      if (secrets.some(value => recorded.includes(value)) || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(text))
++        throw new Error("Unsafe fixture entity; capture refused.");
++      active.exchanges.push({ actor: requestHeaders.get("authorization") === `Bearer ${token}` ? "admin" : "restricted-token", request, response: { status: response.status, headers,
++        bodyBase64: Buffer.from(bytes).toString("base64"), bodyBytes: bytes.length,
++        bodySha256: createHash("sha256").update(bytes).digest("hex") } });
++      await save();
++      return new Response(bytes.length ? Uint8Array.from(bytes).buffer : null, { status: response.status, statusText: response.statusText, headers: response.headers });
++    }
++    return response;
++  };
++  const admin = new TeamCityClient({ baseUrl: labUrl, token, fetch: transport, signal: context.signal });
++  const server = await admin.getServerStatus(), actor = await admin.currentUser();
++  const roles = await admin.listAccountRoles("users", "1");
++  const api = await admin.captureReference("api-version"), rest = await admin.captureReference("rest-version");
++  if (server.version !== "2026.1.3 (build 222742)" || server.buildNumber !== "222742" || server.webUrl !== labUrl ||
++      actor.id !== 1 || actor.username !== "vivarium-lab-admin" || !roles.some(r => r.roleId === "SYSTEM_ADMIN" && r.scope === "g") ||
++      !("bodyBase64" in api) || Buffer.from(api.bodyBase64!, "base64").toString() !== "2026.1" ||
++      !("bodyBase64" in rest) || Buffer.from(rest.bodyBase64!, "base64").toString() !== "222742")
++    throw new Error("Isolated lab version/administrator proof failed; no fixture writes attempted.");
++  receipt.server = server; receipt.apiVersion = api; receipt.restVersion = rest; receipt.admin = { actor, roles };
++  const httpFailure = (error: unknown) => { if (!(error instanceof HttpError)) throw error; };
++  try { await admin.getProject(project); throw new Error("Owned fixture already exists; capture refuses overwrite."); }
++  catch (error) { if (!(error instanceof HttpError) || error.status !== 404) throw error; }
++  const run = async (id: string, who: string, action: () => Promise<unknown>, allowHttpError = false) => {
++    active = { id, actor: who, exchanges: [] }; cases.push(active);
++    try { await action(); } catch (error) {
++      if (!allowHttpError) throw error;
++      httpFailure(error);
++    } finally { active = undefined; await save(); }
++  };
++  await run("TC-PROJECT-CREATE-READBACK-002", "admin", async () => {
++    await admin.createProject(project, { name: "Vivarium isolated fixture project", description: "initial project" });
++    await admin.getProject(project);
++  });
++  await run("TC-PROJECT-EDIT-READBACK-001", "admin", async () => {
++    await admin.setProjectField(project, "description", "updated project"); await admin.getProject(project);
++  });
++  await run("TC-PROJECT-DUPLICATE-ID-001", "admin", async () => {
++    try { await admin.createProject(project, { name: "Duplicate rejected project" }); }
++    finally { await admin.getProject(project); }
++  }, true);
++  await run("TC-PROJECT-MALFORMED-ID-001", "admin", async () => {
++    try { await admin.createProject(prefix + "_Bad-Project", { name: "Malformed rejected project" }); }
++    finally { await admin.getProject("_Root"); try { await admin.getProject(prefix + "_Bad-Project"); } catch (error) { httpFailure(error); } }
++  }, true);
++  await run("TC-BUILDTYPE-CREATE-READBACK-001", "admin", async () => {
++    await admin.createJob(job, { project, name: "Vivarium isolated fixture build", description: "initial build" }); await admin.getJob(job);
++  });
++  await run("TC-BUILDTYPE-EDIT-READBACK-001", "admin", async () => {
++    await admin.setJobField(job, "description", "updated build"); await admin.getJob(job);
++  });
++  await run("TC-BUILDTYPE-DUPLICATE-ID-001", "admin", async () => {
++    try { await admin.createJob(job, { project, name: "Duplicate rejected build" }); }
++    finally { await admin.getJob(job); }
++  }, true);
++  await run("TC-BUILDTYPE-MALFORMED-ID-001", "admin", async () => {
++    try { await admin.createJob(prefix + "_Bad-Build", { project, name: "Malformed rejected build" }); }
++    finally { try { await admin.getJob(prefix + "_Bad-Build"); } catch (error) { httpFailure(error); } }
++  }, true);
++  const alias = "p0-second-view-project", tokenName = prefix + "_ViewToken";
++  await admin.createCurrentUserToken({ name: tokenName, alias, noExpiration: true,
++    restrictions: [{ permission: "VIEW_PROJECT", project }] }, context.secrets);
++  const issued = await readIssuedToken(context.secrets, alias);
++  if (!issued) throw new Error("Missing privately persisted issued token.");
++  const restrictedToken = (JSON.parse(issued) as { value: string }).value;
++  secrets.push(restrictedToken);
++  receipt.restrictedActor = { username: actor.username, id: actor.id, tokenName,
++    restrictions: [{ permission: "VIEW_PROJECT", project }], secretStorage: "Existing profile-scoped CLI secret store; never exported" };
++  active = { id: "ACTOR-RESTRICTION-PROVENANCE", actor: "admin", exchanges: [] };
++  receipt.actorEvidence = active;
++  try { await admin.listCurrentUserTokens(true); } finally { active = undefined; await save(); }
++  const viewer = new TeamCityClient({ baseUrl: labUrl, token: restrictedToken, fetch: transport, signal: context.signal });
++  await run("TC-PERMISSION-VIEW-PROJECT-GRANTED-001", "restricted-token", async () => { await viewer.getProject(project); await viewer.getJob(job); });
++  await run("TC-PERMISSION-EDIT-PROJECT-DENIED-001", "restricted-token", async () => {
++    await viewer.getProject(project);
++    try { await viewer.setProjectField(project, "description", "unauthorized project update"); }
++    finally { await admin.getProject(project); }
++  }, true);
++  await run("TC-PERMISSION-EDIT-BUILDTYPE-DENIED-001", "restricted-token", async () => {
++    await viewer.getJob(job);
++    try { await viewer.setJobField(job, "description", "unauthorized build update"); }
++    finally { await admin.getJob(job); }
++  }, true);
++  await run("TC-PERMISSION-CREATE-PROJECT-DENIED-001", "restricted-token", async () => {
++    await viewer.getProject(project);
++    try { await viewer.createProject(prefix + "_DeniedProject", { name: "Unauthorized rejected project" }); }
++    finally { try { await admin.getProject(prefix + "_DeniedProject"); } catch (error) { httpFailure(error); } }
++  }, true);
++  receipt.completedAtUtc = new Date().toISOString(); await save();
++  return { capturedCases: cases.length, output, ownedProject: project, ownedBuildType: job, buildsExecuted: 0 };
++}
+diff --git a/integrations/teamcity/tests/lab-fixture-capture.test.ts b/integrations/teamcity/tests/lab-fixture-capture.test.ts
+new file mode 100644
+--- /dev/null
++++ b/integrations/teamcity/tests/lab-fixture-capture.test.ts
+@@ -0,0 +1,67 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { assertLabRequest, assertLabTarget, captureLabFixtures, labUrl, labProfile, prefix } from "../src/lab-fixture-capture.js";
++import type { CommandContext } from "@eyeauras/cli-factory";
++import { TeamCityClient } from "../src/client.js";
++import { idPath } from "../src/locator.js";
++import { resolve } from "node:path";
++import { createTestRuntime } from "./support.js";
++
++test("fixture capture refuses any other profile, URL, credential authority and unrelated resource", () => {
++  assertLabTarget(labProfile, labUrl);
++  for (const [profile, url] of [["default", labUrl], [labProfile, "https://teamcity.example.test"], [labProfile, "http://localhost:18111"]])
++    assert.throws(() => assertLabTarget(profile!, url!));
++  for (const url of ["http://127.0.0.1:8111/app/rest/projects", `${labUrl}/app/rest/agents`, `${labUrl}/app/rest/projects/id:Existing`, `${labUrl}/app/rest/users/current/tokens/other`, `http://user:pass@127.0.0.1:18111/app/rest/server`])
++    assert.throws(() => assertLabRequest(new URL(url), "POST"));
++  assertLabRequest(new URL(`${labUrl}/app/rest/projects/id:${prefix}_Project/description`), "PUT");
++  assertLabRequest(new URL(`${labUrl}/app/rest/projects/${idPath(prefix + "_Bad-Project", "Project ID")}`), "GET");
++  assertLabRequest(new URL(`${labUrl}/app/rest/buildTypes/${idPath(prefix + "_Bad-Build", "BuildType ID")}`), "GET");
++  assert.throws(() => assertLabRequest(new URL(`${labUrl}/app/rest/projects/${idPath("Unrelated-Bad-Project", "Project ID")}`), "GET"));
++});
++
++test("fixture capture rejects a nonisolated process store before reading credentials", async () => {
++  let reads = 0;
++  await assert.rejects(captureLabFixtures({ profile: { name: labProfile, values: { url: labUrl } },
++    environment: {}, secrets: { require: async () => { reads++; return "never-read"; } } } as unknown as CommandContext), /process-isolated lab credential store/);
++  assert.equal(reads, 0);
++});
++
++test("typed restriction projection requests no token value and keeps normal decoder safe", async () => {
++  const client = new TeamCityClient({ baseUrl: labUrl, token: "fixture-token", fetch: async (input, init) => {
++    const url = new URL(String(input));
++    assert.equal(url.pathname, "/app/rest/users/current/tokens");
++    assert.equal(url.searchParams.get("fields"), "count,token(name,creationTime,expirationTime,permissionRestrictions(permissionRestriction(permission(id),project(id),isGlobalScope)))");
++    assert.equal(init?.method, "GET");
++    return new Response(JSON.stringify({ token: [{ name: "owned-token", value: "never-export", permissionRestrictions: { permissionRestriction: [{ permission: { id: "view_project" } }] } }] }));
++  } });
++  assert.deepEqual(await client.listCurrentUserTokens(true), [{ name: "owned-token" }]);
++});
++
++test("Credentials alone does not admit fixture writes; all gates precede secret/network", async t => {
++  for (const permissions of [["Credentials"], ["ReadOnly", "Credentials"], ["Update", "Credentials"]]) {
++    const fixture = await createTestRuntime(t, { profiles: [{ name: labProfile, url: labUrl, permissions }], tokens: {} });
++    let reads = 0, calls = 0;
++    const context = { profile: { name: labProfile, values: { url: labUrl } }, environment: {
++      APPDATA: resolve("artifacts/p0-rest-first/teamcity-lab/cli-state/roaming"),
++      LOCALAPPDATA: resolve("artifacts/p0-rest-first/teamcity-lab/cli-state/local"),
++    }, secrets: { require: async () => { reads++; return "never-read"; } }, fetch: async () => { calls++; throw new Error("must not call"); } } as unknown as CommandContext;
++    await assert.rejects(captureLabFixtures(context, fixture.profileStore), /Permission '(ReadOnly|Update)' is disabled/);
++    assert.equal(reads, 0); assert.equal(calls, 0);
++  }
++});
++
++test("fixture capture local Credentials gate runs before profile/auth/network", async t => {
++  const fixture = await createTestRuntime(t, { profiles: [{ name: "default", url: "https://teamcity.test", permissions: ["ReadOnly", "Update"] }], tokens: {} });
++  let calls = 0;
++  fixture.runtime.fetch = async () => { calls++; throw new Error("must not call"); };
++  await assert.rejects(fixture.createCli().execute(["server", "fixture-capture"]), /Permission 'Credentials'/);
++  assert.equal(calls, 0);
++});
++
++test("fixture capture rejects a granted production profile without contacting it", async t => {
++  const fixture = await createTestRuntime(t, { profiles: [{ name: "default", url: "https://teamcity.test", permissions: ["Credentials"] }], tokens: { default: "fixture-token" } });
++  let calls = 0;
++  fixture.runtime.fetch = async () => { calls++; throw new Error("must not call"); };
++  await assert.rejects(fixture.createCli().execute(["server", "fixture-capture"]), /exact isolated lab profile/);
++  assert.equal(calls, 0);
++});

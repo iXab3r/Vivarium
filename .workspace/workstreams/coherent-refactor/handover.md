@@ -17,14 +17,17 @@
   `webUrl=http://127.0.0.1:18111` after its normal Global Settings UI correction. Process-local
   APPDATA/LOCALAPPDATA stay under ignored `artifacts/p0-rest-first/teamcity-lab/cli-state`;
   no production/default profile read. Server/account/profile authentication is ready; local CLI
-  gates remain ReadOnly on and Update/Admin/Credentials off. Dedicated mutation fixtures and
-  least-privileged/denied actors remain pending, with no fixture mutation executed.
+  gates are restored to ReadOnly on and Update/Admin/Credentials off after twelve actual bounded
+  mutation/permission reference workflows. The owner authorizes synthetic projects/configurations,
+  users/roles and dedicated new test Agents on this separate local playground without per-fixture
+  approval; production and existing fleet Agents remain excluded. The owned restricted PAT/local
+  alias and project/configuration were removed, with typed absence readbacks and a cleanup receipt.
   Data/log/temp bind mounts and setup/container receipts stay under ignored
   `artifacts/p0-rest-first/teamcity-lab/`. CLI inventory confirmed zero Agents; existing fleet Agent
   connections/execution need separate authorization.
   Preserve historical read-only captures/receipts with their original target identity; they are not
   evidence that the new test instance is ready. Current fixture
-  contracts are synchronized in #33/#35/#42 and tools/teamcity-reference/README.md.
+  contracts and current evidence are synchronized in #33/#35/#42 and tools/teamcity-reference/README.md.
 - GitHub: #2–#9 remain milestone closure parents. D40 reuses existing subsystem code tasks, moves
   REST contract/acceptance tasks under their same-milestone subsystem owner and adds #56–#76:
   eight milestones, 75 open issues and 67 native child links in the historical planning snapshot.
@@ -75,6 +78,15 @@
   A third source-established project create/readback case now reaches real POST RED; its expected
   semantics come from installed metadata and documented explicit inputs, not a live mutation capture.
   Required checks exposed canonical Git byte/provenance defects tracked in same-P0 #77.
+  The later [local mutation cohort](../../../docs/design/teamcity-rest-local-mutations.md) now records
+  twelve actual project/configuration/permission workflows with readbacks and exact captured error
+  JSON (including observed malformed-ID 500). Total known materialized cases: fifteen, fourteen
+  captured and one source-established. Five ready product cases execute genuine RED; ten dependent
+  catalog/scoped-PAT variants remain product-prerequisite-blocked. Current receipt is
+  `rest-local-mutation-results.json`; the original receipt remains historical. Root build passed,
+  root ordinary tests passed (374 Passed/twelve existing NotExecuted rows), and focused controls
+  passed 31/31. `api-status.json` distinguishes seven headings with any bound reference/replay case,
+  three with ready product cases, and 442 with no binding; full variant allocation/denominator stay unknown.
   The broader checkpoints remain incomplete; no production TeamCity write/farm operation occurred.
   Inspection: current VivariumControllerHost.StartAsync directly constructs storage/TLS/services and
   wires Kestrel/background workers; no TestServer composition seam was found there. BuildScheduler
@@ -89,18 +101,21 @@
 - Read-only source role census captured seven definitions and their permissions/includes, including
   RESTRICTEDBOT and TOOLS_INTEGRATION, under ignored artifacts/depot-refactor-study/teamcity-role-*.json.
 - Status review: corrected stale 31-AC entries in scope/ledger to canonical 110; no new AC or runtime
-  evidence. All 36 reference decomposition findings remain open; no compatible facade or new RED suite.
+  evidence from that historical review. All 36 reference decomposition findings remain open; the
+  current executable RED cohort is recorded above, while the compatible facade remains absent.
 - D39 (2026-11-01): 14 task issues #42–#55 added; all 54 issues/8 milestones synchronized and native
   links verified. api-blocks.tsv is the task graph, api-ledger.tsv seeds 449 source headings, and
   api-status.json is an explicitly unverified seed snapshot. #36 delivers mechanical accounting;
   #42 verifies baseline/ledger. Formal reviews only at milestone end, including explicit independent
   Security/Adversarial; resolve all milestone debts before next implementation. No current review,
-  debt clearance, test run or API-complete claim. GitHub owns task state; result ledger owns evidence.
+  debt clearance or API-complete claim. Current bounded test evidence is recorded above; GitHub
+  owns task state and the result ledger owns evidence.
 - D40: 16 logical subsystems, 17 delivery slices, one primary owner/task plus related owners for
   every one of the same 449 discovery headings. subsystem-slices.tsv is the implementation/REST
   task graph; api-blocks.tsv is milestone aggregation. Proto has no exclusive top-level resource;
   native/non-REST requirements still apply. Classification is planning ownership, not verified
-  reference semantics, frozen allocation or API acceptance. No product/tests/reviews were run.
+  reference semantics, frozen allocation or API acceptance. The original classification performed
+  no runtime tests/reviews; subsequent bounded execution is recorded above.
 - Cold-start documentation exercise: /root/cold_start_plan independently reconstructed a start-to-
   delivery plan from baseline 3001337 with fork_turns=none. Core order matched: executable-first
   P0, coherent subsystems, honest ledgers, focused tests and final zero-debt milestone/security
