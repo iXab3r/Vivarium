@@ -6,6 +6,25 @@
 - Read `plan.md`, `decisions.md`, `depot-study.md`, `scenarios.md`, `ledger.md` and `issues.json`.
   Plan v1.8 remains draft for unresolved choices; RF-10 delivery and D34–D40 directions are accepted.
   No implementation milestone is complete.
+- Current owner direction (2026-11-01): mutation/reference-effect tests use a separate local TeamCity
+  test server pinned to 2026.1.3, never a temporary project on the owner's working server. Select
+  its dedicated CLI profile explicitly and verify target URL plus observed version/build before
+  writes; do not use the production/default profile. Container `vivarium-p0-rest-teamcity-2026-1-3`
+  is running on loopback `http://127.0.0.1:18111`; normal UI confirmed 2026.1.3 / build 222742 and
+  configured a new data directory, internal HSQL evaluation database, license and private
+  administrator/token bootstrap. Dedicated CLI profile `vivarium-teamcity-lab-202613` is
+  authenticated: actual CLI confirmed 2026.1.3 / build 222742, API 2026.1, REST 222742 and canonical
+  `webUrl=http://127.0.0.1:18111` after its normal Global Settings UI correction. Process-local
+  APPDATA/LOCALAPPDATA stay under ignored `artifacts/p0-rest-first/teamcity-lab/cli-state`;
+  no production/default profile read. Server/account/profile authentication is ready; local CLI
+  gates remain ReadOnly on and Update/Admin/Credentials off. Dedicated mutation fixtures and
+  least-privileged/denied actors remain pending, with no fixture mutation executed.
+  Data/log/temp bind mounts and setup/container receipts stay under ignored
+  `artifacts/p0-rest-first/teamcity-lab/`. CLI inventory confirmed zero Agents; existing fleet Agent
+  connections/execution need separate authorization.
+  Preserve historical read-only captures/receipts with their original target identity; they are not
+  evidence that the new test instance is ready. Current fixture
+  contracts are synchronized in #33/#35/#42 and tools/teamcity-reference/README.md.
 - GitHub: #2–#9 remain milestone closure parents. D40 reuses existing subsystem code tasks, moves
   REST contract/acceptance tasks under their same-milestone subsystem owner and adds #56–#76:
   eight milestones, 75 open issues and 67 native child links in the historical planning snapshot.

@@ -167,9 +167,27 @@ are **unknown**. The broad corpus, full allocation/normalization, mechanical led
 validator, structural/editability contracts and final independent aggregate/Security review are
 unfinished. This cohort does not change the accepted D32–D40 gates.
 
+Current owner direction (2026-11-01): reference mutations and observed effects require a **separate
+local TeamCity test server** (confirmed by the owner), not a disposable project on the owner's
+working instance. Use an explicitly selected dedicated CLI profile and verify its URL plus observed
+server version/build before writes. The production/default profile must not be used for these tests.
+The separate container
+`vivarium-p0-rest-teamcity-2026-1-3` is running on loopback `http://127.0.0.1:18111`; normal UI setup
+configured the new data directory, internal HSQL evaluation database, license and private initial
+administrator/token bootstrap. Dedicated profile `vivarium-teamcity-lab-202613` is authenticated in
+process-local ignored lab `cli-state`: actual CLI reads confirmed 2026.1.3 / build 222742, API 2026.1,
+REST 222742 and canonical `webUrl=http://127.0.0.1:18111` after its normal Global Settings UI correction.
+Server/account/profile authentication is ready; local CLI gates remain ReadOnly on and
+Update/Admin/Credentials off. Dedicated mutation fixtures and least-privileged/denied actors remain
+pending, with no fixture mutation executed. CLI inventory confirms zero Agents; existing fleet Agent
+connections/execution still require separate explicit authorization. Local setup/container receipts
+live under ignored
+`artifacts/p0-rest-first/teamcity-lab/`. Historical read-only captures and receipts above remain
+unchanged and do not establish readiness of this new test instance.
+
 | Cohort / gate | Exact missing prerequisite / owner |
 |---|---|
-| Observed mutation variants, denial and compatible/native effects | The narrow source-established create/readback case is bound; reference observation and additional variants still require an authorized disposable 2026.1.3 project/fixture, permitted actor and known denied-scope actor; #33/#35 and affected domain owners |
+| Observed mutation variants, denial and compatible/native effects | The narrow source-established create/readback case is bound; separate 2026.1.3 / build 222742 server and explicit profile are authenticated with canonical URL verified, but local CLI write gates remain off, dedicated fixtures/least-privileged actors and observed mutation evidence are pending; #33/#35 and affected domain owners |
 | Controlled Agent/lifecycle/fault composition | Disposable build + Agent and independent message/fault timeline and effects; #35/#42 plus Agent/Scheduling owners |
 | Artifact/download bytes | Synthetic reference build/artifact and status/header/byte/hash plus unavailable/retention oracle; #33/#35 and Results/Artifacts |
 | Target PG/Storage isolation and actual execution | Replacement resources and real Agent/workload; R0 and owning subsystem acceptance |

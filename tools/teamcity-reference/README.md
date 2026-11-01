@@ -28,6 +28,43 @@ Retain full schema only in ignored local artifacts: host/base-path metadata is n
 without inspection. These acquisition commands never authorize TeamCity writes. Mutation/error/state
 observations still require explicitly authorized disposable fixtures and known permission actors.
 
+## Current mutation-fixture target
+
+Owner direction, 2026-11-01: mutation/reference-effect tests must use a **separate TeamCity test
+server** matching the pinned 2026.1.3 profile; the owner confirmed a local instance. A temporary
+project on the owner's working TeamCity server does not satisfy this requirement. Select the
+dedicated test CLI profile explicitly and verify its configured URL and observed server version/build
+against the isolated instance before
+state-changing commands. Never rely on the production/default profile or mutate the owner's server.
+Record the selected profile, verified target and fixture actors with each new acquisition receipt.
+
+The separate Docker container `vivarium-p0-rest-teamcity-2026-1-3` is running at
+`http://127.0.0.1:18111` (loopback port 18111 to container 8111). Normal setup UI completed the new
+data directory, internal HSQL evaluation database, license and private administrator/token bootstrap.
+The explicit profile `vivarium-teamcity-lab-202613` is **authenticated**: CLI reads confirmed
+2026.1.3 / build 222742, API 2026.1, REST version 222742 and canonical `webUrl` exactly
+`http://127.0.0.1:18111`. The advertised URL was corrected through normal Administration → Global
+Settings UI because supported typed CLI global-setting keys exclude a URL setting.
+
+The lab account has server `SYSTEM_ADMIN` at global scope; the local CLI gates remain ReadOnly on,
+Update/Admin/Credentials off. Dedicated mutation/readback/denial fixtures and least-privileged actors
+are still pending; no fixture mutation has run. Process-local APPDATA/LOCALAPPDATA stay under the
+ignored lab's `cli-state`; the production profile/default was not read. CLI Agent inventory confirmed
+zero Agents. Existing fleet Agent connections/execution still need separate explicit authorization.
+
+Data/log/temp bind mounts and local evidence remain entirely under ignored
+`artifacts/p0-rest-first/teamcity-lab/` (`container-receipt.json`, `setup-receipt.json`, `README.md`).
+For only this named lab container, use:
+
+```powershell
+docker stop vivarium-p0-rest-teamcity-2026-1-3
+docker start vivarium-p0-rest-teamcity-2026-1-3
+```
+
+After starting it, re-verify the expected target and authenticated profile before any fixture writes.
+Historical 2026-11-01 read-only captures below remain unchanged evidence from their original reference
+target; they are not test-server readiness or mutation evidence.
+
 The actual local acquisition used a scratch build of the pinned source under
 `artifacts/p0-rest-first/reference/cli-acquisition`, through `node dist/src/bin.js --json server
 reference-capture <operation>`. Exact scratch dependencies were `@eyeauras/cli-factory@0.5.2`,
