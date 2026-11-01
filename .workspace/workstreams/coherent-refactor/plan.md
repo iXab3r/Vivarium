@@ -1,4 +1,4 @@
-# Coherent Vivarium refactor — plan v1.13
+# Coherent Vivarium refactor — plan v1.14
 
 **Current planning graph:** [all 18 story-led task packets are active](story-task-migration.md).
 Implementation/contract/acceptance #110–#163 now own the existing slices; all 25 goals have explicit
@@ -25,12 +25,12 @@ Stories drive priority; D37–D40 still govern semantics, subsystem ownership an
 The 449 intent links are not a normalized API union or proof of coverage. See the
 [Stage 1 verification](story-stage1-verification.md); the technical reference sequence below remains.
 
-**Now:** [reference pack #84](t3personal-reference-pack.md) is available: one bounded three-build
-cohort, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;
+**Now:** [reference pack #84](t3personal-reference-pack.md) and the independent
+[server-input receipt #85](t3personal-server-inputs.md) are available: one bounded three-build
+cohort, source/settings/dependency selection, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;
 conformance remains fifteen known cases / five RED / ten blocked / zero GREEN, denominator unknown.
-**Next:** [#85](https://github.com/iXab3r/Vivarium/issues/85) obtains one independent TC-server
-source/settings/dependency/selected-input receipt or a bounded typed-getter gap. Then #111 exact
-wire/control cases, #32 worked model, #34 actual C#/Git proof and #110/#112 case freeze feed full P0 closure.
+**Next:** consume #85 in #32's worked source/settings/selection model, #34's actual C#/Git proof and
+#111's exact wire/control cases; #110/#112 case freeze and remaining gates feed full P0 closure.
 **After that:** remaining P0/#77/final review/debt/main → real Host/Agent #113 and cheap Smoke #115 /
 R0 closure → first all-configuration/all-surface PILOT breadth preview. These steps do not waive
 remaining gates or accept the full chain. See the [goal/output/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
@@ -40,12 +40,12 @@ No product output, recipe, exact new case or publication execution is claimed de
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
-Current assignment (2026-11-01): the owner is still iterating this plan. Continue planning/reference
-analysis, authorized read-only source/reference inspection and maintenance of tasks only in this slice;
-do not start product/harness work, new runnable proofs, builds/tests, live mutations, build execution
-or server/container lifecycle operations. Earlier tooling and receipts
-remain accepted within their recorded limits. This is the current assignment, not a permanent
-implementation ban or a new future approval procedure.
+Current assignment (2026-11-01): the owner continued from the announced #85 next step. Execute the
+bounded read-only source/settings/dependency acquisition, its necessary unpublished fixed getter
+and verification, then publish the receipt/gaps and consuming-task handoff. No product/conformance
+implementation, TeamCity mutation, build execution or server/container lifecycle follows. Earlier
+planning-only restrictions retain their historical scope; this is not a permanent implementation ban
+or a new future approval procedure.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately

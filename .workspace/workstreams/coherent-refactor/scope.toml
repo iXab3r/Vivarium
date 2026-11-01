@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: story-led planning/task transition, source inventories, discussion preservation and existing read-only accounting. Task ownership and administrative source supersession are complete without product acceptance; 62 superseded cards are closed with history retained. No product/harness implementation, new runnable proof scripts, builds/tests, live reference/build execution or server/container lifecycle. Existing tooling/evidence keeps its original boundary."
+current_assignment = "2026-11-01: owner continuation from named next step #85 authorizes bounded read-only server-input acquisition, its necessary unpublished fixed getter and verification, receipt/gap publication and task handoff. Story-led transition/administrative supersession remain complete. No Vivarium product/conformance implementation, TeamCity mutation/build execution or server/container lifecycle. Historical evidence retains its original boundary."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -123,3 +123,18 @@ prior_timeline_entries_retained = 1349
 postclosure_timeline_entries = 1411
 product_acceptance = "NONE"
 source_deletion = "NONE"
+
+[server_input_reference]
+issue = 85
+owner = 111
+source_head = "01aa708dc99623b0a7cfccc7b6354ff501588221"
+summary = "t3personal-server-inputs.md"
+receipt = "t3personal-server-inputs.json"
+state = "AVAILABLE_BOUNDED_REFERENCE; issue remains Open until P0 delivery"
+fixed_get_exchanges = 5
+entity_bytes = 3590
+build_source_revision = "7ff65cada80dd817aa5d7467b85e78ec30c578a9"
+build_settings_revision = "7495b6859c91952ad91478a2428be805a4e48f1a"
+per_file_consumption = "NOT_PROVED"
+historical_settings_mode = "NOT_PROVED; effective config is current observation"
+product_conformance_change = "NONE; original fifteen cases/results unchanged"

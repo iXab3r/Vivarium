@@ -119,4 +119,5 @@ The separate [source cleanup](story-source-cleanup.md) is complete after final d
 reconciliation: 62 superseded sources are closed, 100 active cards remain Open, and all twelve original
 comments and 1,349 prior source timeline entries are retained. Closure grants no product acceptance.
 No product implementation follows automatically from a task-graph migration; the current assignment
-remains planning, and the next technical output remains #85's bounded reference proof.
+at that checkpoint remained planning. The subsequent [#85 reference proof](t3personal-server-inputs.md)
+is now available; #32/#34/#111 consume its source/settings/selection facts and named remaining gaps.

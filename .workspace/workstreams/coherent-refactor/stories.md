@@ -53,9 +53,10 @@ Full T3Personal Prepare → Windows → Release, launch checks and configured de
 the first product goal. Work across UI, direct compatible REST and unchanged CLI at the same breadth
 levels; completing a surface first is not a prerequisite for starting the others. The already
 available [#84 reference pack](t3personal-reference-pack.md) supplies bounded metadata/manifest facts.
-The immediate missing reference output remains #85: independent server-resolved source/settings and
-selected dependency/artifact inputs, or a precise typed-getter gap. #32 model, #34 C#/Git proof,
-#35 actual wire/effect evidence and #36 exact case/source allocation supply their bounded gates.
+The independent [#85 receipt](t3personal-server-inputs.md) now supplies server-resolved source/settings
+and selected producer Build IDs. Per-file consumption and historical settings-mode proof remain gaps.
+#32 model, #34 C#/Git proof, #111 actual wire/effect evidence and #112 exact case/source allocation
+supply their bounded gates.
 Remaining P0 acceptance/review/debt/main gates still precede new-stack R0 Host + Agent and cheap
 LocalSmoke; those precede the actual full-chain PILOT result. These stages do not deliver themselves
 through this catalogue.
@@ -326,7 +327,7 @@ Release operator obtains launch-checked Prepare→Windows→Release outputs and 
 
 **Surfaces:** Preserve #79 UI, #80 direct compatible /app/rest and #81 unchanged CLI as full-chain breadth projections; shared native services/readbacks.
 
-**Future evidence / what to inspect:** Today reference project and `.workspace/workstreams/coherent-refactor/t3personal-reference-pack.md`; replacement unavailable. Later actual three-config DAG/Build/bytes/publication receipt from each entry, cross-readbacks and explicit valid proof reuse. #84 has small-manifest/public release metadata, not server-selected inputs or verified binaries; #85 remains needed.
+**Future evidence / what to inspect:** Today reference project, [pack #84](t3personal-reference-pack.md) and [server-input receipt #85](t3personal-server-inputs.md); replacement unavailable. Later actual three-config DAG/Build/bytes/publication receipt from each entry, cross-readbacks and explicit valid proof reuse. #85 supplies server-selected identities; per-file consumption, binary/platform and causal-publication proof remain open.
 
 **Existing acceptance:** AC-ART-01, AC-ART-03, AC-BLD-01, AC-BLD-02, AC-BLD-03, AC-BLD-04, AC-BLD-05, AC-BLD-07, AC-BLD-13, AC-CFG-07, AC-MIG-04, AC-UI-01, AC-UI-02. AC-derived model obligations: TCM-01, TCM-02, TCM-03, TCM-04, TCM-05, TCM-06, TCM-07, TCM-08, TCM-09, TCM-10.
 

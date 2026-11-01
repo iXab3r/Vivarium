@@ -1,5 +1,10 @@
 # T3Personal reference pack: one bounded same-version cohort
 
+**Subsequent independent evidence:** [server-input receipt #85](t3personal-server-inputs.md) now
+confirms source `7ff65cada…`, separate settings `7495b685…` and the selected producer Build IDs.
+The findings and missing-field handoffs below retain their original acquisition-time meaning;
+use the new receipt for current availability and remaining gaps.
+
 Status: **reference metadata available; runtime/model proofs open**. [Work card #84](https://github.com/iXab3r/Vivarium/issues/84)
 is a P0 leaf under #13. This pack is not a frozen recipe/wire contract, conformance case, product
 GREEN or milestone acceptance. The replacement product and all breadth levels remain NOT_AVAILABLE.

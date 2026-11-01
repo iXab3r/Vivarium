@@ -5,9 +5,10 @@ whole actual Prepare → Windows → Release configuration and default-publicati
 direct compatible /app/rest and unchanged CLI. The earlier Prepare-first recommendation is superseded.
 **Reference available now:** [pack #84](t3personal-reference-pack.md) pins one bounded same-version
 cohort, actual small-manifest bytes and public release metadata without claiming server-selected inputs.
-**Next:** #85 captures TC-server-reported resolved source/settings and actual dependency/selected
-artifact inputs, or a precise typed-getter capability gap. Then #35/#32/#34/#36 establish due
-wire/control, worked-model and actual C#/Git proof outputs. Accepted P0/R0 still precede implementation.
+**Independent inputs now available:** [#85 receipt](t3personal-server-inputs.md) records actual
+source/settings revisions and selected producer Build IDs. Per-file consumption and historical
+settings-mode proof remain gaps. **Next:** #111/#32/#34/#112 establish due wire/control,
+worked-model and actual C#/Git proof outputs. Accepted P0/R0 still precede product implementation.
 **Later:** other families and broader full subsystem/history scope. Used Windows, artifact handoff,
 Release publication and trigger behavior cannot be deferred to those broader owners.
 
@@ -16,7 +17,7 @@ Release publication and trigger behavior cannot be deferred to those broader own
 | Goal | Output / where to open | Blocker or owner |
 |---|---|---|
 | 1. Pin the existing reference result | [#84 evidence pack](t3personal-reference-pack.md): Build 32724/32725/32726, actual three small-manifest byte hashes and public release/tag metadata. | Metadata available; server inputs/actual DAG/binary bytes/causal publisher proof remain open. |
-| 2. Establish the next independent inputs and exact contract proof | [#85](https://github.com/iXab3r/Vivarium/issues/85): one server-source/settings/dependency/selected-input receipt or bounded getter gap. Then #35 literal wire/control cases; #32 returned/related/reused identity trace; #34 actual source diff/editor/evaluator/effective-plan/recovery pack; #36 exact case/principal/oracle freeze. | Typed projection/bounds must be established; no getter coding in this planning turn, guessed fields or producer-claim promotion. |
+| 2. Consume independent inputs and establish exact contract proof | [#85 receipt](t3personal-server-inputs.md) supplies source/settings and selected producer IDs. Then #111 literal wire/control cases; #32 returned/related/reused identity trace; #34 actual source diff/editor/evaluator/effective-plan/recovery pack; #112 exact case/principal/oracle freeze. | Receipt available; per-file consumption, historical settings mode and the snapshot-list documentation discrepancy remain explicit gaps. |
 | 3. Close P0, with all its remaining obligations | #42/#2 baseline/controls/composition/allocation/disposition evidence, #77 debt disposition, final independent aggregate+Security, zero debt and verified main delivery. | Steps 1–2 alone do not finish P0. Existing remaining gates stay due. |
 | 4. Open the real local technical prerequisites | #37 actual Host/PG/Storage/login/Agent URL and owned lifecycle receipt; #38 actual LocalSmoke CLI/run/log/byte/failure/cancel evidence, plus #14/#44 recovery and R0 main closure. | All replacement outputs remain NOT_AVAILABLE; cheap fixture is not T3 success. |
 | 5. Try the first product breadth checkpoint | #78/#79/#80/#81/#82: truthful auth/discovery/readiness/chain-state across all three configurations and supported UI/REST/CLI projections; explicit applicability/gaps. | Real DAG/runners/launch/bytes/default publication and cumulative fault levels remain due before full PILOT acceptance. |

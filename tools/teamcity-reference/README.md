@@ -1,5 +1,24 @@
 # Bounded TeamCity reference acquisition
 
+## Fixed T3Personal input receipt
+
+[`cli-t3-inputs-capture.patch`](cli-t3-inputs-capture.patch) is a four-file unpublished increment after
+`cli-reference-capture.patch` on the same pinned source. `server t3-inputs-capture` has no arguments:
+it requires ReadOnly, the exact `default` profile at `https://build.eyeauras.net`, and observed
+2026.1.3/build 222742. Five GETs read the server, Builds 32726/32725/32724 and current effective
+T3Personal Versioned Settings. It uses existing auth/transport, a 30-second total deadline, bounded
+strict projections and at most eight collection items; no redirects, paging, arbitrary paths,
+parameters, logs or package downloads. Non-200 bodies are omitted and stop the sequence explicitly.
+Source/settings revisions and selected producer IDs are retained literally, separately from
+current configuration, source declarations and per-file byte proof.
+
+[Receipt, findings and remaining gaps](../../.workspace/workstreams/coherent-refactor/t3personal-server-inputs.md)
+bind the final patch hash and original entities. TypeScript build and all 664 tests pass (eight new,
+zero skipped); clean patch application and source identity are verified. This installs/publishes
+nothing and changes no TeamCity state or Vivarium production/conformance code.
+
+## Existing metadata acquisition
+
 The installed `@eyeauras/teamcity-cli@0.5.2` has no original-entity/status/schema export.
 [`cli-reference-capture.patch`](cli-reference-capture.patch) is a tested, unpublished source increment
 against [CliFactory b158fe03eab3c31982a21b36c278f690f6b541d9](https://github.com/iXab3r/EyeAuras.CliFactory/tree/b158fe03eab3c31982a21b36c278f690f6b541d9).

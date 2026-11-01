@@ -2,7 +2,20 @@
 
 ## Current state — 2026-11-01
 
-**Latest checkpoint: source cleanup completed with history retained.**
+**Latest checkpoint: independent server-input receipt #85 is available.**
+[Findings and raw-entity receipt](t3personal-server-inputs.md): five fixed read-only exchanges confirm
+source `7ff65cada…`, separate settings `7495b685…`, Windows→Prepare snapshot/artifact selection and
+Release→Windows snapshot plus Release→Windows/Prepare artifact selection. The settings file at the
+server settings revision matches its source-revision counterpart byte-for-byte. Current settings
+mode/hash facts are separate from historical execution; per-file consumption and the snapshot-list
+documentation discrepancy remain gaps. The unpublished getter uses existing auth/gates/transport;
+installed CLI/product/conformance code and all fifteen old cases are unchanged. Next consume the
+receipt in #32/#34/#111; #85 stays Open until P0 delivery, without blocking use of available evidence.
+TypeScript build/664 CLI tests and root .NET build/test pass (421 passed, 11 skipped); no new raw
+conformance execution or milestone acceptance. Current API/case/result accounting uses explicit
+unchanged-input reuse rather than relabelling the new reference receipt as product GREEN.
+
+**Preceding checkpoint: source cleanup completed with history retained.**
 [Cleanup and preservation proof](story-source-cleanup.md): 62 superseded source cards are closed with
 `not_planned`, while 100 active issues and nine milestones remain Open. All original bodies, twelve
 comments and 1,349 prior source timeline entries are retained; the 54 new packet bodies and active
