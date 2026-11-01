@@ -68,5 +68,24 @@ dependency_records = 52
 old_issues_retained = 84
 old_native_child_links_retained = 75
 old_comments_retained = 12
-discussion_transfer = "NOT_TRANSFERRED; source discussions remain authoritative"
+discussion_transfer = "PARTIAL: selected topics/five comments in task-transfer.tsv; source discussions remain authoritative; no cleanup clearance"
 verification = "story-stage1-verification.md"
+
+[source_union_continuation]
+source_head = "defaffec72dc1718c937bc37c49b5362a7998f8f"
+summary = "story-transition-stage2.md"
+cli_source_revision = "b158fe03eab3c31982a21b36c278f690f6b541d9"
+cli_fixture_candidate_rows = 456
+cli_rows_with_multiple_structural_candidates = 125
+cli_suffix_binding_qualifications = 17
+native_literal_http_declarations = 40
+agent_envelope_alternatives = 20
+surface_scenario_candidates = 160
+normalized_denominator = "UNKNOWN"
+proposed_task_issues = [110, 111, 112]
+task_activation = "PROPOSED_REPLACEMENT_PACKET_NOT_ACTIVATED; original ledger/slice ownership remains authoritative"
+partial_transfer_units = 11
+old_issue_bodies_and_assignments_retained = 108
+old_native_edges_retained = 75
+new_native_task_edges = 3
+verification = "story-stage2-verification.md"

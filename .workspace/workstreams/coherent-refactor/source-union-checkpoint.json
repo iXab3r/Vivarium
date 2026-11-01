@@ -1,0 +1,195 @@
+{
+  "source_head": "defaffec72dc1718c937bc37c49b5362a7998f8f",
+  "cli_source_revision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+  "cli_fixture_source_hashes": [
+    {
+      "path": "integrations/teamcity/tests/admin-cases.ts",
+      "sha256": "d3f38d4cd035b5690d94515d90155e8416eec861dbe6e2e7531f349357caf82e"
+    },
+    {
+      "path": "integrations/teamcity/tests/advanced-authoring-cases.ts",
+      "sha256": "22abbb49503678a8d81b5363bd9696fd2643c6fa830f8e14ce20c304a94943cd"
+    },
+    {
+      "path": "integrations/teamcity/tests/authoring-cases.ts",
+      "sha256": "d9c8ad4b8fb088d4cf1c306249cb002f265d27d2f4100b2c0145e992d7d1fc95"
+    },
+    {
+      "path": "integrations/teamcity/tests/bulk-configuration-cases.ts",
+      "sha256": "695e3ee233074296b17d2e20cb9a29c8fef1fcac4f3ee5f6c8646c390e02abce"
+    },
+    {
+      "path": "integrations/teamcity/tests/configuration-cases.ts",
+      "sha256": "02009b99941afd4b51babb8990328c80b6d29d7e7f600560e607fccc93b96139"
+    },
+    {
+      "path": "integrations/teamcity/tests/files-cases.ts",
+      "sha256": "ec4f083eae9ded674c980881cd6e5fbfa875e9bef5bfe05432eea8fb20068619"
+    },
+    {
+      "path": "integrations/teamcity/tests/infrastructure-cases.ts",
+      "sha256": "b66243d4ac120e89c8f5374a32bdf92d3090b7f6762da7c2399f82a0ca660238"
+    },
+    {
+      "path": "integrations/teamcity/tests/operator-cases.ts",
+      "sha256": "94eda92318500c8338c7287a4c4e24024eba28714e2e462eb43c710ab31237d7"
+    },
+    {
+      "path": "integrations/teamcity/tests/system-cases.ts",
+      "sha256": "9f0d218193bef5e77ad2d2d4074d089bee1bd0a50ecbb401ca5f6a7c53ee972c"
+    },
+    {
+      "path": "integrations/teamcity/tests/triage-cases.ts",
+      "sha256": "c7e6c0a9254416f9c6130354d366b9779c8bd9485881411db29911d2918c30cc"
+    }
+  ],
+  "cli_implementation_files": [
+    {
+      "path": "integrations/teamcity/src/admin-commands.ts",
+      "sha256": "d88fa350a4c6814bc15d3759e9bd63a57b4c39117a02e70f09a3cd4eda78f266"
+    },
+    {
+      "path": "integrations/teamcity/src/admin-models.ts",
+      "sha256": "8895efd9fb80a2fa6419420f4160a3fb8f881c29d296b8aafa7ebfbeceea87c5"
+    },
+    {
+      "path": "integrations/teamcity/src/advanced-authoring-commands.ts",
+      "sha256": "141602a4014a27bdabf15b589125c5bb306d6486ecc798f000536989e7b23979"
+    },
+    {
+      "path": "integrations/teamcity/src/advanced-authoring-models.ts",
+      "sha256": "eb4599d76b9c1816653a7c69222a817914fa24f1e5890a000d0a7d7f2be97335"
+    },
+    {
+      "path": "integrations/teamcity/src/authoring-commands.ts",
+      "sha256": "3aaf6dfac760181a0dc3b74b9d0203a90dbbe736b21f32fd6d773336267fe324"
+    },
+    {
+      "path": "integrations/teamcity/src/authoring-models.ts",
+      "sha256": "db326d2b2fea341396fcef473663309fe265884e0aabf0bb79c3beac4d5ba192"
+    },
+    {
+      "path": "integrations/teamcity/src/bin.ts",
+      "sha256": "84091c73d597f4872a3bdb0b130d4d541317d33e75dd6ba1b6f0ad39ce1105cf"
+    },
+    {
+      "path": "integrations/teamcity/src/build-flow.ts",
+      "sha256": "7a26e32a1f2841d7608bd7f22c2fc873d89d9d48b2bb33e8f1fa10eb51f3900c"
+    },
+    {
+      "path": "integrations/teamcity/src/bulk-configuration-commands.ts",
+      "sha256": "6efd35a22fd1da346770250e44cf0c846620284e96117eae13848e4b7bd8f7b6"
+    },
+    {
+      "path": "integrations/teamcity/src/bulk-configuration-models.ts",
+      "sha256": "bbe2d64e991b40c2b00c9ca66019fdfd406420e8ee5aba894d5ad7997db1a381"
+    },
+    {
+      "path": "integrations/teamcity/src/cli.ts",
+      "sha256": "55c3cd3af82383b818ee2756f377aa19676483bc208fa3577df79ba74794984f"
+    },
+    {
+      "path": "integrations/teamcity/src/client.ts",
+      "sha256": "4b0557d3ccc96c9bf39b57f207905b11445b5fb936ab316fe0984336ac407925"
+    },
+    {
+      "path": "integrations/teamcity/src/command-support.ts",
+      "sha256": "bbbde102ebcd235fa3e0035c0f109f61e6b6367f6476e8ba77ac1408366bc756"
+    },
+    {
+      "path": "integrations/teamcity/src/credential-inputs.ts",
+      "sha256": "cddd2ae470721894c456772200846686096a790623dd23e1ebea176a5e8bfaee"
+    },
+    {
+      "path": "integrations/teamcity/src/downloads.ts",
+      "sha256": "e197c81af8aeb6363579ca249134d8b530d33ec6e47e773b82be3d45410b5c98"
+    },
+    {
+      "path": "integrations/teamcity/src/file-commands.ts",
+      "sha256": "7ab7f521b512ac0264ea064200c0c5b30c471f61cbfa6b56bc925eae0c0df97a"
+    },
+    {
+      "path": "integrations/teamcity/src/file-models.ts",
+      "sha256": "4cedfaf186a6bc5fbc77fe91d2364daaea9bcc2f8dbe78ab257c0f292370fb35"
+    },
+    {
+      "path": "integrations/teamcity/src/index.ts",
+      "sha256": "d5fd9f9ed21b2e9c002850f08a4a44d368fb5f060ea653fe162461b85b3d4f67"
+    },
+    {
+      "path": "integrations/teamcity/src/infrastructure-commands.ts",
+      "sha256": "fda140a587457e825a498a6be682fcfdc7804171cd67e4b487ae90a7811207ac"
+    },
+    {
+      "path": "integrations/teamcity/src/infrastructure-models.ts",
+      "sha256": "4f779551a4f1d885b6dace8a632e331609e643d4f93ccadc947cfd078b45fd14"
+    },
+    {
+      "path": "integrations/teamcity/src/locator.ts",
+      "sha256": "4b945188448f9ed16eb1a4c28f7459aaef0e565fad5243afdf7523f3d2fb2b64"
+    },
+    {
+      "path": "integrations/teamcity/src/models.ts",
+      "sha256": "131161b62bc1bd82da8b609ee849f9a9d236052ecea29478c7860f95268212eb"
+    },
+    {
+      "path": "integrations/teamcity/src/operator-commands.ts",
+      "sha256": "f9bd9d3562f2b31fcfdd36104e8bd4666314b5ef98df2d36b995caf23f08e749"
+    },
+    {
+      "path": "integrations/teamcity/src/operator-models.ts",
+      "sha256": "a0ba1446251f5d68ca986459e442660ed3f9f339ffe8f11ec46ab90c80aba282"
+    },
+    {
+      "path": "integrations/teamcity/src/outcome.ts",
+      "sha256": "8f764208645927dbdbcd104a703cf69847173015b1189fc3c613dc3f80f214dd"
+    },
+    {
+      "path": "integrations/teamcity/src/paging.ts",
+      "sha256": "dcca487564719976bc53785fd4fb4fc202ee74c997f7097b9bafd502263bb216"
+    },
+    {
+      "path": "integrations/teamcity/src/presentation.ts",
+      "sha256": "c44d01d02d518bd3777bcaf3f431e5a0d4ed8a2e7afbc2d2417320190522368e"
+    },
+    {
+      "path": "integrations/teamcity/src/server-url.ts",
+      "sha256": "fb19e16374064652853e31025ad09ce13310137a3d1350f3ab619f64fce44559"
+    },
+    {
+      "path": "integrations/teamcity/src/system-commands.ts",
+      "sha256": "f32c9c1a941fc564a25df2d094211535d23eec45cbc3855afcc96b907511b431"
+    },
+    {
+      "path": "integrations/teamcity/src/system-models.ts",
+      "sha256": "193bd7ab7f77ce93059b2cdf672cb7d3fb8edb70005808af811172c1b6338551"
+    },
+    {
+      "path": "integrations/teamcity/src/triage-commands.ts",
+      "sha256": "c697b4d378e359887d89635b452c1d772be4ce58c0d4492410807d35aa66e3a3"
+    },
+    {
+      "path": "integrations/teamcity/src/triage-models.ts",
+      "sha256": "db4ccaae890e1fc26a9bacea199c01fa3997a0352b7104d36a15fc98caeadb66"
+    }
+  ],
+  "candidate_counts": {
+    "cli_rows": 456,
+    "unique_preferred": 456,
+    "ambiguous_or_unmatched": 0,
+    "multiple_structural_candidates": 125,
+    "path_suffix_qualifications": 17,
+    "native_literal_declarations": 40,
+    "agent_envelope_fields": 20
+  },
+  "unknowns": [
+    "CLI implementation branch expansion and inline client tests",
+    "Other consumers and non-REST paths",
+    "Razor route and gRPC ControlPlane adapter preservation",
+    "Native/compatible semantic equivalence",
+    "Exact variants, independent expected effects and normalized denominator"
+  ],
+  "normalized_denominator": null,
+  "scope": "Finite source extraction and candidate path joins, not full API union, behavior or coverage",
+  "source_hash_mode": "Git blob bytes at source_revision; CLI implementation files checked against pinned source tree"
+}

@@ -6,7 +6,9 @@ Lead: Story Delivery Lead; co-held Reconciliation, REST, Business Acceptance and
 The owner chose three stages: establish stories, prepare the API inventory and allocate dependencies;
 then create implementation tasks and transfer useful existing discussion; finally remove redundant
 work after checking that the discussion and decisions survive. This catalogue completes the first
-planning catalogue and records the remaining inventory work. Stage 2 and cleanup have not started.
+planning catalogue and records the remaining inventory work. The
+[source-union continuation and first Stage 2 packet](story-transition-stage2.md) now carry additional
+source/scenario joins and three proposed replacement tasks. Cleanup has not started.
 
 Stories drive priority and useful outcomes. Every implementation contribution must trace upward to
 an actor goal; API discovery measures missing behavior. A story does not waive reference semantics
@@ -34,7 +36,8 @@ continue to govern evidence, subsystem ownership and milestone closure.
   gaps; these records do not mean there are only 78 unknown variants.
 
 The former 84-issue graph is the preserved source graph. The verified expanded GitHub snapshot has
-108 open issues, nine milestones and 24 additional unscheduled roots; issue counts are not progress.
+108 open issues, nine milestones and 24 additional unscheduled roots at Stage 1; the
+[continuation](story-transition-stage2.md) records subsequent task additions. Issue counts are not progress.
 [stories.tsv](stories.tsv) is the compact catalogue; GitHub remains authoritative for live task state.
 
 ## Priority and dependencies
@@ -575,7 +578,8 @@ Do not create one backend implementation per surface or a task for each discover
 For each old issue, transfer the useful decisions, rationale, rejected alternatives that still
 explain the decision, open questions, constraints, dependencies and evidence limits into the new task.
 Use stable issue/comment anchors and a source-to-destination readback. A link alone is not a transfer;
-`legacy-crosswalk.tsv` deliberately says NOT_TRANSFERRED. Capture changes/comments arriving after the
+`legacy-crosswalk.tsv` distinguishes NOT_TRANSFERRED from explicit partial transfers in
+[task-transfer.tsv](task-transfer.tsv); neither means complete migration. Capture changes/comments arriving after the
 baseline before cleanup. Existing local snapshots are partial preservation evidence, not a complete
 archive of timelines, attachments, external evidence and later edits.
 

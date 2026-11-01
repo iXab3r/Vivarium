@@ -971,6 +971,33 @@
       "milestone": null,
       "number": 109,
       "key": "US-025"
+    },
+    {
+      "parent": 78,
+      "url": "https://github.com/iXab3r/Vivarium/issues/110",
+      "title": "US-013 / P0: Complete compatibility evidence and story traceability",
+      "state": "open",
+      "milestone": "P0",
+      "number": 110,
+      "key": "story-US-013-P0-implementation"
+    },
+    {
+      "parent": 110,
+      "url": "https://github.com/iXab3r/Vivarium/issues/111",
+      "title": "US-013 / P0 contract: Freeze early source, identity and wire obligations",
+      "state": "open",
+      "milestone": "P0",
+      "number": 111,
+      "key": "story-US-013-P0-contract"
+    },
+    {
+      "parent": 110,
+      "url": "https://github.com/iXab3r/Vivarium/issues/112",
+      "title": "US-013 / P0 acceptance: Verify evidence, raw outcomes and reuse controls",
+      "state": "open",
+      "milestone": "P0",
+      "number": 112,
+      "key": "story-US-013-P0-acceptance"
     }
   ],
   "milestones": [
@@ -1039,8 +1066,8 @@
     }
   ],
   "snapshot": {
-    "recorded_utc": "2026-11-01T14:29:42.877504+00:00",
-    "source": "Stage 1 GitHub issue metadata readback; all old parent-child links and populated discussions compared with baseline",
-    "scope": "108 open issues/nine milestones; 84 old issues/75 native children preserved; 24 new proposed unscheduled actor-goal stories; no product acceptance or discussion-transfer claim"
+    "recorded_utc": "2026-11-01T14:53:35.269874+00:00",
+    "source": "Stage 2 issue/task/body/comment/native-link readback; old content/assignments preserved; three proposed replacement tasks, no execution-graph activation",
+    "scope": "111 Open issues/nine milestones; 75 original native edges retained plus three new edges; 11 partial transfer units; no product acceptance"
   }
 }

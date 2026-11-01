@@ -2,7 +2,22 @@
 
 ## Current state — 2026-11-01
 
-**Latest assignment: story-driven transition, Stage 1.** The owner requested stories and API
+**Latest checkpoint: source-union continuation and first Stage 2 packet.**
+[Continuation](story-transition-stage2.md): all 456 CLI fixtures have ranked source/story/scenario
+candidates, retaining 125 multiple structural matches and 17 suffix-binding qualifications;
+40 current native HTTP declarations and 20 Agent envelope fields have pinned source/story links.
+160 surface-scenario candidates are not tests or frozen variants. Full union/denominator remain
+UNKNOWN. Proposed P0 implementation #110 under US-013/#78 has same-P0 contract #111 and acceptance
+#112 children; the old execution-ledger ownership is not switched. Eleven partial substantive
+transfer units carry selected body topics and all five #35/#36 comments with source/destination
+hashes and readback. All 108 prior issue bodies/assignments, twelve original comments and 75 old
+native links are preserved; three new task links bring GitHub to 111 Open issues/nine milestones.
+No cleanup, product/harness code, build/test/runtime proof or milestone acceptance. See
+[verification](story-stage2-verification.md). Next reconcile remaining implementation/non-REST/
+producer sources and exact early evidence, finish selected source transfer and activate one coherent
+replacement mapping before executing old/new work. Other story packets and Stage 3 remain pending.
+
+**Stage 1 checkpoint (preceding the continuation).** The owner requested stories and API
 inventory/dependencies first, self-contained implementation tasks with useful discussion transfer
 second, and redundant-task cleanup last. [The catalogue](stories.md) now has 25 actor goals:
 24 new unscheduled stories #86–#109 plus retained #78/US-013. #79–#81 remain UI/REST/CLI tracks.

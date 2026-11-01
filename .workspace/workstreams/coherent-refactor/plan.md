@@ -1,4 +1,10 @@
-# Coherent Vivarium refactor — plan v1.10
+# Coherent Vivarium refactor — plan v1.11
+
+**Current planning increment:** [source-union continuation and first Stage 2 task packet](story-transition-stage2.md).
+The additional finite source joins and 160 surface-scenario candidates do not freeze variants.
+#110/#111/#112 are proposed same-P0 implementation/contract/acceptance work under US-013; partial
+source transfer is recorded, old task/ledger ownership remains until reconciled activation, and no
+cleanup or product execution has occurred. Other story-led packets remain to be prepared.
 
 **Latest owner direction: story-driven transition in three stages.** Start from
 [25 actor-goal stories](stories.md), [API inventory preparation](api-inventory-preparation.md)

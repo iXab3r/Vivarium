@@ -5,6 +5,11 @@ Stage 1 planning checkpoint, 2026-11-01, source HEAD
 This is preparation for a normalized source union and exact variant allocation, not a replacement
 for [api-ledger.tsv](api-ledger.tsv) or a newly accepted compatibility corpus.
 
+The [source-union continuation](story-transition-stage2.md) now materializes per-fixture candidate
+relations, current native declarations, Agent envelope fields and surface-scenario groups, and
+records the first proposed implementation-task packet. The work list below still governs the
+remaining semantic/branch reconciliation and exact variant freeze.
+
 ## Sources and stable identities
 
 | Source | Retained discovery | Identity and current limitation |
