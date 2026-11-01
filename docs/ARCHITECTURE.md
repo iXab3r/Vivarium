@@ -1152,8 +1152,18 @@ Storage, local TLS, technical installation authentication and ordinary enrollmen
 R0.1 proves prepare/start/status/attach/reset/stop and Agent ready state; R0.2 proves a seeded Git-owned
 smoke configuration through unchanged teamcity-cli: queue, inspect, run/watch, cancel and artifact
 download, plus bounded restart/reconnect evidence. Use the eventual catalog/queue/Agent/Storage
-services and a thin process-runner subset, not a disposable lab-only engine. R1 completes ordinary
-OIDC and TeamCity scoped access; R2 adds full C# catalog authoring/evaluation and exact source checkout.
+services and a thin process-runner subset, not a disposable lab-only engine.
+
+Planning refinement, 2026-11-01: after accepted P0 and R0, a bounded PILOT integration delivers the
+first real T3Personal product through UI, direct compatible REST and unchanged CLI before full R1
+and general R2–R4 completion. Prepare-first is the recommended draft boundary pending the owner's
+optional Prepare/full-chain response. Reuse the shared production catalog/source/Agent/run/log/blob
+owners, current ordinary credentials/grants, actual counter and required service-message effects;
+no special pilot engine. Full IAM, general C# editor/checkout, runners/chains and diagnostics remain
+with their later full owners. P0 shared structural/reference/representation/allocation gates and D39
+milestone aggregate + Security/Adversarial, zero-debt and main-delivery gates remain unchanged.
+Cards expose branch checkpoints when ready and close after PILOT main acceptance; no per-card formal
+review. See the [concrete pilot](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md).
 
 See [REST domain contract](design/teamcity-rest-domain.md), the workstream REST breakdown and local
 lab gates. Current legacy session tests/manual process entry points are prior evidence, not proof

@@ -1,11 +1,21 @@
-# Coherent Vivarium refactor — plan v1.8
+# Coherent Vivarium refactor — plan v1.9
+
+**Now:** the replacement Host/Agent/product build is NOT_AVAILABLE. Existing evidence is fifteen
+known cases: five RED, ten product-prerequisite-blocked, zero product GREEN; global denominator unknown.
+**Next:** #13/#35 **Freeze Prepare recipe/expected outputs and due reference cases**, then accepted
+P0 → R0 → [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78).
+**Later:** full remaining IAM/catalog/runners/diagnostics and cumulative migration under existing owners.
+The [T3Personal pilot](t3personal-pilot.md) exposes three small stories and openable checkpoints.
+Prepare-first is the recommended draft boundary while the owner's optional scope response is pending.
+No product output, exact pilot case or publication is claimed delivered/frozen.
 
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
 Current assignment (2026-11-01): the owner is still iterating this plan. Continue planning/reference
-analysis and maintenance of existing tasks only in this slice; do not start product/harness work,
-new runnable proofs, builds/tests or live reference/server operations. Earlier tooling and receipts
+analysis, authorized read-only source/reference inspection and maintenance of tasks only in this slice;
+do not start product/harness work, new runnable proofs, builds/tests, live mutations, build execution
+or server/container lifecycle operations. Earlier tooling and receipts
 remain accepted within their recorded limits. This is the current assignment, not a permanent
 implementation ban or a new future approval procedure.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
@@ -192,6 +202,7 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 |---|---|---|
 | P0 | Executable reference-backed REST contracts and a genuine RED baseline precede structural replacement | P0.REST.1–3 corpus/replay/product baseline executed with evidence and explicit blockers; resource/ID/state/command, protocol and C# mutation/authority proof reviewed; required variants allocated; no unknown mapping hidden behind a count |
 | R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 real PG/Storage/Host/Agent admission/debug and ordinary credential readiness; R0.2 unchanged CLI success/nonzero/queued and running cancel/exact artifact bytes; R0.3 restart/reconnect/owned cleanup. Installation login plus minimal ordinary OIDC/My keys, SYSTEM_ADMIN and restricted project principals/current allow-deny for exposed actions; full IAM R1 |
+| PILOT | Build real T3Personal_Prepare through UI, direct compatible REST and unchanged CLI | Recommended draft Prepare-first scope; #78 integrates #79/#80/#81 and same-milestone #82/#83. Real source/Docker/counter/preflight/service-message/version/log/launch/artifact evidence; full later owners remain open |
 | R1 | Ordinary identity/access and compatible lifecycle work beyond the R0 subset is complete | Complete roles/groups/project inheritance, provider/account/token/PAT wire variants and legacy disposition; preserve R0 current-cookie/token grant, withdrawal, expiry/revoke and key/restart guarantees |
 | R2 | A user authors a full C# catalogue and runs a genuine source-based Compile | Extend R0 catalogue/execution with full C# evaluation/editing/inheritance, exact checkout, requirements/reasons and report/artifact provenance; same existing PG scheduler, Agent and compatible/native run services |
 | R3 | Existing build families can express and execute their complete chains | Parameters/inheritance, all observed runners/features, chain/artifact policies, counters/locks/triggers, paused jobs and publish gating; representative Windows/Linux workflows |
@@ -199,7 +210,15 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 | R5 | Existing TeamCity clients pass cumulative cross-family conformance | Finish agreed remaining operations and all method/path/variant/client/negative/files checks built since P0/R0; this is not the first REST analysis or adapter implementation |
 | R6 | A local full migration rehearsal supports independent operation and final switch | All 97 dispositions and 120 requirements evidenced; full history+bytes/import replay+diff choices, coexistence ownership, final delta, encrypted restore, real family/OS tests; old implementation removed |
 
-Dependencies: P0.REST.1–3 executable test-first gate + P0 structural/representation gates → R0 → R1 → R2 → R3 → R4 → R5 → R6.
+Near-term dependencies: accepted P0.REST.1–3 and shared structural/representation/allocation gates → accepted R0 → PILOT.
+PILOT pulls only its required production contributions forward; full later-owner completion is not a
+prerequisite. The recommended Prepare-first boundary remains draft pending the optional scope answer.
+Existing P0 gates, cumulative earlier GREEN, end-milestone review/zero-debt/main delivery remain.
+After PILOT, plan visible Windows → chain/build-only → explicitly scoped publication → other families
+→ history/diff-import stories. R1–R6 below remain full-scope owner/completion backlogs and cumulative
+gates, not blanket prerequisites before each next product story. Allocate its exact next milestone
+and needed partial contributions before implementation, after predecessor closure; do not create all
+later milestones now, accept broad owners early or move failing due/previously GREEN cases.
 P0 starts with the [D38 executable REST suite and initial RED baseline](../../../docs/design/teamcity-rest-test-first.md).
 P0.REST.1 freezes independent expectations, P0.REST.2 proves minimal deterministic production-code
 composition/cost before bulk expansion and runs strict WireMock.Net/client controls,
@@ -221,7 +240,9 @@ Domain-compatible REST and scenarios grow with each domain milestone. R5 is the 
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Published plan: **8 milestones, 8 milestone parent issues and 67 native sub-issues** (75 issues total).
+Current GitHub planning graph: **9 milestones, 9 closure parents and 73 native sub-issues**
+(82 open issues, including #77 and six PILOT issues). These counts are task state, not product progress.
+The refreshed issues.json comes from current metadata/native parents; older counts below are historical.
 Subsystem slices parent their REST subtasks; #12 also owns the cross-cutting P0 foundation. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are
 [R0 #3](https://github.com/iXab3r/Vivarium/issues/3),
@@ -231,7 +252,7 @@ Subsystem slices parent their REST subtasks; #12 also owns the cross-cutting P0 
 [R4 #7](https://github.com/iXab3r/Vivarium/issues/7),
 [R5 #8](https://github.com/iXab3r/Vivarium/issues/8) and
 [R6 #9](https://github.com/iXab3r/Vivarium/issues/9).
-All issues remain open. `issues.json` records exact links and hierarchy.
+All issues remain open. `issues.json` records exact links and hierarchy, including PILOT #78–#83.
 
 Early concrete tasks: [REST breakdown #12](https://github.com/iXab3r/Vivarium/issues/12),
 [resource/state model #32](https://github.com/iXab3r/Vivarium/issues/32),
@@ -256,7 +277,7 @@ been accepted in main. Preserve verified evidence while that milestone remains i
 completed earlier milestones do not wait for R6 to close their issues.
 
 D40 makes the [16 logical subsystems](subsystems.tsv) the units of implementation and completed
-lifecycle/integration. [17 subsystem slices](subsystem-slices.tsv) bind owning code tasks to native
+lifecycle/integration. [18 subsystem slices](subsystem-slices.tsv) bind owning code tasks to native
 REST-contract/acceptance children, including separate P0/R5 protocol-foundation slices. Reuse the
 existing code tasks; new owners #56/#57/#58 cover Agent fleet, required capacity and deployments.
 For example VCS #19 owns REST #59/#60; queue/run #20 owns #65/#66; results #25 owns #71/#72.
@@ -287,8 +308,8 @@ authorization, current-style UI and debugger attach. R0.2 adds unchanged teamcit
 seeded real configuration: enqueue/watch/cancel/download; R0.3 proves bounded restart/reconnect
 and cleanup. These are concrete internal checkpoints, not runtime already delivered by the plan.
 The lab can be exercised on its milestone branch before all R0 acceptance is complete; merge still
-requires the declared regression/review gates and existing-feature disposition. R2 is the first full
-source-based C# Compile, not the first occasion on which a real Agent may run locally.
+requires the declared regression/review gates and existing-feature disposition. PILOT is the first targeted real source product after R0; R2 completes general source/catalogue
+capabilities. R0 checkpoints stay branch previews until its existing whole-milestone closure; no R0 split.
 
 The current legacy process entry points/protocol tests and exact verified SDK exist today;
 the new-stack reproducible lab is not delivered. Do not equate those facts with an end-user local

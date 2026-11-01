@@ -1,5 +1,6 @@
 slice_id	subsystem_id	milestone	implementation_issue	implementation_issues	rest_contract_issue	rest_acceptance_issue	scope_state	implementation_state	api_complete
 SS-HOST@R0	SS-HOST	R0	14	14;15;37;38;40	43	44	unfrozen	NOT_ACCEPTED	UNVERIFIED
+SS-RUN@PILOT	SS-RUN	PILOT	78	78;79;80;81	82	83	unfrozen	NOT_ACCEPTED	UNVERIFIED
 SS-IAM@R1	SS-IAM	R1	16	16;17	45	46	unfrozen	NOT_ACCEPTED	UNVERIFIED
 SS-CFG@R2	SS-CFG	R2	18	18	47	48	unfrozen	NOT_ACCEPTED	UNVERIFIED
 SS-VCS@R2	SS-VCS	R2	19	19	59	60	unfrozen	NOT_ACCEPTED	UNVERIFIED

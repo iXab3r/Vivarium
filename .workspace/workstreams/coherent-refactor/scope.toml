@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: the owner is still iterating the plan. This slice is planning/reference analysis and maintenance of existing tasks only; no product/harness implementation, new runnable proof scripts, builds/tests or live server/container/TeamCity operations. Existing tooling/evidence remains accepted at its recorded boundary. 'Continue' within this assignment means continue that planning work."
+current_assignment = "2026-11-01: the owner is still iterating the plan. This slice is planning/reference analysis, authorized read-only source/reference metadata inspection and task maintenance; no product/harness implementation, new runnable proof scripts, builds/tests, live mutations/build execution or server/container lifecycle operations. Existing tooling/evidence remains accepted at its recorded boundary. 'Continue' within this assignment means continue that planning work."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -38,3 +38,14 @@ delivery_model = "RF-10 accepted by owner on 2026-10-31: each verified milestone
 [status_authority]
 tracked = "Source universe and case/evidence facts: API ledger/results; contracts: architecture/designs. Workstream summaries follow those authorities."
 external = "D39: GitHub issues/milestones own live task and closure state; api-blocks.tsv/issue snapshots record verified links, not a competing task board."
+
+[pilot]
+key = "PILOT"
+status = "recommended-prepare-first-pending-optional-owner-response; NOT_AVAILABLE"
+order = "accepted P0 -> accepted R0 -> PILOT; later business stories allocated before implementation after predecessor closure; R1-R6 full-scope completion backlog, not blanket prerequisites"
+integration_slice = "SS-RUN@PILOT"
+parent_issue = 78
+story_issues = [79, 80, 81]
+contract_issue = 82
+acceptance_issue = 83
+targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"

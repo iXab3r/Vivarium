@@ -95,6 +95,11 @@ to an existing accountable integration slice, its same-milestone implementation/
 tasks and bounded business outcome. It does not create another slice, owner, service or duplicate
 case. R0 uses SS-HOST@R0 (#14/#43/#44); R2 Compile output uses SS-RUN@R2 (#20/#65/#66),
 with source checkout/Compile code and evidence from #19/#59/#60 and catalog inputs from #18.
+Between accepted R0 and full later domains, [SS-RUN@PILOT](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md)
+uses #78/#82/#83 for the recommended real Prepare path and surface cards #79–#81. It pulls bounded
+IAM/CFG/VCS/AGT/EXEC/counter/LOG/BLOB contributions forward while full owner #20 remains R2.
+This adds one integration slice, not a subsystem/node/engine or duplicated API universe.
+
 R2 step editing has a separate bounded SS-EXEC contribution to SS-CFG@R2 (#18/#47/#48): EXEC
 supplies ordered step/property/reset semantics and CFG uses its shared C#/Git validation/activation.
 For example `TCREST:buildtypeapi.replaceAllBuildSteps` keeps SS-EXEC/#22 as primary owner while
@@ -125,6 +130,6 @@ separately from product compatibility.
 
 Task #36 extends ledger validation/result binding to these joins: exactly one owner, valid task and
 same-milestone native links, no missing/duplicate/unallocated required variants, no double counting,
-and global/subsystem/milestone consistency. Task #42 verifies controls. The runtime checker is not
-implemented by this planning change. D39's focused-test cadence, final aggregate and explicit
+and global/subsystem/milestone consistency. Task #42 verifies controls. The existing offline checker is a bounded foundation;
+full allocation/freeze/closure validation is not delivered by this planning change. D39's focused-test cadence, final aggregate and explicit
 Security/Adversarial review, zero-debt gate and verified main-delivery closure remain unchanged.

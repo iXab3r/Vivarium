@@ -2,9 +2,32 @@
 
 ## Current state — 2026-11-01
 
+**Now:** replacement product NOT_AVAILABLE. **Next:** #13/#35 Freeze Prepare recipe/expected outputs
+and due reference cases, then accepted P0/R0. **Later:** [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78)
+with UI #79, direct compatible REST #80 and unchanged CLI #81; #82/#83 are its same-milestone pair.
+Prepare-first is a recommended draft pending the optional owner response, not assumed approval.
+See [T3Personal pilot](t3personal-pilot.md) for exact pinned facts and openable checkpoints. GitHub
+now has 82 open issues/nine milestones; registers have 18 subsystem slices/20 bounded contributions,
+still 16 subsystem owners. Existing native parents/states are preserved; #77 is included in the
+refreshed graph. Task counts are not product progress. The historical97 inventory is unchanged;
+three T3 configurations are a targeted addendum, not a global100 census.
+
+This planning graph/prose revision changes no product, 449 primary API rows, fifteen known cases,
+raw receipts or generated status. New registers require explicit offline accounting input/reuse
+assessment; older zero-stale/exit0 reports below keep their original revisions and do not establish
+freshness or completion of this new unfrozen PILOT scope.
+
+Working-tree planning assessment at `7b19fa5` used the existing read-only offline DLL and
+`artifacts/p0-ledger/assessments/t3personal-pilot-working-tree.json`: exit0, REUSED, 18 slices /
+20 contributions, still 449 headings / 15 cases / 5 RED / 10 blocked / 0 GREEN/stale/errors.
+All 183 recorded source inputs and six accounting sources are unchanged. This validates supported
+joins and historical cohort reuse, not the recipe, complete graph semantics, source alignment or
+PILOT acceptance. No build/test/product execution ran. Exact postcommit transfer remains required.
+
 Current assignment: the owner is still iterating the plan. This slice continues planning/reference
-analysis and existing GitHub task maintenance only; no product/harness implementation, new runnable
-proof scripts, builds/tests or live server/container/TeamCity operations. Earlier tooling/results
+analysis, authorized read-only source/reference metadata inspection and GitHub task maintenance;
+no product/harness implementation, new runnable proof scripts, builds/tests, live mutations/build
+execution or server/container lifecycle operations. Earlier tooling/results
 remain accepted at the historical boundary below. This is current scope, not a permanent ban or a
 new future approval framework. The historical “Next” execution backlog below is not an instruction
 to start implementation in this slice.

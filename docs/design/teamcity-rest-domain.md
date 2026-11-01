@@ -170,7 +170,11 @@ corresponding pre-existing failing contracts and preserves the growing implement
 R0 delivers the first thin compatible execution path together with the actual local Host/Agent lab.
 R0's [unfrozen journey manifest](../../.workspace/workstreams/coherent-refactor/r0-journey-manifest.md)
 includes the minimal ordinary OIDC/key/current-grant contribution required by the unchanged CLI and
-denied-access controls. R1 completes identity/access variants; R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
+denied-access controls. After accepted P0/R0, the [PILOT integration](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md)
+brings the bounded real Prepare path through UI/direct compatible REST/unchanged CLI before full IAM
+and general catalogue/runner/log completion. Its same-milestone #78/#82/#83 own the integration;
+full owners retain later scope and one authority. R1 then completes identity/access variants;
+R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
 R4 tests/logs/history/files; R5 cumulative client/variant conformance and remaining agreed operations.
 Provider, server-internal, licensing, Kotlin and plugin-specific calls need early explicit dispositions;
 no false successful license/cluster/JVM response or silent omission can close full compatibility.

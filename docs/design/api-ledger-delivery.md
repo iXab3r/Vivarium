@@ -13,6 +13,14 @@ task IDs. The milestone [block register](../../.workspace/workstreams/coherent-r
 aggregates those subsystem slices and retains the parent closure gate. It is not an execution plan
 for unrelated endpoints. Do not create one implementation issue per route or another workflow bot.
 
+The [T3Personal PILOT](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md) is one
+bounded SS-RUN@PILOT integration after accepted P0/R0, before remaining full R1–R4 owners.
+#78 parents UI/direct-compatible-REST/unchanged-CLI cards #79–#81 and same-milestone contract #82 /
+acceptance #83. Cards expose branch checkpoints and close after PILOT main acceptance, with one
+final milestone review/zero-debt gate. Reuse existing owners and bounded early contributions;
+full later-owner completion is neither a hidden prerequisite nor waived remaining scope.
+
+
 Work progresses contract-ready → focused real RED → implementation → REST verification → final
 milestone review/fixes → main delivery → bottom-up issue/milestone closure. Contract/code readiness
 can be recorded while issues stay Open until verified main delivery (RF-10). Completed earlier

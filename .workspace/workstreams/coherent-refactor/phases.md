@@ -1,32 +1,25 @@
 # Phase state
 
-Active: P0 contract/TDD preparation; executable replacement corpus has not started.
+Active: owner planning iteration; no replacement milestone is accepted on main. Existing P0 tooling
+is a partial foundation: fifteen known cases, five RED, ten product-prerequisite-blocked, zero GREEN.
+The global variant denominator remains unknown. This is not a request to start implementation now.
 
-1. Checkpoint and census — complete.
-2. Depot/PoeBane study and plan v1.8 — recorded; RF-10 accepted (separate milestone merges to main).
-   D34/D35 accept Depot authentication/superuser, exact TeamCity RBAC in PG, Chiral settings ownership
-   and Depot-style TypeScript/Vite Workbench UI; remaining choices still require P0 work.
-3. Deep REST resource/ID/state/protocol/mutation/harness/allocation — open #12/#32–#36 before
-   structural implementation. Initial 456 synthetic fixture rows discovered, not reconciled coverage.
-4. R0.1 local Host+real Agent (#37), R0.2 unchanged-CLI smoke (#38), R0.3 restart/cleanup — planned.
-5. R1…R6 domain expansion and cumulative client/migration proof — not started or accepted.
-6. D37 is continuous across all phases: business AC/model/wire links and a small cumulative
-   implemented TeamCity base plus extension-neutrality checks at each milestone, not only R5.
-   Business specs #39 are specified-unbound; R0 bindings #40 and targeted-run gap #41 remain open.
-7. D38/#35 is the immediate executable slice: prepare exact SDK, freeze verified reference cohorts,
-   prove small replay/production-code composition controls and record actual current-product RED.
-   Start sound cohorts before whole-API prose completion; P0 still closes structural/allocation gates
-   before replacement. First RED does not wait for R0; all three checkpoints remain unexecuted.
-8. D39 task blocks and discovery ledger seed are recorded; #36 mechanical accounting and #42 actual
-   baseline verification remain open. API-complete UNVERIFIED; no security review/debt-clearance
-   PASS. At each milestone end finish aggregate and explicit Security/Adversarial review and all
-   same-milestone debt before main closure/next implementation. No mass per-task runs/reviews.
-9. D40 subsystem catalogue/ownership is recorded: 16 logical owners, 17 slices, full discovery
-   ledger preserved with primary/related owners. Implement complete subsystem lifecycles with REST
-   child contracts/acceptance; milestone blocks aggregate, not drive route-by-route implementation.
-   Subsystem lifecycle/integration and API status remain unverified; exact variants/allocation open.
+1. Historical checkpoint/census and Depot-informed plan are recorded; 97 configurations are the old
+   source inventory. Three T3Personal configurations are a targeted addendum, not a global100 census.
+2. P0 remains open: #13/#35 next **Freeze Prepare recipe/expected outputs and due reference cases**;
+   #32/#34 shared model/representation, #36 known-input allocation/freeze/accounting, #42 baseline
+   acceptance and #2 aggregate/Security/zero-debt/main closure still apply. Existing #77 debt remains.
+3. R0 remains planned: #37 local Host+real Agent, #38 LocalSmoke/unchanged CLI, #14/#44 recovery and
+   owned cleanup. These are openable branch checkpoints, closing only after whole R0 main acceptance.
+4. PILOT #78 follows accepted P0/R0 and precedes full IAM/general domains. Recommended draft
+   Prepare-first scope is pending the optional owner response. #79 UI → #80 direct compatible REST
+   → #81 unchanged CLI share services; #82/#83 form its same-milestone contract/acceptance pair.
+5. Remaining full R1/R2/R3/R4/R5/R6 owners retain IAM/catalog/runners/chains/logs/history/migration
+   scope. Windows, full-chain build-only and deliberately scoped publication are visible follow-ups.
+6. All sixteen subsystem owners remain. Eighteen slices and twenty bounded contributions assign
+   ownership; all are unaccepted/unfrozen, not compatibility. The 449 API headings and fifteen cases
+   remain unchanged; GitHub owns live task state (82 open issues/nine milestones).
 
-Acceptance dependencies and exact exit contracts live in `plan.md`; status/evidence lives in
-`ledger.md`, TC requirement assignment in `requirement-routing.tsv`, external coordination in
-GitHub milestones/issues. Closing P0 requires updating the authoritative architecture/designs for
-chosen differences, not merely resolving conversations in GitHub.
+[Plan](plan.md) and [pilot checkpoints](t3personal-pilot.md) define acceptance order. At every milestone
+retain cumulative delivered behavior, focused checks, independent final aggregate + Security review,
+zero due debt and verified main delivery before closure/next implementation. No per-card formal review.
