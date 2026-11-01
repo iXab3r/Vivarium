@@ -114,3 +114,13 @@ are distinct from bound product-scoped C# settings; blank-install/unbound placem
 completion follow reference contracts; exact defaults/timing remain #32/#34/#36. No runtime result,
 normalized case, milestone acceptance or new product policy is claimed. Next execution remains #35
 alongside affected P0 contracts; these repairs require only cheap documents/task/accounting checks.
+
+## Three-cycle planning provenance (2026-11-01)
+
+[Structured cycle record](planning-probe-cycles.json) retains source/fix revisions, bounded probe angles,
+raw-report hashes/local ignored paths, dispositions, actual cheap checks and limits. C1 repairs are
+`c33ae7c`; C2 repairs are `46a63a6`. C3 at `46a63a6` found no material defect in its sampled closure
+path; no semantic fix followed. This is not exhaustive consistency or runtime/API/milestone/security
+PASS. Raw reports remain unchanged local artifacts. #35 executable-first cohorts/real RED, #32–#34
+model/reference/C# proofs and #36/#42 accounting/controls remain actual P0 deliverables; no commands
+or oracles are invented by this record, and no task state/graph or acceptance gate changed.

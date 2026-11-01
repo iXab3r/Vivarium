@@ -44,3 +44,9 @@ SS-EXEC -> SS-CFG@R2 (#18/#47/#48) without changing 16 owners/17 slices, source 
 retain exact collection-mode/concurrency/completion and due-variant contracts. Internal Git CAS
 and immutable actual provenance remain; no universal queue-time freeze or compatible native-only
 precondition/async rule is adopted. Format/SDK/path/reference unknowns stay future deliverables.
+
+[Three-cycle planning record](planning-probe-cycles.json): C1/C2 material repairs are committed as
+`c33ae7c`/`46a63a6`; C3 at `46a63a6` found no material defect in its bounded closure sample. The
+record preserves exact revisions, local ignored raw-report paths/hashes, dispositions, cheap checks
+and limits. It is provenance, not runtime/API/milestone/security acceptance or a fourth probe.
+Actual P0 reference/representation/harness/RED and ledger/control deliverables remain open.
