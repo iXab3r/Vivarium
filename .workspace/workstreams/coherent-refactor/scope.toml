@@ -50,3 +50,23 @@ contract_issue = 82
 acceptance_issue = 83
 targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"
 breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real DAG/runners/artifact/launch/stage/default-publication -> fault/recovery/access/cumulative acceptance; no serial surface completion"
+
+[story_transition]
+assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. Planning only; no product/runtime work or old issue cleanup in this checkpoint."
+catalogue = "stories.md"
+registry = "stories.tsv"
+inventory_preparation = "api-inventory-preparation.md"
+source_head = "9f5f36859f6a90309b117168db343abf14ae44df"
+actor_goals = 25
+new_unscheduled_issues = 24
+retained_priority_story = "US-013 / #78; #79 UI, #80 direct compatible REST, #81 unchanged CLI are shared acceptance tracks"
+canonical_ac_intent_links = 110
+documented_heading_intent_links = 449
+installed_http_occurrences = 449
+normalized_union_denominator = "UNKNOWN"
+dependency_records = 52
+old_issues_retained = 84
+old_native_child_links_retained = 75
+old_comments_retained = 12
+discussion_transfer = "NOT_TRANSFERRED; source discussions remain authoritative"
+verification = "story-stage1-verification.md"

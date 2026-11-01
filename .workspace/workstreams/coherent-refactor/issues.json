@@ -755,6 +755,222 @@
       "milestone": "P0",
       "number": 85,
       "key": "reference-t3personal-server-inputs"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/86",
+      "title": "US-001 Operate a usable installation",
+      "state": "open",
+      "milestone": null,
+      "number": 86,
+      "key": "US-001"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/87",
+      "title": "US-002 Bootstrap, delegate and recover administration",
+      "state": "open",
+      "milestone": null,
+      "number": 87,
+      "key": "US-002"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/88",
+      "title": "US-003 Sign in as myself and return to my work",
+      "state": "open",
+      "milestone": null,
+      "number": 88,
+      "key": "US-003"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/89",
+      "title": "US-004 Give and remove the right access",
+      "state": "open",
+      "milestone": null,
+      "number": 89,
+      "key": "US-004"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/90",
+      "title": "US-005 Run automation with a controllable credential",
+      "state": "open",
+      "milestone": null,
+      "number": 90,
+      "key": "US-005"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/91",
+      "title": "US-006 Maintain a usable project and build definition",
+      "state": "open",
+      "milestone": null,
+      "number": 91,
+      "key": "US-006"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/92",
+      "title": "US-007 Build and explain the intended source",
+      "state": "open",
+      "milestone": null,
+      "number": 92,
+      "key": "US-007"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/93",
+      "title": "US-008 Admit trusted build machines",
+      "state": "open",
+      "milestone": null,
+      "number": 93,
+      "key": "US-008"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/94",
+      "title": "US-009 Match work to allowed capacity",
+      "state": "open",
+      "milestone": null,
+      "number": 94,
+      "key": "US-009"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/95",
+      "title": "US-010 Control a run and the waiting work",
+      "state": "open",
+      "milestone": null,
+      "number": 95,
+      "key": "US-010"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/96",
+      "title": "US-011 Recover and maintain machines without losing work",
+      "state": "open",
+      "milestone": null,
+      "number": 96,
+      "key": "US-011"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/97",
+      "title": "US-012 Execute the configured workload faithfully",
+      "state": "open",
+      "milestone": null,
+      "number": 97,
+      "key": "US-012"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/98",
+      "title": "US-014 Start the right work automatically",
+      "state": "open",
+      "milestone": null,
+      "number": 98,
+      "key": "US-014"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/99",
+      "title": "US-015 Inspect reliable live and historical output",
+      "state": "open",
+      "milestone": null,
+      "number": 99,
+      "key": "US-015"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/100",
+      "title": "US-016 Follow one test across builds",
+      "state": "open",
+      "milestone": null,
+      "number": 100,
+      "key": "US-016"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/101",
+      "title": "US-017 Resolve or mute a known failure without erasing it",
+      "state": "open",
+      "milestone": null,
+      "number": 101,
+      "key": "US-017"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/102",
+      "title": "US-018 Retrieve and retain the right bytes",
+      "state": "open",
+      "milestone": null,
+      "number": 102,
+      "key": "US-018"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/103",
+      "title": "US-019 Find and explain retained work",
+      "state": "open",
+      "milestone": null,
+      "number": 103,
+      "key": "US-019"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/104",
+      "title": "US-020 Publish and know what is deployed",
+      "state": "open",
+      "milestone": null,
+      "number": 104,
+      "key": "US-020"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/105",
+      "title": "US-021 Bring complete retained history into Vivarium",
+      "state": "open",
+      "milestone": null,
+      "number": 105,
+      "key": "US-021"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/106",
+      "title": "US-022 Coexist, reconcile differences and retire TeamCity safely",
+      "state": "open",
+      "milestone": null,
+      "number": 106,
+      "key": "US-022"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/107",
+      "title": "US-023 Restore a complete installation and trust the result",
+      "state": "open",
+      "milestone": null,
+      "number": 107,
+      "key": "US-023"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/108",
+      "title": "US-024 Inspect and safely act on my fleet independently of builds",
+      "state": "open",
+      "milestone": null,
+      "number": 108,
+      "key": "US-024"
+    },
+    {
+      "parent": null,
+      "url": "https://github.com/iXab3r/Vivarium/issues/109",
+      "title": "US-025 Obtain and release required build capacity",
+      "state": "open",
+      "milestone": null,
+      "number": 109,
+      "key": "US-025"
     }
   ],
   "milestones": [
@@ -823,8 +1039,8 @@
     }
   ],
   "snapshot": {
-    "recorded_utc": "2026-11-01T13:11:19.974477+00:00",
-    "source": "read-only GitHub metadata/native parents; two bounded P0 reference leaves",
-    "scope": "84 open issues/nine milestones/nine roots/75 native children, not product acceptance"
+    "recorded_utc": "2026-11-01T14:29:42.877504+00:00",
+    "source": "Stage 1 GitHub issue metadata readback; all old parent-child links and populated discussions compared with baseline",
+    "scope": "108 open issues/nine milestones; 84 old issues/75 native children preserved; 24 new proposed unscheduled actor-goal stories; no product acceptance or discussion-transfer claim"
   }
 }

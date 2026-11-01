@@ -1,4 +1,15 @@
-# Coherent Vivarium refactor — plan v1.9
+# Coherent Vivarium refactor — plan v1.10
+
+**Latest owner direction: story-driven transition in three stages.** Start from
+[25 actor-goal stories](stories.md), [API inventory preparation](api-inventory-preparation.md)
+and [stage-specific dependencies](story-dependencies.tsv). Stage 1 adds 24 proposed unscheduled
+stories while retaining #78 and its #79–#81 surface tracks. Stage 2 creates coherent implementation
+tasks from selected story scenarios and carries useful decisions/discussion into them with stable
+source anchors and readback. Stage 3 cleans redundant active tasks only after preserving the original
+discussions and checking transfer/deltas. No old issue is closed, deleted or reparented in Stage 1.
+Stories drive priority; D37–D40 still govern semantics, subsystem ownership and evidence gates.
+The 449 intent links are not a normalized API union or proof of coverage. See the
+[Stage 1 verification](story-stage1-verification.md); the technical reference sequence below remains.
 
 **Now:** [reference pack #84](t3personal-reference-pack.md) is available: one bounded three-build
 cohort, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;

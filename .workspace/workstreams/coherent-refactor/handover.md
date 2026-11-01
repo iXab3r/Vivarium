@@ -2,6 +2,20 @@
 
 ## Current state — 2026-11-01
 
+**Latest assignment: story-driven transition, Stage 1.** The owner requested stories and API
+inventory/dependencies first, self-contained implementation tasks with useful discussion transfer
+second, and redundant-task cleanup last. [The catalogue](stories.md) now has 25 actor goals:
+24 new unscheduled stories #86–#109 plus retained #78/US-013. #79–#81 remain UI/REST/CLI tracks.
+All 110 AC and all 449 documented headings have intent links; 52 dependency records cover all
+stories and bounded early evidence/contributions. [Inventory preparation](api-inventory-preparation.md)
+retains 449 installed HTTP occurrences, two name discrepancies, nine duplicated operationId groups
+and the existing 456 CLI fixtures. The normalized union/variant denominator remains UNKNOWN.
+All 84 old issues, 75 native child links and twelve existing comments were read back unchanged;
+GitHub has 108 open issues/nine milestones. [Verification](story-stage1-verification.md) records
+the exact limits. No discussion transfer, old issue cleanup, product implementation or runtime
+acceptance occurred. Next planning work is source-union/scenario refinement for Stage 2; full
+T3Personal remains the first product priority. The reference/evidence sequence below still applies.
+
 **Now:** [reference pack #84](t3personal-reference-pack.md) is available; replacement product
 NOT_AVAILABLE. **Next:** #85 server-reported resolved source/settings and actual selected dependency/
 artifact inputs, with exact typed-getter capability/bounds. Then #35 wire/control, #32 worked model,
@@ -16,7 +30,7 @@ are due here, not deferred, and no surface must finish before another starts. Fu
 publication execution scope/authorization is an operator gate, not a new Build state or approval API;
 this turn only plans and never builds/publishes/modifies production.
 See [T3Personal pilot](t3personal-pilot.md) for exact pinned facts and openable checkpoints. GitHub
-now has 84 open issues/nine milestones; registers have 18 subsystem slices/22 bounded contributions,
+had 84 open issues/nine milestones before Stage 1; registers have 18 subsystem slices/22 bounded contributions,
 still 16 subsystem owners. Existing native parents/states are preserved; #77 is included in the
 refreshed graph. Task counts are not product progress. The historical97 inventory is unchanged;
 three T3 configurations are a targeted addendum, not a global100 census.
