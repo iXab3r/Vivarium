@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Vivarium.Tests.TeamCity;
 
-public sealed record RestExpectation(HttpStatusCode Status, string MediaType, byte[] Body);
+public sealed record RestExpectation(HttpStatusCode Status, string? MediaType, byte[] Body);
 
 internal static class RestResponseAssert
 {
@@ -24,6 +24,10 @@ internal static class RestResponseAssert
             return $"media type: expected {expected.MediaType}, actual {actual.Content.Headers.ContentType?.MediaType}";
         }
         var detail = $"actual UTF-8: {Encoding.UTF8.GetString(bytes.AsSpan(0, Math.Min(bytes.Length, 512)))}";
+        if (expected.Body.Length == 0)
+        {
+            return bytes.Length == 0 ? null : $"response bytes differ; {detail}";
+        }
         if (expected.MediaType == "application/json")
         {
             var expectedJson = JsonNode.Parse(expected.Body);

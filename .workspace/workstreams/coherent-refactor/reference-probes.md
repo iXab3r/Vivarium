@@ -1,5 +1,11 @@
 # Queue, capture timing and authoring reference findings
 
+**Subsequent execution:** [US-013 P0 observations](us013-p0-execution.md) now include real owned-Agent
+lifecycle/bytes, separate definition/source timing fixtures and generated/manual/computed Kotlin
+REST edits with source commits. Use their exact contexts and limits; they do not freeze a universal
+capture default, all modes or product conformance. The original research/gap list below remains
+provenance and is not evidence that those later experiments never ran.
+
 Planning research at `ac609f5355f188080951015083114a3a3bce7625`, 2026-11-01.
 This narrows existing #32/#33/#34/#35/#36 obligations; it adds no case, executed conformance,
 implementation choice or review verdict. The [R0 manifest](r0-journey-manifest.md) stays UNFROZEN.

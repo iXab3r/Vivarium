@@ -2,7 +2,16 @@
 
 ## Current state — 2026-11-01
 
-**Current assignment: plan full autonomous US-013 E2E and resolve dark spots.** Confirmed: test-only
+**Current assignment: execute US-013 autonomously, starting with its P0 gates.** The owner said
+“let's work” after accepting the plan. [Execution evidence](us013-p0-execution.md) now includes real
+owned-Agent reference execution/bytes/cancellation, source/settings timing, generated/manual/computed
+Kotlin editing and the bounded checked-in C#/Git representation experiment. Literal reference
+observations have strict NUnit/WireMock replay; they are not new materialized product cases or a
+ready replacement Host. The integrated P0 model/activation/recovery/allocation/closure work remains
+in progress. No milestone main merge or R0/PILOT implementation has occurred. Continue the connected
+story work; planning-session no-execution statements below are historical, not a new approval gate.
+
+**Previous assignment: plan full autonomous US-013 E2E and resolve dark spots.** Confirmed: test-only
 repository publication is sufficient; no built-T3 GUI/CLI launch checks or interactive Windows;
 small frequent checks plus one actual T3 build/package; owned Agent processes on this Windows machine
 and Linux/Docker; fresh isolated installation without migration/TeamCity cutover; autonomous milestone

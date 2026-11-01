@@ -17,7 +17,10 @@ public sealed record RecordedExchange(string Actor, string Method, string PathAn
         if (Body is not null)
         {
             request.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(Body));
-            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(Headers["content-type"]);
+            if (Headers.TryGetValue("content-type", out var contentType))
+            {
+                request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+            }
         }
         request.Headers.Accept.ParseAdd(Headers["accept"]);
         if (fixtureCredential is not null)
@@ -29,7 +32,7 @@ public sealed record RecordedExchange(string Actor, string Method, string PathAn
 
     public RestExpectation ExpectedAt(Uri target)
     {
-        if (Expected.MediaType != "application/json")
+        if (Expected.MediaType != "application/json" || Expected.Body.Length == 0)
         {
             return Expected;
         }
@@ -90,15 +93,18 @@ internal static class RecordedMutationCases
 {
     public static IEnumerable<RecordedMutationCase> All => Load();
 
+    // These are literal reference observations only, not additional frozen/product cases.
+    public static IEnumerable<RecordedMutationCase> StoryObservations => Load("us013-observations.json");
+
     // No existing object or restricted actor is required by these two workflows. Dependent
     // catalog/actor workflows stay replay-bound and explicitly product-blocked in the receipt.
     public static IEnumerable<RecordedMutationCase> ProductReady => Load().Where(testCase =>
         testCase.Id is "TCREST-PROJECT-CREATE-READBACK-002" or "TCREST-PROJECT-MALFORMED-ID-001");
 
-    private static IReadOnlyList<RecordedMutationCase> Load()
+    private static IReadOnlyList<RecordedMutationCase> Load(string filename = "local-mutations.json")
     {
         using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(
-            TestContext.CurrentContext.TestDirectory, "TeamCity", "Reference", "local-mutations.json")));
+            TestContext.CurrentContext.TestDirectory, "TeamCity", "Reference", filename)));
         return document.RootElement.GetProperty("cases").EnumerateArray().Select(item =>
             new RecordedMutationCase(item.GetProperty("id").GetString()!.Replace("TC-", "TCREST-", StringComparison.Ordinal),
                 item.GetProperty("exchanges").EnumerateArray().Select(exchange =>
@@ -119,7 +125,8 @@ internal static class RecordedMutationCases
                         request.GetProperty("method").GetString()!,
                         request.GetProperty("path").GetString()! + (suffix.Length == 0 ? "" : "?" + suffix),
                         headers, request.TryGetProperty("body", out var body) ? body.GetString() : null,
-                        new RestExpectation((HttpStatusCode)response.GetProperty("status").GetInt32(), media, bytes));
+                        new RestExpectation((HttpStatusCode)response.GetProperty("status").GetInt32(),
+                            media.Length == 0 ? null : media, bytes));
                 }).ToArray())).ToArray();
     }
 }

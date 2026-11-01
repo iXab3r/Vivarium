@@ -2,6 +2,12 @@
 
 ## Current story delivery plan
 
+**Execution update, 2026-11-01:** the owner assigned this plan with “let's work”. The
+[integrated P0 execution checkpoint](us013-p0-execution.md) records actual reference effects,
+replay and C#/Git source experiments, their limits and remaining work. Planning readiness is now
+being exercised; it is not P0 acceptance or permission to skip into R0/PILOT. Original planning
+statements below describe that earlier session, not a continuing implementation prohibition.
+
 Owner direction, 2026-11-01: work through actor-goal stories; when the route to a story is unclear,
 resolve its plan. **US-013 / #78 is the active unit of delivery.** Lead: Story Delivery; co-held
 TeamCity, Testing Architect, REST and Docs perspectives. Technical cards identify responsibilities

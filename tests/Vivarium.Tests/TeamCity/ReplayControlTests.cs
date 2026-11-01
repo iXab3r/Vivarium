@@ -59,7 +59,7 @@ public sealed class ReplayControlTests
             }),
         };
         response.Content.Headers.ContentType = new(
-            corruption == "media" ? "text/html" : expected.MediaType);
+            corruption == "media" ? "text/html" : expected.MediaType!);
         Assert.That(await RestResponseAssert.DifferenceAsync(response, expected), Is.Not.Null);
     }
 
@@ -127,7 +127,7 @@ public sealed class ReplayControlTests
                 .WithHeader("Accept", new ExactMatcher(testCase.Accept))
                 .WithHeader("Authorization", new ExactMatcher("Bearer fixture-token")))
             .RespondWith(Response.Create().WithStatusCode((int)testCase.Expected.Status)
-                .WithHeader("Content-Type", testCase.Expected.MediaType)
+                .WithHeader("Content-Type", testCase.Expected.MediaType!)
                 .WithBody(testCase.Expected.Body));
         using var http = new HttpClient { BaseAddress = new Uri(server.Url!) };
         using var request = testCase.Request();

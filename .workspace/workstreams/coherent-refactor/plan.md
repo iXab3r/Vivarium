@@ -1,4 +1,11 @@
-# Coherent Vivarium refactor — plan v1.17
+# Coherent Vivarium refactor — plan v1.18
+
+**Execution started for US-013.** The owner assigned the accepted autonomous delivery plan with
+“let's work”. Continue the integrated P0 proof/model/contract/evidence block; its actual outputs are in
+[the execution checkpoint](us013-p0-execution.md). Reference observations and a bounded C#/Git source
+experiment are available; product availability remains NOT_AVAILABLE, no milestone is accepted and
+R0/PILOT must wait for P0 closure. Earlier planning-only assignments below retain their historical
+scope and do not prohibit this newly assigned execution.
 
 **Active discussion: full autonomous story delivery.** The owner confirmed test-repository publication,
 small checks plus one real T3 build/package without built-app launch, this Windows machine plus
@@ -8,7 +15,7 @@ UI manages/inspects builds, logs and artifacts, with configuration authoring in 
 See the [execution-ready delivery plan](t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution).
 All seven owner choices are resolved. The future agent starts with bounded P0 technical proof work,
 not another round of unspecified owner decisions; exact variant freeze and product acceptance remain
-open. This is planning, not authority to start implementation or external effects in this discussion. Earlier
+open. The preceding planning session started no implementation or external effect. Earlier
 launch/interactive-Windows/production-publication scope is superseded for current US-013 acceptance.
 
 **Current delivery unit: US-013 / #78.** Follow the

@@ -89,13 +89,69 @@ public sealed class RecordedMutationReplayTests
         Assert.That(server.LogEntries.All(entry => entry.MappingGuid is not null), Is.True);
     }
 
+    [TestCaseSource(typeof(RecordedMutationCases), nameof(RecordedMutationCases.StoryObservations))]
+    public async Task Story_reference_observation_replays_literal_requests_responses_and_bytes(RecordedMutationCase observation)
+    {
+        using var server = StartReplay(observation);
+        using var http = new HttpClient { BaseAddress = new Uri(server.Url!) };
+        await observation.ExecuteAsync(http, replay: true);
+        Assert.Multiple(() =>
+        {
+            Assert.That(server.LogEntries, Has.Count.EqualTo(observation.Exchanges.Count));
+            Assert.That(server.LogEntries.All(entry => entry.MappingGuid is not null), Is.True);
+        });
+    }
+
+    [TestCase(null)]
+    [TestCase("application/json")]
+    public async Task No_content_response_preserves_literal_media_and_empty_bytes(string? mediaType)
+    {
+        var expected = new RestExpectation(HttpStatusCode.NoContent, mediaType, []);
+        using var response = new HttpResponseMessage(HttpStatusCode.NoContent)
+        {
+            Content = new ByteArrayContent([]),
+        };
+        if (mediaType is not null)
+        {
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+        }
+        Assert.That(await RestResponseAssert.DifferenceAsync(response, expected), Is.Null);
+        response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
+        Assert.That(await RestResponseAssert.DifferenceAsync(response, expected), Does.StartWith("media type:"));
+        response.Content = new ByteArrayContent("unexpected"u8.ToArray());
+        if (mediaType is not null)
+        {
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+        }
+        Assert.That(await RestResponseAssert.DifferenceAsync(response, expected), Does.StartWith("response bytes differ;"));
+    }
+
+    [Test]
+    public async Task Extra_content_type_does_not_match_a_captured_headerless_delete()
+    {
+        var observation = RecordedMutationCases.StoryObservations.Single(item =>
+            item.Id == "authoring:configuration-parameter-reset");
+        var exchange = observation.Exchanges[0];
+        Assert.That(exchange.Headers.ContainsKey("content-type"), Is.False);
+        using var server = StartReplay(observation);
+        using var http = new HttpClient { BaseAddress = new Uri(server.Url!) };
+        using var request = exchange.Request("fixture-admin");
+        request.Content!.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        using var response = await http.SendAsync(request);
+        Assert.Multiple(() =>
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(server.LogEntries.Single().MappingGuid, Is.Null);
+        });
+    }
+
     private static WireMockServer StartReplay(RecordedMutationCase testCase, bool corruptReadback = false)
     {
         var server = WireMockServer.Start(new WireMockServerSettings
         {
             StartAdminInterface = false,
             AllowPartialMapping = false,
-            MaxRequestLogCount = 30,
+            MaxRequestLogCount = Math.Max(30, testCase.Exchanges.Count + 1),
         });
         for (var index = 0; index < testCase.Exchanges.Count; index++)
         {
@@ -105,21 +161,32 @@ public sealed class RecordedMutationReplayTests
                 .UsingMethod(exchange.Method)
                 .WithHeader("Accept", new ExactMatcher(exchange.Headers["accept"]))
                 .WithHeader("Authorization", new ExactMatcher("Bearer fixture-" + exchange.Actor));
+            if (exchange.Headers.TryGetValue("content-type", out var contentType))
+            {
+                request.WithHeader("Content-Type", new ExactMatcher(contentType));
+            }
+            else
+            {
+                request.WithHeader(headers => !headers.Keys.Any(name =>
+                    name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)));
+            }
             if (exchange.Body is not null)
             {
-                request.WithHeader("Content-Type", new ExactMatcher(exchange.Headers["content-type"]))
-                    .WithBody(new ExactMatcher(exchange.Body));
+                request.WithBody(new ExactMatcher(exchange.Body));
             }
             var mapping = server.Given(request).InScenario(testCase.Id);
             if (index != 0)
             {
                 mapping.WhenStateIs(index.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
+            var response = Response.Create().WithStatusCode((int)exchange.Expected.Status);
+            if (exchange.Expected.MediaType is { } mediaType)
+            {
+                response.WithHeader("Content-Type", mediaType);
+            }
             mapping.WillSetStateTo((index + 1).ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .RespondWith(Response.Create().WithStatusCode((int)exchange.Expected.Status)
-                    .WithHeader("Content-Type", exchange.Expected.MediaType)
-                    .WithBody(corruptReadback && index == testCase.Exchanges.Count - 1
-                        ? "{}"u8.ToArray() : exchange.ExpectedAt(new Uri(server.Url!)).Body));
+                .RespondWith(response.WithBody(corruptReadback && index == testCase.Exchanges.Count - 1
+                    ? "{}"u8.ToArray() : exchange.ExpectedAt(new Uri(server.Url!)).Body));
         }
         return server;
     }

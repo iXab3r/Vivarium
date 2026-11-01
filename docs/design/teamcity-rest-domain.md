@@ -116,6 +116,12 @@ either exactly-once intent or an obligation to create a different Build every ti
 
 ## C# authoring is a pre-implementation gate
 
+The [US-013 execution checkpoint](../../.workspace/workstreams/coherent-refactor/us013-p0-execution.md)
+now supplies bounded real reference editing/source effects and a compiled C#/Git representation
+experiment. It distinguishes demonstrated source editing/reevaluation from still-unproved real
+Host activation, authorization and recovery. The complete P0 gate below remains due; the experiment
+does not establish the final public SDK or all mode/collection semantics.
+
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
 clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.
 P0 must prove the managed/user-owned representation, precedence and supported computed-field rules.
