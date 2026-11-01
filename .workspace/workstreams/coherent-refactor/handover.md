@@ -3,6 +3,15 @@
 ## Current state — 2026-11-01
 
 **Current assignment: execute US-013 autonomously, starting with its P0 gates.** The owner said
+“let's work”. The latest [source/story accounting increment](story-source-accounting.md) adds real
+referential checks across the existing 25 stories, 160 scenarios, 52 readiness declarations and
+source/case registers, plus consumed-input freshness. Current exact actor/effect/variant/source-byte
+proof and the 78 source-gap dispositions remain open; those counts are not compatibility. Original
+case IDs/oracles/bindings/results stay intact, with acceptance metadata corrected from #110 to #112.
+The receipt separates full-root 489 Passed from final 147 controls/78 accounting controls and explicit
+ordinary reuse after the tiny dependency-target guard. Continue the integrated P0 story work.
+
+**Prior physical checkpoint:** the owner said
 “let's work” after accepting the plan. [Execution evidence](us013-p0-execution.md) now includes real
 owned-Agent reference execution/bytes/cancellation, source/settings timing, generated/manual/computed
 Kotlin editing, the bounded checked-in C#/Git representation experiment and the separately invoked

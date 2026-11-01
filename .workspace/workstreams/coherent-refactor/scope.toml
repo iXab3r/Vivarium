@@ -57,7 +57,7 @@ delivery_plan = "t3personal-pilot.md#current-story-delivery-plan"
 unclear_route = "Resolve the story plan and required proof, then continue connected authorized work without leaf-card handoffs"
 
 [autonomous_delivery]
-state = "P0_EXECUTION_IN_PROGRESS; bounded reference/source and eight-case physical recovery proof exists; model/mode/concurrency/allocation and closure remain due"
+state = "P0_EXECUTION_IN_PROGRESS; bounded reference/source/physical proof and referential story/source/dependency accounting exist; model/mode/concurrency, exact actor/effect/variant/source proof, 78 source gaps and closure remain due"
 acceptance_publication = "TEST_REPOSITORY_SUFFICIENT; no production iXab3r/t3code publication required"
 workload = "Frequent small-chain checks plus one actual T3 build/package E2E"
 built_application_execution = "EXCLUDED; explicit test-recipe delta removes T3 GUI/CLI launch smoke checks"

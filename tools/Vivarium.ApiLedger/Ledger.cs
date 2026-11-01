@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Vivarium.ApiLedger;
 
-public sealed record Identity(string Head, string ProductionTree, bool ProductionDirty, string[]? ProductionPaths = null);
+public sealed record Identity(string Head, string ProductionTree, bool ProductionDirty, string[]? RequiredInputPaths = null);
 public sealed record CaseResult(string CaseId, string PrimaryOwner, string State, string ReplayState);
 public sealed record Rollup(string Id, int? DiscoveryRows, int KnownCases, int Executed, int Green, int Red,
     int Blocked, int Stale, bool ApiComplete = false, string ScopeState = "unfrozen");
@@ -25,6 +25,16 @@ public sealed class Report
     public string DebtState => "NOT_ASSESSED";
     public int SubsystemSlices { get; set; }
     public int IntegrationContributionRows { get; set; }
+    public int ActorGoalStories { get; set; }
+    public int SurfaceScenarioCandidates { get; set; }
+    public int StoryDependencyReferences { get; set; }
+    public int SchemaSourceOccurrences { get; set; }
+    public int CliFixtureSourceOccurrences { get; set; }
+    public int NativeHttpSourceOccurrences { get; set; }
+    public int AgentEnvelopeSourceOccurrences { get; set; }
+    public int KnownStorySourceGaps { get; set; }
+    public int DistinctScenarioLinkedCases { get; set; }
+    public string StorySourceJoinState { get; set; } = "UNVERIFIED";
     public List<ObservedResult> RawResults { get; } = [];
     public int DiscoveryRows { get; set; }
     public int DiscoveryRowsWithAnyBoundReferenceOrReplayCase { get; set; }
@@ -33,7 +43,7 @@ public sealed class Report
     public int? NormalizedOperationVariantDenominator => null;
     public double? GlobalCompatibilityPercent => null;
     public bool GlobalApiComplete => false;
-    public string DiscoveryAllocationStatus => "UNVERIFIED; source union, normalization and due-scope freeze remain open #36";
+    public string DiscoveryAllocationStatus => "UNVERIFIED; source normalization, due variants and impact assessment remain open #110/#111/#112";
     public int MaterializedCases => Cases.Count;
     public int ExecutedCases => Cases.Count(c => c.State is "GREEN" or "RED" or "HARNESS_FAILURE");
     public int ProductGreenCases => Cases.Count(c => c.State == "GREEN");
@@ -42,15 +52,17 @@ public sealed class Report
     public int StaleCases => Cases.Count(c => c.State == "STALE");
     public int HarnessFailureCases => Cases.Count(c => c.State == "HARNESS_FAILURE");
     public List<string> Errors { get; } = [];
+    public List<string> RequiredInputPaths { get; } = [];
     public List<CaseResult> Cases { get; } = [];
     public List<Rollup> Subsystems { get; } = [];
     public List<Rollup> Blocks { get; } = [];
     public List<string> Limits { get; } = ["Accounting validates identity and provenance, not assertion/oracle correctness.",
         "Known cases are a partial cohort, not frozen global or subsystem scope.",
-        "#36 allocation/model/freeze and #42 final independent milestone/Security review remain open."];
+        "Source/story joins check declared referential links, not source-byte provenance, semantic aliases, exact actors/effects, independent surface entry or acceptance.",
+        "#110/#111/#112 allocation/model/freeze and final independent milestone/Security review remain open."];
 }
 
-public static class Ledger
+public static partial class Ledger
 {
     public const string Workstream = ".workspace/workstreams/coherent-refactor/";
 
@@ -70,14 +82,15 @@ public static class Ledger
 
     private static void ReadInto(string root, string candidate, Func<string, Identity> inspect, Report report, string assessmentPath)
     {
-        var ledger = Table(root, "api-ledger.tsv", "api_id");
-        var sources = Table(root, "teamcity-official-rest-operations.tsv", "resource", "operation");
-        var owners = Table(root, "subsystems.tsv", "subsystem_id");
-        var slices = Table(root, "subsystem-slices.tsv", "slice_id");
-        var blocks = Table(root, "api-blocks.tsv", "block");
-        var contributions = Table(root, "subsystem-contributions.tsv", "contribution_id");
-        var cases = Table(root, "rest-first-cohort-cases.tsv", "case_id")
-            .Concat(Table(root, "rest-local-mutation-cases.tsv", "case_id")).ToArray();
+        var metadataInputs = new HashSet<string>();
+        var ledger = Table(root, "api-ledger.tsv", metadataInputs, "api_id");
+        var sources = Table(root, "teamcity-official-rest-operations.tsv", metadataInputs, "resource", "operation");
+        var owners = Table(root, "subsystems.tsv", metadataInputs, "subsystem_id");
+        var slices = Table(root, "subsystem-slices.tsv", metadataInputs, "slice_id");
+        var blocks = Table(root, "api-blocks.tsv", metadataInputs, "block");
+        var contributions = Table(root, "subsystem-contributions.tsv", metadataInputs, "contribution_id");
+        var cases = Table(root, "rest-first-cohort-cases.tsv", metadataInputs, "case_id")
+            .Concat(Table(root, "rest-local-mutation-cases.tsv", metadataInputs, "case_id")).ToArray();
         Unique(cases, "case_id");
         var byCase = cases.ToDictionary(c => c["case_id"]);
         var byApi = ledger.ToDictionary(c => c["api_id"]);
@@ -123,7 +136,7 @@ public static class Ledger
                 Require(slices.Any(s => s["rest_contract_issue"] == task &&
                     (s["subsystem_id"] == row["primary_owner"] || Split(row["related_owner"]).Contains(s["subsystem_id"]) || s["subsystem_id"] == "SS-PROTO")), "Orphan case contract task.");
             foreach (var task in Split(row["acceptance_task"]))
-                Require(slices.Any(s => (s["rest_acceptance_issue"] == task || Split(s["implementation_issues"]).Contains(task)) &&
+                Require(slices.Any(s => s["rest_acceptance_issue"] == task &&
                     (s["subsystem_id"] == row["primary_owner"] || Split(row["related_owner"]).Contains(s["subsystem_id"]) || s["subsystem_id"] == "SS-PROTO")), "Orphan case acceptance task.");
             Tasks(row["contract_task"]); Tasks(row["acceptance_task"]);
             Require(row["asserted_effect"].Length > 0 && row["product_prerequisite"].Length > 0, "Missing effect/prerequisite binding.");
@@ -139,6 +152,8 @@ public static class Ledger
                 Require(slices.Any(s => s["milestone"] == slice["milestone"] && Split(s["implementation_issues"]).Contains(task)), "Orphan/cross-milestone contributing task.");
             foreach (var id in Split(contribution["variant_case_ids"])) Find(byCase, id, "contribution case");
         }
+
+        ValidateStorySources(root, byApi, byCase, byOwner, bySlice, metadataInputs, report);
 
         var evidence = Json(root, assessmentPath);
         Require(S(evidence, "candidate_id") == candidate, "Unknown candidate: explicit evidence decision required.");
@@ -174,8 +189,9 @@ public static class Ledger
         Unique(overrides.Select(x => new Dictionary<string, string> { ["path"] = S(x!, "path") }).ToArray(), "path");
         var sourceInputs = execution["source_inputs"]!.AsArray();
         Unique(sourceInputs.Select(x => new Dictionary<string, string> { ["path"] = S(x!, "path") }), "path");
-        if (identity.ProductionPaths is null || !identity.ProductionPaths.All(path => sourceInputs.Any(x => S(x!, "path") == path)))
-        { valid = false; report.Errors.Add("STALE: execution receipt does not fingerprint every tracked production source byte."); }
+        report.RequiredInputPaths.AddRange((identity.RequiredInputPaths ?? []).Concat(metadataInputs).Distinct().Order(StringComparer.Ordinal));
+        if (identity.RequiredInputPaths is null || !report.RequiredInputPaths.All(path => sourceInputs.Any(x => S(x!, "path") == path)))
+        { valid = false; report.Errors.Add("STALE: execution receipt omits required producer/harness or accounting-data inputs."); }
         foreach (var item in overrides)
             Require(sourceInputs.Any(x => S(x!, "path") == S(item!, "path") && S(x!, "sha256") == S(item!, "from_sha256")) &&
                 S(item!, "rationale").Length > 0, "Unknown/invalid source override.");
@@ -305,8 +321,9 @@ public static class Ledger
     }
     private static string BindingClass(string binding)
     { Require(binding.IndexOf('.') > 0 && binding.IndexOf('.') == binding.LastIndexOf('.'), "Invalid class/method binding."); return binding[..binding.IndexOf('.')]; }
-    private static List<Dictionary<string, string>> Table(string root, string name, params string[] keys)
+    private static List<Dictionary<string, string>> Table(string root, string name, ISet<string> inputs, params string[] keys)
     {
+        inputs.Add(Workstream + name);
         var lines = File.ReadAllLines(SafePath(root, Workstream + name));
         Require(lines.Length > 0, "Empty table: " + name);
         var header = lines[0].Split('\t');
@@ -356,8 +373,12 @@ public static class Ledger
             if (process.ExitCode != 0) throw new IOException("Git identity read failed: " + error.GetAwaiter().GetResult());
             return output.GetAwaiter().GetResult().Trim();
         }
+        string[] producerRoots = ["src", "tests", "tools", "build", "Directory.Build.props", "global.json", "Vivarium.slnx"];
+        var inputPaths = Git(["ls-files", "--", .. producerRoots]) + "\n" + Git(["ls-files", "--others", "--exclude-standard", "--", .. producerRoots]);
+        var required = inputPaths.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(path => path.TrimEnd('\r'))
+            .Where(path => !path.EndsWith(".md", StringComparison.OrdinalIgnoreCase)).Distinct().ToArray();
         return new(Git("rev-parse", "HEAD"), Git("rev-parse", "HEAD:src"),
             Git("diff", "HEAD", "--name-only", "--", "src").Length > 0 || Git("ls-files", "--others", "--exclude-standard", "--", "src").Length > 0,
-            Git("ls-files", "--", "src").Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(p => p.TrimEnd('\r')).ToArray());
+            required);
     }
 }

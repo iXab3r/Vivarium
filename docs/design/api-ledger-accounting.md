@@ -1,6 +1,7 @@
 # Offline API ledger accounting
 
-> Implemented partial P0 foundation for #36/#42; source census, model decisions, allocation and
+> Implemented partial P0 foundation under #110/#111/#112; former #36/#42 are retained source context.
+> Source normalization, model decisions, allocation and
 > exact due-scope freeze remain open. No product API-complete or milestone acceptance is claimed.
 
 After the ordinary solution build, read the local ledger and execution evidence:
@@ -44,11 +45,42 @@ variants over CFG-owned operation headings. The source-union allocation and norm
 remain unknown. Future blocks have unknown discovery allocation; their zero known cases do not
 establish empty frozen scope or completion. The protocol owner is never vacuous GREEN.
 
+## Source and story links
+
+The reader now joins the existing stories, surface-scenario candidates, source relations, installed
+schema occurrences, CLI fixture inventory/relations, native declarations, Agent envelope fields,
+source gaps, story dependencies and implementation contributions. For the present snapshot this is
+25 stories, 160 scenario candidates, 52 dependency declarations, 449 schema occurrences, 456 CLI
+fixture occurrences, 40 native HTTP declarations, 20 Agent envelope fields and 78 open source gaps.
+These are different source registers, not a normalized operation denominator or coverage fraction.
+
+Checks preserve primary source/owner identity, reverse scenario/source and case/API links, exact
+fixture occurrence fields, declared schema pointers/profile hashes, known task/slice roles and
+retained case identity. One documentation identity may have multiple source occurrences; repeated
+operation names do not deduplicate distinct paths. Related scenarios do not double count a case.
+Acceptance task links must point to REST-acceptance children, not implementation owners.
+
+Dependency declarations name existing stories or known technical evidence/task references and keep
+their bounded output/readiness/owner basis. They do not become reciprocal issue-closure blockers.
+Declared current availability and proof descriptions do not establish actual readiness. The command
+does not inspect GitHub state or interpret these strings as an execution workflow.
+
+`story_source_join_state` reports referential validation only. Source candidates stay UNFROZEN;
+schema/client/native acquisition bytes, semantic aliases, exact actors/current grants, effects,
+completion and independent UI/CLI entry evidence need their own proofs. No scenario, story, API or
+milestone becomes accepted because those links are valid. The full normalized denominator remains
+unknown, and all due gap/impact/freeze/review/debt/main gates remain open.
+
 The [evidence decision](../../.workspace/workstreams/coherent-refactor/api-evidence.json) identifies
 the candidate and expected HEAD, original execution receipt/hash/base/source fingerprint, exact known
 required case set, reference profile and explicit reuse/invalidate assessment. The command verifies
 actual current HEAD, committed production tree, dirty/untracked production files and all recorded
-working-file hashes. Every tracked production file must have execution-time byte provenance; Git
+working-file hashes. Required producer/harness paths include tracked and nonignored added files in
+the current source/test/tool/build roots plus the root SDK/build inputs, excluding Markdown. Every
+accounting table actually consumed by the reader is also required. `required_input_paths` exposes
+that input roster; a self-consistent receipt cannot silently omit a consumed table or newly added
+producer source. Metadata hashes are execution inputs, not another task-state authority.
+Every required file must have execution-time byte provenance; Git
 tree equality alone cannot prove working-file/EOL equality. Relevant input changes or unknown impact
 are stale, including a merge without an explicit assessed transfer. Unrelated prose/tool edits need
 no runtime rerun when the relevant inputs and environment remain valid.
@@ -70,9 +102,9 @@ whether arbitrary test assertions constitute the correct independent TeamCity or
 
 This foundation deliberately rejects frozen/global-complete/percentage/review/debt-closure claims.
 The known cohort remains unfrozen; global denominator/percentage are null and API-complete false.
-No general later-gap classification validator, complete source-union allocation, exact frozen variant
+No general later-gap impact classifier, complete semantic source-union allocation, exact frozen variant
 manifest/history, milestone debt/review evidence or closure workflow is implemented here. Those
-remaining #36/#42 obligations stay open under [D39 delivery](api-ledger-delivery.md).
+remaining #110/#111/#112 obligations stay open under [D39 delivery](api-ledger-delivery.md).
 
 Run the isolated pure-file accounting controls during development:
 
@@ -84,6 +116,9 @@ These use the existing NUnit stack and synthetic standard TRX/files, require no 
 artifacts, and exercise positive product GREEN before attempting corrupt/stale/false-complete inputs.
 Root `dotnet build`/`dotnet test` remain the coherent handoff checks. Status queries run none of them.
 
+## Historical executable checkpoints
+
+The following receipts retain their original counts, dependency state and execution identities.
 The [accounting checkpoint receipt](../../.workspace/workstreams/coherent-refactor/rest-ledger-results.json)
 records a passing root build and ordinary baseline (420 Passed, twelve existing TRX NotExecuted rows,
 zero Failed; 293.27 seconds including the test host). Only optional assessment-file plumbing changed

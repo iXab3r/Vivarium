@@ -57,6 +57,35 @@ public sealed class ApiLedgerTests
                 ["impacts"] = new JsonObject { ["production"] = "unchanged", ["shared_services"] = "unchanged", ["fixture_oracle"] = "unchanged", ["reference_client"] = "unchanged", ["environment"] = "unchanged" },
                 ["source_overrides"] = new JsonArray(), ["linked_reruns"] = new JsonArray() },
         };
+        CreateStorySourceLinks();
+        RebindMetadataInputs();
+    }
+
+    private void CreateStorySourceLinks()
+    {
+        Table("stories.tsv", "story_id\tissue\tcanonical_ac\tapplicable_tcm_from_ac",
+            "US-001\t86\tAC-INS-01\tTCM-08");
+        Table("story-scenarios.tsv", "story_id\tstory_issue\tscenario_id\tsurface\tsource_ids\tretained_case_ids\tcandidate_canonical_ac\tcandidate_model_invariants\tindependent_oracle_and_boundary\tvariant_freeze\tstate",
+            "US-001\t86\tUS-001/server\tcompatible-rest\tTCREST:rootapi.getApiVersion\tCASE-1;CASE-2\tAC-INS-01\tTCM-08\tIndependent captured bytes; synthetic accounting input\tUNFROZEN\tSCENARIO_INTENT_NOT_BINDING_OR_COVERAGE",
+            "US-001\t86\tUS-001/server\tunchanged-cli\tCLI-FIX-0001\t\tAC-INS-01\tTCM-08\tPinned client source, no executed CLI effect\tUNFROZEN\tSCENARIO_INTENT_NOT_BINDING_OR_COVERAGE");
+        Table("story-links.tsv", "source_id\tstory_id\tscenario_id\tsubsystem_id\tactive_owner_issue\tcase_id\tstate",
+            "TCREST:rootapi.getApiVersion\tUS-001\tUS-001/server\tSS-PROTO\t12\tCASE-1;CASE-2\tcandidate-intent-allocation-not-coverage");
+        Table("installed-http-occurrences.tsv", "profile\tmethod\tpath\tjson_pointer\tdeclared_operation_id\tschema_sha256",
+            $"reference\tGET\t/app/rest/apiVersion\t/paths/~1app~1rest~1apiVersion/get\tgetApiVersion\t{Hash("input.cs")}");
+        Table("source-relations.tsv", "api_id\tprofile\tmethod\tpath\tjson_pointer\tdeclared_operation_id\tgap_id\tstate",
+            "TCREST:rootapi.getApiVersion\treference\tGET\t/app/rest/apiVersion\t/paths/~1app~1rest~1apiVersion/get\tgetApiVersion\t\tcandidate-source-relation-not-normalized-or-covered");
+        Table("rest-fixture-inventory.tsv", "id\tkind\tmethod\tpath\tsource\ttable\tcase_index\tcommand",
+            "CLI-FIX-0001\trequest\tGET\t/app/rest/apiVersion\tcli.ts\tcases\t0\tserver version");
+        Table("cli-source-relations.tsv", "fixture_id\tkind\tmethod\tconcrete_path\tsource\ttable\tcase_index\tcommand_prefix\tcandidate_schema_paths\tcandidate_api_ids\tpreferred_api_id\tpreferred_schema_path\tstory_id\tscenario_id\tactive_owner_issue\tgap_id\tstate",
+            "CLI-FIX-0001\trequest\tGET\t/app/rest/apiVersion\tcli.ts\tcases\t0\tserver version\t/app/rest/apiVersion\tTCREST:rootapi.getApiVersion\tTCREST:rootapi.getApiVersion\t/app/rest/apiVersion\tUS-001\tUS-001/server\t12\tGAP-CLI\tCANDIDATE_SOURCE_JOIN_NOT_VARIANT_OR_COVERAGE");
+        Table("native-http-occurrences.tsv", "source_id\tstory_id\tscenario_id\tsubsystem_id");
+        Table("agent-message-occurrences.tsv", "source_id\tstory_id\tscenario_id");
+        Table("story-gaps.tsv", "gap_id\tstory_ids\towner_task\tdue_freeze\tnext_proof\tsource_ref\tstate",
+            "GAP-CLI\tUS-001\t36\tP0 impact assessment remains due\tActual source-backed effect\tcli.ts\tOPEN-NOT-COVERAGE");
+        Table("story-implementation-links.tsv", "story_id\tstory_issue\tslice_id\timplementation_issue\tcontract_issue\tacceptance_issue",
+            "US-001\t86\tSS-PROTO@P0\t12\t33\t42");
+        Table("story-dependencies.tsv", "story_id\tdependency_ref\trelation\tdependent_stage\trequired_output_or_contribution\towner_task\treadiness_or_unblock_condition\tclosure_semantics",
+            "US-001\tnone\tassessed-dependency-basis\tP0\tOwned ready inputs\t36\tActual declared output, not task closure\tNo whole-story closure blocker");
     }
 
     [TearDown]
@@ -77,6 +106,227 @@ public sealed class ApiLedgerTests
             Assert.That(report.Subsystems.Sum(s => s.KnownCases), Is.EqualTo(2));
             Assert.That(report.Blocks.Sum(s => s.Executed), Is.EqualTo(1));
         });
+    }
+
+    [Test]
+    public void Missing_story_discovery_link_cannot_preserve_current_GREEN()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1), "begin with a valid bounded accounting fixture");
+        Table("story-links.tsv", "source_id\tstory_id\tscenario_id\tsubsystem_id\tactive_owner_issue\tcase_id\tstate");
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Not.Empty, "the entire discovery source cannot disappear from the story graph");
+            Assert.That(report.ProductGreenCases, Is.Zero);
+        });
+    }
+
+    [TestCase("duplicate-source")]
+    [TestCase("orphan-story")]
+    [TestCase("missing-scenario")]
+    [TestCase("wrong-source-owner")]
+    [TestCase("lost-api-case-link")]
+    [TestCase("lost-scenario-case")]
+    [TestCase("orphan-scenario-source")]
+    [TestCase("missing-ac")]
+    [TestCase("wrong-model")]
+    [TestCase("missing-oracle-description")]
+    [TestCase("false-frozen-scenario")]
+    [TestCase("wrong-acceptance-task")]
+    [TestCase("implementation-as-acceptance")]
+    [TestCase("wrong-cli-preferred-path")]
+    [TestCase("changed-cli-occurrence")]
+    [TestCase("unowned-gap")]
+    [TestCase("unproved-gap-closure")]
+    [TestCase("invalid-schema-pointer")]
+    [TestCase("invalid-schema-hash")]
+    [TestCase("orphan-dependency-story")]
+    [TestCase("unknown-dependency-task")]
+    [TestCase("issue-closure-edge")]
+    public void Broken_story_source_join_never_preserves_current_GREEN(string corruption)
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        switch (corruption)
+        {
+            case "duplicate-source":
+                var sourcePath = Path.Combine(root, Ledger.Workstream, "story-links.tsv");
+                File.AppendAllText(sourcePath, File.ReadAllLines(sourcePath)[1] + "\n");
+                break;
+            case "orphan-story": ChangeStoryCell("story-links.tsv", "story_id", "US-404"); break;
+            case "missing-scenario": ChangeStoryCell("story-links.tsv", "scenario_id", "US-001/absent"); break;
+            case "wrong-source-owner": ChangeStoryCell("story-links.tsv", "active_owner_issue", "999"); break;
+            case "lost-api-case-link": ChangeStoryCell("story-links.tsv", "case_id", Ready); break;
+            case "lost-scenario-case": ChangeStoryCell("story-scenarios.tsv", "retained_case_ids", Ready); break;
+            case "orphan-scenario-source": ChangeStoryCell("story-scenarios.tsv", "source_ids", "TCREST:absent.read"); break;
+            case "missing-ac": ChangeStoryCell("story-scenarios.tsv", "candidate_canonical_ac", ""); break;
+            case "wrong-model": ChangeStoryCell("story-scenarios.tsv", "candidate_model_invariants", "TCM-999"); break;
+            case "missing-oracle-description": ChangeStoryCell("story-scenarios.tsv", "independent_oracle_and_boundary", ""); break;
+            case "false-frozen-scenario": ChangeStoryCell("story-scenarios.tsv", "variant_freeze", "FROZEN-GREEN"); break;
+            case "wrong-acceptance-task": ChangeStoryCell("story-implementation-links.tsv", "acceptance_issue", "35"); break;
+            case "implementation-as-acceptance": ChangeStoryCell("rest-first-cohort-cases.tsv", "acceptance_task", "35"); break;
+            case "wrong-cli-preferred-path": ChangeStoryCell("cli-source-relations.tsv", "preferred_schema_path", "/app/rest/absent"); break;
+            case "changed-cli-occurrence": ChangeStoryCell("cli-source-relations.tsv", "command_prefix", "invented command"); break;
+            case "unowned-gap": ChangeStoryCell("story-gaps.tsv", "owner_task", ""); break;
+            case "unproved-gap-closure": ChangeStoryCell("story-gaps.tsv", "state", "CLOSED-GREEN"); break;
+            case "invalid-schema-pointer": ChangeStoryCell("installed-http-occurrences.tsv", "json_pointer", "/paths/guessed"); break;
+            case "invalid-schema-hash": ChangeStoryCell("installed-http-occurrences.tsv", "schema_sha256", "missing"); break;
+            case "orphan-dependency-story": ChangeStoryCell("story-dependencies.tsv", "dependency_ref", "US-404"); break;
+            case "unknown-dependency-task": ChangeStoryCell("story-dependencies.tsv", "dependency_ref", "#999"); break;
+            case "issue-closure-edge": ChangeStoryCell("story-dependencies.tsv", "relation", "blocks-until-whole-story-closed"); break;
+            default: throw new ArgumentOutOfRangeException(nameof(corruption));
+        }
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Not.Empty);
+            Assert.That(report.ProductGreenCases, Is.Zero);
+            Assert.That(report.GlobalApiComplete, Is.False);
+        });
+    }
+
+    [Test]
+    public void Related_scenarios_do_not_double_count_cases_or_accept_an_independent_entry()
+    {
+        File.AppendAllText(Path.Combine(root, Ledger.Workstream, "story-scenarios.tsv"),
+            "US-001\t86\tUS-001/related\tcompatible-rest\tTCREST:rootapi.getApiVersion\tCASE-1\tAC-INS-01\tTCM-08\tRelated reference support, not another execution\tUNFROZEN\tSCENARIO_INTENT_NOT_BINDING_OR_COVERAGE\n");
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Empty);
+            Assert.That(report.ActorGoalStories, Is.EqualTo(1));
+            Assert.That(report.SurfaceScenarioCandidates, Is.EqualTo(3));
+            Assert.That(report.DistinctScenarioLinkedCases, Is.EqualTo(2));
+            Assert.That(report.MaterializedCases, Is.EqualTo(2));
+            Assert.That(report.ProductGreenCases, Is.EqualTo(1));
+            Assert.That(report.GlobalApiComplete, Is.False);
+            Assert.That(report.GlobalCompatibilityPercent, Is.Null);
+            Assert.That(report.StorySourceJoinState, Does.Contain("NOT_PROVED"));
+        });
+    }
+
+    [Test]
+    public void Shared_operation_name_keeps_distinct_source_occurrences_without_a_semantic_merge()
+    {
+        File.AppendAllText(Path.Combine(root, Ledger.Workstream, "installed-http-occurrences.tsv"),
+            $"reference\tGET\t/app/rest/anotherVersion\t/paths/~1app~1rest~1anotherVersion/get\tgetApiVersion\t{Hash("input.cs")}\n");
+        File.AppendAllText(Path.Combine(root, Ledger.Workstream, "source-relations.tsv"),
+            "TCREST:rootapi.getApiVersion\treference\tGET\t/app/rest/anotherVersion\t/paths/~1app~1rest~1anotherVersion/get\tgetApiVersion\tGAP-CLI\tcandidate-source-relation-not-normalized-or-covered\n");
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Empty);
+            Assert.That(report.DiscoveryRows, Is.EqualTo(1));
+            Assert.That(report.SchemaSourceOccurrences, Is.EqualTo(2));
+            Assert.That(report.MaterializedCases, Is.EqualTo(2));
+            Assert.That(report.NormalizedOperationVariantDenominator, Is.Null);
+        });
+    }
+
+    [Test]
+    public void Missing_CLI_reverse_scenario_source_is_not_a_complete_join()
+    {
+        Assert.That(Read().Errors, Is.Empty);
+        ChangeStoryCell("story-scenarios.tsv", "source_ids", "", row: 2);
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Not.Empty);
+            Assert.That(report.ProductGreenCases, Is.Zero);
+        });
+    }
+
+    [Test]
+    public void Different_schema_bytes_cannot_share_one_pinned_source_profile()
+    {
+        File.AppendAllText(Path.Combine(root, Ledger.Workstream, "installed-http-occurrences.tsv"),
+            $"reference\tGET\t/app/rest/anotherVersion\t/paths/~1app~1rest~1anotherVersion/get\tgetApiVersion\t{new string('0', 64)}\n");
+        File.AppendAllText(Path.Combine(root, Ledger.Workstream, "source-relations.tsv"),
+            "TCREST:rootapi.getApiVersion\treference\tGET\t/app/rest/anotherVersion\t/paths/~1app~1rest~1anotherVersion/get\tgetApiVersion\tGAP-CLI\tcandidate-source-relation-not-normalized-or-covered\n");
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Not.Empty);
+            Assert.That(report.ProductGreenCases, Is.Zero);
+        });
+    }
+
+    [Test]
+    public void Changed_valid_story_input_requires_an_explicit_evidence_assessment()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        ChangeStoryCell("story-scenarios.tsv", "independent_oracle_and_boundary", "A changed declared evidence boundary");
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Has.Some.StartsWith("STALE:"));
+            Assert.That(report.ProductGreenCases, Is.Zero);
+            Assert.That(report.RequiredInputPaths, Does.Contain(Ledger.Workstream + "story-scenarios.tsv"));
+        });
+    }
+
+    [Test]
+    public void Added_producer_source_cannot_hide_behind_an_old_input_manifest()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        Write("new-helper.cs", "new producer source");
+        identity = identity with { RequiredInputPaths = ["input.cs", "new-helper.cs"] };
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Has.Some.StartsWith("STALE:"));
+            Assert.That(report.ProductGreenCases, Is.Zero);
+            Assert.That(report.RequiredInputPaths, Does.Contain("new-helper.cs"));
+        });
+    }
+
+    [Test]
+    public void A_self_consistent_receipt_cannot_omit_a_consumed_metadata_input()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        var inputs = receipt["candidate"]!["source_inputs"]!.AsArray();
+        inputs.Remove(inputs.Single(item => item!["path"]!.GetValue<string>() == Ledger.Workstream + "story-links.tsv"));
+        var fingerprint = Sha(Encoding.UTF8.GetBytes(string.Join('\n', inputs.Select(input =>
+            input!["path"]!.GetValue<string>() + ":" + input["sha256"]!.GetValue<string>()))));
+        receipt["candidate"]!["source_fingerprint_sha256"] = fingerprint;
+        evidence["decision"]!["from_source_fingerprint"] = fingerprint;
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Has.Some.StartsWith("STALE:"));
+            Assert.That(report.ProductGreenCases, Is.Zero);
+        });
+    }
+
+    [Test]
+    public void Missing_dependency_target_is_not_an_assessed_readiness_basis()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        ChangeStoryCell("story-dependencies.tsv", "dependency_ref", "");
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.Multiple(() =>
+        {
+            Assert.That(report.Errors, Is.Not.Empty);
+            Assert.That(report.ProductGreenCases, Is.Zero);
+        });
+    }
+
+    private void ChangeStoryCell(string name, string column, string value, int row = 1)
+    {
+        var path = Path.Combine(root, Ledger.Workstream, name);
+        var lines = File.ReadAllLines(path);
+        var index = Array.IndexOf(lines[0].Split('\t'), column);
+        Assert.That(index, Is.GreaterThanOrEqualTo(0));
+        var cells = lines[row].Split('\t');
+        cells[index] = value;
+        lines[row] = string.Join('\t', cells);
+        File.WriteAllText(path, string.Join('\n', lines) + "\n");
     }
 
     [Test]
@@ -188,7 +438,7 @@ public sealed class ApiLedgerTests
             case "artifact": Write("raw.trx", File.ReadAllText(Path.Combine(root, "raw.trx")).Replace("Passed", "NotExecuted", StringComparison.Ordinal)); break;
             case "invalidate": evidence["decision"]!["action"] = "invalidate"; break;
             case "source-eol": Write("input.cs", "original source/oracle bytes\r\n"); break;
-            case "missing-production-fingerprint": identity = identity with { ProductionPaths = ["input.cs", "unfingerprinted.cs"] }; break;
+            case "missing-production-fingerprint": identity = identity with { RequiredInputPaths = ["input.cs", "unfingerprinted.cs"] }; break;
         }
         var report = Read();
         Assert.That(report.Errors, Is.Not.Empty);
@@ -272,6 +522,22 @@ public sealed class ApiLedgerTests
         evidence["receipt_sha256"] = Hash("receipt.json");
         Write(Ledger.Workstream + "api-evidence.json", evidence.ToJsonString());
         return Ledger.Read(root, "candidate", _ => identity);
+    }
+
+    private void RebindMetadataInputs()
+    {
+        var inputs = receipt["candidate"]!["source_inputs"]!.AsArray();
+        foreach (var input in inputs.Where(input => input!["path"]!.GetValue<string>().StartsWith(Ledger.Workstream, StringComparison.Ordinal)).ToArray())
+            inputs.Remove(input);
+        foreach (var path in Directory.GetFiles(Path.Combine(root, Ledger.Workstream), "*.tsv").Order(StringComparer.Ordinal))
+        {
+            var relative = Path.GetRelativePath(root, path).Replace('\\', '/');
+            inputs.Add(new JsonObject { ["path"] = relative, ["sha256"] = Hash(relative) });
+        }
+        var fingerprint = Sha(Encoding.UTF8.GetBytes(string.Join('\n', inputs.Select(input =>
+            input!["path"]!.GetValue<string>() + ":" + input["sha256"]!.GetValue<string>()))));
+        receipt["candidate"]!["source_fingerprint_sha256"] = fingerprint;
+        evidence["decision"]!["from_source_fingerprint"] = fingerprint;
     }
     private JsonObject Result(string path, int count, bool failed = false) => new()
     {
