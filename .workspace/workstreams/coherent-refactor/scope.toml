@@ -29,7 +29,7 @@ subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement comp
 accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
 
 [authority]
-current_assignment = "2026-11-01: plan full autonomous E2E delivery of US-013/#78 and resolve dark spots with recommendations/questions. Six scope/environment/autonomy choices are confirmed; UI configuration-authoring scope is pending. Do not start implementation or external effects during this planning discussion. Story work remains connected across technical contributions; D37-D40 gates and historical evidence identity remain."
+current_assignment = "2026-11-01: finish planning full autonomous E2E delivery of US-013/#78. All seven owner scope/environment/autonomy choices are confirmed, including C#/Git preparation and build-operation UI only. Plan is ready for future autonomous P0 execution; exact technical proofs/variant freezes remain work for that agent. This session remains planning, without implementation or external effects; D37-D40 gates and historical evidence identity remain."
 planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
 planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
 interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
@@ -57,7 +57,7 @@ delivery_plan = "t3personal-pilot.md#current-story-delivery-plan"
 unclear_route = "Resolve the story plan and required proof, then continue connected authorized work without leaf-card handoffs"
 
 [autonomous_delivery]
-state = "PLANNING; definition/model/contract proofs and UI-authoring scope remain unresolved"
+state = "PLAN_READY_FOR_AUTONOMOUS_P0; exact definition/model/contract proofs and variant freezes execute inside P0, not already accepted"
 acceptance_publication = "TEST_REPOSITORY_SUFFICIENT; no production iXab3r/t3code publication required"
 workload = "Frequent small-chain checks plus one actual T3 build/package E2E"
 built_application_execution = "EXCLUDED; explicit test-recipe delta removes T3 GUI/CLI launch smoke checks"
@@ -65,9 +65,12 @@ environment = "Current Windows machine plus available Linux/Docker; separately o
 interactive_windows = "NOT_REQUIRED"
 installation = "FRESH_ISOLATED; no existing-data migration or TeamCity cutover in US-013"
 merge_policy = "Agent merges verified milestones to main after all due gates and independent review; no merge during planning"
-ui_authoring = "PENDING_OWNER_ANSWER; C#/Git setup plus build-operation UI recommended"
+ui_authoring = "CONFIRMED: C#/Git preparation; UI inspects/runs/cancels builds and reads logs/artifacts; configuration editor is a separate story"
 end_to_end = "Independent small-chain UI/REST/unchanged-CLI entries; one heavy T3 CLI submission with UI/REST readbacks"
-current_execution = "NONE; read-only tool availability inspection only"
+current_execution = "NONE; read-only tool availability and GitHub policy inspection only"
+execution_plan = "t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution"
+test_repository_default = "New private iXab3r/vivarium-us013-e2e or unique owned suffix; verify ownership before reuse; create only during execution"
+merge_enforcement = "Re-read policy/check state; require exact-revision checks/evidence and independent verdicts even if GitHub main is unprotected"
 
 [story_transition]
 assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. All three planning stages complete; no product/runtime work. Historical stage counts below retain their original checkpoint meaning."

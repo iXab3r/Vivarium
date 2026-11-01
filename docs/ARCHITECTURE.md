@@ -1167,7 +1167,10 @@ PowerShell/selected artifacts/staging/test publication; and fault/recovery/acces
 Surface cards are projections across every level, not serial implementation gates. Use the current
 Windows machine and available Linux/Docker with separately owned test Agent processes, never the
 existing fleet. Use a new isolated installation; existing-data migration and TeamCity cutover are
-outside this story. Reuse one production authority. Actual used triggers,
+outside this story. The agent prepares the three definitions through C#/Git; the UI inspects and
+operates builds, logs and artifacts. Creating/editing configurations through UI belongs to its
+corresponding story, without waiving due shared-model/configuration-API proof. Reuse one production
+authority. Actual used triggers,
 coexistence publisher ownership, counters, service messages, manifests/bytes and publication cannot
 be deferred to broader owners. Off-mode is a marked intermediate checkpoint, not default-publication
 parity within the agreed test repository. The agent may merge verified milestones into main after

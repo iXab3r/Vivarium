@@ -21,7 +21,10 @@ small independent whole-chain entries across the three surfaces plus one actual 
 without built-application launch checks or an interactive desktop. Publication in a separate test
 repository is sufficient; no production T3 publication, migration or TeamCity cutover is required.
 Owned Agent processes use the current Windows machine and available Linux/Docker. The agent may
-merge milestones after all due gates and independent review. One surface need not finish before another starts. Actual used
+merge milestones after all due gates and independent review. C#/Git prepares the three configurations;
+UI configuration creation/editing belongs to its corresponding story, while the PILOT UI operates
+and inspects builds/logs/artifacts. Shared-model/configuration-API proofs still apply. One surface
+need not finish before another starts. Actual used
 Windows/chain/trigger/publication cannot move to later broad owners. Cards close after PILOT main acceptance, with one
 final milestone review/zero-debt gate. Reuse existing owners and bounded early contributions;
 full later-owner completion is neither a hidden prerequisite nor waived remaining scope.

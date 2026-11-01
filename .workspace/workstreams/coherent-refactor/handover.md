@@ -6,14 +6,18 @@
 repository publication is sufficient; no built-T3 GUI/CLI launch checks or interactive Windows;
 small frequent checks plus one actual T3 build/package; owned Agent processes on this Windows machine
 and Linux/Docker; fresh isolated installation without migration/TeamCity cutover; autonomous milestone
-merges after all due gates and independent review. The [draft execution contract](t3personal-pilot.md#autonomous-execution-contract--planning-draft)
+merges after all due gates and independent review; C#/Git prepares configurations while UI only
+operates/inspects builds, logs and artifacts. The [autonomous delivery plan](t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution)
 defines preparation, integrated P0, real R0, three independent small-chain surface entries, one heavy
-T3 CLI entry/readbacks, publication verification/recovery and reviewed main delivery. UI configuration
-authoring scope is awaiting the owner's answer. Actual C#/Git/model/reference proofs remain open;
-the execution plan is not frozen. No implementation, test execution, repository creation, merge or
+T3 CLI entry/readbacks, publication verification/recovery and reviewed main delivery. All seven owner
+choices are resolved. The plan is READY_FOR_AUTONOMOUS_P0; actual C#/Git/model/reference proofs and
+variant freezes remain assigned P0 work, not already accepted evidence. No implementation, test execution, repository creation, merge or
 publication occurs in this planning discussion. Read-only checks found Linux/amd64 Docker and MSVC
 tools, not a completely verified pinned environment. Historical launch/production-publish wording
 below and in captured source bodies is superseded for current story acceptance; keep original evidence.
+The plan supplies concrete repository/fixture defaults, exact merge/resume rules, completion evidence
+and a future agent brief. GitHub inspection observed unprotected main/no effective rules; the agent
+must enforce exact-revision gates independently of missing PR checks and re-read policy at execution.
 
 **Preceding direction: deliver US-013 as a story, with planning where the route is unclear.** The owner
 rejected leaf-by-leaf execution/handoffs. The [current story delivery plan](t3personal-pilot.md#current-story-delivery-plan)

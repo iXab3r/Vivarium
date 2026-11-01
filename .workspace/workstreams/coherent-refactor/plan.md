@@ -1,12 +1,14 @@
-# Coherent Vivarium refactor — plan v1.16
+# Coherent Vivarium refactor — plan v1.17
 
 **Active discussion: full autonomous story delivery.** The owner confirmed test-repository publication,
 small checks plus one real T3 build/package without built-app launch, this Windows machine plus
 Linux/Docker with owned Agent processes, a fresh isolated installation without migration/cutover, and
-autonomous main merges after all due gates and independent review. See the
-[draft execution contract](t3personal-pilot.md#autonomous-execution-contract--planning-draft).
-UI configuration-authoring scope is pending; definition/model/contract proof remains open. This is
-planning, not authority to start implementation or external effects in this discussion. Earlier
+autonomous main merges after all due gates and independent review. C#/Git prepares the configurations;
+UI manages/inspects builds, logs and artifacts, with configuration authoring in its separate story.
+See the [execution-ready delivery plan](t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution).
+All seven owner choices are resolved. The future agent starts with bounded P0 technical proof work,
+not another round of unspecified owner decisions; exact variant freeze and product acceptance remain
+open. This is planning, not authority to start implementation or external effects in this discussion. Earlier
 launch/interactive-Windows/production-publication scope is superseded for current US-013 acceptance.
 
 **Current delivery unit: US-013 / #78.** Follow the

@@ -29,6 +29,9 @@ The owner resolved these choices on 2026-11-01:
   this story; current-data/legacy-path handling still follows the relevant broader milestone contract.
 - Autonomous milestone merges into main after all due checks, independent review and debt closure.
   Planning does not merge the current branch or waive any unpassed P0/R0/PILOT gate.
+- The delivery agent prepares the three configurations through C#/Git. UI scope is chain/readiness
+  inspection, run/cancel, logs and artifact downloads; UI configuration creation/editing belongs
+  to its corresponding story. This does not remove due shared-model/configuration-API proofs.
 
 The test recipe must explicitly map hardcoded repository/updater/credential-preflight identities
 to the owned test repository and remove built-application launch checks. These are attributed fixture
@@ -37,14 +40,20 @@ package, selected artifact transfer and publication remain real; remaining comma
 failures. Browser journeys test Vivarium's own UI, not the T3 application. Source/settings/recipe
 fingerprints identify the adapted test inputs separately from historical #84/#85 observations.
 
-One scope question is still pending: whether C#/Git preparation plus build-operation UI is sufficient,
-or US-013 must also include creating/editing the chain in the UI. Do not assume that answer.
+All seven owner scope/environment/autonomy choices are resolved. The remaining definition/model/
+reference questions are technical proof work assigned to the autonomous agent. Resolve them through
+the bounded P0 experiments below; do not return them as unspecified policy questions or assume GREEN.
 
-### Autonomous execution contract — planning draft
+<a id="autonomous-execution-contract--planning-draft"></a>
+
+### Autonomous delivery plan — ready for P0 execution
 
 This plan prepares a future agent to deliver the whole story without technical-card handoffs.
-Implementation and external effects are not started by this planning session. The remaining UI
-authoring answer and actual definition/model/contract proofs still prevent declaring the plan frozen.
+**Plan readiness: READY_FOR_AUTONOMOUS_P0.** This is readiness to execute the integrated P0 proof
+work, not acceptance of its still-unfrozen variants or readiness to skip into R0/PILOT. Implementation
+and external effects are not started by this planning session. The agent freezes each dependent
+contract from actual evidence before implementing against it; routine technical choices need no
+further owner selection while they preserve the agreed behavior and authorities.
 
 1. **Freeze and prepare.** Pin source/settings, tool/client versions and the explicit test-recipe
    deltas; record upstream versus adapted fixture Git identities. Resolve the exact owned test
@@ -76,6 +85,8 @@ authoring answer and actual definition/model/contract proofs still prevent decla
    further T3 submissions. No built T3 GUI/CLI smoke launch is required. The current default-publication
    path must actually publish the expected outputs in the owned test repository. Record actual
    identities, exits, version/manifest consistency, file inventories and byte hashes.
+   This is one selected heavy acceptance journey, not a prohibition on necessary repair/reruns;
+   retain failed attempts and renew the proof when relevant changes invalidate it.
 6. **Review, merge and finish.** Run focused TDD during work and batch required root/boundary checks
    at coherent milestones. Obtain independent final correctness/simplicity and Security/Adversarial
    review on exact integrated revisions; repair all due findings and renew affected evidence. Merge
@@ -84,6 +95,12 @@ authoring answer and actual definition/model/contract proofs still prevent decla
    implemented GREEN or accept harness/setup failures. Final story completion requires the frozen
    story cases and cumulative delivered behavior, not all 449 discovery headings being GREEN.
 
+Resolve each phase's concrete prerequisites before its effects; do not make a late publication
+credential or a heavy T3 environment a blocker for independent P0 work. Provision resources only
+when their phase needs them. Verify the actual test repository, scoped credential, remaining recipe
+commands and environment before starting the heavy run rather than discovering missing publication
+access after hours of compilation. Normal private provisioning is not a new per-action owner gate.
+
 The agent records resumable decisions, exact heads/PRs, evidence locations, owned resources and next
 actions in the existing workstream/GitHub records. It re-reads actual build/release state after
 interruptions before acting again. This uses the existing host/CLI/testing contours, not a new
@@ -91,6 +108,90 @@ orchestrator, business state authority or scenario language. Missing PR checks a
 treated as PASS: observe configured checks and run the required exact-revision evidence. Vivarium's
 checked-in CI triggers Compile on the default branch; its Release/publishers have no trigger.
 Test T3 publication and publishing Vivarium itself are separate effects.
+
+### Concrete defaults and technical decisions delegated to the agent
+
+| Area | Planned default and required proof |
+|---|---|
+| Test repository | Create a new private `iXab3r/vivarium-us013-e2e` if available, or a unique owned suffix. Reuse an existing repository only after verifying its fixture ownership/provenance. Names are routine setup choices, not a reason to ask the owner. Never modify the production T3 repository or overwrite unrelated tags/releases. |
+| Source fixture | Keep small synthetic input on a distinct branch and the adapted pinned T3 snapshot on another, so semantic-trigger cases do not repeatedly rebuild T3. Preserve source/license provenance and record both upstream and fixture commits. Seed the adapted tree after applying test-repository/launch-check deltas; do not push upstream tags or enable copied upstream `.github/workflows`. Desired C# definitions live in the controller's Git authority, separately from the workload repository. |
+| C# definitions | Prove RF-05's managed C# settings plus separate user code candidate with the real three definitions. Prefer typed deterministic edits to managed fields and a bounded separate evaluator over arbitrary C# AST rewriting. Demonstrate valid/invalid activation, immutable effective plans and restart recovery. Inspect the pinned APIs before choosing file/type names; adopt only a proved candidate. Git-first US-013 setup does not exempt configuration mutations due in P0 from their compatible behavior. |
+| Reference fixtures | Use the explicitly isolated `vivarium-teamcity-lab-202613` profile/target, never default production writes. Verify version/origin before mutations, use owned small configurations/actors/Agent processes where needed, capture literal effects/bytes, and restore temporary lab gates/resources. Establish reuse, cancellation, source/settings timing and selected inputs independently; unobserved facts stay gaps until resolved. |
+| Authentication | Reuse the pinned Depot real OIDC fixture and stock Identity/OpenIddict flow with owned ordinary users. Obtain real cookies/finite CLI credentials through normal product paths, grant/withdraw current rights through owning services and prove denial. No database grant seed or installation password used as a bearer substitute. Private values stay in existing stores; request a missing credential through the private mechanism once concrete need is established. |
+| Local resources | Own Windows processes, Linux containers, private PG/Git/Storage and namespaced caches/volumes. Verify actual Windows↔Linux controller/data-plane URLs, TLS trust, tool versions, Docker access, disk and bounded cleanup; localhost reachability is not assumed across containers. Do not switch the host Docker mode, reboot, replace global tools or install unrelated host components silently. |
+| Heavy workload | Use the source-confirmed T3 cohort as the initial pinned build/package baseline, with explicitly separate fixture Git identities after adaptation. Keep the used later trigger-exclusion delta in its due controlled cases. Prepare/Windows/Release timeout inputs remain 90/90/15 minutes for that recipe; derive supported CLI wait/queue budgets from the frozen critical path rather than the client's 10-minute default. Timeout does not imply cancellation. |
+| Evidence and cleanup | Retain exact source/fixture/target identities, requests, outcomes, bytes and cleanup receipts in the existing contours. Final output includes the test release, required evidence and reproducible start/setup inputs. Reap test-owned processes/containers; preserve final evidence/release and never recursively clean paths or resources without checked ownership. No new orchestration framework or second task/status authority. |
+
+If the definition candidate fails, the agent may revise its implementation approach and repeat the
+bounded proof without asking about class names or libraries. Escalate only a concrete incompatible
+observable contract or scope/authority change, presenting the failed proof and viable recommendation.
+This differs from asking the owner to choose an unspecified abstraction before inspecting its APIs.
+
+### Failure classification and autonomous repair
+
+| Failure | Agent action and honest result |
+|---|---|
+| Vivarium differs from independently established behavior | Preserve real RED, fix the owning production implementation and required regression evidence. Do not change the oracle or hide the case. |
+| Reference/default/identity behavior is unknown | Inspect pinned sources and execute the bounded isolated reference case. Resolve the fact, not a new owner preference; escalate only a concrete unresolved material contract conflict. |
+| Test harness, tool, URL/TLS or private fixture setup fails | Diagnose and repair within the owned scope; classify setup failure separately from product RED. Missing external authority/secret uses its concrete supported resolution, not repeated blind runs. |
+| T3 compile/package fails because of its own source or dependency environment | Verify the pinned inputs and distinguish reproducible workload failure from CI handling. Repair declared fixture/tool integration where justified; do not rewrite the T3 application, drop remaining build steps or turn their nonzero exit into success. A correct failed Build is not a successful heavy E2E; an unavailable independently working workload is a named prerequisite blocker. |
+| Submit/cancel/publish response is lost | Inspect the known operation/Build/tag/release and actual effects, then follow the frozen retry/reuse semantics. Do not manufacture a new run or overwrite unrelated output merely to retry. |
+| Independent review or main verification finds a defect | Fix due findings within the same milestone, renew affected checks/verdicts and verify the actual main result before closure. A review unavailable or issued for another revision is not PASS. |
+
+### Exact milestone merge and resume rules
+
+Read-only GitHub inspection on 2026-11-01 found main at `09dd40bb…`, `protected=false`, no effective
+branch rules, and a branch-protection 404. These are observations, not permanent configuration.
+The checked-in TeamCity definition has a default-branch Compile trigger and no automatic PR,
+Release or publisher trigger. Re-read actual policy/check state at execution; this plan changes no
+repository administration or CI settings and does not interpret missing checks as successful checks.
+
+Before each milestone merge, the agent must have: the exact integrated candidate/base, all due
+checks and explicit reuse/invalidation on that candidate, zero due findings/debt, independent final
+correctness/simplicity and Security/Adversarial verdicts on that revision, and satisfied observed
+repository checks/policies. Reviewers inspect raw evidence with independent context; author self-
+review is not PASS. Create/link the milestone PR through the available host integration, merge only
+that verified candidate, then inspect the actual main result. A changed merge tree invalidates
+affected evidence/verdicts until renewed; an unchanged relevant tree still needs an explicit transfer
+assessment. Close cards only after verified main delivery. Do not auto-merge this planning branch
+merely because story-level autonomy has been agreed.
+
+On resume, read the existing workstream/GitHub checkpoint, verify the current branch/head/PR and
+owned resources, and inspect actual build/assignment/release state before repeating commands. Lost
+submit or publish responses do not authorize blind resubmission; preserve the operation's frozen
+retry/identity behavior and inspect the known object. Do not adopt a stale reviewer PASS, a stale
+controller instance, unrelated process/container or unrelated same-named release. Fix ordinary
+failures autonomously; if a required reviewer/tool/credential or agreed environment is unavailable,
+record the concrete blocker rather than weakening the gate.
+
+### Completion evidence for this story
+
+| Observable | Required evidence |
+|---|---|
+| C#/Git setup and ordinary access | Real activated three-configuration definitions/revisions; ordinary login/key and current scoped allow/deny. No UI configuration editor required. |
+| Three surfaces | Independent small whole-chain UI, compatible REST and unchanged-CLI entries, with real state/effect readbacks and selected input/output bytes. Viewing one run three ways is insufficient. |
+| Execution and ownership | Actual Windows/Linux work, requirements and waiting reasons, ordered configured commands, upstream failure, queued/running cancellation and restart/reconnect without fabricated success or orphan ownership. |
+| Artifacts and publication | Coherent common version, selected producer/consumer files and hashes, retained/downloaded bytes and actual complete publication in the owned test repository; partial/retry/current-access controls use small owned fixtures. |
+| Real T3 build/package | One real three-configuration T3 CLI submission using the attributed adapted recipe, successful remaining compile/package commands, expected outputs/test publication and UI/REST inspection; no built-application GUI/CLI launch proof. |
+| Automation and delivery | Used controlled trigger/quiet-period/exclusion/single-publisher cases, frozen due/cumulative case evidence, independent milestone verdicts, zero due debt and verified main revisions. |
+
+Bind these observables to the existing AC/TCM/ledger and real independent cases during P0; this table
+does not invent case IDs, expectations or a new test language. A plan can be ready to execute while
+product availability remains NOT_AVAILABLE and exact variant scope remains UNFROZEN.
+
+### Future agent assignment
+
+Use this as the delivery brief after the owner assigns execution; it does not start work from this
+planning session:
+
+> Deliver US-013 / #78 end to end using this plan and the current repository contracts. Start with
+> the integrated P0 proof package, close its gates/main delivery, then R0 and PILOT. Preserve the
+> seven confirmed boundaries and use the existing subsystem owners rather than a leaf-task queue.
+> Resolve routine technical choices through pinned APIs and independent bounded evidence, implement
+> and repair continuously, and obtain independent milestone verdicts before autonomous main merges.
+> Do not launch the built T3 application, require interactive Windows, migrate existing installations,
+> use existing fleet Agents or publish to production T3. Finish with verified story/main/test-release
+> evidence and cleanup, or report a concrete blocker outside the agreed scope with a recommendation.
 
 **Publication oracle and recovery.** The original T3 publisher can exit zero for an already published
 tag without verifying its assets. The E2E test therefore independently checks repository, tag target,
@@ -111,12 +212,13 @@ production TeamCity cutover, production T3 publication or global interactive-des
 
 ### Assessment and immediate work
 
-**Planning is currently necessary before structural implementation.** The current controller still
+**P0 proof work is the first autonomous execution block.** The current controller still
 references SQLite and has the existing queue/Agent/Git/native-REST foundation, not the accepted
 C#/Chiral/PostgreSQL catalog and compatible full-chain product. #84/#85 give usable independent
 reference inputs; they do not supply a complete definition/editing/selection model or frozen
 entry/effect cases. P0's baseline/composition/allocation and final review/main gates remain open.
-This is an identified readiness gap, not a proposal to restart the already accepted architecture.
+These are assigned technical readiness obligations, not unresolved owner scope choices or a proposal
+to restart the accepted architecture. Execute their bounded proof before dependent structural code.
 
 **The current work block is the integrated US-013 preparation package**, spanning #110/#111/#112,
 #32/#34 and the existing story contract #117. Finish its definition, model, reference cases and
