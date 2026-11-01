@@ -37,6 +37,10 @@ Security/Adversarial review at the exact revision. Fix all findings and introduc
 tails through same-milestone tasks, verify narrowly, renew affected verdicts, then deliver/close.
 No debts carried into next-milestone implementation; no security follow-up waiver at closure.
 
+The [offline ledger command](design/api-ledger-accounting.md) reads local structured registers,
+standard TRX, hashes and explicit candidate reuse decisions. It does not launch tests/builds or probe
+TeamCity. Its generated status remains partial with unknown global scope and API-complete false.
+
 ## Building
 
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete

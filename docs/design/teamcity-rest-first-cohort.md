@@ -167,9 +167,10 @@ cross-platform performance or a completed bulk-scaling/maintenance proof.
 ## Remaining gates
 
 P0 remains open and product API-complete is **false**; global variant count and compatibility percentage
-are **unknown**. The broad corpus, full allocation/normalization, mechanical ledger/result/reuse
-validator, structural/editability contracts and final independent aggregate/Security review are
-unfinished. This cohort does not change the accepted D32–D40 gates.
+are **unknown**. The [offline ledger foundation](api-ledger-accounting.md) now validates partial
+case/task/result/reuse accounting. Broad corpus, full allocation/normalization and exact due freeze,
+structural/editability contracts and final independent aggregate/Security review remain unfinished.
+This cohort does not change the accepted D32–D40 gates.
 
 Current owner direction (2026-11-01): reference mutations and observed effects require a **separate
 local TeamCity test server** (confirmed by the owner), not a disposable project on the owner's

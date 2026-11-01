@@ -34,8 +34,10 @@ downloads and domain/Agent behavior supplement discovery; no denominator is froz
 
 P0 task #36 owns the small ledger validator/report binding. It must use ordinary structured files and
 existing test results, not add a scheduler, dashboard service, runner or recurring full-suite job.
-The report remains partial/unverified. A [first-cohort NUnit target](teamcity-rest-first-cohort.md)
-now executes real raw cases; mechanical report ingestion, scope and reuse validation remain #36 work.
+The [offline accounting foundation](api-ledger-accounting.md) now checks discovery/case/task joins,
+standard raw/replay TRX provenance and explicit evidence freshness/reuse. It remains partial: complete
+source-union allocation, normalized/frozen due scope and closure evidence remain #36 work. A
+[first-cohort NUnit target](teamcity-rest-first-cohort.md) executes real raw cases.
 The validator checks accounting, bindings and evidence provenance; it cannot infer that an arbitrary
 assertion is a correct TeamCity oracle. Reference contracts and actual state/byte checks still own
 that meaning. A populated receipt or a renamed test cannot turn self-consistency into parity.
@@ -130,7 +132,8 @@ rerun the affected selection and real boundary before counting it GREEN. Indepen
 judge sufficiency, retain exact reviewed revisions and renew affected verdicts; an old PASS is not
 automatically a new-head PASS. #36 validates records and stale accounting, not a dependency engine.
 #42 proves unchanged reuse, invalidation on shared semantics/fixture/oracle changes and unknown-impact
-rejection. Current seed receipts/checker remain unimplemented.
+rejection. The partial checker and cohort receipts are implemented; complete allocation/freeze,
+later-gap and milestone closure evidence remain open.
 
 All four verification targets must be available and buildable from first harness delivery. Execute
 the full raw target for the first D38 baseline; later execute the due/cumulative cases at coherent

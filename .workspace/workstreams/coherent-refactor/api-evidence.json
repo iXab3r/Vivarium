@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "candidate_id": "ledger-accounting-working-tree",
+  "expected_head": "e9bf12c5040b4020dd6b5ff267945ee903acc209",
+  "receipt": ".workspace/workstreams/coherent-refactor/rest-ledger-results.json",
+  "receipt_sha256": "debf7fd8b7ce07ff72e49a54a9320897d505619b1e1d91186f468a852d0eb1a7",
+  "reference_profile": "vivarium-teamcity-lab-202613",
+  "retained_assemblies": [
+    {
+      "recorded_path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+      "artifact": "artifacts/p0-ledger/checkpoint-assemblies/Vivarium.Controller.dll",
+      "sha256": "fe80d9a6d73a07be6c909884b56847b2a2fa825baa3f424f2047c775e75837ec"
+    },
+    {
+      "recorded_path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+      "artifact": "artifacts/p0-ledger/checkpoint-assemblies/Vivarium.Tests.dll",
+      "sha256": "4bd87d4b414264ab10d290bcfa9f82178385f5e9a905448fd466989ddfd6584c"
+    },
+    {
+      "recorded_path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+      "artifact": "artifacts/p0-ledger/checkpoint-assemblies/Vivarium.TeamCity.Conformance.dll",
+      "sha256": "369f3edf9b3c75ed2318aa9b1a1c86922c58bbd6f86b0b10b993f9432ea1ff1b"
+    }
+  ],
+  "scope": {
+    "frozen": false,
+    "normalized_denominator": null,
+    "required_case_ids": [
+      "TCREST-SERVER-API-VERSION-TEXT-001",
+      "TCREST-PROJECT-ROOT-FIELDS-JSON-001",
+      "TCREST-PROJECT-CREATE-READBACK-JSON-001",
+      "TCREST-PROJECT-CREATE-READBACK-002",
+      "TCREST-PROJECT-EDIT-READBACK-001",
+      "TCREST-PROJECT-DUPLICATE-ID-001",
+      "TCREST-PROJECT-MALFORMED-ID-001",
+      "TCREST-BUILDTYPE-CREATE-READBACK-001",
+      "TCREST-BUILDTYPE-EDIT-READBACK-001",
+      "TCREST-BUILDTYPE-DUPLICATE-ID-001",
+      "TCREST-BUILDTYPE-MALFORMED-ID-001",
+      "TCREST-PERMISSION-VIEW-PROJECT-GRANTED-001",
+      "TCREST-PERMISSION-EDIT-PROJECT-DENIED-001",
+      "TCREST-PERMISSION-EDIT-BUILDTYPE-DENIED-001",
+      "TCREST-PERMISSION-CREATE-PROJECT-DENIED-001"
+    ],
+    "api_complete": false,
+    "compatibility_percent": null,
+    "review_state": "NOT_REVIEWED",
+    "debt_state": "NOT_ASSESSED"
+  },
+  "decision": {
+    "from_base": "e9bf12c5040b4020dd6b5ff267945ee903acc209",
+    "from_source_fingerprint": "a2ed282f7ae4c5c204c4f0b1dd5a3935261afda149ca027fca12b38f03922806",
+    "to_candidate": "ledger-accounting-working-tree",
+    "action": "reuse",
+    "assessor": "Test Steward (implementation assessment; not independent milestone review)",
+    "rationale": "This read-only report reuses the explicitly completed raw/control checkpoint for the same candidate. Verify current HEAD/tree/worktree and all recorded production/source/fixture/profile/artifact bytes; no suite runs at status time. Original receipt and earlier incomplete provenance remain unchanged.",
+    "impacts": {
+      "production": "unchanged",
+      "shared_services": "unchanged",
+      "fixture_oracle": "unchanged",
+      "reference_client": "unchanged",
+      "environment": "unchanged"
+    },
+    "source_overrides": [],
+    "linked_reruns": []
+  }
+}

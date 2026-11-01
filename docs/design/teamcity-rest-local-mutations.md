@@ -89,7 +89,8 @@ workflow IDs and exactly two ready IDs, and verify the raw actor-restriction ent
 
 Keep the original first-cohort records immutable. Record the new acquisition/tool/source inputs and
 new candidate/result hashes separately. Focused replay and raw checks precede a single required
-solution build/test checkpoint; the full future API denominator, #36 mechanical ledger validator,
+solution build/test checkpoint. The [offline ledger foundation](api-ledger-accounting.md) now checks
+partial case/task/result/reuse accounting; full future API denominator/allocation/due freeze,
 P0 composition/Agent/PG gates and final independent milestone review remain incomplete. Exact commands
 and current results are recorded in the [new receipt](../../.workspace/workstreams/coherent-refactor/rest-local-mutation-results.json).
 

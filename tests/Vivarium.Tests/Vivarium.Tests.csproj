@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\tools\Vivarium.ApiLedger\Vivarium.ApiLedger.csproj" />
     <!-- Build the separately invoked raw target without running it as ordinary GREEN evidence. -->
     <ProjectReference Include="..\Vivarium.TeamCity.Conformance\Vivarium.TeamCity.Conformance.csproj"
                       ReferenceOutputAssembly="false" />
