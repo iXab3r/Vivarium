@@ -18,7 +18,7 @@ separate-Agent execution or operator deployment experience already exists.
 | R0.1 | Prepare/start local PG, Host and a real separate Agent; open current-style UI, inspect nodes/health, enroll/authorize the Agent, attach debuggers and restart/reset/stop | Full catalogue authoring, source checkout, all roles/clients or full build parity |
 | R0.2 | Use unchanged teamcity-cli with a local profile to run/watch/cancel seeded LocalSmoke, inspect the same run through native UI/API and download a verified artifact | Entire CLI route surface or migrated real build families |
 | R0.3 (R0 exit) | Repeat the above after Host/Agent disconnect/restart, preserve stable identity/ownership/results, prove clean reset/teardown and protected output | All platform fault cases, upgrade rollout or complete durable searchable logs |
-| R1 | Exercise ordinary OIDC users, tokens and exact TeamCity project/group role model through actual UI/API | Source-based full Compile still belongs to R2 |
+| R1 | Complete ordinary identity/token lifecycle and exact TeamCity project/group roles beyond R0's required ordinary-user credential and current-grant subset | Source-based full Compile still belongs to R2 |
 | R2 | Configure and run a genuine source-based C# Compile with exact Git revisions/requirements and durable provenance | Chains/publishers/history migration still have their later gates |
 
 The local Host/Agent lab must not wait until R2 or R5. It is usable at R0.1; the first compatible
@@ -38,8 +38,16 @@ Use the existing EyeAuras.Automation consumer approach, not a new orchestration 
   its normal pin. No disabled TLS validation, credential bypass or special lab-only queue API.
 - Bundled TypeScript/Workbench UI preserving TeamCity/current Vivarium composition. No frontend
   runtime service, forced Depot outline layout or separate browser authority.
-- Minimal stock Identity/OpenIddict installation authentication in R0; R1 completes ordinary external
-  OIDC and full scoped/group access. This is staged reuse of the final mechanisms, not a new legacy token.
+- Stock Identity/OpenIddict installation login plus the minimal ordinary external-OIDC/My keys/current-grant
+  contribution in R0; R1 completes identity, roles/groups, compatible PAT wire and account lifecycle.
+  The installation user is excluded from My keys issuance and code redemption in the frozen Depot
+  source. Its password/cookie cannot supply the unchanged CLI bearer.
+
+The [R0 journey manifest](r0-journey-manifest.md) is the concrete, still **UNFROZEN** planning input
+owned by #36, consumed by #43/#14/#37/#38 and verified by #42/#44. It names request shapes,
+ordinary/admin/restricted principals, activated seeds, required states, effects and reference gaps.
+It adds no fixture language, product behavior or executed case. #32/#33 establish unknown TeamCity
+facts; #34 proves the seed's source representation before R0 implementation.
 
 Preparation pins SDK/packages/browser/client inputs and builds the real programs/fixture payload.
 start/status/attach/run/reset/stop use the same product fixture composition as acceptance; exact
@@ -61,6 +69,13 @@ is displayed truthfully. Debugger attachment does not alter domain rules. Reset 
 lab state; stop leaves no owned child process/container behind. Commands and safe status receipts make
 the same environment usable by a human and by Automation.
 
+Before #38, prove ordinary OIDC sign-in with no implicit grants, My keys finite bearer issuance,
+installation-user token denial, and normal installation login granting the ordinary account
+TeamCity SYSTEM_ADMIN through the shared authorized Access path. The same pre-grant bearer must
+gain current rights. Prepare a second ordinary principal with only the required project grant for
+positive own-project reads and denied cross-project artifact/Agent-control checks. #14 integrates
+this SS-IAM contribution from #16/#17 without depending on complete R1 acceptance.
+
 ## R0.2 proof
 
 Seed one Git-owned LocalSmoke configuration using P0's final approved definition representation and
@@ -71,8 +86,13 @@ Full evaluator/editor/inheritance and product-source checkout expand in R2.
 Run an actual prepared native fixture executable. It emits recognizable stdout and smoke.txt and
 supports deterministic nonzero/long-running modes for negative/cancel checks. Through a separate
 normal CLI profile: authenticate, discover Agent/configuration, enqueue/watch completion, inspect
-outcome, download and hash smoke.txt, then run/cancel the long case. Native UI/API observe the same
-run IDs/state and raw output. No real publisher/trigger or production credential is involved.
+outcome, list/download/hash smoke.txt through the client's actual artifact `/files/smoke.txt` path.
+Execute the nonzero mode and prove terminal FAILURE plus unchanged CLI nonzero exit. Separately
+cancel queued work and prove it never starts; cancel running long work and prove actual stop,
+terminal state and capacity release, with reference-defined raced-completion handling. Native
+UI/API observe the same run IDs/state and retained raw output. Verify denied access using the
+restricted principal and known protected bytes, with positive controls. No real publisher/trigger
+or production credential is involved.
 
 ## R0.3 proof and replacement discipline
 

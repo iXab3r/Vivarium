@@ -117,8 +117,11 @@ either exactly-once intent or an obligation to create a different Build every ti
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
 clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.
 P0 must prove the managed/user-owned representation, precedence and supported computed-field rules.
-All required mutable fields must have a real path to deterministic validated source changes; otherwise
-the affected compatibility remains an explicit blocker. Do not hide a DB/JSON override or introduce a
+For each reference Versioned Settings/DSL mode, freeze which mutations TeamCity permits, rejects or
+makes read-only, with its failure and completion behavior. Required mutable fields must have a real
+path to deterministic validated source changes where that mode permits edits; do not assume arbitrary
+computed C# must be editable or invent a native restriction where TeamCity allows the edit. Unverified
+mode behavior or an unrepresentable required edit remains an explicit blocker. Do not hide a DB/JSON override or introduce a
 general C# AST rewriter to claim 1:1 behavior.
 
 #34's concrete proof starts with a blank installation: create Project P before any product binding,
@@ -133,6 +136,16 @@ preserves identity/history without duplicate state, but do not invent paths or a
 planning seed. #42 verifies P0's actual representation/ownership evidence; #47/#48 freeze and accept
 the R2 product authoring behavior. This is an assigned proof, not existing runnable C# or GREEN.
 
+The future P0 proof pack must contain actual before/after source files and a field-authority table,
+not only a proposed SDK. Identify managed versus user-owned source, exact editor/evaluator invocation,
+independently expected diff/effective result and source/reference case links. Demonstrate individual
+properties, collection replacement/reordering and inherited reset in their permitted modes, plus a
+representative computed field and an existing destination-ID/binding collision. Show candidate,
+accepted and active control/product revisions, returned error/completion/readback and recovery when
+commit/ref/apply or a cross-repository binding handoff fails. Preserve one owner per field and the
+previous usable state. This bounded representability gate precedes R2's full engine/live UI authoring;
+exact source paths, SDK and implementation are outputs of #34, not choices made by this plan.
+
 ## Earliest implementation and verification
 
 D38 places the executable REST expectation corpus/replay harness/actual RED baseline first in P0,
@@ -142,7 +155,9 @@ and reports product-prerequisite blockers honestly. Each domain implementation t
 corresponding pre-existing failing contracts and preserves the growing implemented suite.
 
 R0 delivers the first thin compatible execution path together with the actual local Host/Agent lab.
-R1 supplies identity/access variants; R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
+R0's [unfrozen journey manifest](../../.workspace/workstreams/coherent-refactor/r0-journey-manifest.md)
+includes the minimal ordinary OIDC/key/current-grant contribution required by the unchanged CLI and
+denied-access controls. R1 completes identity/access variants; R2 catalogue/VCS/requirements; R3 chains/runners/triggers;
 R4 tests/logs/history/files; R5 cumulative client/variant conformance and remaining agreed operations.
 Provider, server-internal, licensing, Kotlin and plugin-specific calls need early explicit dispositions;
 no false successful license/cluster/JVM response or silent omission can close full compatibility.

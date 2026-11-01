@@ -117,6 +117,11 @@ command/profile/fixture provenance. No supported command or ready fixture is cla
 
 ## Initial compatible R0 execution profile
 
+The concrete [request/principal/seed/effect manifest](r0-journey-manifest.md) is #36's UNFROZEN
+planning input for #43/#44 and #14/#37/#38. It records pinned client shapes, actual ordinary-user
+credential prerequisites, positive/denied controls and missing reference effects; this summary does
+not substitute for that exact freeze or add executed cases.
+
 Freeze exact selectors, defaults/statuses/media from the pinned client before implementation:
 
 - Authenticate/current user and server/profile discovery under normal locally trusted HTTPS.

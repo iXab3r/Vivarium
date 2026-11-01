@@ -2,6 +2,32 @@
 
 ## Current state — 2026-11-01
 
+Current assignment: the owner is still iterating the plan. This slice continues planning/reference
+analysis and existing GitHub task maintenance only; no product/harness implementation, new runnable
+proof scripts, builds/tests or live server/container/TeamCity operations. Earlier tooling/results
+remain accepted at the historical boundary below. This is current scope, not a permanent ban or a
+new future approval framework. The historical “Next” execution backlog below is not an instruction
+to start implementation in this slice.
+
+Planning refinement at `511c259520e4387fe4a779a95bfbe260950edd68`:
+[R0 manifest](r0-journey-manifest.md) remains UNFROZEN and adds no cases. #36 freezes concrete
+requests/principals/seeds/effects; #43 consumes and #42/#44 verify their respective P0/R0 outputs.
+The existing IAM→HOST contribution now names minimal ordinary OIDC/My keys/current grants required
+by the actual unchanged CLI and denied Agent-control/cross-project artifact controls. Full IAM stays
+with #16/#17 in R1. #34's future proof pack requires actual source diffs/evaluation/revisions/recovery
+and per-reference-mode editing behavior, without choosing an SDK/source layout or running that proof.
+
+The fifteen known cases, runtime, ledger receipts and generated status are unchanged. A read-only
+run of the existing accounting DLL with the ignored explicit assessment
+`artifacts/p0-ledger/assessments/planning-inputs-working-tree.json` returned exit 0 for working HEAD
+`511c259`: all 183 recorded source bytes and six accounting sources are unchanged. Its adjacent
+`.report.json` records reused evidence, 449 headings, fifteen known cases, five RED, ten blocked,
+zero GREEN/stale/errors and API-complete false. The changed IAM contribution retains its joins,
+unfrozen scope and empty case IDs; the acceptance map/new manifest are not semantically validated
+by this partial checker. This validates bounded historical evidence reuse, not the new R0 contract
+or P0 closure. A new exact-HEAD transfer is required after any commit. No build/test/runtime action
+or independent review PASS is claimed for this planning slice.
+
 Reviewed source: `faf45b1662efcdef4af25ce5b21a4cd8cbe06535` on
 `bugfix/teamcity-behavior-parity`. At this review, local `main` and verified remote `origin/main` both point
 to `09dd40b`; the branch is 24 commits ahead and zero behind. No refactor milestone has reached
@@ -37,7 +63,7 @@ authorized; production and existing fleet remain excluded. This reference lab is
 GitHub owns live task state: the review found 76 open issues and zero closed; #2/#3/#12/#32–#36/
 #39/#42/#77 remain Open. Historical task/census snapshots below retain their original counts.
 
-Next: extend grounded P0 cohorts and resolve their #12/#32–#34 model/reference/representation gates;
+Execution backlog after the current planning slice: extend grounded P0 cohorts and resolve their #12/#32–#34 model/reference/representation gates;
 finish #36 allocation/freeze/accounting obligations and #42 baseline acceptance, including #77's
 milestone disposition. Then obtain final aggregate correctness/simplicity and Security/Adversarial
 review, resolve all P0 debt and deliver the accepted milestone to main before R0 implementation.

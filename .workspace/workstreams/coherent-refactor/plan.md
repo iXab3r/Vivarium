@@ -3,6 +3,11 @@
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
 structural product work still follows the accepted P0 exit and milestone gates below.
+Current assignment (2026-11-01): the owner is still iterating this plan. Continue planning/reference
+analysis and maintenance of existing tasks only in this slice; do not start product/harness work,
+new runnable proofs, builds/tests or live reference/server operations. Earlier tooling and receipts
+remain accepted within their recorded limits. This is the current assignment, not a permanent
+implementation ban or a new future approval procedure.
 Captured 2026-10-31. Lead: Reconciliation; co-held TeamCity, Platform/Persistence, Identity,
 Test Steward and Docs. Existing accepted decisions remain authoritative until explicitly amended.
 Owner clarification on 2026-10-31: RF-10 is accepted; each verified milestone may merge separately
@@ -163,7 +168,7 @@ ControlPlane and SQLite only after named consumers/data have a verified replacem
 | Mechanism | Required specification/output | Delivery owner |
 |---|---|---|
 | Host readiness/settings | Node IDs, dependencies, init/migrate/run order, masked schema/CAS, restart application, persisted key paths | R0 |
-| Login/current authority | OIDC issuer+sub mapping, normal Identity login/logout, superuser lifecycle, current account/grants, token issuance/revoke, CSRF | P0 contracts; minimal final technical identity R0, full R1 |
+| Login/current authority | OIDC issuer+sub mapping, normal Identity login/logout, superuser lifecycle, current account/grants, token issuance/revoke, CSRF | P0 contracts; installation login plus minimal ordinary OIDC/My keys/current-grant R0 contribution; complete IAM R1 |
 | C# catalog | Trusted settings revision vs source revision, pinned evaluator inputs, bounded separate process, immutable semantic plan, inheritance/provenance, last-good activation | R2 |
 | Editing desired configuration | Exact REST/UI-editable C# representation, generated/user-owned boundaries, Git CAS/review/activation and unsupported expression behavior | P0 decision, R2 |
 | VCS/workspaces | Exact checkout/submodules/rules, branch selection, private credentials, caches and OS isolation | R2 |
@@ -186,8 +191,8 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 | ID | Observable increment | Exit evidence |
 |---|---|---|
 | P0 | Executable reference-backed REST contracts and a genuine RED baseline precede structural replacement | P0.REST.1–3 corpus/replay/product baseline executed with evidence and explicit blockers; resource/ID/state/command, protocol and C# mutation/authority proof reviewed; required variants allocated; no unknown mapping hidden behind a count |
-| R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 actual PG/Storage/Host/Agent enrollment and debug lifecycle; R0.2 unchanged CLI enqueue/watch/cancel/artifact; R0.3 restart/reconnect/regressions/owned cleanup. Minimal final-framework technical identity and seeded Git configuration; no disposable lab engine |
-| R1 | An ordinary user can sign in and an administrator can grant/revoke current access | Approved superuser model; UI login/access/token journeys; same existing cookie and token reflect revocation; keys/session continuity across Host restart |
+| R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 real PG/Storage/Host/Agent admission/debug and ordinary credential readiness; R0.2 unchanged CLI success/nonzero/queued and running cancel/exact artifact bytes; R0.3 restart/reconnect/owned cleanup. Installation login plus minimal ordinary OIDC/My keys, SYSTEM_ADMIN and restricted project principals/current allow-deny for exposed actions; full IAM R1 |
+| R1 | Ordinary identity/access and compatible lifecycle work beyond the R0 subset is complete | Complete roles/groups/project inheritance, provider/account/token/PAT wire variants and legacy disposition; preserve R0 current-cookie/token grant, withdrawal, expiry/revoke and key/restart guarantees |
 | R2 | A user authors a full C# catalogue and runs a genuine source-based Compile | Extend R0 catalogue/execution with full C# evaluation/editing/inheritance, exact checkout, requirements/reasons and report/artifact provenance; same existing PG scheduler, Agent and compatible/native run services |
 | R3 | Existing build families can express and execute their complete chains | Parameters/inheritance, all observed runners/features, chain/artifact policies, counters/locks/triggers, paused jobs and publish gating; representative Windows/Linux workflows |
 | R4 | A developer diagnoses a failure and compares historical tests/logs/artifacts | Persistent logs/tail/search/download/gaps, TRX+JUnit identities/history/duration, problems/investigations/mutes/statistics, permissions and retention/GC; real UI workflows |
@@ -269,6 +274,13 @@ the actual RED baseline. Current bounded tests are recorded above; no product AP
 final review PASS or debt clearance is claimed.
 
 ### Earliest hands-on checkpoints
+
+The [R0 journey manifest](r0-journey-manifest.md) makes #36's existing freeze obligation concrete:
+actual selected requests, ordinary/admin/restricted principals, activated P/C and protected Q/D seeds,
+Agent/workload states, byte/readback/nonzero/cancel/restart effects and source-versus-reference gaps.
+It remains UNFROZEN, consumed by #43/#14/#37/#38 and verified by #42/#44. The existing IAM→HOST
+contribution pulls only the ordinary credential/current-grant subset forward from #16/#17; no full
+R1 prerequisite or duplicate owner is added. Depot's installation account cannot issue My keys.
 
 R0.1 is the first usable new-stack local lab: real server + Agent, PG/Storage, normal enrollment and
 authorization, current-style UI and debugger attach. R0.2 adds unchanged teamcity-cli against a
