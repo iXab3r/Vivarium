@@ -60,6 +60,7 @@ Role consultation is bounded to the contracts actually touched. A role is a pers
 |---|---|---|
 | Docs Expert | [docs-expert.md](docs-expert.md) | Decisions, status, document authority, context routing, or durable handoff guidance changes. |
 | Reconciliation Lead | [reconciliation-lead.md](reconciliation-lead.md) | A migration, replacement, parity effort, or broad audit must close a known universe in evidence-gated phases. |
+| Story Delivery Lead | [story-delivery-lead.md](story-delivery-lead.md) | Actor goals, surface scenarios and API evidence need a clear next usable result across existing subsystem owners. |
 | Test Steward | [test-steward.md](test-steward.md) | Tests, fixtures, runners, CI gates, compatibility evidence, or verification policy change. |
 | Business Acceptance | [business-acceptance.md](business-acceptance.md) | Highest-level user-language system AC, independent expected outcomes and acceptance scope change. |
 | Testing Architect | [testing-architect.md](testing-architect.md) | Evidence boundary/oracle, pyramid, shared fixture/runner selection, coverage migration or execution-cost policy changes. |

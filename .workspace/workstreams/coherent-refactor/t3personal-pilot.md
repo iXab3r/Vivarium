@@ -51,6 +51,19 @@ new-ID or no-reuse rules. Cheap controlled workloads test broad variants without
 whole product for thousands of assertions; they do not replace actual Windows/Release/publication.
 Existing 110 canonical AC/TCM are instantiated, not replaced by three new requirements/frameworks.
 
+The actor goal for #78 is an authorized release operator obtaining the coherent, launch-checked
+T3Personal product and its configured publication result. #79–#81 keep the requested UI/direct
+compatible REST/unchanged CLI interaction projections of that goal. Trace existing AC-BLD-01/02/
+03/04/05/07/13, AC-ART-01/03, AC-CFG-07, AC-UI-01/02 and AC-MIG-04 with applicable identity/access
+criteria and their applicable TCM obligations, including base identity and extension neutrality.
+#82 freezes the exact per-case subset with source variants/cases, due owners, independent oracles,
+effects and reference completion timing; whole import/history remains later. This is a join over
+existing IDs, not a new matrix universe.
+Follow [the story practice](../../../docs/design/api-ledger-delivery.md#actor-goal-stories-and-traceability):
+coverage links and ready evidence do not imply reciprocal issue-closure blockers; #83 reports story,
+subsystem integration and whole-operation API-complete separately. Selected story success cannot
+claim all required operation variants. Current next work remains #85; #84's pack is already usable.
+
 #82/#83 must freeze the smallest sufficient real publication proof through the shared producer
 boundary, together with actual UI/REST/CLI chain entries and controlled request/default/effect tests.
 This does not silently require three identical live GitHub publications or a full rebuild per negative

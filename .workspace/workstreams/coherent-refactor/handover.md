@@ -24,6 +24,16 @@ three T3 configurations are a targeted addendum, not a global100 census.
 The two reference leaves (#84 under #13, #85 under #35) bring the graph to nine roots /75 native
 children. No milestone/slice/contribution/AC/APIcase is added.
 
+Story Delivery Lead is now a local process-role/practice adaptation of CliFactory PR71 at
+`0c94d94efe1923ca02938a060f925ea93d0fc312` (open/unmerged when inspected), linking actor goals,
+existing AC/TCM, surface scenarios and exact API evidence through current subsystem owners.
+See [role](../../../docs/roles/story-delivery-lead.md) and
+[practice/provenance](../../../docs/design/api-ledger-delivery.md#actor-goal-stories-and-traceability).
+Local D37–D40 govern; no automatic upstream sync, new framework, scope waiver or runtime consistency
+tolerance is adopted. Coverage/use, readiness evidence and true blockers are distinct; Open issues
+can already supply usable evidence. #78–#83/#36 receive focused traceability wording; #84/#85 and
+next #85 remain unchanged. The 84-issue/nine-milestone graph and all evidence counts stay unchanged.
+
 This planning graph/prose revision changes no product, 449 primary API rows, fifteen known cases,
 raw receipts or generated status. New registers require explicit offline accounting input/reuse
 assessment; older zero-stale/exit0 reports below keep their original revisions and do not establish

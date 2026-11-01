@@ -138,6 +138,8 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   document graph current.
 - Adopt **Reconciliation Lead** for broad migrations/audits and **Test Steward** for test or verification
   changes. State the lead and co-held roles before acting.
+- Adopt [Story Delivery Lead](docs/roles/story-delivery-lead.md) to connect actor goals, surface
+  scenarios and API evidence to useful increments; follow the existing [delivery practice](docs/design/api-ledger-delivery.md#actor-goal-stories-and-traceability).
 
 ## Configuration and management contracts
 

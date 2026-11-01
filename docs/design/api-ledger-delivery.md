@@ -34,6 +34,63 @@ can advance in verified cohorts. A contract task states expected responses **and
 profile, exact case IDs, owning services and implementation/verification links. Implementations may
 not choose different TeamCity defaults or hide required variants behind an unsupported label.
 
+## Actor-goal stories and traceability
+
+The [Story Delivery Lead](../roles/story-delivery-lead.md) connects a useful actor goal to existing
+business AC, surface scenarios and subsystem delivery. Stories choose priority; D40 subsystem
+lifecycles remain implementation units. Keep the current full API ledger/variant universe and task
+owners, not one new issue per heading or an arbitrary story quota.
+
+Use this compact story record; concrete UI/HTTP/CLI flows are projections of business intent:
+
+| Field | Required content |
+|---|---|
+| Actor/goal/context | Who needs which observable result and why; linked canonical AC/TCM and Given/When/Then normal/empty/error/denial/cancel/recovery examples where applicable. Highest-level AC stay business language, independent of implementation. |
+| Surface/try | Applicable interaction/request/command scenarios, actual availability and what to open; label unsupported/unknown applicability and never invent working commands. |
+| Evidence/ownership | Primary subsystem and due contribution; exact source operation/variant/case IDs, independent oracle, cheapest adequate real boundary, effects and reference completion/readback timing. |
+| Scope/next/gate | Explicit exclusions/deferred/unsupported gaps, owner/task/source/proof/due freeze, current stage/evidence and next output; milestone acceptance, cumulative cases and existing review/debt/main gates. |
+
+These are joins over existing IDs, not another matrix/ledger service. Distinguish coverage/use links,
+readiness-evidence prerequisites and actual blockers. An Open reference task may already supply
+usable evidence; an earlier contribution need not wait for its full owner's later closure. Do not
+create story↔operation reciprocal closure or mass native blocked-by links. Use true blocking links only
+where prerequisite readiness/independent closure semantics make progress possible; verify stage
+evidence while issues remain Open under D39.
+
+Story completion proves its promised scenarios and selected variants, not a whole operation/family.
+Report story outcomes, subsystem lifecycle/integration and API-complete separately. Operation/family
+completion still requires its full frozen required variants, errors/current grants/effects/protocol
+and prior GREEN, with no required blocker/debt; one happy path or one delivered story is insufficient.
+Explicit won't-do/deferred/unsupported records stay visible and cannot turn required TC1:1 behavior
+GREEN, silently waive it or move failing due cases. Required scope decisions follow existing authority.
+
+### Convergence and local adaptation
+
+Coverage converges incrementally through accountable gaps, not a promise inferred from tickets.
+Pin source/profile versions; correct generated facts through their source/generator and regeneration.
+For reference-version deltas, preserve lineage, classify affected story/variant inputs, update due
+proofs and revalidate affected cases before claiming support. Do not hand-edit generated facts to fit
+intent or merge unobserved rolling documentation into an installed reference oracle.
+
+This coverage convergence is **not weaker runtime consistency**. Delivered operations already obey
+reference defaults/errors/current permission effects, response completion and read-after-write.
+Do not add “wait until consistent,” extra polling, new native headers or blanket 202 to an unchanged
+200/201 contract. Reference asynchronous queue admission/stop transitions are allowed where actually
+specified; unknown timing remains a verification gap, not an implementation choice.
+
+This is a local adaptation of the MIT-licensed EyeAuras.CliFactory
+[PR #71](https://github.com/iXab3r/EyeAuras.CliFactory/pull/71) at pinned head
+`0c94d94efe1923ca02938a060f925ea93d0fc312` (open/unmerged when inspected), specifically its
+[canonical role](https://github.com/iXab3r/EyeAuras.CliFactory/blob/0c94d94efe1923ca02938a060f925ea93d0fc312/docs/roles/story-delivery-lead.md)
+and [practice](https://github.com/iXab3r/EyeAuras.CliFactory/blob/0c94d94efe1923ca02938a060f925ea93d0fc312/docs/practices/story-driven-delivery.md).
+The adopted authority is this local practice and D37–D40, not automatic upstream synchronization.
+Retain actor/goal, explicit needs/denials, regenerated pinned facts and no-debt review. Adapt CLI-only
+E2E/mocked-every-AC and red-test-commit rules to our cheapest adequate real boundaries, genuine RED
+or preserved GREEN and valid reuse. Keep final milestone aggregate + Security/zero-debt/main rather
+than per-card formal reviews/mass runs. Do not import a story quota, operation-issue forest, one-story
+operation closure, unrelated upstream AGENTS rules or a new framework/approval flow. Already accepted
+whole-chain breadth, authorized reads/sandbox work and the actual later publication gate persist.
+
 ## Mechanical ledger and API-complete
 
 Reuse the discovered source universe and preserve stable source IDs when normalizing/splitting rows.
