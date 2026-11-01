@@ -737,6 +737,24 @@
       "milestone": "PILOT",
       "number": 83,
       "key": "pilot-acceptance"
+    },
+    {
+      "parent": 13,
+      "url": "https://github.com/iXab3r/Vivarium/issues/84",
+      "title": "Reference: pin the full T3Personal chain evidence pack",
+      "state": "open",
+      "milestone": "P0",
+      "number": 84,
+      "key": "reference-t3personal-pack"
+    },
+    {
+      "parent": 35,
+      "url": "https://github.com/iXab3r/Vivarium/issues/85",
+      "title": "Reference: capture server-resolved T3 inputs and dependency selection",
+      "state": "open",
+      "milestone": "P0",
+      "number": 85,
+      "key": "reference-t3personal-server-inputs"
     }
   ],
   "milestones": [
@@ -805,8 +823,8 @@
     }
   ],
   "snapshot": {
-    "recorded_utc": "2026-11-01T12:36:40.867746+00:00",
-    "source": "read-only GitHub metadata and native parents after owner-selected full-chain breadth update",
-    "scope": "82 open issues/nine milestones unchanged; titles refreshed, no product completion claim"
+    "recorded_utc": "2026-11-01T13:11:19.974477+00:00",
+    "source": "read-only GitHub metadata/native parents; two bounded P0 reference leaves",
+    "scope": "84 open issues/nine milestones/nine roots/75 native children, not product acceptance"
   }
 }

@@ -6,7 +6,8 @@ The global variant denominator remains unknown. This is not a request to start i
 
 1. Historical checkpoint/census and Depot-informed plan are recorded; 97 configurations are the old
    source inventory. Three T3Personal configurations are a targeted addendum, not a global100 census.
-2. P0 remains open: #13/#35 next **Freeze full T3Personal recipe/capability/expected outputs and due AC/wire matrix**;
+2. P0 remains open: #84 reference pack is available; #85 next captures server inputs/dependency selection, then
+   #35 exact wire/control and #32/#34/#36 model/representation/freeze outputs;
    #32/#34 shared model/representation, #36 known-input allocation/freeze/accounting, #42 baseline
    acceptance and #2 aggregate/Security/zero-debt/main closure still apply. Existing #77 debt remains.
 3. R0 remains planned: #37 local Host+real Agent, #38 LocalSmoke/unchanged CLI, #14/#44 recovery and
@@ -19,7 +20,7 @@ The global variant denominator remains unknown. This is not a request to start i
    families/history are later. Off-mode is only a marked build-only checkpoint, not publication parity.
 6. All sixteen subsystem owners remain. Eighteen slices and twenty-two bounded contributions assign
    ownership; all are unaccepted/unfrozen, not compatibility. The 449 API headings and fifteen cases
-   remain unchanged; GitHub owns live task state (82 open issues/nine milestones).
+   remain unchanged; GitHub owns live task state (84 open issues/nine milestones).
 
 [Plan](plan.md) and [pilot checkpoints](t3personal-pilot.md) define acceptance order. At every milestone
 retain cumulative delivered behavior, focused checks, independent final aggregate + Security review,

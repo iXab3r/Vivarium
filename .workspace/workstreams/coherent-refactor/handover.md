@@ -2,19 +2,27 @@
 
 ## Current state — 2026-11-01
 
-**Now:** replacement product NOT_AVAILABLE. **Next:** #13/#35 Freeze full-chain recipe/capability/expected outputs
-and due reference cases, then accepted P0/R0. **Later:** [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78)
-with UI #79, direct compatible REST #80 and unchanged CLI #81; #82/#83 are its same-milestone pair.
+**Now:** [reference pack #84](t3personal-reference-pack.md) is available; replacement product
+NOT_AVAILABLE. **Next:** #85 server-reported resolved source/settings and actual selected dependency/
+artifact inputs, with exact typed-getter capability/bounds. Then #35 wire/control, #32 worked model,
+#34 actual C#/Git representation outputs and #36 case freeze feed the remaining P0/#42/#77/review/
+debt/main gate, before #37/#38/R0 and the first all-config/all-surface PILOT breadth preview.
+See the [goal/output/where/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
+#84's metadata/producer/provider facts do not close server selection, binary/platform, wire/access/
+cancel or causal-publication proof. These remain named handoffs, not frozen contract or GREEN.
 The owner selected breadth-first full Prepare/Windows/Release including default publication. Four
 levels apply across all configurations/surface projections; Windows/Release/used trigger features
 are due here, not deferred, and no surface must finish before another starts. Future external
 publication execution scope/authorization is an operator gate, not a new Build state or approval API;
 this turn only plans and never builds/publishes/modifies production.
 See [T3Personal pilot](t3personal-pilot.md) for exact pinned facts and openable checkpoints. GitHub
-now has 82 open issues/nine milestones; registers have 18 subsystem slices/22 bounded contributions,
+now has 84 open issues/nine milestones; registers have 18 subsystem slices/22 bounded contributions,
 still 16 subsystem owners. Existing native parents/states are preserved; #77 is included in the
 refreshed graph. Task counts are not product progress. The historical97 inventory is unchanged;
 three T3 configurations are a targeted addendum, not a global100 census.
+
+The two reference leaves (#84 under #13, #85 under #35) bring the graph to nine roots /75 native
+children. No milestone/slice/contribution/AC/APIcase is added.
 
 This planning graph/prose revision changes no product, 449 primary API rows, fifteen known cases,
 raw receipts or generated status. New registers require explicit offline accounting input/reuse

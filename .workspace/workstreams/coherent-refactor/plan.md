@@ -1,14 +1,16 @@
 # Coherent Vivarium refactor — plan v1.9
 
-**Now:** the replacement Host/Agent/product build is NOT_AVAILABLE. Existing evidence is fifteen
-known cases: five RED, ten product-prerequisite-blocked, zero product GREEN; global denominator unknown.
-**Next:** #13/#35 **Freeze the full T3Personal recipe/capability/expected-output and due AC/wire matrix**, then accepted
-P0 → R0 → [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78).
-**Later:** full remaining IAM/catalog/runners/diagnostics and cumulative migration under existing owners.
-The [T3Personal pilot](t3personal-pilot.md) exposes three small stories and openable checkpoints.
-The owner chose breadth-first full Prepare → Windows → Release, including default publication,
-across all three surfaces at each measurable level; no serial surface-completion dependency.
-No product output, exact pilot case or publication is claimed delivered/frozen.
+**Now:** [reference pack #84](t3personal-reference-pack.md) is available: one bounded three-build
+cohort, small-manifest hashes and public release metadata. The replacement product is NOT_AVAILABLE;
+conformance remains fifteen known cases / five RED / ten blocked / zero GREEN, denominator unknown.
+**Next:** [#85](https://github.com/iXab3r/Vivarium/issues/85) obtains one independent TC-server
+source/settings/dependency/selected-input receipt or a bounded typed-getter gap. Then #35 exact
+wire/control cases, #32 worked model, #34 actual C#/Git proof and #36 case freeze feed full P0 closure.
+**After that:** remaining P0/#77/final review/debt/main → real Host/Agent #37 and cheap Smoke #38 /
+R0 closure → first all-configuration/all-surface PILOT breadth preview. These steps do not waive
+remaining gates or accept the full chain. See the [goal/output/blocker sequence](t3personal-pilot.md#current-result-and-the-next-measurable-steps).
+The owner-selected whole-chain/default-publication scope and shared surface projections remain.
+No product output, recipe, exact new case or publication execution is claimed delivered/frozen.
 
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
 P0 now includes actual conformance implementation and its RED baseline, not only documents. Other
@@ -241,8 +243,8 @@ Domain-compatible REST and scenarios grow with each domain milestone. R5 is the 
 conformance gate, not permission to discover client contracts late. R4 completes existing diagnostics,
 not their first appearance. Work may overlap only where prerequisites are explicit and stable.
 
-Current GitHub planning graph: **9 milestones, 9 closure parents and 73 native sub-issues**
-(82 open issues, including #77 and six PILOT issues). These counts are task state, not product progress.
+Current GitHub planning graph: **9 milestones, 9 closure parents and 75 native sub-issues**
+(84 open issues, including #77, six PILOT issues and reference leaves #84/#85). These counts are task state, not product progress.
 The refreshed issues.json comes from current metadata/native parents; older counts below are historical.
 Subsystem slices parent their REST subtasks; #12 also owns the cross-cutting P0 foundation. Start at
 [P0 / roadmap #2](https://github.com/iXab3r/Vivarium/issues/2); milestone parents are

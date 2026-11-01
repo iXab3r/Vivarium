@@ -3,10 +3,23 @@
 **Now:** NOT_AVAILABLE in the replacement product. The owner chose **breadth-first**: preserve the
 whole actual Prepare → Windows → Release configuration and default-publication behavior across UI,
 direct compatible /app/rest and unchanged CLI. The earlier Prepare-first recommendation is superseded.
-**Next:** #13/#35 freeze the whole-chain recipe/capability/expected-output and due AC/wire matrix;
-#36 joins it to the existing ledger. Accepted P0 and R0 remain prerequisites to PILOT implementation.
+**Reference available now:** [pack #84](t3personal-reference-pack.md) pins one bounded same-version
+cohort, actual small-manifest bytes and public release metadata without claiming server-selected inputs.
+**Next:** #85 captures TC-server-reported resolved source/settings and actual dependency/selected
+artifact inputs, or a precise typed-getter capability gap. Then #35/#32/#34/#36 establish due
+wire/control, worked-model and actual C#/Git proof outputs. Accepted P0/R0 still precede implementation.
 **Later:** other families and broader full subsystem/history scope. Used Windows, artifact handoff,
 Release publication and trigger behavior cannot be deferred to those broader owners.
+
+## Current result and the next measurable steps
+
+| Goal | Output / where to open | Blocker or owner |
+|---|---|---|
+| 1. Pin the existing reference result | [#84 evidence pack](t3personal-reference-pack.md): Build 32724/32725/32726, actual three small-manifest byte hashes and public release/tag metadata. | Metadata available; server inputs/actual DAG/binary bytes/causal publisher proof remain open. |
+| 2. Establish the next independent inputs and exact contract proof | [#85](https://github.com/iXab3r/Vivarium/issues/85): one server-source/settings/dependency/selected-input receipt or bounded getter gap. Then #35 literal wire/control cases; #32 returned/related/reused identity trace; #34 actual source diff/editor/evaluator/effective-plan/recovery pack; #36 exact case/principal/oracle freeze. | Typed projection/bounds must be established; no getter coding in this planning turn, guessed fields or producer-claim promotion. |
+| 3. Close P0, with all its remaining obligations | #42/#2 baseline/controls/composition/allocation/disposition evidence, #77 debt disposition, final independent aggregate+Security, zero debt and verified main delivery. | Steps 1–2 alone do not finish P0. Existing remaining gates stay due. |
+| 4. Open the real local technical prerequisites | #37 actual Host/PG/Storage/login/Agent URL and owned lifecycle receipt; #38 actual LocalSmoke CLI/run/log/byte/failure/cancel evidence, plus #14/#44 recovery and R0 main closure. | All replacement outputs remain NOT_AVAILABLE; cheap fixture is not T3 success. |
+| 5. Try the first product breadth checkpoint | #78/#79/#80/#81/#82: truthful auth/discovery/readiness/chain-state across all three configurations and supported UI/REST/CLI projections; explicit applicability/gaps. | Real DAG/runners/launch/bytes/default publication and cumulative fault levels remain due before full PILOT acceptance. |
 
 ## What to open at each breadth-first level
 
@@ -72,13 +85,12 @@ All use source root T3Personal_Git. Current source is pinned at
 [prepare.sh](https://github.com/iXab3r/t3code/blob/041345f2c201d68e718d5dbf0ba5ce9755f1704b/scripts/personal-release/prepare.sh),
 [run.mjs](https://github.com/iXab3r/t3code/blob/041345f2c201d68e718d5dbf0ba5ce9755f1704b/scripts/personal-release/run.mjs),
 [publish.sh](https://github.com/iXab3r/t3code/blob/041345f2c201d68e718d5dbf0ba5ce9755f1704b/scripts/personal-release/publish.sh).
-Settings blob is `db0a1ed24a0b51c6a9bf726590c2c898ca2a776b`; source is intended behavior,
-not a successful executed recipe. Prepare 32698 / Windows 32699 / Release 32700 were observed
-successful with displayed version 0.1.6-nightly.20261101.15; only root artifact listings were read,
-without hashes/bytes. Change f48df77f6f0e1347d5bf4185e2f6bf2d11414b22 is change metadata, not
-resolved source/settings provenance. Current source's Linux artifact folders differ from the older
-Prepare root listing. #13/#35 must align exact effective source/settings/recipe before GREEN, or
-deliberately freeze the new source and prove its actual outputs. Do not combine these evidence classes.
+Settings blob db0a1ed24a0b51c6a9bf726590c2c898ca2a776b describes that 041345f2 source snapshot.
+Earlier 32698/32699/32700 metadata was not source-aligned proof. The [new bounded pack](t3personal-reference-pack.md)
+now records 32724/32725/32726, version 0.1.6-nightly.20261101.16, producer-claimed revision 7ff65cada,
+actual small-manifest bytes and public release metadata. That is stronger reference input, still not
+independent server-resolved source/settings, selected DAG/inputs or locally verified binary bytes.
+#85 owns that immediate server receipt; #13/#35/#82 retain recipe/wire/effect freeze and execution gaps.
 
 Prepare has one actual reference runner step, RUNNER_1; internal script stages are observed output/
 progress, not invented per-command StepRuns. Prepare uses a pinned Node Docker digest, Node 26.12.1, Rust 1.96.1, Vite+ 1.4.0 and pnpm 12.14.0,
@@ -113,8 +125,10 @@ reference Cvat/laptop-g15 requirements, never those existing fleet Agents or a s
 The common version originates in Prepare and is validated through Windows/Release manifests;
 per-configuration counters/identities and reference DAG reuse remain distinct and must be frozen.
 
-Source Release has a default-branch VCS trigger, 60s quiet period and metadata-path exclusions.
-Freeze exact effective rules and coexistence/single-publisher ownership at level 0; prove their used
+The 041345f2 source snapshot has default-branch VCS/60s quiet period and metadata-path exclusions;
+manifest-claimed 7ff65cada Kotlin retains the branch/quiet period but has no metadata exclusions.
+Freeze the applicable server settings version, exact rules and coexistence/single-publisher ownership
+at level 0; do not mix the two sources. Prove their used
 behavior with controlled fixtures before full configuration parity closes. Manual surface stories do
 not require a separate trigger project per surface or authorize activating production triggers now.
 
