@@ -37,3 +37,10 @@ links without adding owning slices, native tasks or cases. Known-discovery alloc
 due freeze, evidence reuse/main transfer, broad-run triggers and finding classification are specified
 in `docs/design/api-ledger-delivery.md`; #36/#42 still implement/prove them. Approved schema/raw HTTP
 acquisition is an explicit #33/#35 deliverable. No execution/acceptance status changed.
+
+Cycle-2 clarification: the contribution register now has 12 unfrozen links, adding step editing
+SS-EXEC -> SS-CFG@R2 (#18/#47/#48) without changing 16 owners/17 slices, source IDs or coverage.
+#34/#42 own the blank-install Project/BuildType/binding representation/diff proof; #32/#34/#36
+retain exact collection-mode/concurrency/completion and due-variant contracts. Internal Git CAS
+and immutable actual provenance remain; no universal queue-time freeze or compatible native-only
+precondition/async rule is adopted. Format/SDK/path/reference unknowns stay future deliverables.

@@ -95,6 +95,12 @@ to an existing accountable integration slice, its same-milestone implementation/
 tasks and bounded business outcome. It does not create another slice, owner, service or duplicate
 case. R0 uses SS-HOST@R0 (#14/#43/#44); R2 Compile output uses SS-RUN@R2 (#20/#65/#66),
 with source checkout/Compile code and evidence from #19/#59/#60 and catalog inputs from #18.
+R2 step editing has a separate bounded SS-EXEC contribution to SS-CFG@R2 (#18/#47/#48): EXEC
+supplies ordered step/property/reset semantics and CFG uses its shared C#/Git validation/activation.
+For example `TCREST:buildtypeapi.replaceAllBuildSteps` keeps SS-EXEC/#22 as primary owner while
+its R2 authoring variants join that CFG contribution; full runner/feature execution remains R3.
+The P0 #34 representation proof and #36/#47 exact allocation still precede changed behavior;
+the discovered heading is not a frozen method/variant/case or execution claim.
 #19 and #20 develop their real integration incrementally; a related later full-owner task is not
 a finish-to-start prerequisite. The R2 contract names usable R0 runner/queue/Agent/Storage inputs
 and the additional exact checkout, parameters, report and output interfaces before changed behavior.

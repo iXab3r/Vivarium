@@ -737,14 +737,16 @@ duplicated in Git or a second product settings store. This target exception is n
 Versioned desired settings become effective from a validated Git revision: Projects and Build
 Configurations, fleet/pool policy, agent names/custom properties/enablement policy,
 retention policy, provider/image recipes, and other declared desired state. Host/resource settings
-use Chiral instead of a second Git schema. Repository-
-owned `vivarium.yaml` remains with the product (D17); controller-owned desired state lives in a control
-repository initialized or adopted during first-run administration (D26).
+use Chiral instead of a second Git schema. D32/D36 adopt C# product build definitions; D17's
+`vivarium.yaml` remains transitional payload-submission evidence until verified migration/replacement.
+Controller-owned desired state lives in a control repository initialized or adopted through the
+installation lifecycle refined by D34/D35.
 
 The first-release control repository is managed-local Git with direct commits on its authoritative
 branch, so an air-gapped first run is deterministic. A Project may explicitly bind a product/settings
-repository and path; that repository owns its Build Configuration definitions and source revision,
-while the control repository owns Project identity/metadata, repository bindings, versioned fleet
+repository and path; that repository owns its bound product-scoped Build Configuration definitions,
+project parameters and templates, while source selections remain distinct VCS-root provenance.
+The control repository owns Project identity/hierarchy/metadata, repository bindings, versioned fleet
 policy, and allowed paths. Every Build records the resulting revision set. Remote Git authority and
 review branches are opt-in and require private credential references plus verified HTTPS CA/SPKI or SSH
 host-key trust. Security-sensitive external commits are accepted only under attested identity or an
@@ -755,8 +757,10 @@ REST, UI, CLI, and external Git edits converge through one validation and reconc
 The controller commits or proposes an atomic candidate tree, validates the committed bytes, and only
 then advances the applied revision. A rejected or unavailable revision leaves the last-known-good
 projection active and visible as stale/degraded; it never triggers a fallback mutation in SQLite.
-Concurrent edits carry an expected base revision. Rollback is a forward-moving revert commit, never
-history rewriting.
+Internal commits compare the expected base/ref revision. Explicit native version-checked workflows
+also check the caller's precondition; compatible/default operations keep D33's reference concurrency
+and completion behavior without new mandatory headers or universal stale-edit rejection.
+Rollback is a forward-moving revert commit, never history rewriting.
 
 SQLite is the transitional implementation; PostgreSQL owns target runtime/business state and
 materialized Git projections. Users, role/group definitions and grants, credentials, secret values,
@@ -786,10 +790,11 @@ plane. The implemented gRPC `ControlPlane` is a transitional compatibility adapt
 application services and gains no management feature absent from REST; the CLI migrates before that
 adapter is retired. Detailed contract: [`design/rest-api.md`](design/rest-api.md).
 
-Configuration writes use `If-Match` against the authoritative repository revision; heartbeats and live
-observations never create false configuration conflicts. Secret-producing requests persist only a
-non-secret receipt/hash and never replay plaintext, and every replay rechecks current authorization and
-object visibility. Build submission dedupe is scoped by principal plus client request ID. REST blob-
+Explicit native version-checked configuration workflows use `If-Match` against the authoritative
+repository revision; D33-compatible/default operations retain reference preconditions and success
+fences. Heartbeats and live observations never create false configuration conflicts. Secret-producing
+requests persist only a non-secret receipt/hash and never replay plaintext, and every replay rechecks
+current authorization and object visibility. Build submission dedupe is scoped by principal plus client request ID. REST blob-
 upload plans replace `MissingBlobs` without revealing cross-project presence, and object grants bind
 staging, assignment GET, owned-work PUT, result manifests, and human downloads to their Project/Build.
 

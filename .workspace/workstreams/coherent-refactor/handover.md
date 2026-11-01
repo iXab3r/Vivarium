@@ -102,3 +102,15 @@ reference acquisition and controls. This is guidance/task repair, not delivered 
 checker, SDK preparation, raw baseline, API completeness or milestone/security acceptance.
 Next implementation stays #35 with affected #33/#36 contracts, then actual P0 gates before R0.
 Run documents/task/ledger checks for these prose changes; no build/test/runtime check was run.
+
+## Cycle-2 authoring repairs (2026-11-01)
+
+Current contribution register: 12 unfrozen links (the cycle-1 count above records its historical
+11-row handoff). Added SS-EXEC -> SS-CFG@R2 under #18/#47/#48 for already-promised R2 step editing;
+#22 retains primary step semantics/full R3 scope, #34 proves representation and #36 allocates exact
+variants. No new owning slice, task or case. D23 control-owned Project identity/metadata/bindings
+are distinct from bound product-scoped C# settings; blank-install/unbound placement/diff proof is
+#34/#42 work, not a new schema. Immediate/later settings collection and compatible concurrency/
+completion follow reference contracts; exact defaults/timing remain #32/#34/#36. No runtime result,
+normalized case, milestone acceptance or new product policy is claimed. Next execution remains #35
+alongside affected P0 contracts; these repairs require only cheap documents/task/accounting checks.

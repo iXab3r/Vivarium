@@ -117,6 +117,18 @@ All required mutable fields must have a real path to deterministic validated sou
 the affected compatibility remains an explicit blocker. Do not hide a DB/JSON override or introduce a
 general C# AST rewriter to claim 1:1 behavior.
 
+#34's concrete proof starts with a blank installation: create Project P before any product binding,
+then create BuildType C while unbound, then authorize a product-repository binding and read/edit C
+through both surfaces. Show independently expected before/after control and product diffs for Project
+identity/hierarchy/name/description, project parameters/templates, configuration identity/steps and
+binding/trust/credential references, with one owner per field. Follow D23 control versus product
+authority; do not make Project creation depend on a repository binding that itself needs that Project.
+Prove invalid/denied changes leave prior usable state, commit/apply crash recovery and correct
+read-after-write/compatible completion. Declare which files own unbound definitions and how binding
+preserves identity/history without duplicate state, but do not invent paths or an SDK API in this
+planning seed. #42 verifies P0's actual representation/ownership evidence; #47/#48 freeze and accept
+the R2 product authoring behavior. This is an assigned proof, not existing runnable C# or GREEN.
+
 ## Earliest implementation and verification
 
 D38 places the executable REST expectation corpus/replay harness/actual RED baseline first in P0,

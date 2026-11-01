@@ -212,13 +212,13 @@ Step execution policies preserve D14's distinction:
 
 Vivarium must not conflate:
 
-1. **Controller control repository:** controller-owned desired state that registers product settings
-   repositories and binds their project IDs, branches, paths, trust policy, and credential references
-   to this controller. Fleet, agent, provider, and server-wide entries also belong to their owning
-   domains in this repository; they are not TeamCity project settings.
-2. **Product settings repository:** product-owned C# definitions (D32/D36) for projects, build
-   configurations, steps, requirements, matrices, triggers, dependencies, and templates. This is the
-   TeamCity Expert's versioned domain.
+1. **Controller control repository:** owns Project identity, hierarchy/metadata and settings-repository
+   bindings, including allowed branches/paths, trust policy and private credential references (D23).
+   Fleet desired policy also belongs to its owning domain here; private Host/resource configuration
+   uses Chiral under D35.
+2. **Product settings repository:** owns bound product-scoped C# build definitions, project parameters,
+   templates, steps, requirements, matrices, triggers and dependencies (D32/D36). These do not
+   re-declare control-owned Project identity/metadata or authorize their own repository binding.
 3. **Source VCS roots:** Git repositories and immutable revisions checked out or packaged as build
    input.
 
@@ -227,8 +227,11 @@ Today's Phase-1 `vivarium.yaml` beside tested code is transitional payload-submi
 not the target catalog schema. UI/native/compatible REST edits author supported C# settings through
 the same validation/Git activation path; exact runnable syntax/editability requires P0 #34's proof.
 The controller control repository remains separate so a product repository cannot register itself,
-replace its trust policy, or redirect its own
-credential reference.
+replace its trust policy, or redirect its own credential reference. A product binding is not a
+prerequisite to creating its control-owned Project. P0 #34 must prove blank-install Project creation,
+BuildType creation while unbound, and a subsequent authorized binding with exact ownership/diffs;
+unbound C# placement and final file/schema/SDK choices remain that proof's deliverables. See
+[the representation proof](teamcity-rest-domain.md#c-authoring-is-a-pre-implementation-gate).
 
 The Git/Versioning Expert owns the controller control repository mechanism and repository bindings;
 the relevant domain expert owns each entry's schema. The TeamCity Expert owns product settings and
@@ -281,26 +284,33 @@ same reconciliation path; existing build history retains its frozen snapshots.
 The Git/Versioning Expert owns clone/fetch credentials, locking, commit/push mechanics, polling or
 webhooks, conflict resolution, repository health, and recovery. The Reconciliation Lead reviews both
 control and product-settings state machines and their failure behavior. The TeamCity Expert supplies
-product-settings validation and the rule that build admission atomically freezes both active
-projections.
+product-settings validation and the collection-mode contract that records requested selections
+separately from the immutable control/settings/source revisions actually resolved for execution.
 
 ### UI and REST edits
 
 There is no direct `UPDATE build_configurations` authoring path. A project/configuration UI or REST
-mutation targets the product settings repository; a repository binding or controller policy mutation
-targets the controller control repository through its owning domain. In either case the mutation:
+mutation targets the repository owning the changed fields: Project identity/metadata/hierarchy and
+bindings use controller control; bound product-scoped settings use the product repository. Unbound
+definition placement follows #34's proved representation, not a new authority. In either case the
+mutation:
 
-1. reads the active definition and its ETag/revision;
+1. reads the active definition/repository revision and any explicit native workflow precondition;
 2. validates the requested domain change;
 3. renders a deterministic patch to the versioned representation;
-4. creates and pushes a Git commit attributed to the authenticated principal;
+4. commits by internal Git ref compare-and-swap, with remote push/review only under configured policy;
 5. re-reads and validates the committed bytes;
 6. activates the resulting projection revision;
-7. returns the Git commit and reconciliation state.
+7. returns the operation's native or compatible response at its required success/activation fence.
 
-Optimistic concurrency is mandatory: a stale ETag/base commit returns a conflict and never overwrites
-intervening work. A request may complete asynchronously while a remote push or reconciliation is in
-progress; the response then contains a durable configuration-change operation resource.
+Internal ref CAS and recovery protect committed state; a CAS race may require rebuilding/revalidating
+a candidate according to the operation contract. Explicit native version-checked workflows such as
+AC-CFG-03 reject stale caller revisions. Default/compatible edits keep actual TeamCity concurrency
+processing and headers; internal CAS does not impose universal caller-visible stale rejection.
+Only an explicitly declared native asynchronous workflow may return a pending operation resource.
+Compatible calls retain their reference response and completion fence, including 200/201 where
+required; an unapplied/rejected candidate is not successful activation. Exact defaults/variants
+remain #32/#34/#36 contract work.
 
 Direct commits made outside Vivarium travel through the same validation and projection path. The UI
 does not claim success until the commit is durable. Failed pushes or validation errors never leave a
@@ -308,13 +318,14 @@ server-only setting behind.
 
 ### Versioned and non-versioned data
 
-Versioned product TeamCity configuration includes project/configuration identity, names, descriptions,
-parameters, VCS root references, steps, requirements, matrices, artifact/result rules, clean/queue
-policies, triggers, dependencies, templates, and other deterministic behavior settings.
+Control-owned Project identity, hierarchy, names/descriptions and binding policy are versioned desired
+configuration. Product-scoped settings include configuration identity/names/descriptions, project and
+configuration parameters, VCS root references, steps, requirements, matrices, artifact/result rules,
+clean/queue policies, triggers, dependencies and templates. Exact representation remains #34 work.
 
-The controller control repository versions project-to-settings-repository bindings and their trust
-policy, not the product's steps or build parameters. A change in either repository yields a new
-recorded provenance revision even if the other repository is unchanged.
+The controller control repository versions Project declarations and project-to-settings-repository
+bindings/trust policy, not a duplicate product step/parameter store. A change in either repository
+yields a new recorded provenance revision even if the other repository is unchanged.
 
 Git contains references to credentials and secrets, never their values. Repository credentials,
 secret material, user sessions, agent credentials, runtime queue/build state, logs, artifacts, and
@@ -323,13 +334,18 @@ The owner experts must define how operational credentials and secret values are 
 
 ### Configuration activation and builds
 
-Manual and automatic runs default to the current validated control binding and product-settings
-revision. Queueing atomically freezes both revisions before returning the build ID. Later Git changes
-do not mutate queued, running, or finished builds.
+Support the reference immediate settings capture and later collection modes. At enqueue preserve
+requested branch/revision/settings mode and other explicit inputs separately from resolved execution
+selections. Immediate mode captures its required revisions then; later mode collects at the
+contract-defined assignment/start boundary. A queued request does not imply that unresolved settings
+or a preferred Agent are already frozen/assigned. Exact 2026.1.3 defaults, collection timing and
+branch-specific variants remain #32/#34/#36 work, not a universal admission-time rule.
 
-Branch-specific configuration is deferred. When introduced, a build must explicitly record and
-authorize the selected settings revision; an untrusted source branch must not be allowed to change
-privileged steps, secret references, or execution policy merely by opening a pull request.
+At the selected collection boundary, retain the validated control/settings revisions, effective
+definition/hash and source revisions actually used as immutable execution provenance; snapshot Agent
+facts at actual assignment. Later edits never rewrite those actual selections or historical output.
+Explicit settings/source selections must be authorized; an untrusted source branch does not gain
+authority to change privileged steps, secret references or execution policy by opening a pull request.
 
 ### Source revision and verification state
 
@@ -427,6 +443,10 @@ a build.
 
 ## Matrices
 
+The following D14 payload-matrix identity/admission/rerun mechanics describe the transitional native
+workflow. They do not choose compatible catalog collection defaults or promise a new execution for
+every enqueue under reference queue optimization; #32/#34/#36 own that mapping.
+
 A matrix belongs to a build configuration revision and expands a run into:
 
 - one durable composite parent;
@@ -454,8 +474,8 @@ parent/child but never alters original matrix history.
 
 ## Queue, execution, cancellation, and rerun
 
-The existing durable global FIFO and first-runnable scan remain the base behavior. Configuration adds
-only explicit, versioned policy:
+The existing durable global FIFO and first-runnable scan are transitional implementation evidence.
+Adopted catalog operations follow reference queue processing/optimization; versioned policy includes:
 
 - queue-wait deadline;
 - per-configuration concurrency cap;
@@ -463,8 +483,10 @@ only explicit, versioned policy:
 - clean policy and run timeout.
 
 Queue and assignment state is operational, not Git configuration. Every transition is persisted
-before it is projected to clients or agents. Queueing accepts an idempotency key so retries cannot
-create duplicate builds.
+before it is projected to clients or agents. Explicit native keyed queue workflows retain identified
+retry receipts. Default/compatible enqueue follows reference retry/optimization/reuse behavior;
+intentional commands are not collapsed by body hash, and do not universally require distinct Build
+IDs or executions. Freeze returned optimized/replaced identities and links in #32/#34/#36.
 
 Cancellation is a command against a build or composite parent, not deletion. It records principal,
 reason, timestamp, and first accepted request. Queued children finish `CANCELLED`; running children
@@ -545,7 +567,7 @@ These features are staged to protect the small execution core.
 | Catalog foundation | Git-reconciled projects/configurations and REST run endpoint | Stable IDs, settings commits, optimistic edits, last-known-good projection |
 | VCS integration | Git roots and VCS trigger | Immutable source revision selection, polling/webhook reconciliation, branch/trust policy |
 | Scheduling | Schedule trigger | Time zone, missed-fire policy, deduplication, pause behavior, audit event |
-| Reuse | Project inheritance and templates | Stable member IDs, deterministic merge/override rules, resolved snapshot |
+| R2 catalog | Project inheritance and templates | Stable member IDs, reference merge/override rules, resolved snapshot |
 | Chains | Snapshot dependencies | DAG validation, shared source revision set, cancellation and failure propagation |
 | Chains | Artifact dependencies | Immutable producing build selection, explicit artifact rules, provenance |
 | Advanced | Trigger/dependency customization and branch-specific settings | Trust model, parameter precedence, reproducible revision choice |
@@ -555,9 +577,9 @@ Snapshot dependency is the TeamCity source-revision relationship; it must always
 with it. Artifact dependency transfers selected immutable outputs and does not imply ordering unless
 paired with a snapshot dependency.
 
-Templates arrive only after repeated configuration demonstrates real duplication. Until then YAML
-anchors or copy/paste are not elevated into hidden server semantics. When templates ship, their
-application and overrides are fully resolved in the build snapshot.
+R2 catalog authoring includes the required template/inheritance behavior. P0 #34 proves the editable
+representation; #47/#48 freeze and accept its reference variants. Transitional YAML anchors/copy-paste
+do not substitute for those semantics. Actual resolved inheritance remains execution provenance.
 
 ## REST contract handed to the REST Expert
 
@@ -577,11 +599,13 @@ Behavioral requirements:
 
 - JSON representations with stable IDs and links;
 - pagination/filtering for collections and resumable live updates where needed;
-- ETag/`If-Match` for configuration edits;
-- idempotency keys for queue and mutation commands;
+- ETag/`If-Match` for explicitly version-checked native configuration workflows;
+- idempotency keys for explicitly keyed native commands, with reference retry/optimization handling
+  for adopted TeamCity operations and no mandatory new compatible-client headers;
 - consistent distinction among validation, conflict, authorization, not-found, and transient
   reconciliation failures;
-- config mutations return the Git commit or a durable pending change operation;
+- config mutations expose the operation's required response/success fence; only declared native
+  asynchronous workflows return pending operations, while compatible responses keep reference shape;
 - runtime mutations return the durable resulting state and audit correlation ID;
 - no secret values in requests echoed to logs or responses;
 - UI and CLI call the same contract as external clients.
@@ -679,13 +703,16 @@ redaction.
 - A configuration cannot become active without a durable, validated Git commit.
 - Replaying reconciliation for the same commit is idempotent.
 - An invalid commit leaves the prior projection and schedulable revision unchanged.
-- A stale UI/REST edit cannot overwrite a newer Git revision.
-- Queueing freezes configuration and source revisions atomically with build creation.
+- Explicit native version-checked stale edits conflict; compatible/default edit races follow the
+  frozen reference processing while internal ref CAS/recovery preserve coherent accepted revisions.
+- Immediate and later collection modes preserve requested selections and freeze actual settings/source
+  provenance at their respective contract-defined boundary, not universally at queue admission.
 - Queueing records distinct control, configuration, and source provenance; dirty/unverified source
   state can never masquerade as `verified-clean`.
 - Later edits, renames, deletes, agent changes, or reconciliation do not rewrite build history.
 - Matrix expansion is deterministic and all-or-nothing.
-- Any statically impossible selected cell rejects the entire submission before IDs or queue rows exist.
+- Transitional D14 payload-matrix submission rejects a statically impossible selected cell before IDs
+  or queue rows exist; reusable catalog queueing retains D32's wait-for-compatible-capacity behavior.
 - Stable IDs survive mutable-name changes; matrix parent IDs, declared cell keys, child build IDs, and
   execution-target history keys are never conflated.
 - Compatibility explanations are deterministic for the same requirement and agent snapshots.

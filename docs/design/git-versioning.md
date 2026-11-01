@@ -25,10 +25,14 @@ versioned desired settings. Stopping a build is a separate action, not an enable
 
 ## Repository ownership and initialization
 
-A controller settings repository owns the project catalog and fleet policy. A product repository
-owns its source-associated C# build definitions. They may share physical storage, but repository
+A controller settings repository owns Project identity/hierarchy/metadata, settings-repository
+bindings/trust policy and fleet desired policy (D23). A bound product repository owns product-scoped
+C# build definitions, project parameters and templates, without re-declaring Project control identity
+or authorizing its own binding. They may share physical storage, but repository
 identity and revision provenance remain distinct. An operation spanning repositories cannot promise
-one atomic Git commit. Neither repository contains users, groups, roles, bindings or credentials.
+one atomic Git commit. Neither repository contains identity users/groups/roles/grants, external-login
+bindings or credential bytes. Settings-repository bindings and private credential references remain
+control-owned declarations; identity/RBAC authority remains PostgreSQL.
 
 Managed-local direct Git on `main` is the deterministic default. It requires no external Git host;
 this does **not** mean the new server has no PostgreSQL/Storage prerequisites. Initialize only the
@@ -42,13 +46,17 @@ are finalized by the early [REST/domain contract](teamcity-rest-domain.md). Exis
 legacy support; arbitrary C# cannot be represented as editable forms by wishful round-tripping.
 No target `.vivarium/rbac` tree is defined. Non-secret versioned policy is distinct from resource
 connections and their private settings. Final per-kind schemas remain a P0 implementation input.
+A Project can be declared before it has a product/settings binding. #34 must prove the blank-install
+Project → unbound BuildType → authorized binding sequence and independently expected control/product
+diffs; exact unbound C# placement, file schema and SDK API stay unresolved until that proof.
 
 ## Mutation and activation
 
 REST, UI, CLI and imports use the same application mutation service for Git-owned fields. It:
 
 1. Authorizes the actual actor against current PostgreSQL permissions and records a durable intent.
-2. Reads the expected repository/base revision and builds an isolated complete candidate tree.
+2. Reads the internal repository/base revision and any explicit native caller precondition, then
+   builds an isolated complete candidate tree.
 3. Validates paths, schema/definition versions, stable IDs, references, domain rules, secret-reference
    fields, platform claims and the actor's authority for the complete change.
 4. Creates one commit and advances the authoritative ref by compare-and-swap. Reviewed mode waits
@@ -61,6 +69,8 @@ heads and active/last-known-good revisions are distinguishable. Invalid external
 the verified last-known-good settings with actionable diagnostics; they do not rewrite the branch.
 Caller-visible success must follow the relevant native or TeamCity-compatible activation fence.
 The compatible facade must not require new headers or asynchronous behavior from unchanged clients.
+Internal CAS/recovery does not imply universal stale-caller rejection: explicit native version-checked
+workflows enforce their preconditions; default/compatible edits retain reference concurrency handling.
 
 Every build pins the control and tested repository identities/revisions, definition path/hash and
 resolved settings actually used. Settings changes and renames do not rewrite historical runs. Template
