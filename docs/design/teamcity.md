@@ -488,11 +488,14 @@ retry receipts. Default/compatible enqueue follows reference retry/optimization/
 intentional commands are not collapsed by body hash, and do not universally require distinct Build
 IDs or executions. Freeze returned optimized/replaced identities and links in #32/#34/#36.
 
-Cancellation is a command against a build or composite parent, not deletion. It records principal,
+The transitional native matrix cancellation command is distinct from deletion. It records principal,
 reason, timestamp, and first accepted request. Queued children finish `CANCELLED`; running children
-persist cancel intent and receive fenced cancel delivery until a terminal result is accepted. Repeated
-cancellation returns the same effective state. The Scheduling, Persistence, and Agent API Experts
-implement the claim/delivery/reconnect races needed to satisfy this semantic contract.
+persist cancel intent and receive retry-safe fenced delivery until a terminal result is accepted.
+This internal delivery contract does not determine compatible repeated/after-finish HTTP outcomes.
+POST cancellation, DELETE and cancel/requeue follow their actual frozen TeamCity contracts, including
+retention, replacement identity and completion. The [reference findings and probes](../../.workspace/workstreams/coherent-refactor/reference-probes.md)
+keep those unobserved effects and settings-capture defaults explicit. Scheduling, Persistence and
+Agent API implement the claim/delivery/reconnect races required by the adopted contract.
 
 ### Rerun modes
 

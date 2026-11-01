@@ -69,7 +69,9 @@ are distinct. Native and imported origins require collision-free persisted mappi
 hrefs, with compatible JSON representation per resource. Never apply a universal stringify-all rule.
 
 Queue/running/finished state is separate from SUCCESS/FAILURE/other outcome and cancellation/failure
-details. Native TEST/CRASH/INFRA taxonomy must project truthfully into those contracts, including
+details; the installed lifecycle enum also declares deleted and unknown. Literal absent/null/status
+behavior and optimized/reused old-ID resolution remain observation gaps, not a universal numeric-ID
+continuity rule. Native TEST/CRASH/INFRA taxonomy must project truthfully into those contracts, including
 failed-to-start, muted test failures and incomplete reports. Resource identity and terminal provenance
 remain stable after configuration rename/edit, reconnect, import and retention changes.
 
@@ -117,6 +119,11 @@ either exactly-once intent or an obligation to create a different Build every ti
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
 clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.
 P0 must prove the managed/user-owned representation, precedence and supported computed-field rules.
+The [reference findings](../../.workspace/workstreams/coherent-refactor/reference-probes.md) record
+that 2026.1 Kotlin help permits UI edits after manual changes via patches, while one-way/context
+and initialization modes have distinct UI restrictions. This does not select a Vivarium patch
+architecture or imply REST rejection from UI behavior. Installed contextParameters declares GET/PUT;
+generic Versioned Settings POST response metadata does not establish a numeric status/apply fence.
 For each reference Versioned Settings/DSL mode, freeze which mutations TeamCity permits, rejects or
 makes read-only, with its failure and completion behavior. Required mutable fields must have a real
 path to deterministic validated source changes where that mode permits edits; do not assume arbitrary
@@ -145,6 +152,12 @@ accepted and active control/product revisions, returned error/completion/readbac
 commit/ref/apply or a cross-repository binding handoff fails. Preserve one owner per field and the
 previous usable state. This bounded representability gate precedes R2's full engine/live UI authoring;
 exact source paths, SDK and implementation are outputs of #34, not choices made by this plan.
+
+Freeze requested versus resolved source/settings revisions and capture timing separately: installed
+freezeSettings describes immediate versus assigned-ready-to-start collection but declares no absent
+default. Compatible cancel POST, DELETE and requeue also have distinct contracts; internal durable
+retry/delivery guarantees do not prescribe repeated or after-finish HTTP outcomes. The linked probe
+note assigns the exact actor/request/timeline/effect observations to #32/#33/#35/#36.
 
 ## Earliest implementation and verification
 

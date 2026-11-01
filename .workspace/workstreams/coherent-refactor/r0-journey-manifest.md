@@ -16,6 +16,9 @@ expected status/media/body plus resulting state/bytes; source/capture provenance
 ID mapping; native readback; cleanup; owning contribution and existing contract/acceptance task.
 Missing reference observations remain named gaps, not expected values derived from Vivarium.
 Resolve structural/R0 gaps before P0 exit. A client request shape alone cannot freeze an effect.
+The [reference findings and future probes](reference-probes.md) distinguish installed schema,
+2026.1 help, pinned client source and unobserved installed effects. They qualify identity/reuse,
+state/outcome, cancel/delete/requeue, settings timing and editing-mode claims below.
 
 ## Principals and seeds
 
@@ -50,7 +53,7 @@ a JSON body exists. Freeze download media/headers from the actual chosen client 
 | Agent / pending → ready | GET `/agents` with connected/enabled/authorized locators (defaults `any`) and `agentFields`; GET `/agents/id:E?fields=<agentFields>` | Stable numeric external/native mapping, independent status axes and real heartbeat. Approval uses the delivered normal native UI/API or independently frozen compatible action; unauthorized R control is denied and state unchanged. | AGT → #37 |
 | Catalog / activated P/C | GET `/projects` or `/projects/id:P` using `projectFields`; GET `/buildTypes` with `templateFlag:false` and selected project; GET `/buildTypes/id:C` with `jobFields` | Real activated identities/revisions and current visibility, not an in-memory sample or DB-only definition. | CFG → #14/#38 |
 | Enqueue / ready or deliberately queued | POST `/buildQueue?fields=<buildFields>` body `{"buildType":{"id":"C"}}`; source adds branchName, comment, properties and cleanSources only when supplied | Positive safe-integer JSON Build.id, observed status/media/projection and accepted shared work. Freeze default and explicit fixture-mode requests; reference establishes optimization/reuse and the `fields` behavior on this POST. | RUN → #38 |
-| Poll / queued → running → finished | GET `/builds/id:N?fields=<buildFields>` even while queued; selected explicit queue/history reads | Same accepted underlying run and numeric ID across queue/poll/cancel/history; state and outcome remain independent. Queue removal does not erase Build identity. | RUN → #38 |
+| Poll / ordinary lifecycle and substitution | GET `/builds/id:N?fields=<buildFields>` with enqueue-returned N even while queued; selected explicit queue/history reads | Establish returned-ID resolution across queue/poll/cancel/history for the selected ordinary journey and any reference-defined substitution. Optimization/reuse and old-locator behavior remain gaps; POST cancel and DELETE have distinct retention effects. Preserve independent lifecycle/outcome. The shared model recognizes declared deleted/unknown states; #36 allocates their exact due variants without adding DELETE/requeue to this selected R0 journey. | RUN → #38 |
 | Success / real process | Normal `builds run C --wait` / `builds wait N`, selected from source | Actual executable start/exit, expected SUCCESS, recognizable retained output, same native/compatible run, exact produced bytes and CLI success. Record actual commands/exit codes. | EXEC/RUN/LOG → #38 |
 | Failure / nonzero mode | Same normal enqueue/poll commands with the frozen fixture-mode input | Actual nonzero process exit, durable terminal FAILURE/detail and unchanged CLI nonzero exit. No fabricated failed HTTP response or empty successful artifact substitutes for execution. | EXEC/RUN → #38 |
 | Queued cancel / work prevented from starting | POST `/buildQueue/id:N?fields=<buildFields>`, body `{"readdIntoQueue":false}` plus optional string comment | Reference-defined cancel response/terminal projection, no later process start, consistent queue/history/native readback. Establish effects rather than assume request acceptance means cancellation completed. | RUN → #38 |
@@ -58,6 +61,18 @@ a JSON body exists. Freeze download media/headers from the actual chosen client 
 | Artifact / known completed Build N | GET `/builds/id:N/artifacts?resolveParameters=false&logBuildUsage=false&locator=<fileLocator>&fields=count,file(name,size,modificationTime)`; GET `/builds/id:N/artifacts/files/smoke.txt?resolveParameters=false&logBuildUsage=false` | Selected unchanged `files artifacts list/download` commands, observed metadata/media/status and exact retained bytes/hash. This client uses `/files/`, not an assumed `/content/` route. R can download P's allowed bytes; denied Q download/control yields no protected content/effect. | BLOB → #38/#44 |
 | Retained output / same Build | Delivered native output path or independently sourced unchanged-client log request, still to select/freeze | Recognizable actual stdout retained and readable after restart with current permission checks. Generic “raw output” is not a frozen compatible log-download contract; full log search remains R4. | LOG → #38/#44 |
 | Recovery / owned work and completed bytes | Repeat the same ordinary read/poll/download around controlled Host restart and Agent disconnect/reconnect | Stable identities, truthful occupied/terminal state, immutable actually resolved input/Agent provenance, no duplicate execution/result acceptance, retained output/bytes and owned cleanup. | #14 R0.3 with #15/#38/#44 |
+
+Installed Build.id is int64; the unchanged CLI additionally requires a positive safe integer.
+Neither the installed taskId declaration nor rolling documentation proves taskId/id equality for
+2026.1.3. State has a declared enum; status has separate descriptions whose actual absent/null/value
+projections still need capture. POST cancel responses, repeat/after-finish outcomes and actual stop
+timing must be observed; the selected client sends readdIntoQueue:false, not DELETE or requeue.
+
+The CLI omits freezeSettings. Installed metadata describes true as immediate code/settings collection
+and false as collection when assigned and ready to start, without declaring an absent default.
+Probe all three conditions and distinguish source `revisions` from `versionedSettingsRevision` and
+requested settings mode. Freeze actually resolved execution inputs at their reference-defined boundary,
+not an invented enqueue snapshot. Full branch/VCS authoring remains #34/#47/#48 proof/acceptance work.
 
 ## Credential lifecycle and denial controls due in R0
 

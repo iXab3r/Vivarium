@@ -9,6 +9,15 @@ remain accepted at the historical boundary below. This is current scope, not a p
 new future approval framework. The historical “Next” execution backlog below is not an instruction
 to start implementation in this slice.
 
+Planning research at `ac609f5355f188080951015083114a3a3bce7625` is summarized in
+[reference findings and future probes](reference-probes.md): qualified queue/execution identity under
+optimization, full declared state versus outcome, separate cancel/delete/requeue, absent/default
+capture-timing gaps, separate source/settings revisions and documented DSL editing modes. Existing
+tasks retain the future installed-reference acquisition and representation proofs. No capture, case,
+TSV/ledger/result/generated-status or product change is added; all new installed effects remain gaps.
+The prior reuse receipts below retain their original candidate. These prose changes need an explicit
+current-head input assessment before any refreshed accounting claim.
+
 Planning refinement at `511c259520e4387fe4a779a95bfbe260950edd68`:
 [R0 manifest](r0-journey-manifest.md) remains UNFROZEN and adds no cases. #36 freezes concrete
 requests/principals/seeds/effects; #43 consumes and #42/#44 verify their respective P0/R0 outputs.

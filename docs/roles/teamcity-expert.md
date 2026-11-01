@@ -54,7 +54,8 @@ The TeamCity Expert owns the domain meaning and invariants of:
 ## Non-negotiable invariants
 
 - The domain hierarchy is `Project -> Build Configuration -> Build -> Step Run`. A build
-  configuration is a reusable definition; a build is one execution of one frozen revision.
+  configuration is a reusable definition; execution retains the revisions actually resolved under
+  the reference capture mode, not an assumed enqueue-time snapshot.
 - Steps in one build run in declared order on one assigned agent unless a future numbered decision
   explicitly introduces another execution form.
 - Mutable project and build-configuration settings are Git-backed from day one. PostgreSQL is the target
@@ -73,8 +74,10 @@ The TeamCity Expert owns the domain meaning and invariants of:
   snapshot. Current eligibility remains separate from static compatibility.
 - Matrix children are ordinary builds. Their parent aggregates state and results but does not own or
   duplicate child artifacts.
-- Cancellation is idempotent, controller-owned, persisted before delivery, and safe across controller
-  or agent reconnects.
+- Cancellation intent is controller-owned, persisted before delivery and safe to redeliver across
+  controller or agent reconnects. Compatible POST/DELETE/requeue, repeat and after-finish HTTP
+  outcomes follow the frozen reference contract; internal retry safety does not prescribe them.
+  See the [reference findings and probes](../../.workspace/workstreams/coherent-refactor/reference-probes.md).
 - AgentExplorer operations are not builds. The two domains may share agent capacity arbitration, but
   they do not share queues, history, permissions, or result semantics.
 - UI, CLI, and automation use the same application services and public REST behavior. No client gets
