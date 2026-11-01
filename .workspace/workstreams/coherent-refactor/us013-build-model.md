@@ -51,6 +51,33 @@ facade state. The target PG transaction owns admission, alias/replacement relati
 the Agent protocol retains its own stable workload/session fences. Neither Git nor Chiral messaging
 is the runtime transaction authority.
 
+### Native matrix preservation boundary
+
+The existing implementation allocates a 32-character opaque aggregate ID and a different opaque
+ID for each cell in one `MatrixBuildStore.SubmitScopedAsync` transaction. The stored Agent assignment
+contains the cell ID. `BuildRestProjection` exposes the aggregate as `/api/v1/builds/{id}`, cell IDs
+inside `children`, queue entries with cell `buildId` and an aggregate `buildUrl`, and artifact URLs
+containing both IDs. The CLI treats IDs as strings and rejects caller-supplied child IDs; its watcher
+also requires an event's resource ID to match the requested native aggregate ID. These are actual
+current contracts, not evidence that a numeric alias adapter already exists.
+
+| Existing observable | Required candidate mapping and R0 preservation evidence |
+|---|---|
+| Native submission result and idempotent retry | One explicit native-matrix aggregate identity plus one identity per declared cell, each with a stable native alias and canonical numeric ID. Keep actor/operation/request-key scoping and exact prior response semantics. Native keyed retry must not change ordinary compatible unkeyed enqueue behavior. |
+| Ordinary compatible configuration run | Its ordinary Build, without an automatically created native matrix or composite wrapper. A native-matrix kind is not a claim that TeamCity Composite settings reproduce payload-matrix semantics. |
+| Assignment, acknowledgement, heartbeat and terminal result | Resolve the stable cell alias to the same owning Build. Preserve the string workload ID and its lease/session fences through the Agent protocol; no independent facade queue or recreated execution. |
+| Native GET, cancellation, events and replay cursor | Resolve the aggregate alias once in the shared service; emit the expected native resource ID, child IDs, links, runtime revision and cursor ordering. A canonical numeric key does not justify rewriting an accepted native response/event ID. |
+| Queue, results and artifact bytes | Preserve the cell-to-aggregate relation, cell name/order, RID, requirement, immutable assigned-host facts, exit/timeout/skip results and byte hash/length. Old native download URLs continue to resolve the same authorized stored bytes. |
+| Native cancellation and outcomes | Preserve queued/running/cancel-requested/finished and native cancelled/failure/success distinctions. Compatible state/status/cancellation projections follow the reference cases; do not turn an in-progress native cancellation into a finished compatible Build. |
+| Historical IDs and restart | Durable alias uniqueness and kind/parent relations survive process restart. US-013's fresh installation does not authorize a second identity authority or require legacy database migration. |
+
+Existing preservation evidence is in `BuildRestApiTests`, `BuildMutationRestApiTests`,
+`BuildEventStreamTests`, `BuildLeaseTests`, `CliRestClientTests` and `CliTests` (exact due tests
+must be selected in the ledger). The current tests run the legacy implementation, not the candidate
+mapping. R0 must reuse those assertions against the replacement shared domain and add native/compatible
+cross-reads, independent ordinary-run neutrality, alias-collision and restart controls. A model table
+alone does not close that proof or adopt a public identity schema.
+
 ## Definition, settings and source selections
 
 The historical independent server receipt distinguishes source `7ff65cada…` from settings

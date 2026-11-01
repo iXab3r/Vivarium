@@ -1,9 +1,11 @@
-# Coherent Vivarium refactor — plan v1.18
+# Coherent Vivarium refactor — plan v1.19
 
 **Execution started for US-013.** The owner assigned the accepted autonomous delivery plan with
 “let's work”. Continue the integrated P0 proof/model/contract/evidence block; its actual outputs are in
 [the execution checkpoint](us013-p0-execution.md). Reference observations and a bounded C#/Git source
-experiment are available; product availability remains NOT_AVAILABLE, no milestone is accepted and
+experiment and an eight-case real Git/PostgreSQL physical-recovery study are available. The latter
+proves a single-worker prototype, not Host/authorization/concurrent-writer integration. Product
+availability remains NOT_AVAILABLE, no milestone is accepted and
 R0/PILOT must wait for P0 closure. Earlier planning-only assignments below retain their historical
 scope and do not prohibit this newly assigned execution.
 

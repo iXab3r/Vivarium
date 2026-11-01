@@ -57,7 +57,7 @@ delivery_plan = "t3personal-pilot.md#current-story-delivery-plan"
 unclear_route = "Resolve the story plan and required proof, then continue connected authorized work without leaf-card handoffs"
 
 [autonomous_delivery]
-state = "P0_EXECUTION_IN_PROGRESS; bounded reference/source proof exists, integrated model/activation/recovery/allocation and closure remain due"
+state = "P0_EXECUTION_IN_PROGRESS; bounded reference/source and eight-case physical recovery proof exists; model/mode/concurrency/allocation and closure remain due"
 acceptance_publication = "TEST_REPOSITORY_SUFFICIENT; no production iXab3r/t3code publication required"
 workload = "Frequent small-chain checks plus one actual T3 build/package E2E"
 built_application_execution = "EXCLUDED; explicit test-recipe delta removes T3 GUI/CLI launch smoke checks"
@@ -67,7 +67,7 @@ installation = "FRESH_ISOLATED; no existing-data migration or TeamCity cutover i
 merge_policy = "Agent merges verified milestones to main after all due gates and independent review; no merge during planning"
 ui_authoring = "CONFIRMED: C#/Git preparation; UI inspects/runs/cancels builds and reads logs/artifacts; configuration editor is a separate story"
 end_to_end = "Independent small-chain UI/REST/unchanged-CLI entries; one heavy T3 CLI submission with UI/REST readbacks"
-current_execution = "Owned isolated reference Agent/Git fixtures, real source/authoring/lifecycle/byte observations, strict replay and bounded C#/Git representation; no target Host/R0/PILOT delivery"
+current_execution = "Owned isolated reference Agent/Git fixtures, real source/authoring/lifecycle/byte observations, strict replay, bounded C#/Git representation and separate real Git/PostgreSQL single-worker recovery study; no target Host/R0/PILOT delivery"
 execution_evidence = "us013-p0-execution.md"
 execution_plan = "t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution"
 test_repository_default = "New private iXab3r/vivarium-us013-e2e or unique owned suffix; verify ownership before reuse; create only during execution"

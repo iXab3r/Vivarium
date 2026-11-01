@@ -169,6 +169,9 @@ It is retained for source/data/consumer disposition, not as an alternative targe
   removes a currently materialized Agent document, and recovers pending committed work after restart.
   Desired activation and scheduler admission share an Agent lifecycle lease; a bounded hosted monitor
   converges external managed-local commits into the durable and live projections.
+  Controller disposal joins canceled background workers before disposing their services/database,
+  with a separate bounded drain after the shared Host stop budget. A completed in-process shutdown
+  therefore releases the monitor's repository lock before the same data directory is reopened.
 - The canonical v1alpha1 tree currently supports `.vivarium/agents/{id}.yaml`,
   `.vivarium/rbac/users/{id}.yaml`, and `.vivarium/rbac/bindings/{id}.yaml`. The authorization cut is
   deliberately restricted to direct User bindings to product-owned built-in roles. Setup uses the

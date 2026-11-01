@@ -23,6 +23,8 @@
     <!-- Build the separately invoked raw target without running it as ordinary GREEN evidence. -->
     <ProjectReference Include="..\Vivarium.TeamCity.Conformance\Vivarium.TeamCity.Conformance.csproj"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Vivarium.DefinitionProof\Vivarium.DefinitionProof.csproj"
+                      ReferenceOutputAssembly="false" />
     <Using Include="NUnit.Framework" />
     <None Update="TeamCity\Reference\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

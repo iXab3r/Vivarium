@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using Vivarium.Agent;
 using Vivarium.Agent.Facts;
+using Vivarium.Contracts.V1;
 using Vivarium.Controller;
 using Vivarium.Controller.Agents;
 using Vivarium.Controller.Deployment;
@@ -589,7 +590,7 @@ public sealed class AgentDeploymentTests
             using var publishedBody = JsonDocument.Parse(publishedText);
             var packageId = publishedBody.RootElement.GetProperty("packageId").GetString()!;
 
-            Assert.That(controller.Registry.TryBeginBuild(first.AgentId, "busy-build", out _), Is.True);
+            await using var busyBuild = await StartBlockedBuildAsync(controller, first.AgentId, "busy-build");
             using var create = new HttpRequestMessage(
                 HttpMethod.Post,
                 $"/api/v1/agents/{Uri.EscapeDataString(first.AgentId)}/upgrade-operations")
@@ -608,12 +609,13 @@ public sealed class AgentDeploymentTests
             var operationId = createdBody.RootElement.GetProperty("operationId").GetString()!;
 
             var draining = await controller.AgentUpgrades.FindAsync(operationId);
+            await using var peerBuild = await StartBlockedBuildAsync(controller, second.AgentId, "peer-build");
             Assert.Multiple(() =>
             {
                 Assert.That(draining!.State, Is.EqualTo(AgentUpgradeState.Draining));
                 Assert.That(controller.Registry.Get(first.AgentId)!.Activity,
                     Is.EqualTo(AgentActivity.Building));
-                Assert.That(controller.Registry.TryBeginBuild(second.AgentId, "peer-build", out _), Is.True);
+                Assert.That(controller.Registry.Get(second.AgentId)!.CurrentBuildId, Is.EqualTo("peer-build"));
             });
             var agentToken = File.ReadAllText(Path.Combine(firstData, "auth.token")).Trim();
             using var agentHttp = PinnedClient(controller);
@@ -625,8 +627,8 @@ public sealed class AgentDeploymentTests
                 Assert.That(blockedManifest.StatusCode, Is.EqualTo(HttpStatusCode.NoContent),
                     "bootstrap must not see target bytes until the busy Build has handed off");
             }
-            controller.Registry.EndBuild(second.AgentId, "peer-build");
-            controller.Registry.EndBuild(first.AgentId, "busy-build");
+            await peerBuild.CompleteAsync();
+            await busyBuild.CompleteAsync();
             await controller.AgentUpgrades.TryAdvanceAsync(operationId);
 
             // D30 persists restart intent before delivery and permits three attempts separated by
@@ -777,7 +779,7 @@ public sealed class AgentDeploymentTests
                 return body.RootElement.GetProperty("operationId").GetString()!;
             }
 
-            Assert.That(controller.Registry.TryBeginBuild(agent.AgentId, "cancel-busy", out _), Is.True);
+            await using var busyBuild = await StartBlockedBuildAsync(controller, agent.AgentId, "cancel-busy");
             var beforeHandoffId = await CreateAsync("cancel-before-handoff");
             using (var cancellation = await admin.PutAsJsonAsync(
                        $"/api/v1/agent-upgrade-operations/{beforeHandoffId}/cancellation",
@@ -794,10 +796,10 @@ public sealed class AgentDeploymentTests
             }
             Assert.That(agentTask.IsCompleted, Is.False);
             Assert.That(await controller.AgentUpgradeStore.IsDrainedAsync(agent.AgentId), Is.False);
-            controller.Registry.EndBuild(agent.AgentId, "cancel-busy");
+            await busyBuild.CompleteAsync();
 
             var afterHandoffId = await CreateAsync("cancel-after-handoff");
-            await agentTask.WaitAsync(TimeSpan.FromSeconds(20));
+            await agentTask.WaitAsync(RestartDeliveryEvidenceTimeout);
             using (var bootstrap = PinnedClient(controller))
             {
                 bootstrap.DefaultRequestHeaders.Authorization = new(
@@ -1852,6 +1854,62 @@ public sealed class AgentDeploymentTests
             packages = entries,
         }));
         return catalogPath;
+    }
+
+    private async Task<BlockedBuild> StartBlockedBuildAsync(
+        VivariumControllerHost controller, string agentId, string buildId)
+    {
+        var started = Path.Combine(rootDir, buildId + ".started");
+        var release = Path.Combine(rootDir, buildId + ".release");
+        var assignment = new BuildAssignment { BuildId = buildId };
+        var step = new Step
+        {
+            Program = OperatingSystem.IsWindows() ? "powershell.exe" : "/bin/sh",
+            TimeoutSec = 60,
+        };
+        step.Args.Add(OperatingSystem.IsWindows()
+            ? new[] { "-NoProfile", "-NonInteractive", "-Command",
+                "Set-Content -LiteralPath $env:PROOF_STARTED -Value started; " +
+                "while (-not (Test-Path -LiteralPath $env:PROOF_RELEASE)) { Start-Sleep -Milliseconds 50 }" }
+            : new[] { "-c", ": > \"$PROOF_STARTED\"; while [ ! -e \"$PROOF_RELEASE\" ]; do sleep 0.05; done" });
+        step.Env.Add("PROOF_STARTED", started);
+        step.Env.Add("PROOF_RELEASE", release);
+        assignment.Steps.Add(step);
+        var build = new BlockedBuild(controller.Builds.RunBuildFromControllerAsync(
+            agentId, assignment, CancellationToken.None), release);
+        try
+        {
+            await WaitForAsync(() => File.Exists(started) || build.Result.IsCompleted, TimeSpan.FromSeconds(20));
+            Assert.That(File.Exists(started), Is.True, "Controlled build did not enter its real process.");
+            var live = controller.Registry.Get(agentId)!;
+            ulong sequence;
+            lock (live.Gate) sequence = live.LastHeartbeatSequence;
+            await WaitForAsync(() =>
+            {
+                lock (live.Gate) return live.LastHeartbeatSequence > sequence;
+            }, TimeSpan.FromSeconds(20));
+            Assert.Multiple(() =>
+            {
+                Assert.That(live.CurrentBuildId, Is.EqualTo(buildId));
+                Assert.That(live.Quarantined, Is.False, "Real busy heartbeat must agree with controller ownership.");
+                Assert.That(build.Result.IsCompleted, Is.False);
+            });
+            return build;
+        }
+        catch { await build.DisposeAsync(); throw; }
+    }
+
+    private sealed class BlockedBuild(Task<BuildResult> result, string release) : IAsyncDisposable
+    {
+        public Task<BuildResult> Result => result;
+
+        public async Task CompleteAsync()
+        {
+            await File.WriteAllTextAsync(release, "release");
+            Assert.That((await result.WaitAsync(TimeSpan.FromSeconds(20))).Outcome, Is.EqualTo(BuildOutcome.Succeeded));
+        }
+
+        public async ValueTask DisposeAsync() => await CompleteAsync();
     }
 
     private static AgentRunner CreateAgent(

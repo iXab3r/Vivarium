@@ -7,6 +7,8 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model.cs;Program.cs;UserCode.cs;Control.g.cs;$(SettingsSource)" />
+    <Compile Include="Model.cs;Control.g.cs" />
+    <Compile Include="ControlReader.cs" Condition="'$(ReadControlOnly)' == 'true'" />
+    <Compile Include="Program.cs;UserCode.cs;$(SettingsSource)" Condition="'$(ReadControlOnly)' != 'true'" />
   </ItemGroup>
 </Project>

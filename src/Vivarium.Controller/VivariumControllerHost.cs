@@ -428,7 +428,22 @@ public sealed class VivariumControllerHost : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        var backgroundTasks = app.Services.GetServices<IHostedService>()
+            .OfType<BackgroundService>()
+            .Select(service => service.ExecuteTask)
+            .OfType<Task>()
+            .ToArray();
         await app.StopAsync(TimeSpan.FromSeconds(5));
+        // The host's shared stop budget can expire while Kestrel drains a reverse stream.
+        // Canceled workers must release Git locks before disposal/restart reuses this data directory.
+        try
+        {
+            await Task.WhenAll(backgroundTasks).WaitAsync(TimeSpan.FromSeconds(30));
+        }
+        catch (OperationCanceledException)
+        {
+            // BackgroundService cancellation is normal; its task has now actually completed.
+        }
         await app.DisposeAsync();
         await Database.DisposeAsync();
     }

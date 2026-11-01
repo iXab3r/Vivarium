@@ -1,8 +1,11 @@
 # R0 request, principal, seed and effect manifest
 
-Status: **UNFROZEN planning input; no new reference capture or product case executed**.
-#36 owns completion and exact ledger/variant/case joins; #43 consumes the frozen contract,
-#42 checks P0's freeze and #44 accepts the eventual real R0 journey. Existing seven R0
+Status: **UNFROZEN manifest; bounded reference observations now available, no new product case
+materialized by this document.** Current owners are #111/#112 under #110 for P0 contract/acceptance
+and #114/#115 under #113 for R0. Legacy task IDs below are retained source pointers, not a second
+active board; the [task migration](story-task-migration.md) records their transfers.
+Former #36 owns the retained completion/ledger input; former #43 supplies R0 contract input,
+former #42 supplies P0 freeze input and former #44 supplies R0 acceptance input. Existing seven R0
 [contributions](subsystem-contributions.tsv) retain their primary/full owners and empty case IDs
 until independently established cases exist. This Markdown is planning data, not a fixture DSL.
 
@@ -19,6 +22,16 @@ Resolve structural/R0 gaps before P0 exit. A client request shape alone cannot f
 The [reference findings and future probes](reference-probes.md) distinguish installed schema,
 2026.1 help, pinned client source and unobserved installed effects. They qualify identity/reuse,
 state/outcome, cancel/delete/requeue, settings timing and editing-mode claims below.
+
+The [execution checkpoint](us013-p0-execution.md) and literal observation corpus now independently
+cover ordinary success/artifact bytes, actual nonzero failure, queued/running cancellation, old-locator
+resolution after queue optimization, explicit disabled-Agent targeting, and after-finish cancellation.
+These can supply the corresponding selected positive workflow expectations. They use an owned Linux
+Agent and the lab's administrative actor, not the final LocalSmoke recipe or R0 A/R current-grant
+setup. Do not relabel that actor as restricted or the Windows-named tiny stage as Windows evidence.
+Absent/true/false settings/source-timing observations remain separately qualified and do not establish
+a universal default. Exact actor/seed/wire/effect joins, denial controls, output contract, replacement
+native readbacks and actual product execution remain due before this manifest is frozen.
 
 ## Principals and seeds
 

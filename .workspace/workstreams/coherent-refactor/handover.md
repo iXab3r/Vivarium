@@ -5,9 +5,17 @@
 **Current assignment: execute US-013 autonomously, starting with its P0 gates.** The owner said
 “let's work” after accepting the plan. [Execution evidence](us013-p0-execution.md) now includes real
 owned-Agent reference execution/bytes/cancellation, source/settings timing, generated/manual/computed
-Kotlin editing and the bounded checked-in C#/Git representation experiment. Literal reference
+Kotlin editing, the bounded checked-in C#/Git representation experiment and the separately invoked
+eight-pass Git/PostgreSQL physical-recovery study. That study proves real process-kill/resume,
+projection atomicity, ownership transfer, source rejection and DB restart for its experimental
+single-worker schema; it is not production Host/authorization/concurrency acceptance. The known
+OpenAPI/CMS dependency advisories have patched pins. A discovered legacy busy-Agent test race is
+corrected with actual blocked builds and observed matching heartbeat, preserving production safeguards.
+A second exposed legacy restart race is fixed by joining canceled Host background tasks before
+services/DB disposal; all five focused fencing/restart tests pass. No Bootstrap/protocol change.
+Literal reference
 observations have strict NUnit/WireMock replay; they are not new materialized product cases or a
-ready replacement Host. The integrated P0 model/activation/recovery/allocation/closure work remains
+ready replacement Host. The integrated P0 model/mode/concurrency/allocation/closure work remains
 in progress. No milestone main merge or R0/PILOT implementation has occurred. Continue the connected
 story work; planning-session no-execution statements below are historical, not a new approval gate.
 
