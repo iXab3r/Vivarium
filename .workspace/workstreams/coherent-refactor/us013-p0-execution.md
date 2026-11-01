@@ -12,6 +12,10 @@ installation, UI and full T3 chain remain NOT_AVAILABLE.
 No P0/R0/PILOT gate, independent review or main merge is accepted here. The original fifteen
 materialized conformance cases retain their identities; observation labels are not new frozen cases.
 
+The subsequent [literal T3 settings proof](us013-recipe-representation.md) fills explicit recipe-field
+omissions while preserving this original smaller computed/recovery fixture and its historical receipts.
+It does not resolve implicit defaults, all computed field categories or full workload adaptation.
+
 ## Independently observed reference behavior
 
 The explicit `vivarium-teamcity-lab-202613` profile targets the separate loopback TeamCity

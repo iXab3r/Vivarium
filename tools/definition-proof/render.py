@@ -28,13 +28,17 @@ def settings(value):
                           for s in item['snapshots'])
         artifacts = array(constructor(quote(a['configuration']), quote(a['selector']), quote(a['rules']),
                                       str(a['cleanDestination']).lower()) for a in item['artifacts'])
-        triggers = array(constructor(quote(t['type']), quote(t['branchFilter']), str(t['quietSeconds']))
+        triggers = array(constructor(quote(t['type']), quote(t['branchFilter']), str(t['quietSeconds']),
+                                     *([quote(t.get('quietPeriodMode')), quote(t.get('rules'))]
+                                       if t.get('quietPeriodMode') is not None or t.get('rules') is not None else []))
                          for t in item['triggers'])
         configurations.append(constructor(quote(item['id']), quote(item['name']),
                                          array(parameter(p) for p in item['parameters']), steps,
-                                         requirements, snapshots, artifacts, str(item['timeoutMinutes']), triggers))
-    source = 'null' if value['source'] is None else constructor(*(quote(value['source'][key]) for key in
-        ('rootId', 'url', 'branch', 'checkoutRules')))
+                                         requirements, snapshots, artifacts, str(item['timeoutMinutes']), triggers,
+                                         *([quote(item['checkoutMode'])] if item.get('checkoutMode') is not None else [])))
+    source = 'null' if value['source'] is None else constructor(
+        *(quote(value['source'][key]) for key in ('rootId', 'url', 'branch', 'checkoutRules')),
+        *([quote(value['source']['name'])] if value['source'].get('name') is not None else []))
     configuration_source = ('[\n            ' + ',\n            '.join(configurations) + '\n        ]') if configurations else '[]'
     return ('using DefinitionProof;\npublic static class Managed\n{\n'
             '    public static Settings Declare() => new(' + quote(value['projectId']) + ', ' + source + ',\n'

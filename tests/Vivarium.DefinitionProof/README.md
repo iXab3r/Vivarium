@@ -12,6 +12,10 @@ dotnet test tests/Vivarium.DefinitionProof/Vivarium.DefinitionProof.csproj -m:1
 ```
 
 Python, Git and Docker Linux containers must work. Setup failure is a failure, never a skip.
+The same target also runs `RecipeSourceTests`: a separate non-Docker C#/Git round-trip of all
+explicit declarations from the pinned T3 Kotlin fixture. Select `--filter FullyQualifiedName~RecipeSourceTests`
+for only that source-representation check. Its owned configuration candidate does not create a GitHub
+repository, modify workload scripts, launch an application, build T3 or publish anything.
 The root test project builds this assembly but does not execute these physical cases implicitly.
 The source fixture is created by `tools/definition-proof/probe.py`; its receipt records literal Git
 revisions and expected effective-plan hashes. The same exact committed C# is compiled by separate
@@ -34,7 +38,7 @@ retry, PostgreSQL restart and an interfering ref writer.
 
 This is a single-worker feasibility experiment over trusted bare repositories. It does not prove
 production concurrency fencing, remote credentials, normal-checkout dirty-state recovery, mode and
-permission behavior, all C# field categories or the complete executable T3 recipe. Those obligations
+permission behavior, all computed C# field categories or the complete executable/adapted T3 recipe. Those obligations
 remain explicit in the US-013 P0 pack. The production legacy reconciler remains SQLite/control-only.
 
 Dependencies: [Npgsql 10.0.3](https://www.nuget.org/packages/Npgsql/10.0.3), using its

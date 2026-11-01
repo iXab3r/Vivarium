@@ -21,7 +21,7 @@ if (args.SequenceEqual(new[] { "declared" }))
 }
 var effective = settings.Configurations.Select(c => new
 {
-    c.Id, c.Name, c.TimeoutMinutes, c.Requirements, c.Snapshots, c.Artifacts, c.Triggers,
+    c.Id, c.Name, c.TimeoutMinutes, c.CheckoutMode, c.Requirements, c.Snapshots, c.Artifacts, c.Triggers,
     parameters = settings.Parameters.Where(p => !c.Parameters.Any(local => local.Name == p.Name))
         .Select(p => new ResolvedParameter(p.Name, Resolve(p), true))
         .Concat(c.Parameters.Select(p => new ResolvedParameter(p.Name, Resolve(p), false)))

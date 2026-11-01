@@ -2,7 +2,14 @@
 
 ## Current state — 2026-11-01
 
-**Current assignment: execute US-013 autonomously, starting with its P0 gates.** The owner said
+**Current assignment: execute US-013 autonomously, starting with its P0 gates.** The
+[literal T3 settings increment](us013-recipe-representation.md) fills explicit Docker/PowerShell/checkout/trigger
+omissions, with actual committed C# compilation, managed round-trip, owned configuration edits and
+old-revision reevaluation. The original smaller seed remains the computed/physical fixture. The
+workload script audit identifies exact no-launch/repository/tool-path deltas; those scripts have not
+yet been adapted/executed. This is representation evidence, not an accepted full model or usable Host.
+
+**Preceding source/story checkpoint:** The owner said
 “let's work”. The latest [source/story accounting increment](story-source-accounting.md) adds real
 referential checks across the existing 25 stories, 160 scenarios, 52 readiness declarations and
 source/case registers, plus consumed-input freshness. Current exact actor/effect/variant/source-byte

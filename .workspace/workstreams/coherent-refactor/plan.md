@@ -1,9 +1,11 @@
-# Coherent Vivarium refactor — plan v1.20
+# Coherent Vivarium refactor — plan v1.21
 
 **Execution started for US-013.** The owner assigned the accepted autonomous delivery plan with
 “let's work”. Continue the integrated P0 proof/model/contract/evidence block; its actual outputs are in
 [the physical checkpoint](us013-p0-execution.md) and [source/story accounting](story-source-accounting.md).
 The latter checks declared links/freshness, not semantic normalization or actor/effect/variant freeze.
+The [literal T3 settings proof](us013-recipe-representation.md) now fills explicit recipe-field
+omissions and checks source-preserving C#/Git edits; workload script adaptation/execution stays due.
 Reference observations and a bounded C#/Git source
 experiment and an eight-case real Git/PostgreSQL physical-recovery study are available. The latter
 proves a single-worker prototype, not Host/authorization/concurrent-writer integration. Product

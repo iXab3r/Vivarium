@@ -23,11 +23,22 @@ replacement/reordering/omission, binding without duplicate ownership, invalid C#
 and reevaluation of the exact prior usable Git revisions in a fresh child. User-code bytes remain
 unchanged and are selected from the owning Git revision together with managed settings.
 
-The three-definition seed represents a focused subset of the pinned T3 settings: identities, runners,
+The original `Settings.g.cs` three-definition seed represents a focused subset of the pinned T3 settings: identities, runners,
 script references, requirements, dependencies, selection rules, timeouts and used trigger. It is not
 the complete executable/adapted T3 recipe; Docker/process properties, runtime substitution, secret
 resolution and complete template/mode behavior still need their owning proof. Its representative
 computed parameter is an attributed experiment addition.
+
+`T3Recipe.cs` is a separate literal translation of **all explicit product declarations** in the
+vendored [historical Kotlin fixture](reference/NOTICE.md). The existing `RecipeSourceTests` NUnit
+target compiles real committed C#, round-trips every declared field through the same managed editor,
+edits source/Agent/cache/trigger inputs for an owned configuration candidate, and reevaluates the old
+Git revision. Checkout mode, source name and quiet-period/rule fields are explicit; Docker and
+PowerShell options remain ordinary typed runner properties. This does not resolve implicit TeamCity
+defaults or execute runners. Its stable step IDs are attributed experiment IDs. The workload scripts
+still require the separately recorded repository/tool-path/no-launch adaptations before a real T3
+build. The original computed/inheritance and physical-recovery experiment continues to use its own
+smaller seed.
 
 Separate processes and deadlines are **not** an OS security sandbox. These are known trusted fixture
 sources; do not use this probe to evaluate untrusted repositories. The prototype neither authorizes

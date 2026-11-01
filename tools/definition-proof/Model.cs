@@ -8,9 +8,11 @@ public sealed record Step(string Id, string Name, string Runner, Parameter[] Pro
 public sealed record Requirement(string Name, string Value);
 public sealed record Snapshot(string Configuration, string Failure, string Cancel);
 public sealed record Artifact(string Configuration, string Selector, string Rules, bool CleanDestination);
-public sealed record Trigger(string Type, string BranchFilter, int QuietSeconds);
-public sealed record Source(string RootId, string Url, string Branch, string CheckoutRules);
+public sealed record Trigger(string Type, string BranchFilter, int QuietSeconds,
+    string? QuietPeriodMode = null, string? Rules = null);
+public sealed record Source(string RootId, string Url, string Branch, string CheckoutRules, string? Name = null);
 public sealed record Configuration(string Id, string Name, Parameter[] Parameters, Step[] Steps,
-    Requirement[] Requirements, Snapshot[] Snapshots, Artifact[] Artifacts, int TimeoutMinutes, Trigger[] Triggers);
+    Requirement[] Requirements, Snapshot[] Snapshots, Artifact[] Artifacts, int TimeoutMinutes, Trigger[] Triggers,
+    string? CheckoutMode = null);
 public sealed record Settings(string ProjectId, Source? Source, Parameter[] Parameters, Configuration[] Configurations);
 public sealed record ResolvedParameter(string Name, string Value, bool Inherited);
