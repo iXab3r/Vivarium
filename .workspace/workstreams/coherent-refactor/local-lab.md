@@ -18,7 +18,7 @@ separate-Agent execution or operator deployment experience already exists.
 | R0.1 | Prepare/start local PG, Host and a real separate Agent; open current-style UI, inspect nodes/health, enroll/authorize the Agent, attach debuggers and restart/reset/stop | Full catalogue authoring, source checkout, all roles/clients or full build parity |
 | R0.2 | Use unchanged teamcity-cli with a local profile to run/watch/cancel seeded LocalSmoke, inspect the same run through native UI/API and download a verified artifact | Entire CLI route surface or migrated real build families |
 | R0.3 (R0 exit) | Repeat the above after Host/Agent disconnect/restart, preserve stable identity/ownership/results, prove clean reset/teardown and protected output | All platform fault cases, upgrade rollout or complete durable searchable logs |
-| PILOT | Build actual T3Personal_Prepare through UI, direct /app/rest and unchanged CLI after accepted R0 | Recommended draft Prepare-first boundary; no Windows/full-chain/default-publication or full IAM/editor/all-runner claim |
+| PILOT | Breadth-first full Prepare/Windows/Release chain including default publication across UI, direct /app/rest and unchanged CLI after accepted R0 | All actual used features are due; all breadth levels currently NOT_AVAILABLE. Full unrelated IAM/editor/all-runner/provider scope remains later |
 | R1 | Complete ordinary identity/token lifecycle and exact TeamCity project/group roles beyond R0's required ordinary-user credential and current-grant subset | Source-based full Compile still belongs to R2 |
 | R2 | Configure and run a genuine source-based C# Compile with exact Git revisions/requirements and durable provenance | Chains/publishers/history migration still have their later gates |
 
@@ -82,7 +82,7 @@ this SS-IAM contribution from #16/#17 without depending on complete R1 acceptanc
 Seed one Git-owned LocalSmoke configuration using P0's final approved definition representation and
 the shared catalogue activation path. Use the eventual process runner/queue/storage services; no
 in-memory sample catalogue, separate fake Agent, direct test-only dispatch or throwaway runner engine.
-Full evaluator/editor/inheritance expand in R2; PILOT first pulls the exact real Prepare source/runner/output subset forward after accepted R0.
+Full evaluator/editor/inheritance expand in R2; PILOT pulls the actual full T3 chain source/runners/interactive launch/artifact/publication/used-trigger scope forward after accepted R0.
 
 Run an actual prepared native fixture executable. It emits recognizable stdout and smoke.txt and
 supports deterministic nonzero/long-running modes for negative/cancel checks. Through a separate

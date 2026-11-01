@@ -2,11 +2,12 @@
 
 **Now:** the replacement Host/Agent/product build is NOT_AVAILABLE. Existing evidence is fifteen
 known cases: five RED, ten product-prerequisite-blocked, zero product GREEN; global denominator unknown.
-**Next:** #13/#35 **Freeze Prepare recipe/expected outputs and due reference cases**, then accepted
+**Next:** #13/#35 **Freeze the full T3Personal recipe/capability/expected-output and due AC/wire matrix**, then accepted
 P0 → R0 → [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78).
 **Later:** full remaining IAM/catalog/runners/diagnostics and cumulative migration under existing owners.
 The [T3Personal pilot](t3personal-pilot.md) exposes three small stories and openable checkpoints.
-Prepare-first is the recommended draft boundary while the owner's optional scope response is pending.
+The owner chose breadth-first full Prepare → Windows → Release, including default publication,
+across all three surfaces at each measurable level; no serial surface-completion dependency.
 No product output, exact pilot case or publication is claimed delivered/frozen.
 
 Status: **owner iteration; D38 executable-first, D39 closure and D40 subsystem-led delivery accepted**.
@@ -202,7 +203,7 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 |---|---|---|
 | P0 | Executable reference-backed REST contracts and a genuine RED baseline precede structural replacement | P0.REST.1–3 corpus/replay/product baseline executed with evidence and explicit blockers; resource/ID/state/command, protocol and C# mutation/authority proof reviewed; required variants allocated; no unknown mapping hidden behind a count |
 | R0 | An operator runs a local Host plus real Agent and the first compatible smoke job | R0.1 real PG/Storage/Host/Agent admission/debug and ordinary credential readiness; R0.2 unchanged CLI success/nonzero/queued and running cancel/exact artifact bytes; R0.3 restart/reconnect/owned cleanup. Installation login plus minimal ordinary OIDC/My keys, SYSTEM_ADMIN and restricted project principals/current allow-deny for exposed actions; full IAM R1 |
-| PILOT | Build real T3Personal_Prepare through UI, direct compatible REST and unchanged CLI | Recommended draft Prepare-first scope; #78 integrates #79/#80/#81 and same-milestone #82/#83. Real source/Docker/counter/preflight/service-message/version/log/launch/artifact evidence; full later owners remain open |
+| PILOT | Build the full actual T3Personal chain across UI, direct compatible REST and unchanged CLI | Breadth levels: full recipe/capability/AC+wire matrix; truthful all-config/surface discovery/auth/state; real DAG/Docker/PowerShell/interactive launch/artifact/publication; fault/recovery/access/cumulative acceptance. #78/#82/#83 and surface projections #79–#81; all NOT_AVAILABLE |
 | R1 | Ordinary identity/access and compatible lifecycle work beyond the R0 subset is complete | Complete roles/groups/project inheritance, provider/account/token/PAT wire variants and legacy disposition; preserve R0 current-cookie/token grant, withdrawal, expiry/revoke and key/restart guarantees |
 | R2 | A user authors a full C# catalogue and runs a genuine source-based Compile | Extend R0 catalogue/execution with full C# evaluation/editing/inheritance, exact checkout, requirements/reasons and report/artifact provenance; same existing PG scheduler, Agent and compatible/native run services |
 | R3 | Existing build families can express and execute their complete chains | Parameters/inheritance, all observed runners/features, chain/artifact policies, counters/locks/triggers, paused jobs and publish gating; representative Windows/Linux workflows |
@@ -212,10 +213,10 @@ is insufficient. P0 closes unresolved choices in [decisions.md](decisions.md), n
 
 Near-term dependencies: accepted P0.REST.1–3 and shared structural/representation/allocation gates → accepted R0 → PILOT.
 PILOT pulls only its required production contributions forward; full later-owner completion is not a
-prerequisite. The recommended Prepare-first boundary remains draft pending the optional scope answer.
+prerequisite. All actual Windows/Release/used trigger/default-publication behavior is due in PILOT.
 Existing P0 gates, cumulative earlier GREEN, end-milestone review/zero-debt/main delivery remain.
-After PILOT, plan visible Windows → chain/build-only → explicitly scoped publication → other families
-→ history/diff-import stories. R1–R6 below remain full-scope owner/completion backlogs and cumulative
+Windows, coherent chain artifacts and default publication are breadth levels within PILOT, not
+follow-up-only scope. After PILOT, plan other families and history/diff-import stories. R1–R6 below remain full-scope owner/completion backlogs and cumulative
 gates, not blanket prerequisites before each next product story. Allocate its exact next milestone
 and needed partial contributions before implementation, after predecessor closure; do not create all
 later milestones now, accept broad owners early or move failing due/previously GREEN cases.

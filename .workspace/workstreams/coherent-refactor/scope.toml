@@ -41,7 +41,7 @@ external = "D39: GitHub issues/milestones own live task and closure state; api-b
 
 [pilot]
 key = "PILOT"
-status = "recommended-prepare-first-pending-optional-owner-response; NOT_AVAILABLE"
+status = "owner-selected-breadth-first-full-T3Personal; all-levels-NOT_AVAILABLE"
 order = "accepted P0 -> accepted R0 -> PILOT; later business stories allocated before implementation after predecessor closure; R1-R6 full-scope completion backlog, not blanket prerequisites"
 integration_slice = "SS-RUN@PILOT"
 parent_issue = 78
@@ -49,3 +49,4 @@ story_issues = [79, 80, 81]
 contract_issue = 82
 acceptance_issue = 83
 targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"
+breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real DAG/runners/artifact/launch/stage/default-publication -> fault/recovery/access/cumulative acceptance; no serial surface completion"

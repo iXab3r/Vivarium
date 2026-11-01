@@ -171,7 +171,7 @@ R0 delivers the first thin compatible execution path together with the actual lo
 R0's [unfrozen journey manifest](../../.workspace/workstreams/coherent-refactor/r0-journey-manifest.md)
 includes the minimal ordinary OIDC/key/current-grant contribution required by the unchanged CLI and
 denied-access controls. After accepted P0/R0, the [PILOT integration](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md)
-brings the bounded real Prepare path through UI/direct compatible REST/unchanged CLI before full IAM
+brings the actual full T3 chain/default publication through breadth levels across UI/direct compatible REST/unchanged CLI before full IAM
 and general catalogue/runner/log completion. Its same-milestone #78/#82/#83 own the integration;
 full owners retain later scope and one authority. R1 then completes identity/access variants;
 R2 catalogue/VCS/requirements; R3 chains/runners/triggers;

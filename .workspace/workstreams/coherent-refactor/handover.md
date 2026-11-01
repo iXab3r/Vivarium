@@ -2,12 +2,16 @@
 
 ## Current state — 2026-11-01
 
-**Now:** replacement product NOT_AVAILABLE. **Next:** #13/#35 Freeze Prepare recipe/expected outputs
+**Now:** replacement product NOT_AVAILABLE. **Next:** #13/#35 Freeze full-chain recipe/capability/expected outputs
 and due reference cases, then accepted P0/R0. **Later:** [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78)
 with UI #79, direct compatible REST #80 and unchanged CLI #81; #82/#83 are its same-milestone pair.
-Prepare-first is a recommended draft pending the optional owner response, not assumed approval.
+The owner selected breadth-first full Prepare/Windows/Release including default publication. Four
+levels apply across all configurations/surface projections; Windows/Release/used trigger features
+are due here, not deferred, and no surface must finish before another starts. Future external
+publication execution scope/authorization is an operator gate, not a new Build state or approval API;
+this turn only plans and never builds/publishes/modifies production.
 See [T3Personal pilot](t3personal-pilot.md) for exact pinned facts and openable checkpoints. GitHub
-now has 82 open issues/nine milestones; registers have 18 subsystem slices/20 bounded contributions,
+now has 82 open issues/nine milestones; registers have 18 subsystem slices/22 bounded contributions,
 still 16 subsystem owners. Existing native parents/states are preserved; #77 is included in the
 refreshed graph. Task counts are not product progress. The historical97 inventory is unchanged;
 three T3 configurations are a targeted addendum, not a global100 census.
@@ -17,7 +21,7 @@ raw receipts or generated status. New registers require explicit offline account
 assessment; older zero-stale/exit0 reports below keep their original revisions and do not establish
 freshness or completion of this new unfrozen PILOT scope.
 
-Working-tree planning assessment at `7b19fa5` used the existing read-only offline DLL and
+Historical pre-breadth working-tree planning assessment at `7b19fa5` used the existing read-only offline DLL and
 `artifacts/p0-ledger/assessments/t3personal-pilot-working-tree.json`: exit0, REUSED, 18 slices /
 20 contributions, still 449 headings / 15 cases / 5 RED / 10 blocked / 0 GREEN/stale/errors.
 All 183 recorded source inputs and six accounting sources are unchanged. This validates supported

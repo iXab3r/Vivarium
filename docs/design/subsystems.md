@@ -96,8 +96,10 @@ tasks and bounded business outcome. It does not create another slice, owner, ser
 case. R0 uses SS-HOST@R0 (#14/#43/#44); R2 Compile output uses SS-RUN@R2 (#20/#65/#66),
 with source checkout/Compile code and evidence from #19/#59/#60 and catalog inputs from #18.
 Between accepted R0 and full later domains, [SS-RUN@PILOT](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md)
-uses #78/#82/#83 for the recommended real Prepare path and surface cards #79–#81. It pulls bounded
-IAM/CFG/VCS/AGT/EXEC/counter/LOG/BLOB contributions forward while full owner #20 remains R2.
+uses #78/#82/#83 for owner-selected full T3 chain/default-publication breadth levels and surface
+projections #79–#81. It pulls bounded IAM/CFG/VCS/AGT/EXEC/CHAIN/counter-trigger/LOG/BLOB/publication
+contributions forward while full owner #20 remains R2. Actual used features are due, broader unrelated
+full-owner scope remains later; no deployment category/dashboard/provider API is inferred.
 This adds one integration slice, not a subsystem/node/engine or duplicated API universe.
 
 R2 step editing has a separate bounded SS-EXEC contribution to SS-CFG@R2 (#18/#47/#48): EXEC

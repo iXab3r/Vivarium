@@ -687,7 +687,7 @@
     {
       "parent": null,
       "url": "https://github.com/iXab3r/Vivarium/issues/78",
-      "title": "PILOT: Build real T3Personal Prepare through UI, REST and CLI",
+      "title": "PILOT: Build the full T3Personal chain across UI, REST and CLI",
       "state": "open",
       "milestone": "PILOT",
       "number": 78,
@@ -696,7 +696,7 @@
     {
       "parent": 78,
       "url": "https://github.com/iXab3r/Vivarium/issues/79",
-      "title": "PILOT: Build T3Personal Prepare from the UI",
+      "title": "PILOT: Operate the full T3Personal chain through the UI",
       "state": "open",
       "milestone": "PILOT",
       "number": 79,
@@ -705,7 +705,7 @@
     {
       "parent": 78,
       "url": "https://github.com/iXab3r/Vivarium/issues/80",
-      "title": "PILOT: Build T3Personal Prepare through direct REST",
+      "title": "PILOT: Operate the full T3Personal chain through direct REST",
       "state": "open",
       "milestone": "PILOT",
       "number": 80,
@@ -714,7 +714,7 @@
     {
       "parent": 78,
       "url": "https://github.com/iXab3r/Vivarium/issues/81",
-      "title": "PILOT: Build T3Personal Prepare with unchanged teamcity-cli",
+      "title": "PILOT: Operate the full T3Personal chain with unchanged CLI",
       "state": "open",
       "milestone": "PILOT",
       "number": 81,
@@ -723,7 +723,7 @@
     {
       "parent": 78,
       "url": "https://github.com/iXab3r/Vivarium/issues/82",
-      "title": "PILOT: Specify the real Prepare integration REST contract",
+      "title": "PILOT: Specify the whole-chain breadth contract and capability matrix",
       "state": "open",
       "milestone": "PILOT",
       "number": 82,
@@ -732,7 +732,7 @@
     {
       "parent": 78,
       "url": "https://github.com/iXab3r/Vivarium/issues/83",
-      "title": "PILOT: Verify real Prepare across UI, REST and CLI",
+      "title": "PILOT: Verify whole-chain breadth across UI, REST and CLI",
       "state": "open",
       "milestone": "PILOT",
       "number": 83,
@@ -755,7 +755,7 @@
       "state": "open"
     },
     {
-      "title": "PILOT: First real T3Personal build through UI, REST and CLI",
+      "title": "PILOT: Full T3Personal chain across UI, REST and CLI",
       "key": "PILOT",
       "number": 9,
       "url": "https://github.com/iXab3r/Vivarium/milestone/9",
@@ -805,8 +805,8 @@
     }
   ],
   "snapshot": {
-    "recorded_utc": "2026-11-01T11:54:00.871140+00:00",
-    "source": "read-only GitHub issue/milestone metadata and native parent links",
-    "scope": "82 open issues, nine milestones; task counts are not product acceptance"
+    "recorded_utc": "2026-11-01T12:36:40.867746+00:00",
+    "source": "read-only GitHub metadata and native parents after owner-selected full-chain breadth update",
+    "scope": "82 open issues/nine milestones unchanged; titles refreshed, no product completion claim"
   }
 }

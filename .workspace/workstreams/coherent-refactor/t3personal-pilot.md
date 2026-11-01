@@ -1,42 +1,57 @@
-# First real product: T3Personal Prepare
+# First real product: the full T3Personal chain
 
-**Now:** NOT_AVAILABLE in the replacement product. The owner selected real T3Personal and three
-stories: UI → direct compatible REST → unchanged CLI. **Prepare-first is the recommended draft
-boundary; the optional Prepare/full-chain choice is unanswered, not assumed approved.**
-**Next:** #13/#35 freeze the Prepare recipe/expected outputs and due reference cases, #36 binds
-them, then close accepted P0 and R0. **Later:** Windows → explicit full-chain build-only validation
-→ separately scoped default publication, plus the remaining full subsystem lifecycles.
+**Now:** NOT_AVAILABLE in the replacement product. The owner chose **breadth-first**: preserve the
+whole actual Prepare → Windows → Release configuration and default-publication behavior across UI,
+direct compatible /app/rest and unchanged CLI. The earlier Prepare-first recommendation is superseded.
+**Next:** #13/#35 freeze the whole-chain recipe/capability/expected-output and due AC/wire matrix;
+#36 joins it to the existing ledger. Accepted P0 and R0 remain prerequisites to PILOT implementation.
+**Later:** other families and broader full subsystem/history scope. Used Windows, artifact handoff,
+Release publication and trigger behavior cannot be deferred to those broader owners.
 
-## What to open, and when
+## What to open at each breadth-first level
 
 Today only the [reference project](https://build.eyeauras.net/project/T3Personal?mode=builds) and
-planning/evidence below are available. No working replacement login/build URL or start command is
-invented here. [PILOT #78](https://github.com/iXab3r/Vivarium/issues/78) is the integration/closure
-owner, with [contract #82](https://github.com/iXab3r/Vivarium/issues/82) and
-[acceptance #83](https://github.com/iXab3r/Vivarium/issues/83) in the same milestone.
+planning/evidence are available; no working replacement URL/command is invented. Integration
+[#78](https://github.com/iXab3r/Vivarium/issues/78), [contract #82](https://github.com/iXab3r/Vivarium/issues/82)
+and [acceptance #83](https://github.com/iXab3r/Vivarium/issues/83) retain one milestone. UI
+[#79](https://github.com/iXab3r/Vivarium/issues/79), direct REST
+[#80](https://github.com/iXab3r/Vivarium/issues/80) and unchanged CLI
+[#81](https://github.com/iXab3r/Vivarium/issues/81) are acceptance projections worked across each
+level, not a serial implementation order. Shared backend/contracts are delivered when first needed.
 
-| Openable checkpoint | User action and observable result | Task / now |
+| Level / visible evidence to open | Whole-chain and surface applicability | Now / existing owners |
 |---|---|---|
-| Local prerequisite | Start real Host/PG/Storage/Agent, sign in, see identity/heartbeat/readiness and use owned stop/reset/attach. | #37, NOT_AVAILABLE; R0 branch preview |
-| Cheap client prerequisite | Run/watch/cancel LocalSmoke with unchanged CLI and verify retained output/bytes/recovery. This is not T3 success. | #38, NOT_AVAILABLE; R0 branch preview |
-| UI: sign in and see Prepare | Open real Project/BuildType and eligible separately owned Linux Agent, or a truthful named incompatibility. | [#79](https://github.com/iXab3r/Vivarium/issues/79), NOT_AVAILABLE |
-| UI: watch real work | Submit through normal UI/native services; actual source checkout and Docker Prepare progress through queued/running/finished with resolved revision/settings/counter/Agent. | #79, NOT_AVAILABLE |
-| UI: inspect and download | Actual SUCCESS, source-emitted version/build number, AppImage, runtime/shared bundle, manifests, retained logs and launch diagnostics; download/hash bytes. | #79, NOT_AVAILABLE |
-| Direct REST | A real /app/rest-entered Prepare execution, normal auth/current grants, intermediate status, logs/bytes and UI/native cross-readbacks. | [#80](https://github.com/iXab3r/Vivarium/issues/80), NOT_AVAILABLE |
-| Unchanged CLI | A real pinned teamcity-cli-entered Prepare execution; exact commands/exits, current status and hash-verified download, cross-readable through UI/REST. | [#81](https://github.com/iXab3r/Vivarium/issues/81), NOT_AVAILABLE |
+| 0. Frozen recipe/capability/AC + wire matrix | Three configurations, exact source/settings/runner/Agent/dependency/credential/counter/artifact/trigger/publication facts; UI, /app/rest and CLI actions plus actual unsupported/unknown dimensions explicitly mapped. Source versus installed alignment is resolved or a named blocker. A parsed matrix is not execution GREEN. | NOT_AVAILABLE as frozen proof; #13/#35/#36/#82 with shared #32/#34 gates |
+| 1. Truthful discovery, auth, readiness and chain state | Open all three configurations/edges and Linux + interactive Windows Agent readiness through UI/REST/CLI; current ordinary/restricted access, queued/running/terminal and independent outcome/reasons. Each supported projection has actual readback; missing surfaces/capabilities remain gaps, not stub success. | NOT_AVAILABLE; #79/#80/#81 with IAM/CFG/VCS/AGT/RUN owners |
+| 2. Real DAG, bytes, launch checks and publication | Each surface enters the same real chain through its frozen entry, with all three configurations observable: exact checkouts, Docker and PowerShell FILE/PS1, interactive Windows launch checks, snapshot + sameChainOrLastFinished artifact selection, source-emitted version/messages, manifests/bytes, Release staging and actual default publication. Off is only an intermediate checkpoint. The real publication execution gate must be satisfied before default-publication acceptance. | NOT_AVAILABLE; #78/#79/#80/#81, CHAIN/EXEC/TRG/LOG/BLOB/DEP contributors |
+| 3. Fault/recovery/access and cumulative acceptance | Cover due failures/cancel/reuse/retry/restart/revocation/byte denial and used Release trigger/quiet-period/exclusions/single-publisher behavior with controlled fixtures where sufficient, plus actual chain/publication evidence. All three configurations and all surfaces have explicit applicability/evidence/gaps. No placeholder, replay-only or effect-free GREEN. | NOT_AVAILABLE; #83 and final PILOT aggregate + Security/zero-debt/main gate |
 
-The future CLI contract uses supported options and a dedicated Vivarium profile, never the default
-production profile. No explicit revision flag is currently supported; a branch/main invocation must
-record its actual resolved source/settings and reconcile recipe changes against this source snapshot.
-Select an adequate supported wait budget for Prepare's 90-minute limit. A local wait timeout (exit124)
-leaves work running and is not cancellation. Deliver verified commands/download locations when ready;
-artifact --output is a name inside the profile download directory, not an arbitrary destination path.
+#37 actual Host/Agent/login lifecycle and #38 cheap LocalSmoke remain R0 technical previews; neither
+accepts T3. The normal terminal entry is T3Personal_Release with the actual Prepare/Windows dependencies,
+not a new composite/parent. Freeze POST-returned Release Build ID versus dependency Build IDs,
+lookup and reuse relationships. UI/direct REST inspect the DAG; CLI uses only supported start/wait/
+read views with cross-readbacks in UI/API, no invented CLI graph command.
 
-Each surface has actual execution/evidence; one submission viewed three ways does not prove three
-entry stories. Implement shared services/API behavior when first needed, not artificial delays for
-a later story. Use cheap controlled workloads for nonzero failure, queued/running cancellation,
-denial/revoke and restart/ownership variants; do not rebuild T3 for thousands of protocol assertions.
-Instantiate the existing canonical AC/TCM at those boundaries; no new business-AC count/framework.
+Each surface needs its own actual chain-entry/effect evidence and cross-readbacks, not
+one submission viewed three ways. Respect reference reuse/identity rather than invent universal
+new-ID or no-reuse rules. Cheap controlled workloads test broad variants without rebuilding the
+whole product for thousands of assertions; they do not replace actual Windows/Release/publication.
+Existing 110 canonical AC/TCM are instantiated, not replaced by three new requirements/frameworks.
+
+#82/#83 must freeze the smallest sufficient real publication proof through the shared producer
+boundary, together with actual UI/REST/CLI chain entries and controlled request/default/effect tests.
+This does not silently require three identical live GitHub publications or a full rebuild per negative
+case. Record explicit valid evidence reuse and its limits; do not declare unknown proof sufficient.
+An off-mode entry is labelled with that parameter difference and never described as having published.
+Actual default-publication behavior remains due for the total PILOT, not waived by this cost choice.
+
+
+Future CLI examples require an explicit Vivarium profile, supported options and measured client
+fingerprints. No explicit revision flag is currently supported: record actual resolved source/settings
+and reconcile a changed recipe. Choose a supported full-chain wait budget considering source limits
+Prepare 90m, Windows 90m, Release 15m plus queue/coordination; the current 10m wait default is not a
+job deadline or a chosen future timeout policy. Wait timeout exit 124 leaves work running, not
+cancelled. Artifact --output names a file within profile downloads, not an arbitrary destination.
 
 ## Targeted source/reference addendum — not a refreshed global census
 
@@ -75,29 +90,37 @@ Cvat/laptop-g15 or silently remove requirements. Record exact permitted mapping 
 Prepare's GITHUB_TOKEN preflight makes an authenticated repository GET and requires push permission;
 it does not publish. Supply a private credential reference, never a token in public planning/logs.
 Release source sets T3_PUBLISH=release and invokes publish.sh; off/draft/release are supported,
-with no dry-run or repository-target override. Draft also writes externally. An eventual off-mode
-chain is explicitly build-only validation, not default-publication parity or full T3 migration.
-Publication and trigger ownership during coexistence need their later deliberate effect scope.
+with no dry-run or repository-target override. Draft also writes externally. An off-mode chain is a useful intermediate build-only checkpoint, not default-publication parity.
+Default publication and the used Release VCS trigger/coexistence ownership are due in this PILOT;
+the eventual real external effect needs a concrete execution scope/authorization gate. This planning
+slice executes nothing and does not request or grant publication authority. This operator gate is
+outside the product model, not a new awaiting-permission Build state or approval feature. No target override or
+dry-run exists; an unavailable execution gate remains a blocker, not permission to omit the behavior.
 
 ## One bounded integration, existing owners
 
-Fixed near-term order is accepted P0 → accepted R0 → PILOT. Next product stories are Windows →
-chain/build-only → explicit publication → other families → history/diff-import. Existing R1–R6 are
-full-scope owner/completion backlogs and cumulative gates, not a wall before the next product story.
-Allocate each later story's exact milestone/partial contributions before implementation and after
-predecessor closure; no new later milestone or debt waiver is invented now.
-P0 shared structural/representation, honest reference/RED, allocation and composition gates remain;
-known independent later variants stay later only after their early-path impact is assessed. Full IAM,
-general catalog editor, all runners and historical import do not become prerequisites to PILOT.
+Near-term order remains accepted P0 → accepted R0 → PILOT. Full IAM/general editor/all-runner/
+provider/history completeness is not a prerequisite, but every feature actually used by this chain
+is now early due. No machine provider or deployment dashboard/type/API is invented: Release's name
+does not establish a special BuildType category. SS-DEP contributes its actual publication behavior.
 
-SS-RUN@PILOT uses #78/#82/#83; primary full owner SS-RUN/#20 remains R2. Early contributions
-reuse #16/#17 current credentials/grants, #18 approved recipe activation, #19 exact checkout,
-#56 Agent compatibility, #22 Docker/step execution, #23 counter, #24 logs/service messages and #26
-artifact bytes. #14 supplies the accepted R0 Host. Later owners retain their full scope and
-regressions; no second engine, node, queue or authority is introduced. All variants stay UNFROZEN
-until actual contract/case evidence exists; global 449 headings and fifteen known cases are unchanged.
+SS-RUN@PILOT #78/#82/#83 uses one production authority with #79/#80/#81 as surface projections.
+Full owners remain #20/R2 run, #16/#17 IAM, #18 CFG, #19 VCS, #56 Agents, #22 runners, #21 chain,
+#23 counter/used VCS trigger/publisher coordination, #24 logs/service messages, #26 bytes and #58
+publication. The ten contributions stay bounded to the actual chain; broader full-owner scope stays
+visible. Use separately owned Linux and interactive Windows fixtures with explicit mapping from
+reference Cvat/laptop-g15 requirements, never those existing fleet Agents or a silent requirement drop.
+The common version originates in Prepare and is validated through Windows/Release manifests;
+per-configuration counters/identities and reference DAG reuse remain distinct and must be frozen.
 
-Cards may expose usable branch checkpoints as soon as ready. They close after PILOT's frozen due
-scope/cumulative evidence, independent aggregate correctness/simplicity and Security/Adversarial
-review, zero unresolved milestone debt and verified main delivery. No per-card formal review/full
-suite tax or debt waiver. Later full-chain/publication/family/history work remains explicitly due.
+Source Release has a default-branch VCS trigger, 60s quiet period and metadata-path exclusions.
+Freeze exact effective rules and coexistence/single-publisher ownership at level 0; prove their used
+behavior with controlled fixtures before full configuration parity closes. Manual surface stories do
+not require a separate trigger project per surface or authorize activating production triggers now.
+
+All variants remain UNFROZEN and all levels NOT_AVAILABLE until evidence exists. Sixteen owners,
+eighteen slices/nine blocks remain; ten PILOT contributions raise the total to 22. Global 449 primary
+API headings and fifteen cases/results/receipts are unchanged. Cards can expose honest branch
+checkpoints; closure follows frozen due/cumulative evidence, independent final aggregate correctness/
+simplicity + Security/Adversarial, zero due debt and verified main delivery. No per-card formal review,
+three engines, scope waiver or closure from parsed/stub/effect-free evidence.

@@ -18,12 +18,13 @@ separates the existing product, accepted replacement, delivered P0 tooling and r
 D36 brings resource/identity/state/mutation/protocol REST decomposition into P0 before implementation.
 The first new-stack local server + real Agent lab is R0.1; unchanged CLI smoke execution is R0.2,
 with restart/cleanup proof at R0 exit. The first real product is then the
-[three-story T3Personal PILOT](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md):
-UI → direct compatible /app/rest → unchanged CLI. Prepare-first is the recommended draft boundary,
-pending the optional owner response. Near-term order: accepted P0 → R0 → PILOT. Then plan Windows,
-chain/build-only, explicit publication, other families and history/diff-import stories with exact
-milestone allocation before implementation/after predecessor closure. R1–R6 retain full-scope owners
-and cumulative gates; they are not blanket prerequisites for every next product story.
+[T3Personal PILOT](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md): full
+Prepare/Windows/Release and default publication through UI, direct /app/rest and unchanged CLI.
+The owner chose breadth-first levels across all configurations/surfaces, not Prepare-first or serial
+UI/REST/CLI completion. Near-term order remains accepted P0 → R0 → PILOT. Windows, coherent chain
+artifacts, used Release trigger/coexistence and default publication are early due here. Other families
+and history/diff-import get later milestone allocation before implementation/after predecessor closure.
+R1–R6 retain broader full-scope owners and cumulative gates, not unrelated blanket prerequisites.
 Pull only the needed shared production contributions forward; full IAM/editor/all-runners/history do
 not block this targeted product. R2 completes general source/catalogue behavior; R5 is cumulative
 conformance. See the [concrete local gates](../.workspace/workstreams/coherent-refactor/local-lab.md)
