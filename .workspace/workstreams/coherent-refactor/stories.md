@@ -49,8 +49,8 @@ The former 84-issue graph is the preserved source graph. The verified expanded G
 
 ## Priority and dependencies
 
-Full T3Personal Prepare → Windows → Release, launch checks and configured default publication remain
-the first product goal. Work across UI, direct compatible REST and unchanged CLI at the same breadth
+Full T3Personal Prepare → Windows → Release build/package and publication in a test repository remain
+the first product goal; built-application launch checks are excluded. Work across UI, direct compatible REST and unchanged CLI at the same breadth
 levels; completing a surface first is not a prerequisite for starting the others. The already
 available [#84 reference pack](t3personal-reference-pack.md) supplies bounded metadata/manifest facts.
 The independent [#85 receipt](t3personal-server-inputs.md) now supplies server-resolved source/settings
@@ -317,17 +317,17 @@ Build author gets actual ordered runners/features/conditions, resolved parameter
 
 **Retained context:** [#19](https://github.com/iXab3r/Vivarium/issues/19), [#20](https://github.com/iXab3r/Vivarium/issues/20), [#22](https://github.com/iXab3r/Vivarium/issues/22), [#23](https://github.com/iXab3r/Vivarium/issues/23), [#24](https://github.com/iXab3r/Vivarium/issues/24), [#67](https://github.com/iXab3r/Vivarium/issues/67), [#68](https://github.com/iXab3r/Vivarium/issues/68). Original decisions/comments remain at those sources; this is not a completed transfer.
 
-### US-013 — Obtain the coherent full T3Personal product
+### US-013 — Build and publish the T3Personal chain
 
 [#78](https://github.com/iXab3r/Vivarium/issues/78) · **retained-priority-story · NOT_AVAILABLE / specified-unbound**
 
-Release operator obtains launch-checked Prepare→Windows→Release outputs and the configured default publication through their chosen channel.
+Build operator obtains coherent Prepare→Windows→Release build/package outputs and publication in a test repository through their chosen channel. Use frequent small-chain checks and one actual T3 build/package, without launching the built application.
 
-**Observable scenarios:** Given frozen recipe/allowed Agents/credential, When enter terminal Release through UI, direct REST or unchanged CLI, Then actual three configurations, reference reuse/IDs, selected artifact bytes/common version, real Linux and interactive Windows launch checks and publication. Given upstream failure/cancel/restart/revocation, Then dependency/result/publication effects truthful. Off-mode is an intermediate checkpoint only.
+**Observable scenarios:** Given frozen adapted recipe/owned Windows and Linux/Docker Agents/test-repository credential, When enter terminal Release through UI, direct REST or unchanged CLI, Then actual three configurations, reference reuse/IDs, selected artifact bytes/common version, real build/package commands and test publication. Given upstream failure/cancel/restart/revocation, Then dependency/result/publication effects remain truthful. No built-T3 launch or interactive desktop is required. Off-mode is an intermediate checkpoint only; fresh installation excludes migration and TeamCity cutover.
 
 **Surfaces:** Preserve #79 UI, #80 direct compatible /app/rest and #81 unchanged CLI as full-chain breadth projections; shared native services/readbacks.
 
-**Future evidence / what to inspect:** Today reference project, [pack #84](t3personal-reference-pack.md) and [server-input receipt #85](t3personal-server-inputs.md); replacement unavailable. Later actual three-config DAG/Build/bytes/publication receipt from each entry, cross-readbacks and explicit valid proof reuse. #85 supplies server-selected identities; per-file consumption, binary/platform and causal-publication proof remain open.
+**Future evidence / what to inspect:** Today [autonomous delivery draft](t3personal-pilot.md#autonomous-execution-contract--planning-draft), [pack #84](t3personal-reference-pack.md) and [server-input receipt #85](t3personal-server-inputs.md); replacement unavailable. Later independent small-chain entries through all three surfaces and one actual T3 CLI build/package/test-publication with UI/REST readbacks. #85 supplies reference server-selected identities, not actual fixture byte/platform/publication proof. The agent merges only after all due gates and independent review; UI configuration-authoring scope remains pending.
 
 **Existing acceptance:** AC-ART-01, AC-ART-03, AC-BLD-01, AC-BLD-02, AC-BLD-03, AC-BLD-04, AC-BLD-05, AC-BLD-07, AC-BLD-13, AC-CFG-07, AC-MIG-04, AC-UI-01, AC-UI-02. AC-derived model obligations: TCM-01, TCM-02, TCM-03, TCM-04, TCM-05, TCM-06, TCM-07, TCM-08, TCM-09, TCM-10.
 

@@ -1154,17 +1154,26 @@ smoke configuration through unchanged teamcity-cli: queue, inspect, run/watch, c
 download, plus bounded restart/reconnect evidence. Use the eventual catalog/queue/Agent/Storage
 services and a thin process-runner subset, not a disposable lab-only engine.
 
-Planning refinement, 2026-11-01: after accepted P0 and R0, PILOT delivers the actual full T3Personal
-Prepare/Windows/Release chain, including default publication, across UI, direct compatible REST and
-unchanged CLI. The owner selected breadth-first levels: whole recipe/capability/AC+wire matrix;
-truthful discovery/auth/readiness/chain-state visibility; real DAG/checkouts/Docker/PowerShell/
-interactive Windows/selected artifacts/launch/stage/publication; fault/recovery/access/cumulative
-acceptance. Surface cards are projections across every level, not serial implementation gates.
-Reuse one production authority and separately owned Linux/Windows fixtures. Actual used triggers,
+Planning refinement and owner clarification, 2026-11-01: after accepted P0 and R0, PILOT proves the
+T3Personal Prepare/Windows/Release build-and-package chain across UI, direct compatible REST and
+unchanged CLI. Frequent controlled small-chain checks precede one actual T3 build/package E2E.
+Publication to a separate test repository is sufficient for story acceptance; no final publication
+to `iXab3r/t3code` is required. The explicit test recipe maps repository/Agent identities and removes
+built-application GUI/CLI launch checks. Vivarium is being accepted as a build system, not as a test
+of T3 application behavior; those checks and an interactive Windows session are not prerequisites.
+Preserve failures/exits of all remaining configured commands. The breadth levels cover the whole
+recipe/capability/AC+wire matrix; discovery/auth/readiness/chain-state; real DAG/checkouts/Docker/
+PowerShell/selected artifacts/staging/test publication; and fault/recovery/access/cumulative evidence.
+Surface cards are projections across every level, not serial implementation gates. Use the current
+Windows machine and available Linux/Docker with separately owned test Agent processes, never the
+existing fleet. Use a new isolated installation; existing-data migration and TeamCity cutover are
+outside this story. Reuse one production authority. Actual used triggers,
 coexistence publisher ownership, counters, service messages, manifests/bytes and publication cannot
 be deferred to broader owners. Off-mode is a marked intermediate checkpoint, not default-publication
-parity. Eventual external effect scope/authorization is an operator execution gate outside the product
-model; no new Build state/approval feature or current build/publication authorization is implied.
+parity within the agreed test repository. The agent may merge verified milestones into main after
+all due gates and independent review pass. Concrete repository/credential/resource preflight remains
+an execution boundary outside the product model; no new Build state/approval feature or permission
+for unrelated production publication/cutover follows from story acceptance.
 Full unrelated IAM/editor/runners/providers/history remains later. Preserve P0 shared structural/
 reference/representation/allocation gates and D39 independent milestone aggregate + Security,
 zero-debt/main delivery; no per-card formal review or placeholder/effect-free GREEN. See the

@@ -2,7 +2,20 @@
 
 ## Current state — 2026-11-01
 
-**Active assignment: deliver US-013 as a story, with planning where the route is unclear.** The owner
+**Current assignment: plan full autonomous US-013 E2E and resolve dark spots.** Confirmed: test-only
+repository publication is sufficient; no built-T3 GUI/CLI launch checks or interactive Windows;
+small frequent checks plus one actual T3 build/package; owned Agent processes on this Windows machine
+and Linux/Docker; fresh isolated installation without migration/TeamCity cutover; autonomous milestone
+merges after all due gates and independent review. The [draft execution contract](t3personal-pilot.md#autonomous-execution-contract--planning-draft)
+defines preparation, integrated P0, real R0, three independent small-chain surface entries, one heavy
+T3 CLI entry/readbacks, publication verification/recovery and reviewed main delivery. UI configuration
+authoring scope is awaiting the owner's answer. Actual C#/Git/model/reference proofs remain open;
+the execution plan is not frozen. No implementation, test execution, repository creation, merge or
+publication occurs in this planning discussion. Read-only checks found Linux/amd64 Docker and MSVC
+tools, not a completely verified pinned environment. Historical launch/production-publish wording
+below and in captured source bodies is superseded for current story acceptance; keep original evidence.
+
+**Preceding direction: deliver US-013 as a story, with planning where the route is unclear.** The owner
 rejected leaf-by-leaf execution/handoffs. The [current story delivery plan](t3personal-pilot.md#current-story-delivery-plan)
 now connects preparation → runnable installation → full-chain visibility → actual chain/bytes →
 default publication/automation → acceptance, through existing owners and P0/R0/PILOT gates. Current

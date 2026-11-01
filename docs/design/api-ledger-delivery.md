@@ -16,8 +16,12 @@ for unrelated endpoints. Do not create one implementation issue per route or ano
 The [T3Personal PILOT](../../.workspace/workstreams/coherent-refactor/t3personal-pilot.md) is one
 bounded SS-RUN@PILOT integration after accepted P0/R0, before remaining full R1–R4 owners.
 #78 parents UI/direct-compatible-REST/unchanged-CLI cards #79–#81 and same-milestone contract #82 /
-acceptance #83. Owner-selected breadth covers the full actual T3 chain/default publication at each
-level across all surface projections; one surface need not finish before another starts. Actual used
+acceptance #83 (retained sources; active contract/acceptance are #117/#118). Owner clarification uses
+small independent whole-chain entries across the three surfaces plus one actual T3 build/package,
+without built-application launch checks or an interactive desktop. Publication in a separate test
+repository is sufficient; no production T3 publication, migration or TeamCity cutover is required.
+Owned Agent processes use the current Windows machine and available Linux/Docker. The agent may
+merge milestones after all due gates and independent review. One surface need not finish before another starts. Actual used
 Windows/chain/trigger/publication cannot move to later broad owners. Cards close after PILOT main acceptance, with one
 final milestone review/zero-debt gate. Reuse existing owners and bounded early contributions;
 full later-owner completion is neither a hidden prerequisite nor waived remaining scope.

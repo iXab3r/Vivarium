@@ -11,10 +11,103 @@ unresolved decision/external execution boundary is reached.
 
 The release operator must be able to sign in, inspect all three configurations and readiness,
 start the ordinary Release configuration through UI, compatible REST or unchanged CLI, follow its
-actual upstream work, retrieve launch-checked coherent Linux/Windows assets and identify the
-configured publication result. Denial, source/runner failure, waiting, cancellation and recovery
+actual upstream work, retrieve coherent Linux/Windows build/package assets and identify the
+publication result in the test repository. Denial, source/runner failure, waiting, cancellation and recovery
 must remain truthful. The full promise includes default publication and used trigger/coexistence
 behavior. Build-only/off is an intermediate result, not completion of US-013.
+
+### Confirmed autonomous E2E boundaries
+
+The owner resolved these choices on 2026-11-01:
+
+- Publication in a separate test repository is sufficient. No final release in `iXab3r/t3code`.
+- Frequent small-chain checks plus one actual T3 build/package E2E; no execution of the built
+  T3 GUI or CLI, application smoke checks or interactive Windows requirement.
+- Separate owned test Agent processes on this Windows machine and available Linux/Docker.
+  No dedicated VM requirement, existing fleet Agent use or new machine-provider implementation.
+- A fresh isolated Vivarium installation. Existing-data migration and TeamCity cutover stay outside
+  this story; current-data/legacy-path handling still follows the relevant broader milestone contract.
+- Autonomous milestone merges into main after all due checks, independent review and debt closure.
+  Planning does not merge the current branch or waive any unpassed P0/R0/PILOT gate.
+
+The test recipe must explicitly map hardcoded repository/updater/credential-preflight identities
+to the owned test repository and remove built-application launch checks. These are attributed fixture
+deltas, not swallowed failures or claims that the original application smoke tests passed. Compile,
+package, selected artifact transfer and publication remain real; remaining command failures stay
+failures. Browser journeys test Vivarium's own UI, not the T3 application. Source/settings/recipe
+fingerprints identify the adapted test inputs separately from historical #84/#85 observations.
+
+One scope question is still pending: whether C#/Git preparation plus build-operation UI is sufficient,
+or US-013 must also include creating/editing the chain in the UI. Do not assume that answer.
+
+### Autonomous execution contract — planning draft
+
+This plan prepares a future agent to deliver the whole story without technical-card handoffs.
+Implementation and external effects are not started by this planning session. The remaining UI
+authoring answer and actual definition/model/contract proofs still prevent declaring the plan frozen.
+
+1. **Freeze and prepare.** Pin source/settings, tool/client versions and the explicit test-recipe
+   deltas; record upstream versus adapted fixture Git identities. Resolve the exact owned test
+   repository/branch/tag scope, private credential aliases, run-owned roots/ports/containers/volumes
+   and concrete URLs/trust reachable from Windows and Linux. Use a fresh private PG/Git/Storage
+   installation. Read-only inspection confirms an available Linux/amd64 Docker engine and MSVC
+   x64 tools on this Windows machine; it does not yet prove the full pinned build environment.
+   Prepare tools privately/per-process where possible rather than changing global PATH or installing
+   unrelated host software. Concrete missing credentials use the existing private secret mechanism.
+2. **Resolve the integrated P0 package.** Prove C#/Git definition/edit/evaluate/activate/recover,
+   source/settings/Build/selection identity, independent entry/lifecycle/current-access/byte cases,
+   representative production composition and the honest executable baseline. Preserve all other
+   P0 structural/allocation/review/debt/main obligations. Reference gaps are evidence work, not
+   opportunities to invent defaults. Ordinary local fixes and experiments continue autonomously.
+3. **Deliver the real R0 composition.** Use production Host/Chiral/PG/Git/Storage/Identity/Agent
+   services and a tiny real workload. Reuse Depot's pinned real OIDC fixture/protocol and ordinary
+   cookie/key paths; no product-only test login, direct grants-as-proof or second auth engine.
+   Prove start/readiness/current rights/run/bytes/failure/cancel/restart, then close R0's due gates.
+4. **Implement and accept the small whole-chain journeys.** Each of UI, compatible REST and the
+   unchanged pinned CLI makes its own real chain entry. All use the same production authorities and
+   real Windows/Linux Agent processes. Use small deterministic source/build/package inputs for
+   selection, reuse, waiting, upstream failure, cancellation, current-rights/byte denial and restart
+   variants. Controlled reference fixtures provide independent expected effects; HTTP replay is
+   transcript/fault control, not another build engine. Verify manifests and actual transferred,
+   retained and downloaded bytes through user-visible paths.
+5. **Run the single real T3 build/package E2E.** Use the ordinary unchanged CLI entry, the adapted
+   pinned recipe, real checkout/Docker/PowerShell/build/package commands and the selected upstream
+   artifact chain. Inspect the same run through UI/REST; these readbacks are not claimed as two
+   further T3 submissions. No built T3 GUI/CLI smoke launch is required. The current default-publication
+   path must actually publish the expected outputs in the owned test repository. Record actual
+   identities, exits, version/manifest consistency, file inventories and byte hashes.
+6. **Review, merge and finish.** Run focused TDD during work and batch required root/boundary checks
+   at coherent milestones. Obtain independent final correctness/simplicity and Security/Adversarial
+   review on exact integrated revisions; repair all due findings and renew affected evidence. Merge
+   only after that milestone's gates pass, then verify main delivery and close its due cards.
+   P0 may deliver its explicitly declared honest RED baseline; this is not permission to regress
+   implemented GREEN or accept harness/setup failures. Final story completion requires the frozen
+   story cases and cumulative delivered behavior, not all 449 discovery headings being GREEN.
+
+The agent records resumable decisions, exact heads/PRs, evidence locations, owned resources and next
+actions in the existing workstream/GitHub records. It re-reads actual build/release state after
+interruptions before acting again. This uses the existing host/CLI/testing contours, not a new
+orchestrator, business state authority or scenario language. Missing PR checks are not silently
+treated as PASS: observe configured checks and run the required exact-revision evidence. Vivarium's
+checked-in CI triggers Compile on the default branch; its Release/publishers have no trigger.
+Test T3 publication and publishing Vivarium itself are separate effects.
+
+**Publication oracle and recovery.** The original T3 publisher can exit zero for an already published
+tag without verifying its assets. The E2E test therefore independently checks repository, tag target,
+release state, expected asset set and hashes. After a lost response, inspect those facts before
+resuming or retrying; do not overwrite an unrelated tag/release or delete evidence to obtain GREEN.
+This is test/producer verification, not a GitHub-specific success policy added to Vivarium's runner.
+Exercise partial/failure/retry variants with small owned test assets. The historical ten-asset
+reference totals 905,365,355 provider-declared bytes; actual fixture sizes/resource budgets must be
+measured rather than claimed locally verified from that metadata.
+
+**Stop and cleanup.** Normal implementation/test failures are work for the agent to fix, not user
+handoffs. Escalate a concrete unavailable secret/resource, unresolved material contract choice,
+unavailable independent reviewer or action outside the agreed scope, with evidence and a recommended
+resolution. Use only owned cleanup targets; preserve final release/evidence and historical source
+discussions. Tests own and reap their processes/containers. Supply reproducible installation/start
+inputs and usable evidence rather than leaving untracked background services. No migration,
+production TeamCity cutover, production T3 publication or global interactive-desktop setup is due.
 
 ### Assessment and immediate work
 
@@ -37,8 +130,8 @@ does not satisfy this exit. Broader P0 obligations must also close before R0 imp
 | Ready to implement the whole chain | Three attributed definitions, selected-source/settings/Build model, due UI/REST/CLI scenarios and independent assertions; real definition/edit/evaluate/activate/recover proof and representative baseline/composition results | Current integrated preparation block; #110–#112 with #32/#34 and #117. P0 remains unaccepted. |
 | A runnable installation and cheap real run | Actual Host URL, login/current grants, Git catalog, PG/Storage and separate Agent; unchanged CLI can run, observe bytes, fail, cancel and recover LocalSmoke | Thin US-001/US-004/US-006/US-009/US-010 contributions through #113–#115. Accepted P0 precedes R0; full later stories are not prerequisites. Smoke does not accept T3. |
 | Whole-chain visibility | All three real configurations and their dependencies, Agent requirements/readiness, queue/build identities and diagnostics are visible across UI/REST/CLI | #116–#118 plus ten existing PILOT contributors. No serial UI-then-REST-then-CLI work order or fake runnable buttons. |
-| Real chain and bytes | Release-entered Prepare→Windows→Release work, exact selected inputs, Docker/PowerShell runners, real Linux/interactive Windows launch checks, common version, retained logs/manifests and actual staged/downloaded bytes | RUN/CFG/VCS/AGT/EXEC/CHAIN/LOG/BLOB contributions below. Off-mode evidence is labelled; publication remains due. |
-| Default publication and used automation | A causally attributable default-publication result, selected tag/assets, and controlled used trigger/quiet-period/exclusion/single-publisher behavior | SS-DEP #155 and SS-TRG #143 with #117/#118. Concrete external execution scope must be ready at execution; no production trigger activation follows from planning. |
+| Real chain and bytes | Release-entered Prepare→Windows→Release build/package work, exact selected inputs, Docker/PowerShell runners, common version, retained logs/manifests and actual staged/downloaded bytes; no built-application launch | RUN/CFG/VCS/AGT/EXEC/CHAIN/LOG/BLOB contributions below. Small fixtures provide frequent checks; one actual T3 build/package E2E is due. |
+| Default publication and used automation | A causally attributable default-publication result in the owned test repository, selected tag/assets, and controlled used trigger/quiet-period/exclusion/single-publisher behavior | SS-DEP #155 and SS-TRG #143 with #117/#118. Concrete test repository/credential preflight is due; no production publication or trigger activation is required. |
 | Accepted story | Current-access denial and byte controls, upstream failure/cancel, selection/retry/restart and publication/recovery evidence; cumulative prior GREEN, zero due debt, independent milestone verdicts and verified main delivery | #118 and existing milestone gates. Report story availability separately from full subsystem/API completeness. |
 
 These are checkpoints within the existing P0 → R0 → PILOT and breadth levels, not new milestones,
@@ -89,9 +182,10 @@ The evidence plan uses real entries from all three surfaces and the smallest suf
 attributed default-publication proof through the shared producer boundary, with explicit reuse and
 off-mode differences. Freeze the exact mapping before execution; do not assume that viewing one run
 three ways proves three entries, or that the three entries require three identical live publications.
-Use separately owned Linux and interactive Windows Agents, not Cvat/laptop-g15. Prepare private
-credential references and the exact external target/effect before any necessary operator approval;
-there is no new product approval state or hypothetical confirmation step in ordinary local work.
+Use separately owned processes on this Windows machine and Linux/Docker, not Cvat/laptop-g15 or a
+required interactive desktop. Prepare the concrete test-repository target, private credential
+references and owned cleanup boundaries before execution. Resolve routine details autonomously
+within that scope; there is no new product approval state or per-action confirmation requirement.
 
 **Reporting:** state the operator outcome now available, the story checkpoint reached, the remaining
 story blocker and verification. Put leaf IDs in supporting links. Current availability is still
@@ -102,6 +196,9 @@ by this planning reconciliation. The 25-story / 18-packet / 54-task graph is unc
 
 The detailed material below retains earlier scope/evidence context. Current work order and handoff
 come from the story plan above; historical “next #85” and superseded task IDs are not a leaf-work queue.
+Descriptions of the original T3 application launch checks, interactive Windows and publication to
+`iXab3r/t3code` below are source/history facts, not current US-013 acceptance requirements. The
+confirmed test-only/build-system boundaries above supersede the earlier pilot scope.
 
 **Now:** NOT_AVAILABLE in the replacement product. The owner chose **breadth-first**: preserve the
 whole actual Prepare → Windows → Release configuration and default-publication behavior across UI,
