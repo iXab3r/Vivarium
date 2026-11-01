@@ -79,6 +79,24 @@ public sealed class ApiLedgerTests
         });
     }
 
+    [Test]
+    public void Missing_oracle_cannot_match_a_declared_missing_hash_sentinel()
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1), "start from valid GREEN evidence");
+        var inputs = receipt["candidate"]!["source_inputs"]!.AsArray();
+        inputs.Add(new JsonObject { ["path"] = "missing-oracle.json", ["sha256"] = "MISSING" });
+        var fingerprint = Sha(Encoding.UTF8.GetBytes(string.Join('\n', inputs.Select(input =>
+            input!["path"]!.GetValue<string>() + ":" + input["sha256"]!.GetValue<string>()))));
+        receipt["candidate"]!["source_fingerprint_sha256"] = fingerprint;
+        evidence["decision"]!["from_source_fingerprint"] = fingerprint;
+        receipt["reference"]!["capture"] = "missing-oracle.json";
+        receipt["reference"]!["capture_sha256"] = "MISSING";
+
+        var report = Read();
+        Assert.That(report.Errors, Is.Not.Empty);
+        Assert.That(report.ProductGreenCases, Is.Zero);
+    }
+
     [TestCase("duplicate")]
     [TestCase("orphan-api")]
     [TestCase("orphan-owner")]

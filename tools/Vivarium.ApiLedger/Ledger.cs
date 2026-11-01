@@ -330,7 +330,7 @@ public static class Ledger
     private static string S(JsonNode node, string key) => node[key]?.GetValue<string>() ?? throw new InvalidDataException("Missing string: " + key);
     private static JsonNode Json(string root, string path) => JsonNode.Parse(File.ReadAllText(SafePath(root, path))) ?? throw new InvalidDataException("Empty JSON: " + path);
     private static string Sha(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
-    private static string Hash(string root, string path) => File.Exists(SafePath(root, path)) ? Sha(File.ReadAllBytes(SafePath(root, path))) : "MISSING";
+    private static string? Hash(string root, string path) => File.Exists(SafePath(root, path)) ? Sha(File.ReadAllBytes(SafePath(root, path))) : null;
     private static string SafePath(string root, string path)
     {
         var full = Path.GetFullPath(Path.Combine(root, path));

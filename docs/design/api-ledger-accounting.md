@@ -100,3 +100,11 @@ product-blocked cases, with zero product GREEN. Seven headings have a bound case
 raw cases. Default and external assessment entry points returned identical output; one default read
 took 276 ms on this Windows host. These are local measurements, not bulk-scaling or cross-platform
 evidence. Existing package advisories and platform prerequisites remain; no Security PASS is claimed.
+
+The [missing-evidence follow-up receipt](../../.workspace/workstreams/coherent-refactor/rest-ledger-missing-evidence-results.json)
+records `API-LEDGER-MISSING-SENTINEL-001`: an absent oracle could match a malformed declared hash of
+`MISSING`. Absence now returns null, which cannot match a required hash string. A control that begins
+with valid product GREEN reproduced the defect before the fix; all 47 current accounting controls
+and root build then passed. The 183 product/reference inputs and prior execution receipts remain
+unchanged. Product raw, reference/composition and unaffected ordinary evidence are explicitly reused;
+no new full ordinary/raw run or final milestone review is claimed for this one-line error-path fix.
