@@ -33,6 +33,8 @@ public sealed class Report
     public int NativeHttpSourceOccurrences { get; set; }
     public int AgentEnvelopeSourceOccurrences { get; set; }
     public int KnownStorySourceGaps { get; set; }
+    public int SourceGapDispositionRows { get; set; }
+    public int UnresolvedEarlyImpactGaps { get; set; }
     public int DistinctScenarioLinkedCases { get; set; }
     public string StorySourceJoinState { get; set; } = "UNVERIFIED";
     public List<ObservedResult> RawResults { get; } = [];

@@ -45,6 +45,7 @@ public static partial class Ledger
                 "DISCOVERED-PARTIAL-NOT-ACCEPTED", "DISCOVERY-GAP-NOT-NORMALIZED" }.Contains(gap["state"]),
                 "Source-gap closure needs explicit evidence; this unfrozen register cannot claim it.");
         }
+        ValidateGapDispositions(root, gaps, owners, slices, metadataInputs, report);
         Require(storyLinks.Select(row => row["source_id"]).ToHashSet().SetEquals(apis.Keys),
             "Story/discovery source bindings differ (missing or orphan source).");
         foreach (var link in storyLinks)

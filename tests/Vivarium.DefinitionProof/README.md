@@ -2,8 +2,20 @@
 
 This explicitly invoked P0 target uses the existing NUnit/Test SDK stack. It is not a product
 acceptance target or a second reference model. The source declarations, evaluator and activation
-algorithm are experimental candidates; production Host, Chiral, authorization and HTTP are absent.
+algorithm are experimental candidates; replacement Host, Chiral and ordinary OIDC are absent.
 Passing this target cannot accept a milestone or turn a raw REST case GREEN.
+
+`BuildIdentityPhysicalTests` additionally uses the real legacy Host, pinned TLS, bounded AgentHub
+enrollment/reconnect and unchanged native `viv-cli` cancellation. Its isolated PostgreSQL identity
+study checks numeric/native matrix aliases, ordinary/composite separation, standalone Agent/type
+identity, collision rollback and restart. The old Host still rejects candidate numeric Build URLs;
+the study is not a compatible facade or a replacement persistence implementation. It does not prove
+real Agent execution, imported identities, optimized queue replacement, SSE or artifact mapping.
+
+`TemplateSourceTests` checks the independently observed parameter precedence: local configuration,
+project, then templates in attachment order. It retains declaration readback, managed edits, cold
+revision evaluation and rejected missing/duplicate references. Only template parameters are proven;
+other template fields, hierarchy, modes, grants and production activation remain separate obligations.
 
 From the repository root, with its pinned .NET SDK on PATH:
 

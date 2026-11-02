@@ -80,9 +80,16 @@ def main():
         enclosing=[re.match(r'message\s+(\w+)\s*\{',text) for text in lines[:index]]
         enclosing=[m[1] for m in enclosing if m]
         require(enclosing and enclosing[-1]==row['envelope'],'Agent field envelope differs')
+    syntax=subprocess.run(['node',str(ROOT/'tools/teamcity-reference/inventory-client.mjs'),'--check','--output',str(work.resolve())],
+        cwd=ROOT,capture_output=True,text=True,timeout=20)
+    require(syntax.returncode==0,'Pinned CLI syntax census differs: '+syntax.stderr[-1000:])
+    require(len(syntax.stdout)<65536,'Syntax census diagnostic bound exceeded')
+    syntax=json.loads(syntax.stdout)
+    require(syntax['source_revision']==PIN,'Syntax census source revision differs')
     for (revision,path),data in sorted(cache.items()):inputs.append({'repository':'vivarium','revision':revision,'path':path,'sha256':sha(data)})
     print(json.dumps({'result':'PASS','installed_operations':len(occurrences),'cli_fixture_sources':len(manifest['cli_fixture_source_hashes']),
-        'cli_implementation_sources':len(manifest['cli_implementation_files']),'native_literal_declarations':len(native),'agent_envelope_fields':len(messages),
+        'cli_implementation_sources':len(manifest['cli_implementation_files']),'cli_syntax_census':syntax,
+        'native_literal_declarations':len(native),'agent_envelope_fields':len(messages),
         'schema':{'path':schema_path.relative_to(ROOT).as_posix(),'sha256':schema_hash},'inputs':inputs,
         'limits':['Byte/declaration provenance only; no source-dispatch or semantic alias proof, inline-branch completeness, actor/effect oracle, normalized denominator or product conformance.',
         'Native suffix check does not prove group-prefix dispatch; source census excludes computed routes. Agent declarations do not prove processing effects.']}))

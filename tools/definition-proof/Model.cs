@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DefinitionProof;
 
 // P0 representability candidate; not the public SDK or a second product catalog.
@@ -16,8 +18,12 @@ public sealed record Trigger(string Type, string BranchFilter, int QuietSeconds,
 public sealed record Source(string RootId, string Url, string Branch, string CheckoutRules, string? Name = null);
 public sealed record Configuration(string Id, string Name, Parameter[] Parameters, Step[] Steps,
     Requirement[] Requirements, Snapshot[] Snapshots, Artifact[] Artifacts, int TimeoutMinutes, Trigger[] Triggers,
-    string? CheckoutMode = null);
-public sealed record Settings(string ProjectId, Source? Source, Parameter[] Parameters, Configuration[] Configurations);
+    string? CheckoutMode = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string[]? Templates = null);
+// Only parameter-template inheritance is observed/proven here; other template fields remain due.
+public sealed record Template(string Id, string Name, Parameter[] Parameters);
+public sealed record Settings(string ProjectId, Source? Source, Parameter[] Parameters, Configuration[] Configurations,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] Template[]? Templates = null);
 public sealed record ResolvedParameter(string Name, string Value, bool Inherited);
 
 // The evaluator is a separate process. Context comes from the selected control binding,

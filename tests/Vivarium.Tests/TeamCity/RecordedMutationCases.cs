@@ -97,6 +97,7 @@ internal static class RecordedMutationCases
     public static IEnumerable<RecordedMutationCase> StoryObservations => Load("us013-observations.json");
     public static IEnumerable<RecordedMutationCase> ModeObservations => Load("versioned-mode-observations.json");
     public static IEnumerable<RecordedMutationCase> CurrentGrantObservations => Load("current-grant-observations.json");
+    public static IEnumerable<RecordedMutationCase> TemplateObservations => Load("template-observations.json");
 
     // No existing object or restricted actor is required by these two workflows. Dependent
     // catalog/actor workflows stay replay-bound and explicitly product-blocked in the receipt.

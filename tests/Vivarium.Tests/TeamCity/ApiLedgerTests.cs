@@ -82,6 +82,8 @@ public sealed class ApiLedgerTests
         Table("agent-message-occurrences.tsv", "source_id\tstory_id\tscenario_id");
         Table("story-gaps.tsv", "gap_id\tstory_ids\towner_task\tdue_freeze\tnext_proof\tsource_ref\tstate",
             "GAP-CLI\tUS-001\t36\tP0 impact assessment remains due\tActual source-backed effect\tcli.ts\tOPEN-NOT-COVERAGE");
+        Table("gap-dispositions.tsv", "gap_id\tprimary_subsystem\trelated_subsystems\tsource_refs\tauthority\tearliest_integration_slice\tearly_implementation_issue\tearly_contract_issue\tearly_acceptance_issue\tfull_owner_slice\tfull_implementation_issue\tfull_contract_issue\tfull_acceptance_issue\tearly_impact\tearly_required_subset\tremaining_dimensions\tdue_freeze\tassessor\trationale\tevidence_refs\tstate",
+            "GAP-CLI\tSS-PROTO\t\tcli.ts\tNo business state authority\tSS-PROTO@P0\t12\t33\t42\tSS-PROTO@P0\t12\t33\t42\tUNKNOWN\tSelected early requests\tRemaining source branches\tP0\tSynthetic accounting fixture\tUnknown impact remains early\tcli.ts\tOPEN_EARLY_IMPACT");
         Table("story-implementation-links.tsv", "story_id\tstory_issue\tslice_id\timplementation_issue\tcontract_issue\tacceptance_issue",
             "US-001\t86\tSS-PROTO@P0\t12\t33\t42");
         Table("story-dependencies.tsv", "story_id\tdependency_ref\trelation\tdependent_stage\trequired_output_or_contribution\towner_task\treadiness_or_unblock_condition\tclosure_semantics",
@@ -90,6 +92,37 @@ public sealed class ApiLedgerTests
 
     [TearDown]
     public void Remove_isolated_files() => Directory.Delete(root, recursive: true);
+
+    [TestCase("missing-disposition")]
+    [TestCase("wrong-owner")]
+    [TestCase("wrong-task")]
+    [TestCase("lost-source")]
+    [TestCase("false-closure")]
+    [TestCase("unknown-impact-deferred")]
+    public void Source_gap_accountability_cannot_be_lost_or_promoted_to_acceptance(string corruption)
+    {
+        switch (corruption)
+        {
+            case "missing-disposition":
+                var path = Path.Combine(root, Ledger.Workstream + "gap-dispositions.tsv");
+                File.WriteAllText(path, File.ReadLines(path).First() + "\n"); break;
+            case "wrong-owner": ReplaceTable("gap-dispositions.tsv", "GAP-CLI\tSS-PROTO", "GAP-CLI\tSS-MISSING"); break;
+            case "wrong-task": ReplaceTable("gap-dispositions.tsv", "\t12\t33\t42\t", "\t12\t999\t42\t"); break;
+            case "lost-source": ReplaceTable("gap-dispositions.tsv", "\tcli.ts\tNo business", "\tother.ts\tNo business"); break;
+            case "false-closure": ReplaceTable("gap-dispositions.tsv", "OPEN_EARLY_IMPACT", "CLOSED"); break;
+            case "unknown-impact-deferred":
+                var slices = Path.Combine(root, Ledger.Workstream + "subsystem-slices.tsv");
+                File.AppendAllText(slices, "SS-PROTO@R5\tSS-PROTO\tR5\t12\t12\t33\t42\tUNVERIFIED\n");
+                var blocks = Path.Combine(root, Ledger.Workstream + "api-blocks.tsv");
+                File.AppendAllText(blocks, "R5\tSS-PROTO@R5\t33\t12\t42\tUNVERIFIED\tunfrozen\n");
+                ReplaceTable("gap-dispositions.tsv", "No business state authority\tSS-PROTO@P0", "No business state authority\tSS-PROTO@R5"); break;
+        }
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.That(report.Status, Is.EqualTo("INVALID_ACCOUNTING"));
+        Assert.That(report.ProductGreenCases, Is.Zero);
+        if (corruption == "unknown-impact-deferred") Assert.That(report.Errors, Has.Some.Contains("Unknown early impact cannot be deferred"));
+    }
 
     [Test]
     public void Positive_raw_GREEN_is_distinct_from_replay_and_unknown_scope()

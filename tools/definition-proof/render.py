@@ -39,15 +39,20 @@ def settings(value):
         configurations.append(constructor(quote(item['id']), quote(item['name']),
                                          array(parameter(p) for p in item['parameters']), steps,
                                          requirements, snapshots, artifacts, str(item['timeoutMinutes']), triggers,
-                                         *([quote(item['checkoutMode'])] if item.get('checkoutMode') is not None else [])))
+                                         *([quote(item.get('checkoutMode')), array(quote(t) for t in item['templates'])]
+                                           if item.get('templates') is not None else
+                                           [quote(item['checkoutMode'])] if item.get('checkoutMode') is not None else [])))
     source = 'null' if value['source'] is None else constructor(
         *(quote(value['source'][key]) for key in ('rootId', 'url', 'branch', 'checkoutRules')),
         *([quote(value['source']['name'])] if value['source'].get('name') is not None else []))
     configuration_source = ('[\n            ' + ',\n            '.join(configurations) + '\n        ]') if configurations else '[]'
+    template_source = (', ' + array(constructor(quote(t['id']), quote(t['name']),
+                                                array(parameter(p) for p in t['parameters']))
+                                    for t in value['templates'])) if value.get('templates') is not None else ''
     return ('using DefinitionProof;\npublic static class Managed\n{\n'
             '    public static Settings Declare() => new(' + quote(value['projectId']) + ', ' + source + ',\n'
             '        ' + array(parameter(p) for p in value['parameters']) + ',\n'
-            '        ' + configuration_source + ');\n}\n')
+            '        ' + configuration_source + template_source + ');\n}\n')
 
 
 def control(value):

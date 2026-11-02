@@ -78,6 +78,15 @@ mapping. R0 must reuse those assertions against the replacement shared domain an
 cross-reads, independent ordinary-run neutrality, alias-collision and restart controls. A model table
 alone does not close that proof or adopt a public identity schema.
 
+The [physical identity study](../../../tests/Vivarium.DefinitionProof/BuildIdentityPhysicalTests.cs)
+now combines actual legacy native submission/HTTP/TLS/AgentHub and unchanged native `viv-cli`
+cancellation with an isolated PostgreSQL identity candidate. Numeric keys retain native aggregate/cell
+aliases under concurrent registration, rollback and restart; independent ordinary/composite rows get
+no implicit matrix. Standalone Agent/type keys remain stable when the real protocol connection
+generation advances. The legacy Host still returns 404 for candidate numeric Build URLs. This proves
+selected representation and existing-client overlap, not the replacement adapter, real Agent execution,
+import/queue-replacement semantics or artifact/log/SSE preservation. Those exact R0 obligations remain.
+
 ## Definition, settings and source selections
 
 The historical independent server receipt distinguishes source `7ff65cada…` from settings

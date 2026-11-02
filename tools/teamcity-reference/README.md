@@ -1,5 +1,27 @@
 # Bounded TeamCity reference acquisition
 
+## Pinned client syntax census
+
+From the repository root, `node tools/teamcity-reference/inventory-client.mjs` reads the pinned
+independent CLI checkout and its existing TypeScript 5.9.3 parser. `--check` verifies the three
+generated call-site/method/path-fragment tables without rewriting them; `--output <directory>`
+selects an owned output directory. `--compiler-package <package.json>` selects the package context
+providing that parser. It parses all 32 pinned implementation files without executing client code.
+Transport-reachable helper calls retain argument expressions and declaration hashes, including
+dynamic selectors absent from constant fixture tables. These are syntax facts, not normalized
+operations, runtime dispatch, actor/effect expectations or compatibility coverage.
+
+## Owned parameter-template capture
+
+`node tools/teamcity-reference/template-parameter-capture.mjs` uses the existing acquisition CLI,
+the fixed private lab profile and loopback 2026.1.3 server. It requires the authorized isolated lab
+and private profile environment described below. It creates one uniquely named project with two
+templates and a consumer, observes parameter order/overrides/reset, then deletes the owned project
+and restores the initial local write gates. It performs no Build, Agent or production-server action.
+Receipts retain literal entities, source/runtime hashes, cleanup and gate restoration. The
+[selected observations](../../tests/Vivarium.Tests/TeamCity/Reference/template-observations.json)
+prove parameter inheritance only; no other template field or product implementation is inferred.
+
 ## Fixed T3Personal input receipt
 
 [`cli-t3-inputs-capture.patch`](cli-t3-inputs-capture.patch) is a four-file unpublished increment after
