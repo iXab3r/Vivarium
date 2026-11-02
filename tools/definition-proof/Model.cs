@@ -1,7 +1,10 @@
 namespace DefinitionProof;
 
 // P0 representability candidate; not the public SDK or a second product catalog.
-public sealed record Binding(string Repository, string Path, string Branch, string TrustReference, string CredentialReference);
+public sealed record ContextParameter(string Name, string Value);
+public sealed record ContextRead(string Name, string Value, bool UsedDefault);
+public sealed record Binding(string Repository, string Path, string Branch, string TrustReference, string CredentialReference,
+    ContextParameter[]? Context = null);
 public sealed record Project(string Id, string Parent, string Name, string Description, Binding? Binding);
 public sealed record Parameter(string Name, string? Literal, string? Expression);
 public sealed record Step(string Id, string Name, string Runner, Parameter[] Properties);
@@ -16,6 +19,31 @@ public sealed record Configuration(string Id, string Name, Parameter[] Parameter
     string? CheckoutMode = null);
 public sealed record Settings(string ProjectId, Source? Source, Parameter[] Parameters, Configuration[] Configurations);
 public sealed record ResolvedParameter(string Name, string Value, bool Inherited);
+
+// The evaluator is a separate process. Context comes from the selected control binding,
+// never ambient environment or a hidden persisted override of product declarations.
+public static class DefinitionContext
+{
+    private static Dictionary<string, string> values = new(StringComparer.Ordinal);
+    private static readonly HashSet<ContextRead> reads = [];
+
+    public static void Initialize(ContextParameter[] parameters)
+    {
+        values = parameters.ToDictionary(p => p.Name, p => p.Value, StringComparer.Ordinal);
+        reads.Clear();
+    }
+
+    public static string Get(string name, string fallback)
+    {
+        var found = values.TryGetValue(name, out var value);
+        value = found ? value! : fallback;
+        reads.Add(new(name, value, !found));
+        return value;
+    }
+
+    public static ContextRead[] Reads => reads.OrderBy(r => r.Name, StringComparer.Ordinal)
+        .ThenBy(r => r.Value, StringComparer.Ordinal).ThenBy(r => r.UsedDefault).ToArray();
+}
 
 // Alternative source-edit candidate, used only by the computed-source feasibility study.
 // The one declaration is C# in Managed.Edits; JSON is a transient read/editor projection.

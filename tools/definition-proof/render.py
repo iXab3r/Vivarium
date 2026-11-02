@@ -53,7 +53,9 @@ def settings(value):
 def control(value):
     binding = value['binding']
     bound = 'null' if binding is None else constructor(*(quote(binding[key]) for key in
-        ('repository', 'path', 'branch', 'trustReference', 'credentialReference')))
+        ('repository', 'path', 'branch', 'trustReference', 'credentialReference')),
+        *([array(constructor(quote(p['name']), quote(p['value'])) for p in binding['context'])]
+          if binding.get('context') is not None else []))
     return ('using DefinitionProof;\npublic static class Control\n{\n'
             '    public static Project Declare() => ' + constructor(*(quote(value[key]) for key in
                 ('id', 'parent', 'name', 'description')), bound) + ';\n}\n')

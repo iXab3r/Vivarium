@@ -1,5 +1,11 @@
 # Bounded C# representation experiment (US-013 / P0)
 
+`ContextSourceTests` additionally compiles exact control/product Git pairs with typed non-secret
+context inputs on the control binding. The same product commit evaluates to different effective
+values for two context revisions and the default; actual context reads retain default provenance.
+Configured but unused context is distinguished, and cold evaluation of the original pair remains
+identical. This does not prove REST editability/authorization, a public SDK or production activation.
+
 This is the RF-05/#34 representability experiment, not the public definition SDK, a catalog engine,
 HTTP implementation or accepted Host activation. It uses the existing pinned .NET SDK, ordinary Git
 and a short Python invocation; it introduces no test framework or scenario language.

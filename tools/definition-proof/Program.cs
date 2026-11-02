@@ -2,6 +2,7 @@ using System.Text.Json;
 using DefinitionProof;
 
 var project = Control.Declare();
+DefinitionContext.Initialize(project.Binding?.Context ?? []);
 var settings = Managed.Declare();
 if (project.Id != settings.ProjectId) throw new InvalidOperationException("Settings owner mismatch.");
 if (settings.Configurations.Select(c => c.Id).Distinct(StringComparer.Ordinal).Count() != settings.Configurations.Length)
@@ -30,4 +31,5 @@ var effective = settings.Configurations.Select(c => new
     steps = c.Steps.Select(s => new { s.Id, s.Name, s.Runner,
         properties = s.Properties.Select(p => new ResolvedParameter(p.Name, Resolve(p), false)).ToArray() }).ToArray()
 }).ToArray();
-Console.Write(JsonSerializer.Serialize(new { project, settings.Source, configurations = effective }, options));
+Console.Write(JsonSerializer.Serialize(new { project, settings.Source, configurations = effective,
+    contextReads = DefinitionContext.Reads }, options));
