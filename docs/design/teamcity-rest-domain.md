@@ -55,10 +55,13 @@ The shared model must represent the following observable concepts without facade
 - Artifact/log/source references, path trees, metadata and streamed bytes; identity/roles/groups/scoped
   assignments; audit and supported server operations.
 
-P0 explicitly resolves the current native MatrixBuild/child UUID model into compatible Build and
-composite identities. It must define what a one-cell run returns, which ID a client polls/cancels,
-and whether a composite parent is independently visible. Existing project/configuration strings are
-not sufficient persisted catalogue identities. Do not defer either mapping until imported history.
+P0 explicitly resolves catalogue-backed Build/composite/matrix identity and real Project/BuildType
+ownership. D41 retires the old YAML/native payload public entry rather than requiring a second
+legacy alias/DTO adapter. Its current MatrixBuild/child UUID behavior remains baseline evidence until
+replacement, not a target public shape. Define what a one-cell configuration run returns, which ID
+a client polls/cancels and whether an explicit composite/matrix parent is independently visible.
+Caller-supplied project/configuration labels are not persisted catalogue identities. Preserve AgentHub
+workload/session fences and the useful execution/cancel/log/byte assertions through replacement.
 
 ## IDs, state and protocol facts that shape persistence
 

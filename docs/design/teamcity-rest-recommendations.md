@@ -130,7 +130,10 @@ the produced Vivarium backup actually restores the supported installation.
 Use real native product/capability identity and the frozen compatible discovery profile. Required
 source-specific repository, license, plugin, authentication, cloud and node calls need explicit
 semantic mappings. The earlier proposed blanket exceptions are withdrawn as the default resolution.
-An operation without an equivalent remains open and cannot pass its family acceptance. Do not
+D42 now records the owner's specific licensing decision: free OSS capacity with no license-imposed
+limits; commercial TeamCity key mutations are explicitly unsupported and remain source-accounted
+negative acceptance, never positive key-operation conformance. Other operations without an equivalent
+remain open and cannot pass their family acceptance. Do not
 fabricate a JVM runtime, installed plugin or completed action, and do not count unsupported responses
 as positive conformance. The already accepted C# and initial single-Host architecture still applies;
 any genuine incompatibility must be demonstrated concretely rather than silently redefining scope.

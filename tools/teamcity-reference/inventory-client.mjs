@@ -98,6 +98,52 @@ for (const [path, input] of sources) {
   }
   visit(input.source);
 }
+// The constant fixture tables omit inline MSW handlers and their client-behavior branches.
+// Preserve each syntax occurrence, including helpers/wildcards/dynamic methods, without executing it.
+const testFiles = git('ls-tree', '-r', '--name-only', revision, '--', 'integrations/teamcity/tests')
+  .toString('utf8').split('\n').filter(path => path.endsWith('.ts')).sort();
+const testSources = [], handlers = [];
+for (const path of testFiles) {
+  const bytes = git('show', revision + ':' + path);
+  const sourceHash = hash(bytes);
+  const parsed = ts.createSourceFile(path, bytes.toString('utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  if (parsed.parseDiagnostics.length) throw new Error('TypeScript test parse failed: ' + path);
+  testSources.push({ source_id: 'CLI-TEST-SOURCE:' + path, source: path, source_revision: revision,
+    source_sha256: sourceHash, bytes: bytes.length, state: 'PINNED_TEST_SOURCE_NOT_SERVER_ORACLE' });
+  const httpNames = new Set();
+  for (const statement of parsed.statements) {
+    if (!ts.isImportDeclaration(statement) || statement.moduleSpecifier.text !== 'msw') continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings && ts.isNamedImports(bindings)) for (const item of bindings.elements)
+      if ((item.propertyName ?? item.name).text === 'http') httpNames.add(item.name.text);
+  }
+  function visit(node) {
+    if (ts.isCallExpression(node) &&
+        (ts.isPropertyAccessExpression(node.expression) || ts.isElementAccessExpression(node.expression)) &&
+        ts.isIdentifier(node.expression.expression) && httpNames.has(node.expression.expression.text)) {
+      const method = ts.isPropertyAccessExpression(node.expression)
+        ? node.expression.name.getText(parsed) : node.expression.argumentExpression.getText(parsed);
+      let enclosing = node.parent, testName = '<helper-or-shared-handler>';
+      while (enclosing) {
+        if (ts.isCallExpression(enclosing) && ts.isIdentifier(enclosing.expression) && enclosing.expression.text === 'test' &&
+            enclosing.arguments[0] && ts.isStringLiteralLike(enclosing.arguments[0])) {
+          testName = enclosing.arguments[0].text; break;
+        }
+        enclosing = enclosing.parent;
+      }
+      const position = location(parsed, node);
+      handlers.push({ source_id: `CLI-INLINE:${path}:${position.line}:${position.column}`,
+        source: path, source_revision: revision, source_sha256: sourceHash, ...position,
+        method_expression: method, path_expression: node.arguments[0]?.getText(parsed) ?? '<omitted>',
+        enclosing_test: testName, declaration_sha256: hash(node.getText(parsed)),
+        primary_subsystem: 'SS-PROTO', gap_id: 'STORY-GAP-CLI-UNION',
+        state: 'SYNTHETIC_HANDLER_SYNTAX_NOT_REQUEST_VARIANT_OR_SERVER_EXPECTATION' });
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(parsed);
+  testSources.at(-1).inline_handlers = handlers.filter(row => row.source === path).length;
+}
 function table(rows) {
   if (!rows.length) throw new Error('Unexpected empty census.');
   const columns = Object.keys(rows[0]);
@@ -106,7 +152,8 @@ function table(rows) {
 }
 await mkdir(output, { recursive: true });
 const outputs = { 'cli-client-calls.tsv': table(callRows), 'cli-client-methods.tsv': table(methodRows),
-  'cli-path-fragments.tsv': table(fragments) };
+  'cli-path-fragments.tsv': table(fragments), 'cli-test-sources.tsv': table(testSources),
+  'cli-inline-handlers.tsv': table(handlers) };
 for (const [name, content] of Object.entries(outputs)) {
   const path = join(output, name);
   if (check) {
@@ -115,5 +162,6 @@ for (const [name, content] of Object.entries(outputs)) {
 }
 console.log(JSON.stringify({ source_revision: revision, parser: ts.version, implementation_files: sources.size,
   call_sites: callRows.length, transport_reachable_methods: methodRows.length, lexical_path_fragments: fragments.length,
+  test_sources: testSources.length, inline_handler_occurrences: handlers.length,
   outputs: Object.fromEntries(Object.entries(outputs).map(([name, content]) => [relative(root, join(output, name)), hash(content)])),
   claim: 'Finite syntax census, including dynamic helper calls; no runtime dispatch, normalized denominator, actor/effect oracle or compatibility coverage.' }));

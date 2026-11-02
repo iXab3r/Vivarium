@@ -52,7 +52,11 @@ completion boundaries. Native DTOs may differ, but the same semantic operation w
 inputs and starting state cannot produce different business effects because it arrived through a
 different route. Additional controls must be explicit and neutral when absent. Unknown reference
 results require evidence; neither a preferred native rule nor a framework default substitutes for
-the reference. Unmapped required operations remain open blockers, not accepted scope exceptions.
+the reference. Unmapped required operations remain open blockers, not implicit scope exceptions.
+D42 records the owner's explicit commercial-license-key exception: free OSS capacity, honest
+unsupported key mutations and retained source/negative acceptance. It is not positive key-operation
+conformance. D41 retires the transitional YAML/native payload entry for the fresh installation;
+catalogue-based execution/matrices/cancel/logs/artifacts and AgentHub/Bootstrap still require proof.
 
 ```text
 Workbench / viv-cli --> /api/v1 -----------+

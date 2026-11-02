@@ -3,13 +3,20 @@
 ## Pinned client syntax census
 
 From the repository root, `node tools/teamcity-reference/inventory-client.mjs` reads the pinned
-independent CLI checkout and its existing TypeScript 5.9.3 parser. `--check` verifies the three
-generated call-site/method/path-fragment tables without rewriting them; `--output <directory>`
+independent CLI checkout and its existing TypeScript 5.9.3 parser. `--check` verifies the five
+generated call-site/method/path-fragment/test-source/inline-handler tables without rewriting them; `--output <directory>`
 selects an owned output directory. `--compiler-package <package.json>` selects the package context
 providing that parser. It parses all 32 pinned implementation files without executing client code.
 Transport-reachable helper calls retain argument expressions and declaration hashes, including
 dynamic selectors absent from constant fixture tables. These are syntax facts, not normalized
 operations, runtime dispatch, actor/effect expectations or compatibility coverage.
+
+The test census reads all 41 pinned TypeScript test files, including the 31 files outside the
+constant case tables. It retains 233 inline MSW handler occurrences with source/declaration hashes,
+literal expressions and intake ownership. Helpers, wildcards and computed expressions are not
+expanded into invented requests. Synthetic responses describe client controls, not TeamCity's
+server contract. The offline ledger checks per-file occurrence counts, source joins and ownership;
+the generator's byte-for-byte check independently detects omissions or changed generated facts.
 
 ## Owned parameter-template capture
 

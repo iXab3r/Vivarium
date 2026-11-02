@@ -551,9 +551,10 @@ snapshot in place of an `ImageVersion` (§6).
 
 ### D17. Repository build configurations are code
 
-**D32 refinement:** new catalog definitions use trusted Git-owned C# and a validated immutable plan.
+**D32/D41 refinement:** new catalog definitions use trusted Git-owned C# and a validated immutable plan.
 `vivarium.yaml` below describes the implemented transitional submission path, not a second authoring
-authority for new catalog definitions. The migration must name its compatibility/removal gate.
+authority for new catalog definitions. D41 replaces this public entry for the fresh US-013 installation
+after verified catalogue-based replacement; preserving its wire format is not a target requirement.
 
 `vivarium.yaml` lives next to the code it tests; `viv-cli run` submits it together with payload blobs
 (sha256-deduped upload). Automation-first means a repository-owned run definition versions with the
@@ -738,7 +739,8 @@ Versioned desired settings become effective from a validated Git revision: Proje
 Configurations, fleet/pool policy, agent names/custom properties/enablement policy,
 retention policy, provider/image recipes, and other declared desired state. Host/resource settings
 use Chiral instead of a second Git schema. D32/D36 adopt C# product build definitions; D17's
-`vivarium.yaml` remains transitional payload-submission evidence until verified migration/replacement.
+`vivarium.yaml` remains transitional payload-submission evidence until D41's verified replacement;
+the fresh-installation target does not retain it as a second public definition format.
 Controller-owned desired state lives in a control repository initialized or adopted through the
 installation lifecycle refined by D34/D35.
 
@@ -1048,6 +1050,8 @@ behavior. TeamCity-shaped settings mutations still use the C# Git mutation/valid
 legacy requests cannot bypass policy or require every existing caller to add native-only headers.
 Source-specific server/Kotlin/license internals need explicit mappings or unresolved dispositions,
 never fabricated success or a false claim that Vivarium runs JetBrains software.
+D42 explicitly resolves commercial TeamCity key operations as unsupported and adopts license-unlimited
+Vivarium capacity. Keep that agreed exception visible; it is not positive TeamCity key conformance.
 
 The reference profile is the observed TeamCity 2026.1.3 installation and pinned actual client versions.
 Generate the method/path/request-variant inventory from client source/tests, reference API metadata
@@ -1296,6 +1300,54 @@ implementation/integration readiness and API-complete separately, plus milestone
 Ownership assignment/zero exclusive routes/closed tickets do not establish runtime completeness.
 Required early variants are not deferred to a full-owner task's later milestone. D39 review/cost/
 zero-debt/main-delivery gates remain. See [subsystem catalogue](design/subsystems.md).
+
+### D41. C#/Git configurations replace the transitional YAML/payload entry
+
+Accepted owner decision, 2026-11-02, for the fresh US-013 installation. The target public workflow
+starts real Git-owned C# Project/BuildType configurations. It does not preserve `viv-cli run
+vivarium.yaml`, arbitrary native payload/matrix submission DTOs, or their public opaque aggregate/cell
+ID shapes as a parallel compatibility surface. This refines D17/D23/D32/D36; it does not authorize
+existing-data migration, deletion or a TeamCity cutover.
+
+Every admitted Build belongs to a real Project and BuildType and retains its evaluated immutable
+definition/revision. Preserve process execution, explicit matrix/scenario capabilities, cancellation,
+logs, results and artifact bytes through that model. Ordinary compatible configuration runs have no
+synthetic matrix wrapper. Catalogue-backed matrix work keeps explicit aggregate/cell relations,
+owning configuration and resolved parameter/scenario provenance; freeze its actual compatible
+variants with the owning subsystem before exposure. Do not create placeholder catalogue objects to
+rescue arbitrary caller-supplied labels or maintain a second scheduler/definition authority.
+
+AgentHub and Bootstrap compatibility remain required. Their opaque string workload/session IDs,
+assignment/heartbeat/result/stop fences, durable ACK/recovery and authenticated byte boundaries are
+independent of the retired public submission format. A canonical numeric public Build identity does
+not justify changing an accepted Agent workload ID in flight or breaking installed Agents.
+
+Keep current code, tests and historical evidence until the replacement proves the retained useful
+behavior through C#/Git. #113/#114/#115 and #116/#117/#118 own the early replacement and its due
+contributions; full matrix/configuration/execution owners retain remaining variants, not a blanket
+later-owner closure prerequisite. Retire the legacy entry and obsolete format-specific assertions
+with the verified replacement, retaining or porting execution/matrix/cancel/log/artifact and security
+assertions. P0 identity experiments remain historical feasibility evidence, not a requirement to ship
+their legacy public alias adapter. No replacement or removal is implemented by this decision.
+
+### D42. Vivarium has no license-imposed capacity limits or TeamCity commercial keys
+
+Accepted owner decision, 2026-11-02. Vivarium is free OSS with no license-imposed Agent/build capacity
+limits. Runtime capacity, compatibility, authorization, configured concurrency and resource budgets
+still describe actual availability; unlimited entitlement never fabricates an available Agent or
+bypasses queue/admission/security rules. Report real Vivarium identity and capabilities separately
+from the supported TeamCity REST protocol profile; do not advertise JetBrains product ownership,
+commercial entitlement, JVM plugins or a fictitious installation of TeamCity.
+
+Commercial TeamCity key upload/activation/removal operations are explicitly unsupported. Return an
+honest non-success unsupported response with no entitlement mutation; do not accept a key as a no-op
+or implement a paid-license engine. This is an owner-approved compatibility exception to D33/D37,
+not a missing operation silently counted GREEN. Keep the discovered operations/variants in the
+ledger with their source identity, owner, exception rationale and negative acceptance obligations.
+Freeze exact read DTOs, unlimited representations, authorization, error/media/status and unchanged
+client behavior before exposing the affected Host surface; do not invent a numeric unlimited sentinel
+or a successful key response from generic metadata. Other server/plugin/cloud operations are not
+waived by this decision. No licensing endpoint is implemented or accepted by this decision.
 
 ## 5. Protocol sketch
 

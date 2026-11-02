@@ -186,6 +186,13 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   to same-milestone subsystem implementation tasks. Track subsystem lifecycle/integration and API
   completeness separately, with milestone/global rollups. See [subsystems](docs/design/subsystems.md).
   REST discovery/TDD still comes early; do not implement route by route or multiply state authorities.
+- D41 replaces the transitional YAML/native payload submission entry with real C#/Git Project/BuildType
+  runs for the fresh US-013 installation. Preserve execution/matrix/cancel/log/artifact capabilities,
+  AgentHub and Bootstrap; retire old code only with verified replacement. Legacy public alias/DTO
+  preservation is not a target requirement.
+- D42 adopts free OSS capacity without license-imposed limits and explicitly unsupported commercial
+  TeamCity key operations. Keep that owner-approved exception visible in source allocation and negative
+  acceptance; unsupported is not positive conformance. Other compatibility obligations remain.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

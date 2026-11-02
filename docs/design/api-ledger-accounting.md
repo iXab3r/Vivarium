@@ -32,7 +32,7 @@ creates or updates that file. An unassessed head remains stale and does not forc
 
 The [ledger](../../.workspace/workstreams/coherent-refactor/api-ledger.tsv) retains 449 discovery
 headings. The [original three bindings](../../.workspace/workstreams/coherent-refactor/rest-first-cohort-cases.tsv)
-and [twelve local bindings](../../.workspace/workstreams/coherent-refactor/rest-local-mutation-cases.tsv)
+and [local bindings](../../.workspace/workstreams/coherent-refactor/rest-local-mutation-cases.tsv)
 jointly name the known cases. These small tables bind existing case IDs to existing NUnit methods,
 owners, tasks and effects; they do not redefine requests, expected values or fixture semantics.
 Exact class plus test display name joins standard TRX rows. A replay row cannot supply product GREEN;
@@ -53,6 +53,14 @@ source gaps, story dependencies and implementation contributions. For the presen
 25 stories, 160 scenario candidates, 52 dependency declarations, 449 schema occurrences, 456 CLI
 fixture occurrences, 40 native HTTP declarations, 20 Agent envelope fields and 78 open source gaps.
 These are different source registers, not a normalized operation denominator or coverage fraction.
+
+The pinned CLI census also preserves all 41 TypeScript test sources and 233 inline MSW handler
+occurrences outside the constant request tables. `cli_test_source_files` and
+`cli_inline_handler_source_occurrences` report source counts, never executed requests or server
+expectations. The reader validates unique source identity, revision/hash/occurrence joins, per-file
+handler counts and source-intake owner/gap; missing rows or a claimed server-oracle/GREEN state fail.
+The separate pinned-source generator verifies all five generated syntax tables byte for byte. The
+global variant denominator and runtime-branch qualification remain unresolved.
 
 Checks preserve primary source/owner identity, reverse scenario/source and case/API links, exact
 fixture occurrence fields, declared schema pointers/profile hashes, known task/slice roles and

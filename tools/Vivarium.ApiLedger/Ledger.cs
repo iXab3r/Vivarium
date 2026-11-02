@@ -30,6 +30,8 @@ public sealed class Report
     public int StoryDependencyReferences { get; set; }
     public int SchemaSourceOccurrences { get; set; }
     public int CliFixtureSourceOccurrences { get; set; }
+    public int CliTestSourceFiles { get; set; }
+    public int CliInlineHandlerSourceOccurrences { get; set; }
     public int NativeHttpSourceOccurrences { get; set; }
     public int AgentEnvelopeSourceOccurrences { get; set; }
     public int KnownStorySourceGaps { get; set; }

@@ -19,6 +19,8 @@ public static partial class Ledger
         var relations = Table(root, "source-relations.tsv", metadataInputs, "api_id", "profile", "method", "path");
         var fixtures = Table(root, "rest-fixture-inventory.tsv", metadataInputs, "id");
         var cli = Table(root, "cli-source-relations.tsv", metadataInputs, "fixture_id");
+        var cliTests = Table(root, "cli-test-sources.tsv", metadataInputs, "source");
+        var inlineHandlers = Table(root, "cli-inline-handlers.tsv", metadataInputs, "source_id");
         var native = Table(root, "native-http-occurrences.tsv", metadataInputs, "source_id");
         var messages = Table(root, "agent-message-occurrences.tsv", metadataInputs, "source_id");
         var gaps = Table(root, "story-gaps.tsv", metadataInputs, "gap_id");
@@ -46,6 +48,38 @@ public static partial class Ledger
                 "Source-gap closure needs explicit evidence; this unfrozen register cannot claim it.");
         }
         ValidateGapDispositions(root, gaps, owners, slices, metadataInputs, report);
+        var byCliTestSource = cliTests.ToDictionary(row => row["source"]);
+        Require(cliTests.Count > 0 && inlineHandlers.Count > 0, "Missing pinned CLI test/inline source census.");
+        foreach (var row in cliTests)
+        {
+            Require(row["source_id"] == "CLI-TEST-SOURCE:" + row["source"] &&
+                row["source"].StartsWith("integrations/teamcity/tests/", StringComparison.Ordinal) &&
+                row["source"].EndsWith(".ts", StringComparison.Ordinal) && !row["source"].Contains("..", StringComparison.Ordinal) &&
+                HashShape(row["source_sha256"]) && row["source_revision"].Length == 40 &&
+                row["source_revision"].All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f') &&
+                int.TryParse(row["bytes"], out var bytes) && bytes > 0 &&
+                row["state"] == "PINNED_TEST_SOURCE_NOT_SERVER_ORACLE", "Invalid CLI test source provenance or false oracle claim.");
+            Require(int.TryParse(row["inline_handlers"], out var count) && count >= 0 &&
+                inlineHandlers.Count(handler => handler["source"] == row["source"]) == count,
+                "Missing/orphan inline handler occurrence for pinned test source.");
+        }
+        foreach (var row in inlineHandlers)
+        {
+            var source = Find(byCliTestSource, row["source"], "inline CLI test source");
+            Require(row["source_revision"] == source["source_revision"] && row["source_sha256"] == source["source_sha256"] &&
+                HashShape(row["declaration_sha256"]) && int.TryParse(row["line"], out var line) && line > 0 &&
+                int.TryParse(row["column"], out var column) && column > 0 &&
+                row["source_id"] == $"CLI-INLINE:{row["source"]}:{row["line"]}:{row["column"]}",
+                "Inline CLI source identity/hash differs.");
+            Find(owners, row["primary_subsystem"], "inline source intake owner");
+            Find(byGap, row["gap_id"], "inline source qualification gap");
+            Require(row["primary_subsystem"] == "SS-PROTO" && row["method_expression"].Length > 0 &&
+                row["path_expression"].Length > 0 && row["enclosing_test"].Length > 0 &&
+                row["state"] == "SYNTHETIC_HANDLER_SYNTAX_NOT_REQUEST_VARIANT_OR_SERVER_EXPECTATION",
+                "Unowned inline CLI source or false server-oracle/coverage claim.");
+        }
+        report.CliTestSourceFiles = cliTests.Count;
+        report.CliInlineHandlerSourceOccurrences = inlineHandlers.Count;
         Require(storyLinks.Select(row => row["source_id"]).ToHashSet().SetEquals(apis.Keys),
             "Story/discovery source bindings differ (missing or orphan source).");
         foreach (var link in storyLinks)

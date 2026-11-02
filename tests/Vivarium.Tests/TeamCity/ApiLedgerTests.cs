@@ -79,6 +79,13 @@ public sealed class ApiLedgerTests
         Table("cli-source-relations.tsv", "fixture_id\tkind\tmethod\tconcrete_path\tsource\ttable\tcase_index\tcommand_prefix\tcandidate_schema_paths\tcandidate_api_ids\tpreferred_api_id\tpreferred_schema_path\tstory_id\tscenario_id\tactive_owner_issue\tgap_id\tstate",
             "CLI-FIX-0001\trequest\tGET\t/app/rest/apiVersion\tcli.ts\tcases\t0\tserver version\t/app/rest/apiVersion\tTCREST:rootapi.getApiVersion\tTCREST:rootapi.getApiVersion\t/app/rest/apiVersion\tUS-001\tUS-001/server\t12\tGAP-CLI\tCANDIDATE_SOURCE_JOIN_NOT_VARIANT_OR_COVERAGE");
         Table("native-http-occurrences.tsv", "source_id\tstory_id\tscenario_id\tsubsystem_id");
+        var testSourceHash = new string('a', 64);
+        var testSourceRevision = new string('b', 40);
+        const string testSource = "integrations/teamcity/tests/example.test.ts";
+        Table("cli-test-sources.tsv", "source_id\tsource\tsource_revision\tsource_sha256\tbytes\tstate\tinline_handlers",
+            $"CLI-TEST-SOURCE:{testSource}\t{testSource}\t{testSourceRevision}\t{testSourceHash}\t100\tPINNED_TEST_SOURCE_NOT_SERVER_ORACLE\t1");
+        Table("cli-inline-handlers.tsv", "source_id\tsource\tsource_revision\tsource_sha256\tline\tcolumn\tmethod_expression\tpath_expression\tenclosing_test\tdeclaration_sha256\tprimary_subsystem\tgap_id\tstate",
+            $"CLI-INLINE:{testSource}:1:1\t{testSource}\t{testSourceRevision}\t{testSourceHash}\t1\t1\tget\t/app/rest/apiVersion\texample\t{testSourceHash}\tSS-PROTO\tGAP-CLI\tSYNTHETIC_HANDLER_SYNTAX_NOT_REQUEST_VARIANT_OR_SERVER_EXPECTATION");
         Table("agent-message-occurrences.tsv", "source_id\tstory_id\tscenario_id");
         Table("story-gaps.tsv", "gap_id\tstory_ids\towner_task\tdue_freeze\tnext_proof\tsource_ref\tstate",
             "GAP-CLI\tUS-001\t36\tP0 impact assessment remains due\tActual source-backed effect\tcli.ts\tOPEN-NOT-COVERAGE");
@@ -139,6 +146,36 @@ public sealed class ApiLedgerTests
             Assert.That(report.Subsystems.Sum(s => s.KnownCases), Is.EqualTo(2));
             Assert.That(report.Blocks.Sum(s => s.Executed), Is.EqualTo(1));
         });
+    }
+
+    [TestCase("omitted-handler")]
+    [TestCase("wrong-source-hash")]
+    [TestCase("orphan-source")]
+    [TestCase("unowned-gap")]
+    [TestCase("false-server-oracle")]
+    [TestCase("duplicate-source")]
+    [TestCase("invalid-revision")]
+    public void Inline_client_source_omission_or_promotion_cannot_preserve_GREEN(string corruption)
+    {
+        Assert.That(Read().ProductGreenCases, Is.EqualTo(1));
+        switch (corruption)
+        {
+            case "omitted-handler":
+                var path = Path.Combine(root, Ledger.Workstream + "cli-inline-handlers.tsv");
+                File.WriteAllText(path, File.ReadLines(path).First() + "\n"); break;
+            case "wrong-source-hash": ReplaceTable("cli-inline-handlers.tsv", new string('a', 64), new string('c', 64)); break;
+            case "orphan-source": ReplaceTable("cli-inline-handlers.tsv", "example.test.ts", "missing.test.ts"); break;
+            case "unowned-gap": ReplaceTable("cli-inline-handlers.tsv", "GAP-CLI", "MISSING-GAP"); break;
+            case "false-server-oracle": ReplaceTable("cli-inline-handlers.tsv", "SYNTHETIC_HANDLER_SYNTAX_NOT_REQUEST_VARIANT_OR_SERVER_EXPECTATION", "SERVER_EXPECTATION_GREEN"); break;
+            case "duplicate-source":
+                var sources = Path.Combine(root, Ledger.Workstream + "cli-test-sources.tsv");
+                File.AppendAllText(sources, File.ReadLines(sources).Skip(1).First().Replace("CLI-TEST-SOURCE:", "INVALID:", StringComparison.Ordinal) + "\n"); break;
+            case "invalid-revision": ReplaceTable("cli-test-sources.tsv", new string('b', 40), new string('z', 40)); break;
+        }
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.That(report.Status, Is.EqualTo("INVALID_ACCOUNTING"));
+        Assert.That(report.ProductGreenCases, Is.Zero);
     }
 
     [Test]

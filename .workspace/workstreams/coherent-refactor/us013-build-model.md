@@ -13,7 +13,7 @@ explicitly enabled with successful-only selection in this fixture, not inferred 
 
 | Entry | Issued/resulting identity | Actual selected work and bytes |
 |---|---|---|
-| First ordinary Release | 35, queued → running → finished/SUCCESS | Snapshot Windows 34; artifacts Prepare 33 and Windows 34. Real commands transfer and compare identical inputs; downloaded Release bytes are 27 bytes, SHA-256 `97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8`. |
+| First ordinary Release | 35, queued â†’ running â†’ finished/SUCCESS | Snapshot Windows 34; artifacts Prepare 33 and Windows 34. Real commands transfer and compare identical inputs; downloaded Release bytes are 27 bytes, SHA-256 `97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8`. |
 | Repeat ordinary Release | 38, finished/SUCCESS | Reuses Windows 34 and Prepare 33. A new root run does not imply every upstream runs again. |
 | Explicit composite | 42, finished/SUCCESS, no Agent | Selects Release 38; the composite is its own Build. An ordinary Release does not acquire an implicit composite parent. |
 | Two unkeyed queued Release requests | First returns 45, second 48 | With the Agent disabled, later GET `/builds/id:45` returns a queued Build whose `id` is 48. Cancellation through the old locator also acts on the resolved Build. Intentional unkeyed requests and domain queue optimization are different from transport deduplication. |
@@ -37,9 +37,9 @@ specified independently. Documentation/projection variants remain accountable ga
 | Configuration | Stable external string ID versus mutable display name, and a regular/composite kind. Current desired settings, an evaluated immutable plan and a historical Build snapshot are different objects. |
 | Build identity | Positive int64 compatible Build ID allocated durably, separate from display build number/counter. The pinned CLI additionally requires a positive JS-safe integer; that is not the server's entire int64 domain. |
 | Requested versus resolved identity | Preserve the admission identity and the reference-defined replacement/resolution relation. Reads/actions through an old locator must resolve consistently with the shared service; no facade-only alias state or body-hash dedupe. An actual completed execution is not rewritten as a different historical execution. |
-| Native IDs | Preserve existing native opaque IDs through durable identity mapping on the same Build, not duplicated native/compatible execution state. Candidate: canonical numeric Build identity plus stable native UUID alias. Existing native payload/matrix adapters need explicit mapping/evidence before this is adopted. |
+| Native IDs | D41 selects the same real catalogue-backed numeric Build identity for native and compatible management in the fresh installation, with one execution state. The old public UUID alias adapter is no longer required. Preserve the distinct opaque in-flight Agent workload/session fence and its durable association with that Build. |
 | Queue | Queue membership/position/reason are views of Build admission/lifecycle. A returned queue href is not a second execution identity. Retain requested target, resolved identity and eventual physical execution separately. |
-| Composite and native matrix | Explicit composite is a Build without an Agent execution. Normal catalogue submission returns its ordinary Build. Candidate native payload-matrix mapping retains its explicitly requested aggregate and ordinary cell Builds; do not introduce that aggregate into ordinary compatible runs. Preserve existing cell keys/outcome assertions. |
+| Composite and native matrix | Explicit composite is a Build without an Agent execution. Normal catalogue submission returns its ordinary Build. D41 retains matrix/scenario capabilities through real Git-owned configurations, with explicit aggregate/cell relations and resolved input provenance. Do not add an aggregate to ordinary compatible runs or manufacture catalogue objects from arbitrary payload labels. |
 | State and outcome | Queued/running/finished is independent of SUCCESS/FAILURE/UNKNOWN and cancellation/failure detail. Running SUCCESS is not finished; running FAILURE/UNKNOWN is observable before completion. Declared deleted/unknown lifecycle variants remain separately allocated. |
 | Agent facts | Requested Agent may already appear on a queued targeted Build. That does not prove assignment acknowledgement, workload ownership or immutable executed-host facts. Keep requested target, accepted assignment/session fence and actual execution provenance distinct. |
 | Eligibility | Connection, authorization, enablement, compatibility, health and occupancy stay independent. Explicit suitable-Agent targeting is a distinct admitted workflow, not a permanent enablement change or bypass of all permissions/dependencies. |
@@ -122,46 +122,74 @@ does not transfer old bytes or perform cutover. Its Host still follows the alrea
 PG/Storage/Git/private-settings/key backup boundary; no compatible backup job can be exposed as a
 successful no-op. Backup wire jobs and source-specific retained originals require their own cases.
 
-### Native matrix preservation boundary
+### D41: catalogue ownership replaces legacy public submission compatibility
 
-The existing implementation allocates a 32-character opaque aggregate ID and a different opaque
-ID for each cell in one `MatrixBuildStore.SubmitScopedAsync` transaction. The stored Agent assignment
-contains the cell ID. `BuildRestProjection` exposes the aggregate as `/api/v1/builds/{id}`, cell IDs
-inside `children`, queue entries with cell `buildId` and an aggregate `buildUrl`, and artifact URLs
-containing both IDs. The CLI treats IDs as strings and rejects caller-supplied child IDs; its watcher
-also requires an event's resource ID to match the requested native aggregate ID. These are actual
-current contracts, not evidence that a numeric alias adapter already exists.
+The owner selected C#/Git replacement on 2026-11-02. Every admitted Build must refer to a real
+Project and BuildType with an immutable evaluated definition/revision. No synthetic generic
+configuration, caller-label import or parallel YAML authority is needed to preserve the retired
+entry. Keep stable internal catalogue identity separate from mutable external IDs/display names,
+numeric Build ID, display number and opaque Agent registration/workload/session fences.
 
-| Existing observable | Required candidate mapping and R0 preservation evidence |
+| Retained capability | Replacement obligation |
 |---|---|
-| Native submission result and idempotent retry | One explicit native-matrix aggregate identity plus one identity per declared cell, each with a stable native alias and canonical numeric ID. Keep actor/operation/request-key scoping and exact prior response semantics. Native keyed retry must not change ordinary compatible unkeyed enqueue behavior. |
-| Ordinary compatible configuration run | Its ordinary Build, without an automatically created native matrix or composite wrapper. A native-matrix kind is not a claim that TeamCity Composite settings reproduce payload-matrix semantics. |
-| Assignment, acknowledgement, heartbeat and terminal result | Resolve the stable cell alias to the same owning Build. Preserve the string workload ID and its lease/session fences through the Agent protocol; no independent facade queue or recreated execution. |
-| Native GET, cancellation, events and replay cursor | Resolve the aggregate alias once in the shared service; emit the expected native resource ID, child IDs, links, runtime revision and cursor ordering. A canonical numeric key does not justify rewriting an accepted native response/event ID. |
-| Queue, results and artifact bytes | Preserve the cell-to-aggregate relation, cell name/order, RID, requirement, immutable assigned-host facts, exit/timeout/skip results and byte hash/length. Old native download URLs continue to resolve the same authorized stored bytes. |
-| Native cancellation and outcomes | Preserve queued/running/cancel-requested/finished and native cancelled/failure/success distinctions. Compatible state/status/cancellation projections follow the reference cases; do not turn an in-progress native cancellation into a finished compatible Build. |
-| Historical IDs and restart | Durable alias uniqueness and kind/parent relations survive process restart. US-013's fresh installation does not authorize a second identity authority or require legacy database migration. |
+| Configuration run | Native and compatible entry use the same real Git-owned configuration and owning services. Ordinary submission returns its ordinary Build, with no implicit matrix/composite wrapper. |
+| Explicit matrices/scenarios | C#/Git declares the real configuration and scenario/parameter expansion. Retain aggregate/cell relations, selected definition, cell keys/order/RID/requirements/results; freeze compatible matrix variants before their affected exposure. |
+| Agent execution/ACK/recovery | Preserve opaque assignment identity for an accepted workload, credential/connection generations, lease/session fences, heartbeats, terminal ACK, stop/restart and current-release upgrade behavior. The public submission format does not own AgentHub/Bootstrap compatibility. |
+| Run/cancel/retry/watch | Preserve authorized actor/operation identity, durable queued/running/terminal/cancel behavior, bounded log/event replay and meaningful CLI exits. Explicit native keyed retry remains distinct from ordinary unkeyed compatible admission/reuse. |
+| Results/logs/artifacts | Preserve original process/report evidence, current status semantics, bytes/hash/length, immutable assigned-host provenance and current project/build authorization. |
+| Retired format | No requirement to preserve `viv-cli run vivarium.yaml`, arbitrary payload/matrix DTOs, old public aggregate/cell IDs or download URL shapes in the fresh target. Existing operational data are not deleted or migrated by this decision. |
 
-Existing preservation evidence is in `BuildRestApiTests`, `BuildMutationRestApiTests`,
-`BuildEventStreamTests`, `BuildLeaseTests`, `CliRestClientTests` and `CliTests` (exact due tests
-must be selected in the ledger). The current tests run the legacy implementation, not the candidate
-mapping. R0 must reuse those assertions against the replacement shared domain and add native/compatible
-cross-reads, independent ordinary-run neutrality, alias-collision and restart controls. A model table
-alone does not close that proof or adopt a public identity schema.
+Existing `BuildRestApiTests`, `BuildMutationRestApiTests`, `BuildEventStreamTests`, `BuildLeaseTests`,
+`CliRestClientTests` and `CliTests` remain useful baseline evidence. Port their behavioral/security
+assertions to the catalogue-based replacement; retire format-only assertions with verified removal.
+#113/#114/#115 and #116/#117/#118 own the early delivery and due contributions, with full configuration,
+execution/matrix owners retaining other variants. D39 still forbids removing a working capability
+without its due replacement proof or requiring a later owner's blanket closure before useful integration.
 
-The [physical identity study](../../../tests/Vivarium.DefinitionProof/BuildIdentityPhysicalTests.cs)
-now combines actual legacy native submission/HTTP/TLS/AgentHub and unchanged native `viv-cli`
-cancellation with an isolated PostgreSQL identity candidate. Numeric keys retain native aggregate/cell
-aliases under concurrent registration, rollback and restart; independent ordinary/composite rows get
-no implicit matrix. Standalone Agent/type keys remain stable when the real protocol connection
-generation advances. The legacy Host still returns 404 for candidate numeric Build URLs. This proves
-selected representation and existing-client overlap, not the replacement adapter, real Agent execution,
-import/queue-replacement semantics or artifact/log/SSE preservation. Those exact R0 obligations remain.
+The [earlier physical identity study](../../../tests/Vivarium.DefinitionProof/BuildIdentityPhysicalTests.cs)
+is retained historical feasibility evidence: actual legacy native submit/HTTP/TLS/AgentHub/native
+`viv-cli` plus isolated PG aliases/concurrency/rollback/restart, with legacy numeric URL404. Its
+public alias adapter is no longer a D41 target obligation. It does not prove the required real
+Project/BuildType relation or the new catalogue entry. Standalone Agent/type and in-flight workload
+identity/fencing remain relevant; no original result/receipt is rewritten.
+
+The [D41 catalogue study](../../../tests/Vivarium.DefinitionProof/CatalogIdentityPhysicalTests.cs)
+now compiles the actual committed C# for T3Personal and its three configurations into real catalogue
+and immutable-definition relations in owned PostgreSQL. Concurrent Build allocations remain distinct;
+missing Project/configuration/definition and definition rewrites are rejected. A real source edit
+selects a new plan for a new Build while old input and opaque workload mapping survive PostgreSQL
+restart. This is structural feasibility, not the production catalogue, activation/authentication,
+source timing, concurrent activation, matrix execution or HTTP acceptance. No old result is rewritten.
+
+### D42: truthful OSS entitlement and discovery
+
+The owner selected free OSS capacity with no license-imposed limits. Configured concurrency,
+physical capacity, compatibility/current authorization and runtime budgets still constrain actual
+work. Native discovery identifies Vivarium and its real release; the compatible API profile identifies
+its supported TeamCity REST contract, not a fictitious JetBrains installation. Source server product
+version, REST implementation version and API schema version remain distinct.
+
+Commercial TeamCity key operations have an explicit unsupported/non-success contract, no entitlement
+mutation and no paid-license engine. Keep their discovered rows, source identity, Host ownership and
+negative acceptance in the ledger. This is a D42 compatibility exception, not positive TeamCity key
+conformance or a waiver for other Host/plugin/cloud operations. Exact DTO/unlimited representation,
+current grants and unsupported status/media/body are due before affected exposure. Installed schema
+already declares `licensingData.unlimitedAgents` separately from numeric capacity fields; do not
+invent a numeric unlimited sentinel or copy source entitlement as Vivarium's current state.
+
+The installed `licensingData.serverLicenseType` enum includes `open_source`; use that compatible
+classification with `unlimitedAgents=true`, `unlimitedBuildTypes=true` and `licenseUseExceeded=false`.
+Omit optional finite maxima/remaining-capacity fields rather than inventing a sentinel. Native
+discovery separately names Vivarium and its release. An unlimited license flag is not evidence of
+unlimited physical capacity or support for a separately unimplemented resource such as Pipelines.
+The pinned CLI's summary projection preserves these booleans without requiring numeric maxima.
+Before exposure, freeze current grants and literal JSON/XML/fields/negative responses. These selected
+representation rules do not constitute a reference capture or an implemented endpoint.
 
 ## Definition, settings and source selections
 
-The historical independent server receipt distinguishes source `7ff65cada…` from settings
-`7495b685…`, even though the settings file bytes match. The same VCS root has different source/settings
+The historical independent server receipt distinguishes source `7ff65cadaâ€¦` from settings
+`7495b685â€¦`, even though the settings file bytes match. The same VCS root has different source/settings
 root instances and checkout rules. Never use a manifest-claimed source revision as settings identity.
 
 Represent the requested branch/revision/settings mode and explicit triggering options separately
@@ -217,11 +245,42 @@ without a new source revision/application, so waiting for a nonexistent new impo
 
 ## Acceptance and unresolved work
 
+### Producer and output boundaries selected for early delivery
+
+The value-free pinned interface assessment at
+`artifacts/us013-producer-source-20261102/interface-assessment.json` supplements the earlier
+172-file settings census. Fixed literal searches across eight pinned repositories and both separately
+attributed T3 revisions find 66 source-file occurrences, including tests/documentation. Thirteen files
+contain service-message text and twenty contain TeamCity environment names. These are source facts,
+not an exhaustive runtime denominator or independently observed server effects.
+
+The actual pinned T3 `scripts/personal-release/run.mjs` emits `buildNumber` and `publishArtifacts`;
+its Kotlin wrapper also publishes the actual Prepare log. Preserve the escape rules, display number
+versus identity, on-Agent path containment, real file collection and selected downstream bytes.
+Prepare/Windows/Release keep the attributed no-application-launch and test-repository deltas. The
+other retained drivers additionally emit `importData` JUnit, `setParameter` and block progress;
+`TEAMCITY_VERSION` guards must not silently disable their behavior. SS-EXEC owns execution/environment
+and parsing integration, with SS-RUN display/parameter state, SS-BLOB collected bytes, SS-RES report
+imports and SS-LOG retained raw output. D14/D32 keep messages untrusted and raw reports authoritative;
+receiving message text is not proof of the requested effect. Exact early variants remain due in P0
+before the affected R0/PILOT integration; other drivers remain due before their owner exposes them.
+
+For R0 retained output, select the existing native durable event capability:
+`GET /api/v1/events?topic=build&resourceId=<Build ID>`, with its cursor/Last-Event-ID reconnect and
+current Build access checks. Port the actual bounded stdout and restart assertions, replacing the
+retired public payload identity as D41 permits. The unchanged TeamCity CLI's inspected byte methods
+use REST file/source/archive/icon resources; they do not supply an ordinary Build-log download
+command. Do not invent one to prove the CLI journey. Native output and compatible artifact download
+inspect the same actual Build. Range/archive/source/server-file/avatar and non-REST clients remain
+separately accountable under their full owners, not waived by selecting this R0 output path. Literal
+event/access/effect cases and current-principal joins are still required before the R0 contract freezes.
+
 Supporting business intent: AC-BLD-01/02/03/04/05/07/09/13, AC-CFG-01/02/03/04/05/06,
 AC-AG-02/06, AC-ART-01/03 and affected access/identity AC. TCM-01/02/03/04/05/07/08/10 and their
 exact wire variants are joined per due case, not all declared GREEN by this document.
 
-Before P0 closure: prove the native-ID/matrix mapping against existing clients/fixtures, complete the
+Before P0 closure: adopt the real catalogue Project/BuildType/Build ownership proved by the bounded
+D41 study, retain Agent/workload fences and matrix capability obligations, complete the
 real representation/activation/recovery boundary, freeze exact R0 actor/request/effect/byte cases,
 classify remaining alias/requeue/deleted/permission/race/settings-mode variants by earliest due
 integration, and finish the existing source/ledger/control/debt/review/main gates. Unknown shared or

@@ -12,6 +12,14 @@ identity, collision rollback and restart. The old Host still rejects candidate n
 the study is not a compatible facade or a replacement persistence implementation. It does not prove
 real Agent execution, imported identities, optimized queue replacement, SSE or artifact mapping.
 
+Under D41, that public legacy alias adapter is historical feasibility evidence, not a replacement
+requirement. `CatalogIdentityPhysicalTests` instead compiles real committed C# into Project and
+BuildType catalogue identities and immutable selected definitions in an owned PostgreSQL database.
+It rejects missing owners/definitions and definition rewrites, allocates concurrent Build identities,
+retains old selected input after a real Git edit and PostgreSQL restart, and separately maps an opaque
+Agent workload identity. This proves the bounded structural relationship, not production catalogue
+activation, HTTP, authorization, source timing, concurrent activation or matrix execution.
+
 `TemplateSourceTests` checks the independently observed parameter precedence: local configuration,
 project, then templates in attachment order. It retains declaration readback, managed edits, cold
 revision evaluation and rejected missing/duplicate references. Only template parameters are proven;
