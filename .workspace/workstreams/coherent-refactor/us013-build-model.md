@@ -274,15 +274,24 @@ imports and SS-LOG retained raw output. D14/D32 keep messages untrusted and raw 
 receiving message text is not proof of the requested effect. Exact early variants remain due in P0
 before the affected R0/PILOT integration; other drivers remain due before their owner exposes them.
 
-For R0 retained output, select the existing native durable event capability:
-`GET /api/v1/events?topic=build&resourceId=<Build ID>`, with its cursor/Last-Event-ID reconnect and
-current Build access checks. Port the actual bounded stdout and restart assertions, replacing the
-retired public payload identity as D41 permits. The unchanged TeamCity CLI's inspected byte methods
-use REST file/source/archive/icon resources; they do not supply an ordinary Build-log download
-command. Do not invent one to prove the CLI journey. Native output and compatible artifact download
-inspect the same actual Build. Range/archive/source/server-file/avatar and non-REST clients remain
-separately accountable under their full owners, not waived by selecting this R0 output path. Literal
-event/access/effect cases and current-principal joins are still required before the R0 contract freezes.
+For R0 lifecycle observation, preserve the existing native durable event capability:
+`GET /api/v1/events?topic=build&resourceId=<Build ID>`, with cursor/Last-Event-ID reconnect and
+current Build access checks. **This is not a workload-output capability.** Actual
+`BuildEventData` contains a recovery resource link and an authoritative-GET flag; the event store
+persists matrix transitions and no stdout/stderr bytes. `BuildTracker.GetLog` retains bounded text
+only in memory. Neither proves retained output after restart. The earlier proposed use of the event
+route for output was incorrect and is withdrawn before contract freeze.
+
+SS-LOG's early R0 contribution must instead deliver real bounded durable output bytes and an
+authorized native read/resume resource under the same Build identity. Freeze its literal resource,
+cursor/gap/error/current-access cases before P0 closure; actual storage/Agent receipt/restart/readback
+remain R0 implementation/acceptance work. Port the actual bounded-output assertions and preserve
+D31's control-path priority; byte provenance and durable gaps cannot be replaced by status events.
+The unchanged TeamCity CLI's inspected byte methods use REST file/source/archive/icon resources;
+they do not supply an ordinary Build-log download command. Do not invent one to prove the CLI
+journey. Native output and compatible artifact download must inspect the same actual Build.
+Range/archive/source/server-file/avatar and non-REST clients remain separately accountable under
+their full owners. This correction does not freeze the missing output contract or declare it GREEN.
 
 Supporting business intent: AC-BLD-01/02/03/04/05/07/09/13, AC-CFG-01/02/03/04/05/06,
 AC-AG-02/06, AC-ART-01/03 and affected access/identity AC. TCM-01/02/03/04/05/07/08/10 and their

@@ -6,8 +6,9 @@ and #114/#115 under #113 for R0. Legacy task IDs below are retained source point
 active board; the [task migration](story-task-migration.md) records their transfers.
 Former #36 owns the retained completion/ledger input; former #43 supplies R0 contract input,
 former #42 supplies P0 freeze input and former #44 supplies R0 acceptance input. Existing seven R0
-[contributions](subsystem-contributions.tsv) retain their primary/full owners and empty case IDs
-until independently established cases exist. This Markdown is planning data, not a fixture DSL.
+[contributions](subsystem-contributions.tsv) retain their primary/full owners. Six now link selected
+reference cases; retained output still needs its exact native case. None is frozen or product GREEN.
+This Markdown is planning data, not a fixture DSL.
 
 ## Selected published client
 
@@ -35,6 +36,42 @@ the remaining manifest/model/current-principal/effect/freeze gates remain open. 
 does not block this selected entry.
 
 ## Freeze inputs and required outputs
+
+The selected [R0 access corpus](../../../tests/Vivarium.Tests/TeamCity/Reference/r0-access-observations.json)
+now binds seven exact cases through the existing replay/ledger runner. All 134 exchanges are literal,
+including actual process completion and positive byte controls. Acquisition uses an isolated install
+of published CLI 0.5.6 and its unmodified `TeamCityClient`; private credential bootstrap and the fixed
+schema-backed administrator token DELETE are qualified acquisition steps, not unchanged CLI acceptance.
+
+| Case | Independently observed boundary | R0 contributions |
+|---|---|---|
+| `TCREST-R0-SCOPED-RUN-ARTIFACT-001` | One ordinary finite P-scoped PAT reads its identity/configuration, admits Build 67, observes an actual successful process and downloads exact `owned-r0-smoke\n` bytes, also downloaded by the administrator. | IAM/CFG/RUN/EXEC/BLOB |
+| `TCREST-R0-PROTECTED-SIBLING-BYTES-DENIED-001` | Administrator runs Q Build 68 and downloads the same real file. The unchanged P credential gets 403 for Q configuration, admission, Build and download; administrator Q and ordinary P bytes remain readable. | IAM/RUN/EXEC/BLOB |
+| `TCREST-R0-PROJECT-ACTOR-AGENT-CONTROL-DENIED-001` | P actor's disable request gets 403; administrator reads enabled=true before and after on the actual owned Agent. | IAM/AGT |
+| `TCREST-R0-SCOPED-NONZERO-EXIT-001` | The same actor selects `env.MODE=fail` through normal admission properties. A real exit 7 yields retained finished/FAILURE on administrative and ordinary reads. | IAM/RUN/EXEC |
+| `TCREST-R0-SCOPED-QUEUED-CANCEL-001` | Administrator disables the only owned Agent. The actor sees its actual queued Build, cancels it with `readdIntoQueue=false` and reads retained finished/UNKNOWN history; administrator re-enables the Agent. | IAM/AGT/RUN/EXEC |
+| `TCREST-R0-SCOPED-RUNNING-CANCEL-001` | The same actor selects `env.MODE=long`, observes running before cancel and separately reads retained finished/UNKNOWN. Request acceptance is not substituted for terminal completion. | IAM/AGT/RUN/EXEC |
+| `TCREST-R0-REVOKED-CREDENTIAL-BUILD-BYTES-DENIED-001` | Scoped PAT self-revoke gets 403; authorized administrator DELETE gets 204. The unchanged revoked credential then gets 401 text for existing Build/bytes; administrator still downloads the exact file. | IAM/RUN/BLOB |
+
+Build/Agent/user IDs in these literal transcripts are independent reference identities, not product
+seed values or a new ID allocator. Product bindings remain prerequisite-blocked until the actual
+catalogue, scoped principal, process/artifact and revocation services can reproduce those effects.
+R0 seed identities must map consistently through the existing reference comparison boundary.
+
+The exact selected workload mode input is the ordinary enqueue `properties.property` entry
+`{"name":"env.MODE","value":"fail"}` or `long`; absence selects success. The scoped PAT explicitly
+permits `customize_build_parameters` and `cancel_build` for P as well as its view/run/file permissions.
+This avoids pulling general configuration editing into R0 just to change the smoke process mode.
+The literal setup retains its actual script and fields; it is a Linux reference fixture, not Windows
+evidence. Actual exit, cancellation and history are independent effects, not invented HTTP errors.
+
+The lab's inherited All Users `PROJECT_DEVELOPER` grant was recorded and left unchanged. Explicit
+token restrictions select P and omit Agent control; the fixture adds P `PROJECT_ADMIN`. These cases
+do not establish no-grant denial, project-grant withdrawal, browser/OIDC expiry or full authorization
+equivalence. The separate current-grant corpus remains the evidence for its observed edit/revoke
+boundary. No administrative actor is substituted for the scoped actor in raw product execution.
+The capture verifies project/user/Agent registration/container/network cleanup and restores private
+CLI gates. Failed preparation attempts and the earlier self-revoke diagnostic remain separate.
 
 #32 supplies verified identity/state/provenance traces; #33/#35 acquire independent reference
 expectations; #34 supplies the approved C#/Git source representation. For every step below, #36
@@ -97,7 +134,7 @@ a JSON body exists. Freeze download media/headers from the actual chosen client 
 | Queued cancel / work prevented from starting | POST `/buildQueue/id:N?fields=<buildFields>`, body `{"readdIntoQueue":false}` plus optional string comment | Reference-defined cancel response/terminal projection, no later process start, consistent queue/history/native readback. Establish effects rather than assume request acceptance means cancellation completed. | RUN → #38 |
 | Running cancel / long process confirmed started | POST `/builds/id:N?fields=<buildFields>`, same cancel body | Durable intent/delivery, actual Agent stop, reference-defined terminal result and capacity release. Establish raced finish/stop outcome independently; never force successful cancellation of already-completed work. | RUN/EXEC/AGT → #38 |
 | Artifact / known completed Build N | GET `/builds/id:N/artifacts?resolveParameters=false&logBuildUsage=false&locator=<fileLocator>&fields=count,file(name,size,modificationTime)`; GET `/builds/id:N/artifacts/files/smoke.txt?resolveParameters=false&logBuildUsage=false` | Selected unchanged `files artifacts list/download` commands, observed metadata/media/status and exact retained bytes/hash. This client uses `/files/`, not an assumed `/content/` route. R can download P's allowed bytes; denied Q download/control yields no protected content/effect. | BLOB → #38/#44 |
-| Retained output / same Build | Delivered native output path or independently sourced unchanged-client log request, still to select/freeze | Recognizable actual stdout retained and readable after restart with current permission checks. Generic “raw output” is not a frozen compatible log-download contract; full log search remains R4. | LOG → #38/#44 |
+| Retained output / same Build | Separate native bounded durable output resource, still to select/freeze; `/api/v1/events` carries lifecycle transitions only | Recognizable actual stdout retained and readable after restart with current permission checks. Current `BuildEventData` contains no stdout and `BuildTracker.GetLog` is memory-only. Neither proves this obligation; full log search remains R4. | LOG → #38/#44 |
 | Recovery / owned work and completed bytes | Repeat the same ordinary read/poll/download around controlled Host restart and Agent disconnect/reconnect | Stable identities, truthful occupied/terminal state, immutable actually resolved input/Agent provenance, no duplicate execution/result acceptance, retained output/bytes and owned cleanup. | #14 R0.3 with #15/#38/#44 |
 
 Installed Build.id is int64; the unchanged CLI additionally requires a positive safe integer.

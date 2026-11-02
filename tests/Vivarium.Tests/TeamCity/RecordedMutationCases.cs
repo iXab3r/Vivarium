@@ -73,13 +73,10 @@ public sealed record RecordedMutationCase(string Id, IReadOnlyList<RecordedExcha
 
     public async Task ExecuteAsync(HttpClient http, bool replay)
     {
+        if (!replay && Exchanges.Any(exchange => exchange.Actor != "admin"))
+            throw new InvalidOperationException("A native administrator cannot stand in for a restricted TeamCity actor.");
         foreach (var exchange in Exchanges)
         {
-            if (!replay)
-            {
-                Assert.That(exchange.Actor, Is.EqualTo("admin"),
-                    "a native administrator cannot stand in for a restricted TeamCity actor");
-            }
             TestContext.Out.WriteLine($"{Id}: {exchange.Actor} {exchange.Method} {exchange.PathAndQuery}; reference {(int)exchange.Expected.Status}");
             using var request = exchange.Request(replay ? "fixture-" + exchange.Actor : null);
             using var response = await http.SendAsync(request);
@@ -97,6 +94,7 @@ internal static class RecordedMutationCases
     public static IEnumerable<RecordedMutationCase> StoryObservations => Load("us013-observations.json");
     public static IEnumerable<RecordedMutationCase> ModeObservations => Load("versioned-mode-observations.json");
     public static IEnumerable<RecordedMutationCase> CurrentGrantObservations => Load("current-grant-observations.json");
+    public static IEnumerable<RecordedMutationCase> R0AccessObservations => Load("r0-access-observations.json");
     public static IEnumerable<RecordedMutationCase> TemplateObservations => Load("template-observations.json");
     public static IEnumerable<RecordedMutationCase> ReportedBuildObservations => Load("reported-build-observations.json");
     public static IEnumerable<RecordedMutationCase> ApprovalObservations => Load("approval-observations.json");
