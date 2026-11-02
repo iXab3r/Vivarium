@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Client;
 using OpenIddict.Server;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using Vivarium.Controller.Auditing;
 
 namespace Vivarium.Controller.Identity;
 
@@ -17,7 +18,19 @@ public static class VivariumIdentityRegistration
     /// <summary>Register the single framework identity stack without reading unrestored node credentials.</summary>
     public static IServiceCollection AddVivariumIdentity(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddIdentity<VivariumUser, IdentityRole<Guid>>()
+        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<RuntimeRequestContext>();
+        services.AddScoped<PostgresAuditStore>();
+        services.AddScoped<CurrentAccess>();
+        services.AddScoped<RuntimeIdentity>();
+        services.AddScoped<TeamCityAccessService>();
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+        }).AddIdentityCookies();
+        services.AddIdentityCore<VivariumUser>()
             .AddEntityFrameworkStores<VivariumDbContext>().AddDefaultTokenProviders()
             .AddSignInManager<VivariumSignInManager>();
         services.ConfigureApplicationCookie(options =>
@@ -53,7 +66,9 @@ public static class VivariumIdentityRegistration
         });
         services.AddSingleton<VivariumIdentityKeys>();
         services.AddOpenIddict()
-            .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<VivariumDbContext>())
+            // Framework writes share application audit transactions. A rolled-back transaction
+            // must never leave a positive/revoked entry in an out-of-transaction entity cache.
+            .AddCore(options => options.DisableEntityCaching().UseEntityFrameworkCore().UseDbContext<VivariumDbContext>())
             .AddServer(options => options.UseAspNetCore())
             .AddClient(options =>
             {

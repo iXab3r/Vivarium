@@ -9,6 +9,8 @@ using OpenIddict.Abstractions;
 using OpenIddict.Client.AspNetCore;
 using OpenIddict.EntityFrameworkCore.Models;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Persistence;
 
 namespace Vivarium.Controller.Tokens.Pages;
 
@@ -16,7 +18,8 @@ namespace Vivarium.Controller.Tokens.Pages;
 [Authorize(Policy = VivariumTokenProfile.OrdinaryUserPolicy)]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class TokensModel(UserManager<VivariumUser> users, IOpenIddictTokenManager tokens,
-    IOpenIddictApplicationManager applications, IConfiguration configuration) : PageModel
+    IOpenIddictApplicationManager applications, IConfiguration configuration,
+    VivariumDbContext database, PostgresAuditStore audits, RuntimeRequestContext requestContext, TimeProvider time) : PageModel
 {
     public List<TokenRow> Entries { get; } = [];
     public int LifetimeCap => configuration.GetValue<int>("Vivarium:Identity:TokenLifetimeDays");
@@ -76,7 +79,12 @@ public sealed class TokensModel(UserManager<VivariumUser> users, IOpenIddictToke
         var token = await VivariumTokenEndpoints.OwnEntryAsync(id, user.Id.ToString(), tokens, applications,
             HttpContext.RequestAborted);
         if (token is null) return NotFound();
+        await using var transaction = await database.Database.BeginTransactionAsync(HttpContext.RequestAborted);
         if (!await tokens.TryRevokeAsync(token, HttpContext.RequestAborted)) return StatusCode(503);
+        audits.Stage(AuditEventDraft.Create(requestContext.ForUser(user.Id, "identity-cookie", "my-keys"),
+            time.GetUtcNow(), "credential.revoke", "oauth-token", id));
+        await database.SaveChangesAsync(HttpContext.RequestAborted);
+        await transaction.CommitAsync(HttpContext.RequestAborted);
         return LocalRedirect("/Identity/Account/Manage/Tokens");
     }
 

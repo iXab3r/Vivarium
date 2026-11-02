@@ -1,7 +1,7 @@
 # Identity and TeamCity authorization
 
 > Status: **Accepted — D34, 2026-10-31**
-> Implementation: **Legacy foundation exists; D34 replacement is not implemented**
+> Implementation: **Legacy foundation exists; fresh D34 Host/IAM delivery is in progress**
 > Maintainers: User Roles, Admin/SuperUser, REST, Security
 > Related: [Architecture](../ARCHITECTURE.md) D23, D26, D33–D35
 
@@ -19,11 +19,30 @@ configuration, not a second live RBAC authority. This explicitly replaces the ol
 
 ## Current implementation
 
-The shipped source still uses SQLite, custom local password verification, panel cookies, Git User
+The legacy entry still uses SQLite, custom local password verification, panel cookies, Git User
 and built-in RoleBinding projections, legacy admin/submit tokens, and a setup/recovery saga. A common
 evaluator and audit boundary already exist. General role/group CRUD, full project inheritance and
 the D34 Identity/OIDC model do not. Preserve boundary/invariant tests while replacing these mechanisms;
 do not describe the accepted target as working functionality.
+
+The fresh R0 Host now composes stock `IdentityCore`, Identity authentication cookies and
+OpenIddict over PostgreSQL. Its scoped TeamCity roles, permission and included-role relations,
+direct grants and All Users contributions are separate application tables; unused framework
+global-role tables are removed only when empty. Current access rereads eligibility and role data,
+without an immutable SYSTEM_ADMIN floor. This is component-level implementation, not completed
+authorized role management, nested-group support, REST conformance or story acceptance.
+
+The common R0 service can edit direct role permissions, grant/withdraw global user roles and
+enable/disable ordinary accounts with current checks and the same PostgreSQL audit transaction.
+Its model tests include delegation, immediate loss of removed administrator permissions and a
+failed audit that rolls back a grant. These are service effects; normal Access UI entry and project
+delegation remain due. The native current-account read resolves one framework credential and
+rereads eligibility, without falling back from an explicit bearer to a browser cookie.
+
+Native My keys issuance wraps framework entry creation/metadata and audit in one EF transaction
+before disclosure. Stock authorization-code consumption remains before that transaction, including
+on a later failed issuance. Revocation shares its mutation/audit transaction. OpenIddict entity
+caching is disabled so rollback cannot leave a committed-looking credential status in that cache.
 
 ## TeamCity parity contract
 

@@ -123,12 +123,72 @@ public sealed class RuntimeHostPhysicalTests
             try
             {
                 Assert.That((await http.GetAsync("/health/ready")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That((await http.GetAsync("/identity.css")).StatusCode, Is.EqualTo(HttpStatusCode.OK),
+                    "The explicit Host build must include the stylesheet linked by its account pages.");
+                using (var anonymous = await http.GetAsync("/api/v1/users/current"))
+                {
+                    Assert.That(anonymous.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+                    Assert.That(anonymous.Headers.Location, Is.Null);
+                    Assert.That(anonymous.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/problem+json"));
+                    using var problem = JsonDocument.Parse(await anonymous.Content.ReadAsStringAsync());
+                    Assert.That(problem.RootElement.GetProperty("code").GetString(), Is.EqualTo("authentication_required"));
+                }
                 foreach (var path in new[] { "/objects", "/objects/", "/OBJECTS" })
                     Assert.That((await http.GetAsync(path)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
                 Assert.That((await http.GetAsync(storageOrigin + "/health/live")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
                 oldPassword = capture.Password ?? throw new InvalidOperationException("Private startup disclosure absent.");
                 var login = await LoginAsync(http, oldPassword);
                 Assert.That(login.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+                using (var current = await http.GetAsync("/api/v1/users/current"))
+                {
+                    Assert.That(current.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    using var account = JsonDocument.Parse(await current.Content.ReadAsStringAsync());
+                    Assert.That(account.RootElement.GetProperty("teamCityId").GetInt64(), Is.Positive);
+                }
+                using (var explicitCredential = new HttpRequestMessage(HttpMethod.Get, "/api/v1/users/current"))
+                {
+                    explicitCredential.Headers.Authorization = new("Bearer", "owned-invalid");
+                    using var mixed = await http.SendAsync(explicitCredential);
+                    Assert.That(mixed.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized),
+                        "An invalid explicit credential cannot inherit the installation cookie.");
+                }
+                await using (var state = new VivariumDbContext(new DbContextOptionsBuilder<VivariumDbContext>()
+                    .UseNpgsql(postgres.ConnectionString).Options))
+                {
+                    Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"),
+                        Is.EqualTo(1));
+                    await state.Database.ExecuteSqlRawAsync("""
+                        CREATE FUNCTION public.owned_reject_signin_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+                        BEGIN RAISE EXCEPTION 'Owned audit sink fault' USING ERRCODE = '23514'; END $$;
+                        CREATE TRIGGER "Owned_AuditSinkFault" BEFORE INSERT ON "AuditEvents"
+                            FOR EACH ROW EXECUTE FUNCTION public.owned_reject_signin_audit();
+                        """);
+                    try
+                    {
+                        using var freshHandler = new HttpClientHandler
+                        {
+                            AllowAutoRedirect = false, CookieContainer = new CookieContainer(),
+                            ServerCertificateCustomValidationCallback = (_, remote, _, _) => remote is not null
+                                && remote.Thumbprint == certificate.Thumbprint,
+                        };
+                        using var fresh = new HttpClient(freshHandler) { BaseAddress = new Uri(origin), Timeout = TimeSpan.FromSeconds(15) };
+                        using var rejected = await LoginAsync(fresh, oldPassword);
+                        Assert.That(rejected.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+                        Assert.That(freshHandler.CookieContainer.GetCookies(new Uri(origin)).Cast<Cookie>()
+                            .Any(cookie => cookie.Name.Contains("Identity.Application", StringComparison.Ordinal)), Is.False);
+                        Assert.That(rejected.Headers.TryGetValues("Set-Cookie", out var cookies)
+                            && cookies.Any(value => value.Contains("Identity.Application", StringComparison.Ordinal)), Is.False);
+                        Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"),
+                            Is.EqualTo(1));
+                    }
+                    finally
+                    {
+                        await state.Database.ExecuteSqlRawAsync("""
+                            DROP TRIGGER "Owned_AuditSinkFault" ON "AuditEvents";
+                            DROP FUNCTION public.owned_reject_signin_audit();
+                            """);
+                    }
+                }
                 Assert.That((await http.GetAsync("/Identity/Account/Manage/Tokens")).StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
                 Assert.That((await http.GetAsync("/Identity/Account/Login?ReturnUrl=https://example.invalid/")).StatusCode,
                     Is.EqualTo(HttpStatusCode.BadRequest));

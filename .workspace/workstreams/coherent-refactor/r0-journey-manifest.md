@@ -1,7 +1,7 @@
 # R0 request, principal, seed and effect manifest
 
-Status: **Selected R0 contract frozen for the P0 candidate; product bindings remain UNBOUND or
-prerequisite-blocked, not GREEN. Independent P0 acceptance/main delivery is still pending.**
+Status: **Selected R0 contract delivered with P0 on main `403d9be`; R0 product bindings remain
+UNBOUND or prerequisite-blocked, not GREEN. GitHub #113/#114/#115 own current R0 delivery.**
 The mechanically checked [scope](r0-contract-scope.json) selects six complete reference workflows
 and [22 specified native/integration variants](r0-contract-variants.tsv), with all seven existing
 R0 contributions joined in [the contribution register](subsystem-contributions.tsv). These are

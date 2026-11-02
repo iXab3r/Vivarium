@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using OpenIddict.Client;
 using OpenIddict.Server;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Auditing;
 
 namespace Vivarium.Controller.Identity;
 
@@ -51,6 +52,11 @@ internal static class VivariumIdentityStartup
             Require(await users.SetLockoutEndDateAsync(user, null));
             Require(await users.ResetAccessFailedCountAsync(user));
         }
+        services.GetRequiredService<PostgresAuditStore>().Stage(AuditEventDraft.Create(
+            services.GetRequiredService<RuntimeRequestContext>().ForSystem("identity-startup"),
+            services.GetRequiredService<TimeProvider>().GetUtcNow(), "account.installation.configure", "user",
+            user.Id.ToString(), details: new Dictionary<string, string> { ["enabled"] = enabled ? "true" : "false" }));
+        await database.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         // D34's explicit private startup disclosure, after the framework hash is durably committed.
         if (password is not null)

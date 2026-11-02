@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../submodules/EyeAuras.Automation/src/EyeAuras.Automation.Cli/EyeAuras.Automation.Cli.csproj" />
+    <ProjectReference Include="../../submodules/EyeAuras.Automation/src/EyeAuras.Automation.Playwright/EyeAuras.Automation.Playwright.csproj" />
+  </ItemGroup>
+</Project>

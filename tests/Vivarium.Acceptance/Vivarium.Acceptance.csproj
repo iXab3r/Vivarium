@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><IsTestProject>true</IsTestProject><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Vivarium.Controller/Vivarium.Controller.csproj" />
+    <ProjectReference Include="../../submodules/EyeAuras.Automation/src/EyeAuras.Automation/EyeAuras.Automation.csproj" />
+    <ProjectReference Include="../../submodules/EyeAuras.Automation/src/EyeAuras.Automation.Playwright/EyeAuras.Automation.Playwright.csproj" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+</Project>

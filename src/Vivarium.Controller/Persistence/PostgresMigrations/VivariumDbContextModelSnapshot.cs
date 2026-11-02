@@ -22,57 +22,6 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -118,21 +67,6 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -362,6 +296,194 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Auditing.PersistentAuditEvent", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .UseCollation("C");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("ActorId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .UseCollation("C");
+
+                    b.Property<string>("ActorType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("BaseRevision")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CorrelationId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("CredentialKind")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("DetailsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Outcome")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("ReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RequestId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ResultRevision")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TargetId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .UseCollation("C");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceivedAt", "Id");
+
+                    b.ToTable("AuditEvents", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AuditEvents_Details", "length(\"DetailsJson\"::text) <= 4096");
+
+                            t.HasCheckConstraint("CK_AuditEvents_Outcome", "\"Outcome\" IN ('SUCCEEDED', 'DENIED', 'FAILED', 'NO_CHANGE')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.GroupRoleGrant", b =>
+                {
+                    b.Property<string>("GroupKey")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("Scope")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("GroupKey", "RoleId", "Scope");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("GroupRoleGrants");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.IncludedRole", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("IncludedRoleId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("RoleId", "IncludedRoleId");
+
+                    b.HasIndex("IncludedRoleId");
+
+                    b.ToTable("IncludedRoles");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.RolePermission", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("PermissionId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.TeamCityGroup", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.TeamCityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.UserRoleGrant", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("Scope")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("UserId", "RoleId", "Scope");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRoleGrants");
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Identity.VivariumUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -446,15 +568,6 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("Vivarium.Controller.Identity.VivariumUser", null)
@@ -466,21 +579,6 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Vivarium.Controller.Identity.VivariumUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Vivarium.Controller.Identity.VivariumUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -519,6 +617,60 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.GroupRoleGrant", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.IncludedRole", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityRole", null)
+                        .WithMany()
+                        .HasForeignKey("IncludedRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.RolePermission", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Identity.UserRoleGrant", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Identity.TeamCityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Identity.VivariumUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>

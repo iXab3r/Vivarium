@@ -8,6 +8,10 @@ using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using OpenIddict.Server;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using Microsoft.EntityFrameworkCore;
+using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Identity;
+using Vivarium.Controller.Persistence;
 
 namespace Vivarium.Controller.Tokens;
 
@@ -16,6 +20,7 @@ internal static class VivariumTokenRegistration
 {
     public static IServiceCollection AddVivariumTokens(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<TokenIssuanceTransaction>();
         services.AddSingleton<IAuthorizationHandler, TokenUserRequirement>();
         services.AddAuthorization(options => options.AddPolicy(VivariumTokenProfile.OrdinaryUserPolicy,
             policy => policy.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme)
@@ -64,9 +69,17 @@ internal static class VivariumTokenRegistration
                 .SetAuthorizationEndpointUris("/connect/authorize").SetTokenEndpointUris("/connect/token")
                 .RegisterScopes(VivariumTokenProfile.Scope);
             options.UseAspNetCore().EnableAuthorizationEndpointPassthrough().EnableTokenEndpointPassthrough();
+            // Preserve stock code consumption on a later failure; only new entry creation is
+            // transactional with application audit. Orders follow the pinned 7.5.0 pipeline.
+            options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(handler => handler
+                .UseScopedHandler<BeginTokenIssuance>()
+                .SetOrder(OpenIddictServerHandlers.RedeemTokenEntry.Descriptor.Order + 500));
             options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(handler => handler
                 .UseScopedHandler<PersistTokenLabel>()
                 .SetOrder(OpenIddictServerHandlers.GenerateAccessToken.Descriptor.Order + 500));
+            options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(handler => handler
+                .UseScopedHandler<CommitTokenIssuance>()
+                .SetOrder(OpenIddictServerHandlers.AttachSignInParameters.Descriptor.Order - 500));
         }).AddClient(options =>
         {
             options.AddEventHandler<OpenIddictClientEvents.ProcessAuthenticationContext>(handler => handler
@@ -107,6 +120,8 @@ internal static class VivariumTokenRegistration
 
     public static async Task InitializeVivariumTokensAsync(this IServiceProvider services, CancellationToken cancellationToken)
     {
+        var database = services.GetRequiredService<VivariumDbContext>();
+        await using var transaction = await database.Database.BeginTransactionAsync(cancellationToken);
         var configuration = services.GetRequiredService<IConfiguration>();
         var applications = services.GetRequiredService<IOpenIddictApplicationManager>();
         var client = services.GetRequiredService<IOptionsMonitor<OpenIddictClientOptions>>().CurrentValue;
@@ -132,5 +147,11 @@ internal static class VivariumTokenRegistration
         var application = await applications.FindByClientIdAsync(VivariumTokenProfile.Client, cancellationToken);
         if (application is null) await applications.CreateAsync(descriptor, cancellationToken);
         else await applications.UpdateAsync(application, descriptor, cancellationToken);
+        services.GetRequiredService<PostgresAuditStore>().Stage(AuditEventDraft.Create(
+            services.GetRequiredService<RuntimeRequestContext>().ForSystem("identity-startup"),
+            services.GetRequiredService<TimeProvider>().GetUtcNow(), "oauth-client.configure", "oauth-client",
+            VivariumTokenProfile.Client));
+        await database.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
     }
 }

@@ -3,11 +3,13 @@ using Vivarium.Controller.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Vivarium.Controller.Auditing;
 
 namespace Vivarium.Controller.Identity;
 
 /// <summary>Atomically provision a passwordless user plus stock issuer/subject login; never link by email.</summary>
-public sealed class VivariumExternalUsers(VivariumDbContext database, UserManager<VivariumUser> users)
+public sealed class VivariumExternalUsers(VivariumDbContext database, UserManager<VivariumUser> users,
+    PostgresAuditStore audits, RuntimeRequestContext context, TimeProvider time)
 {
     /// <summary>Resolve an already validated trusted binding, or create it with no password, roles or private rights.</summary>
     public async Task<VivariumUser> FindOrCreateAsync(string issuer, string subject, string? displayName,
@@ -35,6 +37,9 @@ public sealed class VivariumExternalUsers(VivariumDbContext database, UserManage
                     ?? throw new InvalidOperationException("External login could not be resolved.");
             }
             Require(login);
+            audits.Stage(AuditEventDraft.Create(context.ForUser(user.Id, "external-oidc", "oidc-provisioning"),
+                time.GetUtcNow(), "account.provision", "user", user.Id.ToString()));
+            await database.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return user;
         }

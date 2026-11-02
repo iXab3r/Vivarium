@@ -32,6 +32,12 @@ public static class VivariumRuntime
             options.Configure(builder.Configuration.GetSection("Kestrel"), reloadOnChange: false));
         builder.Services.DeferVivariumIdentityPreload();
         var app = builder.Build();
+        app.UseExceptionHandler(errors => errors.Run(context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.Headers.CacheControl = "no-store";
+            return Task.CompletedTask;
+        }));
         var storageEndpoint = new object();
         app.MapLocalStorage().WithMetadata(storageEndpoint);
         app.UseRouting();
@@ -59,6 +65,7 @@ public static class VivariumRuntime
         app.UseAuthorization();
         app.UseRateLimiter();
         app.MapVivariumIdentity();
+        RuntimeIdentity.Map(app);
         app.MapVivariumTokens();
         app.MapGet("/health/live", () => Results.Text("Healthy"));
         app.MapGet("/health/ready", async (VivariumDbContext database, CancellationToken cancellationToken) =>

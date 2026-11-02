@@ -264,6 +264,17 @@ dummy endpoints before the corresponding Agent API capabilities and safety contr
 may display planned sections from static product metadata; an endpoint that always returns “not
 implemented” is not a useful contract.
 
+### 4.2.1 Current account in the fresh Host
+
+The fresh R0 Host exposes `GET /api/v1/users/current` as a read of the current eligible
+Identity account: `id` (Guid), `teamCityId` (durable int64), `userName` and nullable
+`displayName`. This native projection is distinct from compatible TeamCity user DTOs.
+It uses the normal Identity application cookie or a validated native OpenIddict bearer
+with `vivarium_api` scope. Any explicit Authorization header selects bearer authentication
+without falling back to a cookie. Missing, invalid, expired, revoked or disabled-account
+credentials receive the existing native `authentication_required` Problem Details/401;
+responses are no-store. No role claims or new user/token authority are introduced.
+
 ### 4.3 Errors
 
 Errors follow RFC 9457 Problem Details and add stable machine-readable Vivarium fields:

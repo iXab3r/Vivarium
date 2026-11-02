@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Hosting/Schemas/*.json" />
+    <Content Update="wwwroot/identity.css" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
