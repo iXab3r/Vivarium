@@ -5,6 +5,36 @@ acceptance target or a second reference model. The source declarations, evaluato
 algorithm are experimental candidates; replacement Host, Chiral and ordinary OIDC are absent.
 Passing this target cannot accept a milestone or turn a raw REST case GREEN.
 
+`IsolatedCompilerTests` proves D43's newly accepted Linux/Docker boundary separately from the
+historical trusted-source studies. It compiles actual Git-selected C# and runs ordinary computations
+inside fresh non-root containers with no network/Host mounts/credentials, a read-only root, dropped
+capabilities, no-new-privileges and private bounded tmpfs. Fixed study budgets are one CPU, 512 MiB
+memory with no extra swap, 128 processes, 128 MiB work plus 32 MiB `/tmp`, 256 KiB source and 64 KiB
+combined output; the usual invocation deadline is 30 seconds. These are measured study inputs,
+not a frozen public SDK or independently proven production admission policy.
+
+The study pins the available official SDK **10.0.401** image by immutable digest in
+`IsolatedCompilerStudy.cs`. That compiler pin is separate from the repository's Windows SDK
+10.0.303; do not relabel the older source studies as executions under this image. It uses a trusted
+SDK-only project and an empty package-source list, with compilation and execution both inside the
+container. Repository MSBuild files, paths and oversized input are rejected before container creation.
+No runtime image pull, external package feed, bind mount, Docker socket or Host environment forwarding
+is available to the author code.
+
+Negative evidence includes real Host-file/environment/privilege attempts with intact positive
+controls, an independently reachable TCP receiver blocked by network-none, CPU deadline, output
+flood, unmanaged-memory cgroup OOM and process fanout. Separate cases reject compilation/nonzero/
+malformed-output failure and reconcile a still-running container after killing the actual coordinator
+worker. The latter uses a pre-launch owned descriptor; it is not the production PG operation journal.
+Output and containers are bounded/removed even on rejection. Container cleanup verifies immutable
+identity and invocation ownership before deletion; a stalled attach is closed before management stop.
+
+Select `--filter FullyQualifiedName~IsolatedCompilerTests` for this boundary. Docker Desktop Linux
+containers on the current Windows coordinator are the proved platform; no native Windows/macOS
+sandbox, hostile-kernel protection, catalogue activation, public evaluator endpoint or production
+global concurrency/restart integration is accepted by these tests. A separate same-user process
+remains insufficient. The other source experiments below continue to use known trusted fixtures.
+
 `BuildIdentityPhysicalTests` additionally uses the real legacy Host, pinned TLS, bounded AgentHub
 enrollment/reconnect and unchanged native `viv-cli` cancellation. Its isolated PostgreSQL identity
 study checks numeric/native matrix aliases, ordinary/composite separation, standalone Agent/type

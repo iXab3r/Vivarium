@@ -1349,6 +1349,44 @@ client behavior before exposing the affected Host surface; do not invent a numer
 or a successful key response from generic metadata. Other server/plugin/cloud operations are not
 waived by this decision. No licensing endpoint is implemented or accepted by this decision.
 
+### D43. Compile and evaluate project C# inside an isolated Linux container
+
+Accepted owner decision, 2026-11-02. Ordinary project authors may write C# definitions without
+receiving the Host process's authority. Both compilation and evaluation run in an isolated
+Linux/Docker evaluator, not in the Host or a child under its OS principal. The evaluator has no
+network, Host-data mounts, Docker socket, database/Git/Storage credentials or inherited Host
+environment. A separate same-user process and a compilation deadline alone are not this boundary.
+
+The trusted coordinator selects immutable committed source bytes and typed non-secret context,
+then supplies only that bounded input to a fresh non-root container. It owns the compiler project,
+entry point, SDK/dependency image digest and invocation; repository-supplied MSBuild projects,
+targets, hooks, package feeds and executable restore steps are not trusted build instructions.
+Resolve and pin approved dependencies outside author-code execution. Evaluation performs no online
+restore or implicit external lookup; preparing those dependencies must not execute untrusted
+package/MSBuild instructions on the Host either. A read-only image and private disposable writable storage,
+dropped capabilities/no privilege escalation, private namespaces and enforced CPU, memory, process,
+input, output, storage, concurrency and elapsed-time bounds contain each invocation.
+
+Output is untrusted bounded data. The Host validates schema, ownership, references, secret-reference
+authority and current caller permissions before publishing any plan; compiler success or JSON from
+author code cannot grant authority. Persist the selected control/settings/context revisions,
+compiler/dependency image identity and actual validated immutable plan. Arbitrary C# can be
+nondeterministic; do not claim source bytes alone guarantee identical reevaluation or let later
+reevaluation rewrite historical plans. Evaluation cannot resolve secret values.
+
+Cancellation, timeout, output/resource failure, invalid output and coordinator restart must stop
+and reconcile the owned container, reject the candidate and retain the prior active plan. No
+failure silently falls back to Host execution. Docker/evaluator unavailability is an explicit
+readiness/evaluation failure. The evaluator is not a fleet Agent, provider or second catalogue;
+Git/PG activation, authorization and TeamCity mode/completion semantics keep their existing owners.
+
+The initial delivery uses the available Linux/Docker boundary from the Windows Host; do not claim
+native Windows/macOS isolation or a VM-grade boundary against kernel/daemon compromise. Pin and
+verify the actual platform/runtime and image; numerical budgets and hostile-input evidence are due
+before affected exposure. Existing trusted-source experiments remain historical feasibility evidence,
+not proof of this isolation. P0 proves the boundary; production integration remains behind the P0
+gate. This decision does not waive permitted TeamCity edits, language mappings or other D36 gates.
+
 ## 5. Protocol sketch
 
 ```proto

@@ -193,6 +193,10 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D42 adopts free OSS capacity without license-imposed limits and explicitly unsupported commercial
   TeamCity key operations. Keep that owner-approved exception visible in source allocation and negative
   acceptance; unsupported is not positive conformance. Other compatibility obligations remain.
+- D43 isolates compilation and execution of project C# inside Linux/Docker, without network, Host
+  data or credentials and with resource/time/output bounds. The coordinator owns pinned compiler/
+  dependency inputs and validates untrusted output under current authority; no same-user Host fallback.
+  Existing trusted-source studies are not isolation or production-evaluator acceptance.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

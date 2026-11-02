@@ -58,6 +58,7 @@ controller or hypervisor.
 | Agent → controller | hello facts, inventory, logs, status, results, artifacts | agent identity, session fencing, schemas, size bounds, output escaping, provenance |
 | Controller → agent | build and AgentExplorer operations | pinned TLS, authenticated session, durable lease, operation policy, idempotency, deadline |
 | Git remote → controller | refs, commits, trees, metadata, hooks/config | safe invocation, credential isolation, immutable revision, size/path limits, optional signature policy |
+| Project C# → evaluator | committed source and typed non-secret context | D43 Linux/Docker isolation for compilation and execution; no network, Host data or credentials; non-root, resource/output bounds and owned cleanup |
 | Build submitter → agent OS | payloads, commands, environment, globs | target authorization, trust class, path hardening, timeout/quota, secret minimization |
 | Agent OS → filesystem/process manager | files, exec, terminate, software changes | allowed roots/targets, canonical identity, policy, privilege gate, audit |
 | Browser → controller | cookies, mutations, rendered logs/results | HttpOnly/Secure cookies, CSRF, restrictive CORS, CSP, escaping, object authorization |
@@ -214,6 +215,14 @@ Mutations start disabled by default:
   Git signature counts only when its signer is mapped to the required Vivarium authority.
 
 ### S8. REST and browser security from day one
+
+D43 isolates project C# compilation and evaluation from the Host. A trusted coordinator supplies
+bounded committed source to a pinned Linux/Docker image with no network, Host mounts, Docker socket
+or inherited Host secrets. It controls the build project/dependencies and validates the returned
+plan as untrusted data. Container CPU/memory/process/storage/time/output bounds and cancellation/
+restart cleanup are mandatory; failure retains last-known-good settings and never runs C# on Host
+as a fallback. The Docker daemon and kernel remain trusted infrastructure. Existing trusted-source
+process studies prove neither this isolation nor a production evaluator.
 
 - Native REST uses versioned resource paths; compatible REST preserves its frozen TeamCity wire.
   Both use the same current domain authorization decisions as any remaining gRPC adapter. Authentication is

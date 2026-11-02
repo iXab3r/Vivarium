@@ -254,6 +254,18 @@ without a new source revision/application, so waiting for a nonexistent new impo
 
 ## Acceptance and unresolved work
 
+### D43: project C# evaluation boundary
+
+The owner accepted isolated Linux/Docker evaluation, without network, Host data or secrets and with
+time, memory and output bounds. Both compilation and execution are inside that boundary; ordinary
+project authors need no Host-admin trust. The coordinator owns the pinned compiler/dependency image,
+trusted build project and immutable source selection, then validates returned data under current
+ownership/permission rules before activation. No Host-execution fallback is allowed. Exact resource
+bounds, negative evidence and descriptor-based restart cleanup passed fourteen actual boundary
+checks, retained in `us013-isolation-results.json`. This is not production adoption or closure of
+the remaining source/mode/ownership contract. Historical same-user trusted-source
+experiments keep their original limits. The concrete owner question is resolved by D43.
+
 ### Producer and output boundaries selected for early delivery
 
 The value-free pinned interface assessment at

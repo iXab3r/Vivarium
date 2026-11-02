@@ -95,6 +95,16 @@ Secret references may be versioned; values, password hashes, tokens and private 
 Git validation cannot authorize a secret merely because its reference parses. Resolution checks
 current access and the workload's intended scope. Native and compatible mutations share these rules.
 
+D43 runs both compilation and evaluation of project-authored C# inside an isolated Linux/Docker
+evaluator. Git acquisition and credentials stay with the trusted coordinator. Supply only bounded
+committed source and typed non-secret context; no repository-controlled MSBuild/restore instructions,
+network, Host mounts or secret values. Pin compiler/dependency image provenance with the selected
+revision set and immutable validated plan. Evaluation is not activation; resource/timeout/output or
+coordinator failure retains the previous active plan and reconciles the owned container. A private
+temporary process under the Host user is not this boundary. Existing trusted source studies retain
+their narrower claims; numerical budgets, actual hostile-input evidence and production integration
+have their own gates.
+
 ## Reconciliation, rollback and degraded behavior
 
 Use stable resource IDs, separate configuration revisions from runtime row versions, and keep the
