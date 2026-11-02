@@ -1,5 +1,10 @@
 # Queue, capture timing and authoring reference findings
 
+**2026-11-02 continuation:** [mode/context/concurrency captures](us013-mode-concurrency.md) add
+the actual six-cell parameter-editability matrix, context-dependent read-only/effective-input
+observations and repeated concurrent writes. This narrows the authoring gaps below, not build-time
+selection/defaults, current grants, hierarchy or a deterministic concurrent-replacement oracle.
+
 **Subsequent execution:** [US-013 P0 observations](us013-p0-execution.md) now include real owned-Agent
 lifecycle/bytes, separate definition/source timing fixtures and generated/manual/computed Kotlin
 REST edits with source commits. Use their exact contexts and limits; they do not freeze a universal

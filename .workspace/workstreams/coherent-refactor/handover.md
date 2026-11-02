@@ -1,8 +1,16 @@
 # Handover
 
-## Current state — 2026-11-01
+## Current state — 2026-11-02
 
-**Current assignment: execute US-013 autonomously, starting with its P0 gates.** The
+**Current US-013 P0 continuation:** the [mode/context/concurrency study](us013-mode-concurrency.md)
+now has actual six-cell editability observations, used-context read-only behavior and effective
+changes without a new settings Git commit. Repeated concurrent list writes have varying two/four
+step outcomes; literal replay is not a deterministic race oracle. Internal Git CAS cannot silently
+become a mandatory compatible-client precondition. Current grants, hierarchy, full binding/schema,
+shared mutation/completion oracles and exact allocation/review/debt/main gates remain open. Continue
+the connected P0 package before R0/PILOT; no new owner scope choice is needed.
+
+**Preceding computed-source checkpoint:** The
 [computed-source study](us013-computed-source.md) now checks a single typed C# edit declaration over
 untouched user-owned computations, including readback of existing edits so unrelated mutations retain
 local-removal intent. This is a bounded candidate over the same compiler/model, not an adopted SDK

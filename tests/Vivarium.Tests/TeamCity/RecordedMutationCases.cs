@@ -95,6 +95,7 @@ internal static class RecordedMutationCases
 
     // These are literal reference observations only, not additional frozen/product cases.
     public static IEnumerable<RecordedMutationCase> StoryObservations => Load("us013-observations.json");
+    public static IEnumerable<RecordedMutationCase> ModeObservations => Load("versioned-mode-observations.json");
 
     // No existing object or restricted actor is required by these two workflows. Dependent
     // catalog/actor workflows stay replay-bound and explicitly product-blocked in the receipt.

@@ -145,7 +145,7 @@ public sealed class RecordedMutationReplayTests
         });
     }
 
-    private static WireMockServer StartReplay(RecordedMutationCase testCase, bool corruptReadback = false)
+    internal static WireMockServer StartReplay(RecordedMutationCase testCase, bool corruptReadback = false)
     {
         var server = WireMockServer.Start(new WireMockServerSettings
         {
