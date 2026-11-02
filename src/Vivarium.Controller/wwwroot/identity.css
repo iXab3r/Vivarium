@@ -1,0 +1,156 @@
+:root {
+    color-scheme: dark;
+    font: 13px system-ui, sans-serif;
+    color: #cccccc;
+    background: #1f1f1f;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.app-header {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: #3c3c3c;
+    border-bottom: 1px solid #2b2b2b;
+}
+
+.app-header > a:last-child { font-size: 12px; }
+main { padding: 72px 20px 40px; }
+.sign-in {
+    width: 100%;
+    max-width: 384px;
+    margin: 0 auto;
+    padding: 28px;
+    background: #181818;
+    border: 1px solid #333333;
+    border-radius: 6px;
+}
+
+h1 { margin: 0 0 24px; font-size: 24px; font-weight: 500; }
+form { margin: 0; }
+.provider-form + .provider-form { margin-top: 20px; }
+button, input { font: inherit; }
+button {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #ffffff;
+    background: #3a3d41;
+    cursor: pointer;
+}
+
+button:hover { background: #45494e; }
+button.primary { background: #0078d4; }
+button.primary:hover { background: #026ec1; }
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0 0;
+    color: #aaaaaa;
+}
+
+input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #0078d4; }
+.installation-account { margin-top: 24px; padding-top: 20px; border-top: 1px solid #333333; }
+summary { width: fit-content; cursor: pointer; color: #aaaaaa; }
+summary:hover { color: #ffffff; }
+.installation-form { display: grid; gap: 16px; margin-top: 20px; }
+.installation-form .checkbox { margin: 0; }
+.field { display: grid; gap: 8px; }
+.field input {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px 10px;
+    color: inherit;
+    background: #313131;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+}
+
+:focus-visible { outline: 2px solid #0078d4; outline-offset: 3px; }
+.validation-summary-valid { display: none; }
+.validation { color: #f48771; margin-bottom: 20px; }
+.validation ul { margin: 0; padding-left: 18px; }
+
+@media (max-width: 480px) {
+    .app-header { padding: 0 16px; gap: 12px; }
+    main { padding: 32px 16px; }
+    .sign-in { padding: 24px; }
+}
+
+.account-page main {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+.account-page h1 { margin-bottom: 12px; }
+.account-page h2 { margin: 0 0 20px; font-size: 16px; font-weight: 500; }
+.account-intro { margin: 0 0 28px; color: #aaaaaa; line-height: 1.5; }
+.account-panel {
+    min-width: 0;
+    margin-top: 20px;
+    padding: 24px;
+    background: #181818;
+    border: 1px solid #333333;
+    border-radius: 6px;
+}
+
+.account-page button, .account-button { width: auto; white-space: nowrap; }
+.account-page .create { display: flex; align-items: end; flex-wrap: wrap; gap: 16px; }
+.account-page .token-label { flex: 1 1 240px; min-width: 0; }
+.account-page .token-lifetime { width: 100px; }
+.account-empty { margin: 0; color: #aaaaaa; }
+.token-table { position: relative; overflow-x: auto; }
+.token-table table { width: 100%; border-collapse: collapse; text-align: left; }
+.token-table th, .token-table td { padding: 12px 10px; border-bottom: 1px solid #333333; }
+.token-table th { color: #aaaaaa; font-weight: 500; }
+.token-table td:first-child { min-width: 160px; max-width: 320px; overflow-wrap: anywhere; }
+.token-table td:not(:first-child) { white-space: nowrap; }
+.token-table th:last-child, .token-table td:last-child { text-align: right; }
+.token-table tbody tr:last-child td { border-bottom: 0; }
+.account-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.token-reveal main { max-width: 768px; }
+.token-warning {
+    margin: 0 0 24px;
+    padding: 12px 16px;
+    border-left: 3px solid #cca700;
+    background: #29261a;
+    color: #e8dcae;
+    line-height: 1.5;
+}
+
+.token-reveal textarea {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+    background: #313131;
+    color: inherit;
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+    overflow-wrap: anywhere;
+    resize: vertical;
+}
+
+.token-actions { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+.account-button { display: inline-flex; align-items: center; min-height: 36px; padding: 8px 12px; border: 1px solid #3c3c3c; border-radius: 4px; }
+.account-button:hover { background: #3a3d41; text-decoration: none; }
+
+@media (max-width: 600px) {
+    .account-page main { padding: 28px 16px; }
+    .account-panel { padding: 20px; }
+    .account-page .token-label { flex-basis: 100%; }
+}

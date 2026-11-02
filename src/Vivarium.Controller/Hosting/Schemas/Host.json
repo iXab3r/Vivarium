@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "PublicOrigin": { "type": "string", "format": "uri", "minLength": 1 },
+    "ListenUrl": { "type": "string", "format": "uri", "minLength": 1 },
+    "StorageListenUrl": { "type": "string", "format": "uri", "minLength": 1 },
+    "CertificatePath": { "type": ["string", "null"] },
+    "CertificatePassword": { "type": ["string", "null"], "writeOnly": true }
+  },
+  "required": ["PublicOrigin", "ListenUrl", "StorageListenUrl"]
+}

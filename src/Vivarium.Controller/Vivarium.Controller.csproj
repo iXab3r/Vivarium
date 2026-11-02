@@ -7,6 +7,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <PublishTrimmed>false</PublishTrimmed>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,24 @@
     <!-- Keep the transitive reader on the patched 2.x line (CVE-2026-49451). -->
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="EyeAuras.Chiral" Version="0.1.0-depot.48.1" />
+    <PackageReference Include="EyeAuras.Chiral.AspNetCore" Version="0.1.0-depot.48.1" />
+    <PackageReference Include="EyeAuras.Chiral.FileStorage" Version="0.1.0-depot.48.1" />
+    <PackageReference Include="EyeAuras.Storage" Version="0.1.0-depot.73.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" PrivateAssets="all" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="7.5.0" />
+    <PackageReference Include="OpenIddict.Client.SystemNetHttp" Version="7.5.0" />
+    <!-- Patched transitive crypto dependencies: CVE-2026-84008 / CVE-2026-96958. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+    <!-- Deliberate security override of OpenIddict's older transitive version, including consumers. -->
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.13" NoWarn="NU1510" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Hosting/Schemas/*.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -21,6 +21,13 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
+The fresh D34/D35 Host is being delivered under US-013/R0. Explicit local `init`, `nodes`, `migrate`
+and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
+Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
+HTTP. Real Host/PG/storage restart and installation-login evidence exists. Ordinary OIDC/current
+TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
+controller below remains available until its actual replacement gates pass.
+
 The immediate product priority is replacing the owner's TeamCity infrastructure without functional
 loss, including individual test history, Agent requirements/compatibility, durable logs and operator
 workflows. [Architecture D32](docs/ARCHITECTURE.md#d32-teamcity-behavioral-parity-is-the-immediate-build-product-contract)
@@ -101,7 +108,9 @@ platform evidence remain release-quality gates.
   PostgreSQL business storage and object/blob bytes. SQLite is the current transitional persistence.
 - Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned TypeScript sources,
   `tests/Vivarium.Tests`, `docs/`, plus `images/` for image recipes (later).
-- Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
+- Dependencies must be MIT/Apache-2.0-compatible (the project is MIT). Owner-approved exception
+  (2026-11-02): the closed `EyeAuras.Storage` and `EyeAuras.Storage.Contracts` libraries may be
+  consumed as dependencies; this does not declare those libraries or BankaStore MIT-licensed.
 - The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
   Changes to it require an explicit design discussion first — it is the one piece baked into every VM
   image and installed on every physical machine.

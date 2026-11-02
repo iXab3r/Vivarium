@@ -1,0 +1,30 @@
+{
+  "releases": [
+    {
+      "repository": "iXab3r/EyeAuras.Chiral",
+      "tag": "v0.1.0-depot.48.1",
+      "repositoryCommit": "ca5e4582be6b68c4e8bb61ac97a116d30b480eb5",
+      "files": [
+        { "name": "EyeAuras.Chiral.0.1.0-depot.48.1.nupkg", "sha256": "57ee284df5a4b96f24fbd5641dc5070a2b1c16a95e705a2ea3d0c5aa19279f2a" },
+        { "name": "EyeAuras.Chiral.AspNetCore.0.1.0-depot.48.1.nupkg", "sha256": "5211adcda375832f4dc4a79f43987ddb1c84f9e14079e65ce5726641634c948e" },
+        { "name": "EyeAuras.Chiral.FileStorage.0.1.0-depot.48.1.nupkg", "sha256": "93c2c5164f5210879ad3a784585f3a6faffbf01499b8b90dcdb895f203eacc0a" }
+      ]
+    },
+    {
+      "repository": "Linqse/BankaStore",
+      "tag": "storage-v0.1.0-depot.73.1",
+      "repositoryCommit": "3e56248525b1c20c0eadc5fd922086b183a26ee6",
+      "files": [
+        { "name": "EyeAuras.Storage.0.1.0-depot.73.1.nupkg", "sha256": "17956080daa03b7c1c7e85e652bc5190c32ce1ced54ff8e14e5aa0fdc3c0e1d2" }
+      ]
+    },
+    {
+      "repository": "Linqse/BankaStore",
+      "tag": "storage-v0.1.0-depot.71.1",
+      "repositoryCommit": "db31c0b36da4ad58f792fbbd0ff89d19c6b17afc",
+      "files": [
+        { "name": "EyeAuras.Storage.Contracts.0.1.0-depot.71.1.nupkg", "sha256": "7f9d68ca1d4d44ad6d515894d52666e62b7de803051f570e58e5a398f3b0a764" }
+      ]
+    }
+  ]
+}

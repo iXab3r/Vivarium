@@ -43,6 +43,36 @@ TeamCity. Its generated status remains partial with unknown global scope and API
 
 ## Building
 
+Before restoring the fresh Host dependencies, run `pwsh -File tools/PrepareDependencies.ps1` from
+the repository root with GitHub CLI access to the owner releases. `dependency-artifacts.json` pins
+the exact Chiral/Storage prerelease bytes; preparation verifies SHA256 before populating the local
+feed selected by `NuGet.Config`. These are the adopted Depot package APIs, not local source projects.
+The Controller lock file pins the resolved runtime graph.
+
+The in-progress fresh-install runtime has explicit local commands:
+
+```text
+viv-server init --settings-directory <private-directory>
+viv-server migrate --settings-directory <private-directory>
+viv-server nodes --settings-directory <private-directory>
+viv-server run --settings-directory <private-directory>
+```
+
+`init` reads private node JSON on stdin, keyed by `vivarium-host`, `vivarium-database`,
+`vivarium-identity` and `vivarium-storage`. Schemas are embedded from `Hosting/Schemas`; Storage
+supplies its own schema. Provision persistent private TLS/Identity certificates and Data Protection
+paths before running. The Identity token lifetime cap is explicit (1–365 days), with no inherited
+default. `migrate` separately reads `{"ConnectionString":"<maintenance connection>"}` on stdin;
+it never persists that privileged input as runtime configuration. Run local maintenance with the
+Host stopped. Runtime DB credentials may have narrower permissions than maintenance credentials.
+
+`nodes` emits masked Chiral views. Saves remain separate from active resources until restart;
+startup refuses missing/unready nodes, pending/unknown/checksum-drifted schema and unusable Identity
+keys before opening listeners. Object HTTP stays on a distinct loopback listener. The installation
+password is disclosed only in the intended private startup log after its framework hash commits.
+These commands currently establish infrastructure and account pages. Catalogue/Agent/build and
+Workbench integration remain under R0 delivery; this is not a completed local-run or US-013 claim.
+
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
 ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
 invoked `tests/Vivarium.TeamCity.Conformance` project; its raw five-case product-ready run remains nonzero while

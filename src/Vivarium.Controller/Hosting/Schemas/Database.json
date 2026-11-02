@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ConnectionString": { "type": "string", "minLength": 1, "writeOnly": true }
+  },
+  "required": ["ConnectionString"]
+}
