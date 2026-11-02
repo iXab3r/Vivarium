@@ -51,13 +51,16 @@ internal sealed class SourceCompiler(StudyResources resources)
         File.Copy(Path.Combine(resources.Root, "global.json"), Path.Combine(resources.Evaluation, "global.json"), overwrite: true);
         await CopyCommittedAsync(resources.Control, controlCommit, "Control.g.cs", "Control.g.cs");
         using var control = JsonDocument.Parse(await EvaluateAsync(controlOnly: true));
-        if (control.RootElement.GetProperty("id").GetString() != "T3Personal")
-            throw new InvalidDataException("This bounded proof owns only its fixed Project.");
+        var projectId = control.RootElement.GetProperty("id").GetString();
+        if (projectId is not ("T3Personal" or "T3Personal_Child"))
+            throw new InvalidDataException("This bounded proof owns only its fixed parent and child Projects.");
         var binding = control.RootElement.GetProperty("binding");
         var bound = binding.ValueKind != JsonValueKind.Null;
+        if (projectId == "T3Personal_Child" && (bound || control.RootElement.GetProperty("parent").GetString() != "T3Personal"))
+            throw new InvalidDataException("The observed child fixture has one local control owner and the fixed parent.");
         var settingsRepository = bound ? resources.Product : resources.Control;
         var settingsCommit = bound ? productCommit : controlCommit;
-        var path = bound ? ".vivarium/settings/Settings.g.cs" : ".vivarium/unbound/T3Personal/Settings.g.cs";
+        var path = bound ? ".vivarium/settings/Settings.g.cs" : ".vivarium/unbound/" + projectId + "/Settings.g.cs";
         if (bound && (binding.GetProperty("repository").GetString() != "product-proof" ||
             binding.GetProperty("branch").GetString() != "main" || binding.GetProperty("path").GetString() != path ||
             binding.GetProperty("trustReference").GetString() != "local-owned"))

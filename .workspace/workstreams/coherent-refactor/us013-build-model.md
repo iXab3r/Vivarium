@@ -44,12 +44,83 @@ specified independently. Documentation/projection variants remain accountable ga
 | Agent facts | Requested Agent may already appear on a queued targeted Build. That does not prove assignment acknowledgement, workload ownership or immutable executed-host facts. Keep requested target, accepted assignment/session fence and actual execution provenance distinct. |
 | Eligibility | Connection, authorization, enablement, compatibility, health and occupancy stay independent. Explicit suitable-Agent targeting is a distinct admitted workflow, not a permanent enablement change or bypass of all permissions/dependencies. |
 | Dependency definition versus selection | Settings declare snapshot edges and artifact selectors. A Build records actual selected upstream Build IDs, settings/source selections and consumed files/hashes. Reuse does not create fake new executions. |
-| Original execution versus operator metadata | Original step/result/input evidence remains immutable. Administrative display status/comments/number and their audit do not overwrite it. Exact public mutation behavior remains with its due reference cases. |
+| Original execution versus operator metadata | Original step/result/input evidence remains immutable. Administrative display status/comments/number and their audit do not overwrite it. Current public problem resources are mutable: a manual SUCCESS can remove a previously visible occurrence. Preserve original reporting evidence separately; do not expose every historical report as a current problem. |
 
 These identity mappings are projections of one owning domain, not separate schedulers or copied
 facade state. The target PG transaction owns admission, alias/replacement relations, queue and leases;
 the Agent protocol retains its own stable workload/session fences. Neither Git nor Chiral messaging
 is the runtime transaction authority.
+
+### Reported results and mutable public status
+
+The [literal reported-build corpus](../../../tests/Vivarium.Tests/TeamCity/Reference/reported-build-observations.json)
+contains eight bounded groups / 29 HTTP exchanges against 2026.1.3/build 222742, using one uniquely
+owned Linux Agent and an administrator. It is reference/replay evidence, not product conformance.
+
+| Observed operation and readback | Shared-model consequence |
+|---|---|
+| Change running Build 52's number to `owned-display-label`; GET retains id 52. | Identity and display number are different fields. A number edit cannot move result/input ownership. Counter/default/duplicate-number variants remain separate. |
+| Submit a plain log and a problem occurrence to actual Agent-backed running Build 52; the problem is readable and running status becomes FAILURE. | Public reporting commands can affect an Agent-backed Build. Route both reports and Agent results through the same owning Build services; an external report is not a new execution or fabricated Agent result. |
+| `PUT finish` acknowledges, then GET first reports running/FAILURE and later finished/FAILURE. | Accepted finish and terminal completion are separate facts. Preserve the observed response and real lifecycle transition; no blanket synchronous-completion or 202 rule follows. |
+| Manual SUCCESS on finished Build 52 succeeds; subsequent Build status is SUCCESS, current problem list is empty and direct GET of the previously readable occurrence returns 404. | Preserve original process/report/audit evidence independently from mutable visible status and current problem membership. The HTTP observation does not establish physical database deletion or every later-report policy. |
+| The follow-up Build 53 is observed cancelled with UNKNOWN; a SUCCESS request returns success/errorCount=0, but subsequent status remains UNKNOWN. | A successful status request does not prove that every Build state adopts that status. Preserve cancellation and effective status independently; do not infer natural process failure from this follow-up. |
+| `PUT runningData` for ordinary queued Build 52 returns 400, explicitly not agent-less; the Build stays queued. | Reporting does not grant arbitrary queued Builds a new execution kind. Genuine agent-less admission, executor eligibility and permissions need their own reference cases before exposure. |
+
+The acquisition intended a later natural nonzero exit, but the follow-up was already cancelled;
+`natural_failure_proven=false` explicitly retains that limit. Original acquisition labels are kept
+as provenance, with corrected case IDs rather than a false natural-failure oracle. Existing independent
+nonzero lifecycle evidence is separate. No restricted principal, duplicate/late report, conflicting
+report/Agent-result race or general Agent-less contract is proved here. Those variants stay with
+SS-RUN/#134/#135/#136 and contributing result/log owners before their affected implementation.
+R0's owned-Agent path preserves original facts, report provenance, effective status, cancellation and
+completion separately even though its selected entry does not invoke external producer commands.
+
+The capture removed its project, Agent registration/container and private transport network and
+restored the initial local gates. An earlier capture with failed Agent-disconnect cleanup is retained
+with a separate recovery receipt; it is not substituted for this fully cleaned capture.
+
+### Approval is a separate admission condition
+
+The [literal approval corpus](../../../tests/Vivarium.Tests/TeamCity/Reference/approval-observations.json)
+contains three groups / 83 exchanges against the same pinned server, one administrator and zero Agents.
+The owned configuration has a harmless process step, an explicit individual-user rule, a one-minute
+timeout and `manualStartIsApproval=false`; none is an absent-default observation.
+
+The Build first reports `waitingForApproval`, eligible for the current user. Approving it changes
+approval status to `approved`; it remains queued with no idle compatible Agent. Repeating approval
+returns 400. A nonexistent-user rule instead reports `configurationValid=true` with a deleted-user
+sentinel and cannot be treated as the malformed-rule `configurationValid=false` variant. Its approval
+request returns 200 while the effective approval remains waiting; the Build fails to start.
+
+The valid-user timeout reads as approval `timedOut`, Build finished/FAILURE with `failedToStart=true`,
+a preparation problem and no `canceledInfo` in the literal selected projection. This actual response
+is more specific than the generic cancellation wording in the 2026.1 help. Keep approval rules/votes,
+current-user eligibility and timeout separately from queue membership, execution state, cancellation
+and Agent eligibility. No approval request may manufacture capacity or report a successfully executed
+Build. Group/composite voting, whole-chain approval, untrusted Builds, malformed rules, other actors
+and repeat/race variants remain with SS-RUN/#134/#135/#136 before their affected exposure. R0 has no
+approval feature; its neutral absence must not block the ordinary owned-Agent path.
+
+### Imported origin and retained sizing
+
+TC-IMP-02 already requires stable installation/kind/source-ID mappings. Keep a future imported
+object's original ID qualified by stable source-installation identity and resource kind, separate
+from the globally allocated local Build key, mutable source URL and native alias. Resolve relations
+through that origin mapping; original test IDs remain exact strings. A historical source actor or
+Agent is provenance and never implicitly gains current credentials, grants or workload ownership.
+This applies to retained tombstones/archived parents as well as visible current catalogue rows.
+It refines the existing import contract; no importer, migration or old-ID public adapter is proved.
+
+The read-only retained metadata assessment finds 38 projects, 97 configurations and 104 reported
+Agent registrations. All 97 retained Build-page snapshots together contain only 251 sampled rows;
+76 pages explicitly have more data. The 1,084 collection declarations include 38 failures, followed
+by 38 declared repairs, which are not independent full-export acceptance. Total retained Builds,
+test occurrences and log/artifact bytes remain unknown. Local JSON size is not a Storage estimate.
+Full paging/export, privileged originals, source-change consistency, one-way conflict/import and
+source-unavailable restore proof remain SS-MIG/#158/#159/#160 (R6). US-013's fresh installation
+does not transfer old bytes or perform cutover. Its Host still follows the already adopted coordinated
+PG/Storage/Git/private-settings/key backup boundary; no compatible backup job can be exposed as a
+successful no-op. Backup wire jobs and source-specific retained originals require their own cases.
 
 ### Native matrix preservation boundary
 
@@ -124,6 +195,25 @@ The source experiment proves typed edits and deterministic reevaluation, not tha
 Exact mode/error/completion cases, current grants, collisions, accepted-but-unapplied/interrupted
 handoffs and real recovery remain P0 work. Kotlin/XML-specific public operations still need explicit
 language/source mappings and due ownership; reporting fictitious Kotlin success is not a C# mapping.
+
+The [child-owner reference corpus](../../../tests/Vivarium.Tests/TeamCity/Reference/child-owner-observations.json)
+now supplies seven groups / 297 exchanges and exact source revisions. Under an editing-disabled
+ancestor, an inherited child edit returns 500/ReadOnlyEntityException; explicitly disabling child
+synchronization admits the local edit. A later real parent export excludes the child's declaration.
+Parent-only source import preserves the child value; even explicit source reintroduction of that
+child reports applied at the parent while retaining the child's disabled mode and local value.
+Ancestor source presence is therefore not sufficient ownership. Preserve the independently selected
+child owner and ordinary inherited project parameters rather than allowing two accepted field owners.
+
+The [compiled child-owner study](../../../tests/Vivarium.DefinitionProof/ChildOwnerSourceTests.cs)
+demonstrates a bounded candidate: the parent selects committed product C#, the child selects committed
+control C# and retains its parent identity. A parent edit/foreign child declaration cannot overwrite
+that selection; an owned child edit and cold old-revision reads remain independent. It follows an
+executed internal RED for the formerly single-project-only compiler. This is source-owner selection
+feasibility, not a production hierarchy importer, cross-project effective-parameter evaluator,
+language/mode HTTP adapter or public SDK. Those explicit limits remain due before affected exposure.
+Control-only mode readback also has its own fence: the reference can report configuration updated
+without a new source revision/application, so waiting for a nonexistent new import is not completion.
 
 ## Acceptance and unresolved work
 

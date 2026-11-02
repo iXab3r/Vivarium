@@ -75,6 +75,15 @@ continuity rule. Native TEST/CRASH/INFRA taxonomy must project truthfully into t
 failed-to-start, muted test failures and incomplete reports. Resource identity and terminal provenance
 remain stable after configuration rename/edit, reconnect, import and retention changes.
 
+The [bounded reported-build observations](../../.workspace/workstreams/coherent-refactor/us013-build-model.md#reported-results-and-mutable-public-status)
+also distinguish immutable original execution/report evidence from mutable effective status and
+current public problems. In the pinned reference, manual SUCCESS removes a previously readable
+current problem, finish acknowledgement precedes terminal completion, and an accepted status write
+on a cancelled Build can leave UNKNOWN unchanged. Admin reports can target an Agent-backed running
+Build; runningData does not promote an ordinary queued Build to agent-less execution. Preserve these
+distinctions in shared services without inferring broader permission, race or producer eligibility
+contracts from the selected observations.
+
 Locators need parsed nested structure and resource-specific resolvers, not split-on-comma strings.
 The real client uses nested id dimensions and base64url-encoded branch value conditions. Fields
 projection, collection wrappers, counts/empty pages and numeric continuation affect query/projection
@@ -126,6 +135,12 @@ and [computed-source study](../../.workspace/workstreams/coherent-refactor/us013
 extend that evidence to explicit recipe fields and a typed edit declaration read from compiled C#.
 They remain bounded representation candidates; neither establishes unobserved reference modes,
 current grants, concurrent mutation or production completion behavior.
+
+The later [child-owner source/reference study](../../.workspace/workstreams/coherent-refactor/us013-build-model.md#cgit-authority-and-completion)
+establishes a selected hierarchy boundary: an explicitly disabled child remains independently owned
+when ancestor source excludes or reintroduces it. A bounded compiled C#/Git candidate preserves the
+selected child source and parent identity across ancestor edits and cold revision reads. This does
+not establish the full hierarchy/mode/language API or effective inheritance engine.
 
 The CLI can edit individual properties, replace/reorder collections, reset inherited entries and
 clone/move definitions. An arbitrary hand-written C# expression is not generally editable that way.

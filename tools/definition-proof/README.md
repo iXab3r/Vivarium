@@ -62,3 +62,12 @@ cross-repository activation saga. Preparing then changing a binding demonstrates
 reevaluation demonstrates reproducibility, not production recovery. The active/applied authorities
 must be proved through the real owning services before P0 acceptance. No business AC or product
 conformance is made GREEN by this experiment. Keep this temporary proof separate from R2's engine.
+
+`ChildOwnerSourceTests` adds a fixed parent/child source-owner candidate after the
+[independent hierarchy observation](../../tests/Vivarium.Tests/TeamCity/Reference/child-owner-observations.json).
+The parent chooses product Git; the unbound child chooses its control Git and retains its parent ID.
+Parent source edits/foreign child declarations cannot overwrite that selection. Own child edits
+and cold old-revision reads stay independent. The study compiler deliberately admits only these
+two fixed project identities and one local child owner; it is not a generic hierarchy importer or
+effective cross-project parameter evaluator. It runs trusted committed C# and proves no public
+mode/permission API, public SDK or production activation behavior.

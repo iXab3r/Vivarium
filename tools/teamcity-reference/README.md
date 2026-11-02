@@ -22,6 +22,36 @@ Receipts retain literal entities, source/runtime hashes, cleanup and gate restor
 [selected observations](../../tests/Vivarium.Tests/TeamCity/Reference/template-observations.json)
 prove parameter inheritance only; no other template field or product implementation is inferred.
 
+## Archived reported-build acquisition
+
+[`reference/reported-build-probe.mjs.txt`](reference/reported-build-probe.mjs.txt) is the exact source
+archive of a completed private-lab acquisition, retained as data rather than a supported runner.
+Its hash is bound by the [selected literal corpus](../../tests/Vivarium.Tests/TeamCity/Reference/reported-build-observations.json).
+Eight groups / 29 exchanges cover administrative reports, display number/status and finish readbacks
+on an owned Agent-backed Build, plus rejected ordinary queued-to-agent-less promotion. The follow-up
+intended to establish natural failure was instead cancelled; corrected case IDs and an explicit
+`natural_failure_proven=false` retain that limit alongside original acquisition labels. No restricted
+principal, general producer eligibility or product acceptance is inferred. The exact capture records
+project/Agent/container/network cleanup and restoration of the private write gates. An earlier failed
+disconnect cleanup and its separate successful recovery remain local historical diagnostics.
+
+`reference/approval-probe.mjs.txt` likewise archives one completed acquisition as data. Its
+[three groups / 83 exchanges](../../tests/Vivarium.Tests/TeamCity/Reference/approval-observations.json)
+separate explicit approval from absent-Agent eligibility, a repeat's 400, a missing-user rule's
+literal validation/status behavior and the one-minute timeout's failed-to-start projection.
+The timeout is not rewritten as ordinary cancellation. One administrator/individual rule does not
+prove group/chain/untrusted approvals or restricted permissions. The project and private gates were
+cleaned; earlier locally over-specific observation assertions remain diagnostics, not expectations.
+
+`reference/child-owner-probe.mjs.txt` archives the completed hierarchy acquisition. Its
+[seven groups / 297 exchanges and nine source snapshots](../../tests/Vivarium.Tests/TeamCity/Reference/child-owner-observations.json)
+distinguish inherited read-only settings, local disabled-child ownership, fenced ancestor export,
+parent-only source import and explicit child reintroduction. Exact local values survive both
+imports. The script is retained as acquisition data, not a supported generic runner; control-only
+mode readback and actual source application are separate observations. This proves neither a
+public C# hierarchy API nor all modes, fields and permission variants. Owned transport/network and
+project cleanup completed and private gates match their initial state.
+
 ## Fixed T3Personal input receipt
 
 [`cli-t3-inputs-capture.patch`](cli-t3-inputs-capture.patch) is a four-file unpublished increment after
