@@ -6,7 +6,7 @@
   "aggregate_verdict": "NOT_READY",
   "security_reviewer": "/root/p0_security_review",
   "security_verdict": "PASS_FOR_REVIEWED_CANDIDATE_ONLY",
-  "new_candidate_verdict": "RENEWAL_PENDING",
+  "new_candidate_verdict": "PASS_AT_32ad636_REQUIRED_ROOT_ACCOUNTING_MAIN_PENDING",
   "findings": [
     {
       "id": "P0-REVIEW-R0-CONTRACT",
@@ -33,7 +33,7 @@
           "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
         }
       ],
-      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+      "state": "CLOSED_BY_INDEPENDENT_RENEWAL_AT_32ad636"
     },
     {
       "id": "P0-REVIEW-AGENT-COMPOSITION",
@@ -52,7 +52,7 @@
           "sha256": "cb57858677be25677833eadefb4046526cd4038d812e60102ebfbcebea8708af"
         }
       ],
-      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+      "state": "CLOSED_BY_INDEPENDENT_RENEWAL_AT_32ad636"
     },
     {
       "id": "P0-REVIEW-ACTIVATION-FENCE",
@@ -79,11 +79,42 @@
           "sha256": "07329777acc1752ea09481f25c36a0445fd363526c36ae595cd8b51b539f53d1"
         }
       ],
-      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+      "state": "CLOSED_BY_INDEPENDENT_RENEWAL_AT_32ad636"
     }
   ],
   "limits": [
     "No P0 closure, main merge or R0 product implementation from this disposition. All same-P0 findings require independent renewal and final checks before closure.",
     "Security PASS is the exact earlier candidate; new source/test/contract changes require renewed affected verdict. Existing P0-GIT-EOL-001/#77 is reviewed in the aggregate and still awaits accepted P0/main delivery."
-  ]
+  ],
+  "renewed_reviews": [
+    {
+      "role": "aggregate correctness/domain/completeness/simplicity",
+      "reviewer": "/root/p0_final_aggregate",
+      "candidate": "32ad63600d0c2a8f717be6dcd5230d3952d4bfa7",
+      "base": "09dd40bb8449261d54cf3bd6261b3b1d4227fee0",
+      "verdict": "PASS",
+      "actionable_findings": 0,
+      "evidence": "Independent read-only contract/case/contribution, source/preservation,380candidate hashes,9physical receipts/394input occurrences and actual raw5 mismatch verification. Root was still running; final required checks/accounting/main remain parent gates."
+    },
+    {
+      "role": "Security/Adversarial",
+      "reviewer": "/root/p0_final_security",
+      "candidate": "32ad63600d0c2a8f717be6dcd5230d3952d4bfa7",
+      "base": "09dd40bb8449261d54cf3bd6261b3b1d4227fee0",
+      "verdict": "PASS",
+      "actionable_findings": 0,
+      "evidence": "Independent read-only src delta, D43 isolation, current actor/delegation/origin, activation/output/Agent/evidence boundaries and source/receipt hash review. No product launch/probe or claim of future R0 implementation."
+    }
+  ],
+  "remaining_closure_gates": [
+    "Required root test result",
+    "Exact final head and main evidence/accounting transfer",
+    "Verified main merge before closing P0 or beginning R0 implementation"
+  ],
+  "diff_check_qualification": {
+    "path": "tools/teamcity-reference/cli-lab-fixture-capture.patch",
+    "line": 26,
+    "fact": "A literal single-space unified-diff context line encodes an empty source line. Stripping it corrupts retained patch syntax; no source-format debt.",
+    "checks": "Normal diff --check main passes excluding this data patch; targeted core.whitespace=-blank-at-eol diff --check passes for the literal patch. No global policy/file mutation."
+  }
 }
