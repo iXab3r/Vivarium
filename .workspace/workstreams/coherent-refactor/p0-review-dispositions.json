@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "reviewed_candidate": "3d767098d4d7b7c47b46d58471b94fd26ec0ebde",
+  "reviewed_base": "09dd40bb8449261d54cf3bd6261b3b1d4227fee0",
+  "aggregate_reviewer": "/root/p0_aggregate_review",
+  "aggregate_verdict": "NOT_READY",
+  "security_reviewer": "/root/p0_security_review",
+  "security_verdict": "PASS_FOR_REVIEWED_CANDIDATE_ONLY",
+  "new_candidate_verdict": "RENEWAL_PENDING",
+  "findings": [
+    {
+      "id": "P0-REVIEW-R0-CONTRACT",
+      "severity": "P1",
+      "owning_task": 111,
+      "acceptance_task": 112,
+      "observation": "Selected R0 manifest unfrozen, native LOG contribution case IDs empty; IAM/control/recovery joins incomplete.",
+      "fix": "Selected six literal reference workflows and22 specified native/integration variants join all7 existing contributions, explicit source/actor/seed/request/expected effect/completion/tasks. Full PAT wire stays R1 and native post-revoke effects remain separate. Validator rejects omissions/orphans/missing current actor/completion and false GREEN; product stays unbound.",
+      "evidence": [
+        {
+          "path": ".workspace/workstreams/coherent-refactor/r0-contract-scope.json",
+          "sha256": "ab4b82880a2c805c318645b9d440f477d9bf1211025be8f8368cc37aa5bf859b"
+        },
+        {
+          "path": ".workspace/workstreams/coherent-refactor/r0-contract-variants.tsv",
+          "sha256": "40a22b75ed48ff27ae743c39ea20fc4d0c3b26a2c797da11b0d0d14bce369ae8"
+        },
+        {
+          "path": "tools/Vivarium.ApiLedger/R0Contract.cs",
+          "sha256": "6d0abe57d3943aa6f135167b454b88248777714128637da91b3c422169a9e5ad"
+        },
+        {
+          "path": "artifacts/us013-source-ownership-20261102/results/r0-contract-final-controls.trx",
+          "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
+        }
+      ],
+      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+    },
+    {
+      "id": "P0-REVIEW-AGENT-COMPOSITION",
+      "severity": "P1",
+      "owning_task": 110,
+      "acceptance_task": 112,
+      "observation": "Representative P0.REST.2 proof had Hello/identity but no work-bearing scripted Agent delivery/fault overlap.",
+      "fix": "Actual assignment/result/replay and deliberate missing ACK compare minimal production services with pinned-TLS Kestrel/AgentHub, controlled15s production deadline, retained ownership/quarantine/containment and bounded cleanup. Consolidated14row composition/oracle/reset/selection/cost matrix retains original PG/source evidence at actual limits.",
+      "evidence": [
+        {
+          "path": "tests/Vivarium.Tests/TeamCity/AgentDeliveryCompositionTests.cs",
+          "sha256": "5c1db4dca7a8a607e1830dde4309cd99dfb6394e2016807761f6ad41e86ba946"
+        },
+        {
+          "path": ".workspace/workstreams/coherent-refactor/p0-composition-results.json",
+          "sha256": "cb57858677be25677833eadefb4046526cd4038d812e60102ebfbcebea8708af"
+        }
+      ],
+      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+    },
+    {
+      "id": "P0-REVIEW-ACTIVATION-FENCE",
+      "severity": "P1",
+      "owning_task": 111,
+      "acceptance_task": 112,
+      "observation": "Selected early C#/Git completion/current-authority/collision/failed-handoff fence remained an instruction to freeze.",
+      "fix": "Canonical early activation contract specifies source/field owners, candidate/accepted/active/LKG, current actor/delegation and origin checks, validation/collisions, CAS/PG applied-read fence, failed/restarted handoff/retry and immutable Build history. No compatible field-edit HTTP operation is exposed by C#/Git preparation; later exact mutation/language oracles stay with affected owners before exposure. Older active P0-gate wording is reconciled.",
+      "evidence": [
+        {
+          "path": "docs/design/csharp-activation.md",
+          "sha256": "7e9f03452f56d2340d3dcbfad00ea157285f3620ba20c7988ac10c1b17eb7403"
+        },
+        {
+          "path": "docs/design/git-versioning.md",
+          "sha256": "96c18dde6018ffb5fbbb2515e3ce10d04a9b6081e9b5566108b4fb5b08ed053f"
+        },
+        {
+          "path": ".workspace/workstreams/coherent-refactor/us013-build-model.md",
+          "sha256": "f4edecfcfadef1ffa6bc087d47afa599bfeb9778b40b9a778b092068bd217812"
+        },
+        {
+          "path": ".workspace/workstreams/coherent-refactor/us013-mode-concurrency.md",
+          "sha256": "07329777acc1752ea09481f25c36a0445fd363526c36ae595cd8b51b539f53d1"
+        }
+      ],
+      "state": "FIXED_AWAITING_INDEPENDENT_RECHECK"
+    }
+  ],
+  "limits": [
+    "No P0 closure, main merge or R0 product implementation from this disposition. All same-P0 findings require independent renewal and final checks before closure.",
+    "Security PASS is the exact earlier candidate; new source/test/contract changes require renewed affected verdict. Existing P0-GIT-EOL-001/#77 is reviewed in the aggregate and still awaits accepted P0/main delivery."
+  ]
+}

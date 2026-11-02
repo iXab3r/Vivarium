@@ -49,7 +49,8 @@ authorities. The exact public SDK/file schema for each exposed field remains wit
 [REST/domain contract](teamcity-rest-domain.md). Existing YAML parsing is legacy support; arbitrary
 C# cannot be represented as editable forms by wishful round-tripping.
 No target `.vivarium/rbac` tree is defined. Non-secret versioned policy is distinct from resource
-connections and their private settings. Final per-kind schemas remain a P0 implementation input.
+connections and their private settings. The selected early declaration/activation subset is specified
+below; later per-kind schemas stay with their owners before affected exposure.
 A Project can be declared before it has a product/settings binding. The real source/catalogue
 studies prove bounded unbound C# ownership and destination preparation/binding; product activation
 and authorized blank-install Project → unbound BuildType → binding remain separate implementation
@@ -69,6 +70,12 @@ managed-local C#, retaining inherited relationships rather than flattening effec
 local edits do not invoke an unselected product computation. Re-enabling/inheriting uses the selected
 reference import/overwrite behavior. Desired accepted binding and currently applied/last-known-good
 revision sets remain distinct during a failed or pending transition; that is not two writable owners.
+
+For the selected R0 unbound smoke and PILOT C#/Git preparation, the
+[early activation contract](csharp-activation.md) fixes source packaging, ownership, current
+authority, candidate/accepted/active/LKG identities, commit/apply/readback fence and failed-handoff
+recovery. The study namespace is experimental; the selected field semantics and one-owner/fence
+rules are fixed. Full later SDK/field/remote/language variants remain due before their exposure.
 
 ## Mutation and activation
 
@@ -157,9 +164,11 @@ Exercise stale edits, invalid revisions, dirty/case-colliding paths, denied chan
 commit/ref/audit/apply boundaries, replay, external trust, read-only degradation and source-independent
 restore. Family links in the acceptance map are not execution coverage.
 
-P0 must settle C# editable representation, per-kind schemas, supported Git packaging, remote trust
-adapter, secret-reference shape, schema compatibility and retention of intents/tombstones/revisions.
-These details cannot silently reintroduce Git RBAC or resource connections as Git authority.
+The selected early contract settles C# ownership/typed edits, proved packaging, current trust/secret
+references, schema rejection and retained intents/revisions for R0/PILOT preparation. Actual production
+integration remains due there. Later field schemas, remote adapters, language/mode mutations and
+tombstone variants retain explicit source-gap/full-owner obligations before their exposure. None may
+silently reintroduce Git RBAC or resource connections as Git authority.
 
 ## Legacy checkpoint evidence — not replacement requirements
 

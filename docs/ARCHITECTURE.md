@@ -1394,6 +1394,10 @@ gate. This decision does not waive permitted TeamCity edits, language mappings o
 
 ### D44. One selected Git owner and typed C# edits, independent of synchronization mode
 
+The [selected early activation contract](design/csharp-activation.md) fixes the R0/PILOT source,
+current-authority, candidate/accepted/active/LKG, completion and recovery obligations. Its specification
+is distinct from production integration/acceptance and later full SDK/language/field variants.
+
 The C# representation uses managed typed declarations and, for user-computed definitions, managed
 typed edit declarations applied after the untouched user computation. Both are committed C# in the
 selected settings repository and evaluated through D43. Read declared edits from their compiled

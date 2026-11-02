@@ -2,9 +2,10 @@
 
 P0 working contract for #32/#111, based on the [executed reference proof](us013-p0-execution.md).
 Observed facts below are independently captured. D41/D43/D44 adopt catalogue ownership, isolation
-and the shared source/edit mechanism; exact schemas and public SDK remain P0/owner inputs rather
-than implemented product or milestone acceptance. Resolve the remaining
-remaining checks and final independent review before R0 implementation.
+and the shared source/edit mechanism. The [early activation contract](../../../docs/design/csharp-activation.md)
+specifies the selected R0/PILOT declaration and completion subset; production integration and later
+full SDK/field schemas remain due before their exposure. Complete P0 checks and independent review
+before R0 implementation.
 
 ## Reference traces
 
@@ -234,9 +235,9 @@ require new headers or blanket 202 responses from compatible clients.
 
 The source experiments prove bounded typed edits and cold reevaluation of fixed fixtures; arbitrary
 C# need not be deterministic (D43). Separate Git/PG worker-crash studies prove bounded recovery,
-not a production activation saga. Freeze the selected early completion/current-authority/collision
-and failed-handoff contract in P0; broader exact mode/error/edit cases remain due to their owners
-before exposure. Kotlin/XML-specific public operations still need explicit
+not a production activation saga. The [selected early activation contract](../../../docs/design/csharp-activation.md) now specifies
+completion/current-authority/collision and failed-handoff fences for unbound R0 and C#/Git PILOT
+preparation. Broader exact mode/error/edit cases remain due to their owners before exposure. Kotlin/XML-specific public operations still need explicit
 language/source mappings and due ownership; reporting fictitious Kotlin success is not a C# mapping.
 
 The separate CLI format blocker is now resolved by the published, locally installed **0.5.6** fix in
@@ -314,7 +315,7 @@ authorized native read/resume resource under the same Build identity. The select
 [REST resource](../../../docs/design/rest-api.md#71-selected-r0-durable-build-output) and seven
 [planned native effect variants](r0-journey-manifest.md#selected-native-output-contract-and-planned-effect-cases)
 now specify metadata/content reads, cursor/gap/error/current-access behavior. These remain unbound;
-complete their common IAM/protocol details and P0 freeze before exposure. Actual storage/Agent receipt/restart/readback
+their common IAM/protocol and source/case/contribution obligations are specified in the selected R0 contract. Actual storage/Agent receipt/restart/readback
 remain R0 implementation/acceptance work. Port the actual bounded-output assertions and preserve
 D31's control-path priority; byte provenance and durable gaps cannot be replaced by status events.
 The unchanged TeamCity CLI's inspected byte methods use REST file/source/archive/icon resources;

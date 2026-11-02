@@ -1,14 +1,18 @@
 # R0 request, principal, seed and effect manifest
 
-Status: **UNFROZEN manifest; bounded reference observations now available, no new product case
-materialized by this document.** Current owners are #111/#112 under #110 for P0 contract/acceptance
-and #114/#115 under #113 for R0. Legacy task IDs below are retained source pointers, not a second
-active board; the [task migration](story-task-migration.md) records their transfers.
-Former #36 owns the retained completion/ledger input; former #43 supplies R0 contract input,
-former #42 supplies P0 freeze input and former #44 supplies R0 acceptance input. Existing seven R0
-[contributions](subsystem-contributions.tsv) retain their primary/full owners. Six now link selected
-reference cases; retained output still needs its exact native case. None is frozen or product GREEN.
-This Markdown is planning data, not a fixture DSL.
+Status: **Selected R0 contract frozen for the P0 candidate; product bindings remain UNBOUND or
+prerequisite-blocked, not GREEN. Independent P0 acceptance/main delivery is still pending.**
+The mechanically checked [scope](r0-contract-scope.json) selects six complete reference workflows
+and [22 specified native/integration variants](r0-contract-variants.tsv), with all seven existing
+R0 contributions joined in [the contribution register](subsystem-contributions.tsv). These are
+selected R0 obligations, not a frozen global compatibility denominator or a new test framework.
+The full five-exchange PAT revocation case remains R1 wire work; R0 selects its explicit post-revoke
+read effects after ordinary My keys preparation. Original captures/replay/case identities are intact.
+
+Current owners are #111/#112 under #110 for P0 contract/acceptance and #114/#115 under #113 for R0.
+Legacy task IDs below preserve source lineage; [task migration](story-task-migration.md) identifies
+the current owners. GitHub remains the task board. The source rows and this contract do not execute
+a product binding or accept a milestone merely by being complete.
 
 ## Selected published client
 
@@ -32,7 +36,7 @@ The old **0.5.2 / b158fe03…** pin still owns the original reference acquisitio
 historical executions. Keep those bytes and receipts unchanged. The source-established requests
 below retain that provenance; future product evidence must name the separately selected 0.5.6
 consumer. No XML/Kotlin compatibility waiver is adopted. The local format-value blocker is resolved;
-the remaining manifest/model/current-principal/effect/freeze gates remain open. The wider #80 audit
+selected R0 native/current-principal effects now have explicit contract identities; actual product bindings remain open. The wider #80 audit
 does not block this selected entry.
 
 ## Freeze inputs and required outputs
@@ -74,7 +78,7 @@ issuance/revocation wire; their administrative controls remain part of their req
 
 Build/Agent/user IDs in these literal transcripts are independent reference identities, not product
 seed values or a new ID allocator. Product bindings remain prerequisite-blocked until the actual
-catalogue, scoped principal, process/artifact and revocation services can reproduce those effects.
+catalogue, scoped principal, process/artifact and credential services reproduce the selected effects.
 R0 seed identities must map consistently through the existing reference comparison boundary.
 
 The exact selected workload mode input is the ordinary enqueue `properties.property` entry
@@ -111,8 +115,9 @@ These can supply the corresponding selected positive workflow expectations. They
 Agent and the lab's administrative actor, not the final LocalSmoke recipe or R0 A/R current-grant
 setup. Do not relabel that actor as restricted or the Windows-named tiny stage as Windows evidence.
 Absent/true/false settings/source-timing observations remain separately qualified and do not establish
-a universal default. Exact actor/seed/wire/effect joins, denial controls, output contract, replacement
-native readbacks and actual product execution remain due before this manifest is frozen.
+a universal default. The selected R0 joins and output/current-principal/recovery obligations are now
+explicit in the scope/variant register. Replacement product bindings and actual native effects remain
+due in R0, before its acceptance; this contract does not claim those executions.
 
 ## Principals and seeds
 
@@ -180,7 +185,7 @@ entity is omitted, so this does not freeze that full wire response. `/httpAuth` 
 Bearer form with 401 and is not substituted for the successful root variant. No log-download CLI
 command exists in the selected client. These are access observations, not new TCREST cases.
 
-The following **planned, unbound, not GREEN** native variants belong to #114/#115 within #113,
+The following **specified, product-unbound, not GREEN** native variants belong to #114/#115 within #113,
 with SS-LOG primary and IAM/RUN/EXEC/BLOB/Agent API collaborators. They specify the useful LocalSmoke
 output result, not separate implementation cards or completion of the full R4 logging subsystem.
 Use actual production logic at the smallest sufficient boundary; share the owned real Agent/Build
@@ -210,8 +215,9 @@ The native mask is `[REDACTED]`, with hashes/lengths computed from persisted pos
 Current AgentHub `LogChunk` has no source sequence, output acknowledgement or terminal watermarks.
 The R0 contribution therefore requires a reviewed additive negotiated Agent capability, preserving
 Bootstrap and existing session fences. Current memory-only BuildTracker/SSE is insufficient.
-These seven planned effects have no executable product binding yet and do not close the manifest,
-P0, any source gap or the full SS-LOG owner.
+These seven specified effects now have mechanically checked case/contribution/source/task joins.
+They have no executable product binding yet and cannot close R0, any source gap or the full SS-LOG
+owner. P0 reviews their contract and existing feasibility evidence, not invented product GREEN.
 
 ## Credential lifecycle and denial controls due in R0
 
@@ -254,15 +260,45 @@ Receipts contain fingerprints/metadata/results, never bearer/password/private-ke
 credential-page diagnostics. Fixture/issuer unavailability is a prerequisite/setup blocker, not product
 RED or a successful R0 lab.
 
-## Unresolved reference and representation work
+## Selected joins and due implementation
 
-| Existing task | Concrete missing evidence |
+| Existing source responsibility | Selected output and remaining execution boundary |
 |---|---|
-| #32 | Worked one-cell/composite/matrix graph and returned/polled/cancelled/history IDs; native/import collision; repeated enqueue optimization/reuse; independent state/outcome and Agent axes; actual settings/source capture boundary and resolved provenance. No new invented Vivarium domain. |
-| #33/#35 | Actual pinned-reference default enqueue/poll/queued cancel/running cancel/race, Agent admission/current permissions and retained artifact/log effects; distinguish installed metadata, source, synthetic controls and observations. Include per-mode Versioned Settings/DSL mutation permissions, read-only/rejection/completion for #34. |
-| #34 | Actual source/ownership/edit/evaluation/revision/failure/recovery proof pack from blank installation through unbound definition and binding; no SDK/source-path invention or DB override. |
-| #36 | Freeze exact commands/requests/principals/seeds/states/expected effects and join real variant/case IDs to all seven R0 contributions and ledger. This seed has no frozen cases; an empty or unassessed R0 dependency cannot pass P0 exit. |
-| #42/#43/#44 | #42 verifies P0 proof/freeze outputs; #43 consumes the contract for real shared-service interfaces; #44 verifies success/nonzero/both cancels/denied bytes and control/restart/cleanup with current evidence. Replay controls cannot prove these product effects. |
+| #32 | D41 model in us013-build-model.md distinguishes catalogue/Build/composite/matrix, source origin, requested/resolved IDs, input provenance and Agent axes. Later aliases/requeue/deleted/race variants retain explicit early-impact assessment and owners. |
+| #33/#35 | Literal selected R0 corpus supplies success/nonzero/cancels/denials/retained bytes; output uses its explicit native contract and installed access facts. Other source/mode observations keep their qualified boundaries. |
+| #34 | D43/D44 plus the [selected activation contract](../../../docs/design/csharp-activation.md) freeze early source ownership, current authority, candidate/accepted/active/LKG and failure/handoff/readback fences. Physical studies are feasibility, not product implementation. |
+| #36 | r0-contract-scope.json and r0-contract-variants.tsv mechanically join all seven R0 contributions, source/actor/seed/request/response/effect/completion and native credential-effect distinction. No specified row supplies product/replay GREEN. |
+| #42/#43/#44 | P0 accepts its bounded executable baseline/composition/contract evidence only after final review/debt/main gates. #113/#114/#115 implement and bind the actual selected Host/Agent/IAM/PG/Git/Storage/CLI effects; all required R0 cases must then pass. |
+
+### Comparison and execution binding boundary
+
+The recorded six workflows retain exact requests, statuses, media, field/type/array structure and
+actual state/byte effects. Before product execution, prepare explicit bijections for fixture Project,
+BuildType, User and Agent identities and returned Build IDs; all later locators, hrefs, provenance
+and downloads use those same mappings. Enqueue-returned identity is validated, not replaced with a
+hardcoded reference Build number. Map only the owned installation origin in public URLs.
+
+Timestamp fields are not dropped or wildcarded: queued/start/finish/finish-on-Agent, trigger/cancel
+and artifact modification times use independently controlled production time and independently
+observed actual process boundaries, with the installed field's UTC/offset wire format. Bind the
+fixture counter/number separately from Build identity, retaining the observed queued absence and
+cancelled-before-start `N/A`. Progress remains an integer estimate/unknown value with its observed
+state-dependent presence; a warm run's sample percentage is not a universal clock-independent
+literal. Test fixtures must make any asserted estimate independently reproducible from their
+declared clock/history, or leave that estimate assertion explicitly blocked. They cannot copy it
+from the product response. Status/outcome, errors, property/array structure, cancellation detail
+and artifact bytes retain their selected literal/reference obligations; they are not dynamic fields.
+These are the permitted binding rules. Arbitrary recursive string replacement, ignored fields and
+expected values copied from product responses are forbidden.
+Reference polling observations establish pending and terminal projections, not a universal number of
+network polls or a fixed real-time process duration. Gate the owned small process/actor at the
+required states and assert each required transition/terminal effect. Report a raw literal replay and
+an actual product workflow as distinct evidence. Missing comparison/binding prerequisites remain
+BLOCKED, never GREEN or an assumed compatible delay tolerance.
+
+Native variants use their own public contract as the representation oracle and independently
+prepared process bytes/effects. Existing NUnit/Test SDK fixtures own the future bindings; this
+register is contract data, not a fixture DSL, workflow engine or a passing placeholder test.
 
 Canonical partial links: AC-OPS-01, due AC-INS/AC-SU, AC-ACC-01, AC-AUTH-01/03, AC-SU-07,
 AC-KEY-01/02/03/04/05, bounded AC-ACC-03/09, AC-AG-01/07, AC-BLD-01/02/03/04/05 and

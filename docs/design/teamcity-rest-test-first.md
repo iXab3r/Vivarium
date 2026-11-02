@@ -141,6 +141,25 @@ bounded failure/cleanup behavior and measured maintenance/runtime cost. Select t
 composition from that evidence before materializing thousands of variants. This is part of the
 existing P0.REST.2 gate, not a new milestone or authorization to build a simulator platform.
 
+The selected P0 candidate now has a consolidated
+[composition/evidence/cost matrix](../../.workspace/workstreams/coherent-refactor/p0-composition-results.json).
+It retains fourteen actual ordinary/focused rows and the original explicitly reused physical evidence;
+it does not relabel those executions as a fresh run or compatible product GREEN.
+
+| Representative question | Minimal sufficient composition and real overlap |
+|---|---|
+| Native read/projection/readiness | Real Kestrel `/api/v1/system`, actual bearer/Git/SQLite and invalid-key control. Routing/auth/projection is tested as HTTP, not a fabricated minimal authorization service. |
+| Mutation/readback/denial/retry/cancel | Same owning production services in isolated minimal storage and real Host-owned composition; retained real native HTTP/process checks remain separate. Host-owned service calls are not labeled HTTP mutation proof. |
+| Work-bearing Agent/fault | Scripted assignment/ACK/result/replay and withheld ACK through actual owning services, compared with the same actor over pinned-TLS Kestrel/AgentHub. Existing D4/D31 native protocol is the oracle; no fake process completion or TeamCity wire claim. |
+| Timers/reset/isolation | Actual scheduled production timers on independent clocks/databases with identical IDs, bounded watchdog and verified owned cleanup. |
+| Target persistence/source | Retained actual PG/Git concurrency/durability/crash and isolated C# studies, with unchanged consumed-input rosters and original artifacts; SQLite does not prove the replacement PG integration. |
+
+The small actor measures setup/action/disposal and allocation diagnostics, while the matrix retains
+actual durations and boundaries. Prefer its minimal service seam for message/state variants and a
+decisive real transport overlap; use real processes/PG/Git for their own claims. This choice uses the
+existing NUnit/Test SDK and production services, not an emulator, fixture DSL or new runner. Final
+P0 aggregate/Security/debt/check/main gates remain; new-stack integration is still R0 work.
+
 ## Establish expectations without guessing
 
 For each case record the source reference/profile, operation and exact variant, business/TCM links,

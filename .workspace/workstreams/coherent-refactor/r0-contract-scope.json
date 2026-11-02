@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "SELECTED_R0_CONTRACT_PRODUCT_UNBOUND",
+  "contract_task": 114,
+  "acceptance_task": 115,
+  "required_reference_cases": [
+    "TCREST-R0-SCOPED-RUN-ARTIFACT-001",
+    "TCREST-R0-PROTECTED-SIBLING-BYTES-DENIED-001",
+    "TCREST-R0-PROJECT-ACTOR-AGENT-CONTROL-DENIED-001",
+    "TCREST-R0-SCOPED-NONZERO-EXIT-001",
+    "TCREST-R0-SCOPED-QUEUED-CANCEL-001",
+    "TCREST-R0-SCOPED-RUNNING-CANCEL-001"
+  ],
+  "required_specified_variants": [
+    "NATIVE-R0-OUTPUT-LIVE-RESUME-001",
+    "NATIVE-R0-OUTPUT-CURRENT-ACCESS-001",
+    "NATIVE-R0-OUTPUT-RESTART-REPLAY-001",
+    "NATIVE-R0-OUTPUT-EXPLICIT-GAP-001",
+    "NATIVE-R0-OUTPUT-REDACTION-001",
+    "NATIVE-R0-OUTPUT-CURSOR-EXPIRY-001",
+    "NATIVE-R0-OUTPUT-EMPTY-AND-BOUNDS-001",
+    "R0-CREDENTIAL-REVOKED-READS-001",
+    "R0-IAM-ISSUE-AND-CURRENT-GRANT-001",
+    "R0-IAM-PROJECT-RIGHTS-WITHDRAWAL-001",
+    "R0-IAM-EXPIRY-AND-DISABLE-001",
+    "R0-IAM-API-CHALLENGE-001",
+    "R0-SOURCE-UNBOUND-ACTIVATION-001",
+    "R0-SOURCE-REJECTED-CANDIDATE-001",
+    "R0-SOURCE-HANDOFF-RECOVERY-001",
+    "R0-SOURCE-HISTORY-AND-EDIT-001",
+    "R0-AGENT-READINESS-AND-DENIAL-001",
+    "R0-AGENT-ASSIGNMENT-OWNERSHIP-001",
+    "R0-RECOVERY-BUILD-AND-BYTES-001",
+    "R0-RECOVERY-CREDENTIAL-CONTINUITY-001",
+    "R0-HOST-DISCOVERY-001",
+    "R0-UNCHANGED-CLI-SMOKE-001"
+  ],
+  "contribution_ids": [
+    "SS-IAM->SS-HOST@R0",
+    "SS-CFG->SS-HOST@R0",
+    "SS-AGT->SS-HOST@R0",
+    "SS-RUN->SS-HOST@R0",
+    "SS-EXEC->SS-HOST@R0",
+    "SS-LOG->SS-HOST@R0",
+    "SS-BLOB->SS-HOST@R0"
+  ],
+  "global_variant_denominator": null,
+  "product_acceptance": "NOT_ACCEPTED",
+  "excluded_full_case": {
+    "id": "TCREST-R0-REVOKED-CREDENTIAL-BUILD-BYTES-DENIED-001",
+    "due_owner": "SS-IAM@R1",
+    "reason": "Complete PAT wire remains R1; R0 native preparation binds only explicit post-revoke read effects, never partial GREEN of the fullcase."
+  },
+  "integration_slice": "SS-HOST@R0"
+}

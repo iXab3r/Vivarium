@@ -75,8 +75,12 @@ Keep atomic Git publication and internal compare-and-swap separate from compatib
 The earlier physical study's internal `CONFLICT` is not evidence for returning 409 to these
 unconditional compatible writes. AC-CFG-03 is an explicitly version-checked extension. Its stronger
 precondition belongs only to an opted-in workflow and must remain neutral to ordinary clients.
-The shared mutation processing and admissible concurrency/completion oracles remain a P0 gate under
-the existing owners; this study introduces no second model or state authority.
+The [selected early activation contract](../../../docs/design/csharp-activation.md) now fixes P0's
+unbound R0 and C#/Git PILOT-preparation ownership/current-authority/activation/retry/readback fence.
+Those selected entries expose no compatible field-edit HTTP operation. The full unconditional
+HTTP mutation/concurrency oracles remain due with SS-CFG #122/#123/#124 before exposing those edits;
+their observed races are not an automatic 409 policy or a deterministic mixed-result oracle.
+This study introduces no second model or state authority.
 
 ## Diagnostics that are not accepted positive cases
 

@@ -41,6 +41,9 @@ public sealed class Report
     public int SelectedCoreSourceAllocationRows { get; set; }
     public int ProductionSourceDispositionRows { get; set; }
     public string KnownSourceAllocationState { get; set; } = "UNVERIFIED";
+    public int SpecifiedR0Variants { get; set; }
+    public int SelectedR0ReferenceCases { get; set; }
+    public string R0ContractEvidenceState => "SPECIFIED_PRODUCT_UNBOUND; not materialized TCREST, replay or product GREEN";
     public int NativeHttpSourceOccurrences { get; set; }
     public int AgentEnvelopeSourceOccurrences { get; set; }
     public int KnownStorySourceGaps { get; set; }
@@ -154,6 +157,7 @@ public static partial class Ledger
             Tasks(row["contract_task"]); Tasks(row["acceptance_task"]);
             Require(row["asserted_effect"].Length > 0 && row["product_prerequisite"].Length > 0, "Missing effect/prerequisite binding.");
         }
+        var r0Variants = ValidateR0Contract(root, byCase, byOwner, bySlice, contributions, metadataInputs, report);
         foreach (var contribution in contributions)
         {
             var owner = Find(byOwner, contribution["subsystem_id"], "contribution owner");
@@ -163,7 +167,15 @@ public static partial class Ledger
                 slice["implementation_issue"] == contribution["implementation_issue"], "Wrong contribution owner/task/milestone.");
             foreach (var task in Split(contribution["contributing_issues"]))
                 Require(slices.Any(s => s["milestone"] == slice["milestone"] && Split(s["implementation_issues"]).Contains(task)), "Orphan/cross-milestone contributing task.");
-            foreach (var id in Split(contribution["variant_case_ids"])) Find(byCase, id, "contribution case");
+            foreach (var id in Split(contribution["variant_case_ids"]))
+                if (!byCase.ContainsKey(id))
+                {
+                    var variant = Find(r0Variants, id, "contribution case");
+                    Require(contribution["rest_contract_issue"] == variant["contract_issue"] &&
+                        contribution["rest_acceptance_issue"] == variant["acceptance_issue"], "Cross-milestone native contribution binding.");
+                }
+            if (contribution.TryGetValue("related_reference_case_ids", out var references) && references != "none")
+                foreach (var id in Split(references)) Find(byCase, id, "related contribution reference case");
         }
 
         ValidateStorySources(root, byApi, byCase, byOwner, bySlice, metadataInputs, report);

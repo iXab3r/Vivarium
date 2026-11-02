@@ -60,6 +60,7 @@ public sealed class ApiLedgerTests
         CreateStorySourceLinks();
         CreateCliSourceAllocation();
         CreateSupplementalSourceAllocation();
+        CreateR0Contract();
         RebindMetadataInputs();
     }
 
@@ -97,6 +98,56 @@ public sealed class ApiLedgerTests
             "US-001\t86\tSS-PROTO@P0\t12\t33\t42");
         Table("story-dependencies.tsv", "story_id\tdependency_ref\trelation\tdependent_stage\trequired_output_or_contribution\towner_task\treadiness_or_unblock_condition\tclosure_semantics",
             "US-001\tnone\tassessed-dependency-basis\tP0\tOwned ready inputs\t36\tActual declared output, not task closure\tNo whole-story closure blocker");
+    }
+
+    private void CreateR0Contract()
+    {
+        Table("subsystem-contributions.tsv", "contribution_id\tsubsystem_id\tfull_owner_issue\tintegration_slice\tmilestone\timplementation_issue\tcontributing_issues\trest_contract_issue\trest_acceptance_issue\tvariant_case_ids",
+            "CONTRIBUTION\tSS-PROTO\t12\tSS-PROTO@P0\tP0\t12\t35\t33\t42\tCASE-1;NATIVE-CASE");
+        Table("r0-contract-variants.tsv", "variant_id\tkind\tcontribution_subsystems\tsource_path\tsource_case_id\tsource_exchange_indices\tprincipal_and_current_authority\tseed_and_prior_state\trequest_or_action\texpected_response\texpected_effect\tcompletion\tcomparison_bindings\tcontract_issue\tacceptance_issue\tproduct_binding\tstate",
+            "NATIVE-CASE\tnative-contract\tSS-PROTO\tinput.cs\t\t\tOrdinary current actor\tIndependent prior bytes\tGET native resource\tNative specified response\tExact retained bytes\tDurable reference before ACK\tIndependent fixture bytes\t33\t42\tUNBOUND\tSPECIFIED_PRODUCT_UNBOUND");
+        Write(Ledger.Workstream + "r0-contract-scope.json", new JsonObject
+        {
+            ["kind"] = "SELECTED_R0_CONTRACT_PRODUCT_UNBOUND", ["integration_slice"] = "SS-PROTO@P0",
+            ["contract_task"] = 33, ["acceptance_task"] = 42,
+            ["required_reference_cases"] = new JsonArray("CASE-1"),
+            ["required_specified_variants"] = new JsonArray("NATIVE-CASE"),
+            ["contribution_ids"] = new JsonArray("CONTRIBUTION"),
+            ["global_variant_denominator"] = null, ["product_acceptance"] = "NOT_ACCEPTED",
+            ["excluded_full_case"] = new JsonObject { ["id"] = "CASE-2", ["due_owner"] = "SS-PROTO@P0" },
+        }.ToJsonString());
+    }
+
+    [Test]
+    public void Selected_native_contract_joins_contribution_without_product_or_replay_GREEN()
+    {
+        var report = Read();
+        Assert.That(report.Errors, Is.Empty);
+        Assert.That(report.MaterializedCases, Is.EqualTo(2), "Specified native obligations are not materialized TCREST results.");
+    }
+
+    [TestCase("missing-variant")]
+    [TestCase("missing-contribution-link")]
+    [TestCase("missing-principal")]
+    [TestCase("false-GREEN")]
+    [TestCase("wrong-source")]
+    [TestCase("empty-completion")]
+    public void Missing_or_promoted_R0_contract_is_rejected_even_with_fresh_metadata_hashes(string corruption)
+    {
+        Assert.That(Read().Errors, Is.Empty);
+        switch (corruption)
+        {
+            case "missing-variant":
+                var path = Path.Combine(root, Ledger.Workstream + "r0-contract-variants.tsv");
+                File.WriteAllText(path, File.ReadLines(path).First() + "\n"); break;
+            case "missing-contribution-link": ReplaceTable("subsystem-contributions.tsv", "CASE-1;NATIVE-CASE", "CASE-1"); break;
+            case "missing-principal": ReplaceTable("r0-contract-variants.tsv", "Ordinary current actor", ""); break;
+            case "false-GREEN": ReplaceTable("r0-contract-variants.tsv", "SPECIFIED_PRODUCT_UNBOUND", "GREEN"); break;
+            case "wrong-source": ReplaceTable("r0-contract-variants.tsv", "input.cs", "missing.cs"); break;
+            case "empty-completion": ReplaceTable("r0-contract-variants.tsv", "Durable reference before ACK", ""); break;
+        }
+        RebindMetadataInputs();
+        Assert.That(Read().Errors, Is.Not.Empty);
     }
 
     [TearDown]
@@ -706,7 +757,7 @@ public sealed class ApiLedgerTests
             SupplementalFixtureInputs.Contains(input["path"]!.GetValue<string>())).ToArray())
             inputs.Remove(input);
         foreach (var path in Directory.GetFiles(Path.Combine(root, Ledger.Workstream), "*.tsv")
-            .Concat(new[] { "source-union-checkpoint.json", "supplemental-source-inputs.json", "r0-client-selection.json" }
+            .Concat(new[] { "source-union-checkpoint.json", "supplemental-source-inputs.json", "r0-client-selection.json", "r0-contract-scope.json" }
                 .Select(path => Path.Combine(root, Ledger.Workstream + path)))
             .Concat(SupplementalFixtureInputs.Select(path => Path.Combine(root, path)).Where(File.Exists)).Order(StringComparer.Ordinal))
         {
