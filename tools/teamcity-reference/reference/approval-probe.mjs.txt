@@ -1,0 +1,120 @@
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { setTimeout as pause } from 'node:timers/promises';
+import { execFileSync } from 'node:child_process';
+const { createTeamCityCli }=await import(pathToFileURL(resolve('artifacts/p0-rest-first/reference/cli-acquisition/dist/src/cli.js')));
+const area=resolve('artifacts/us013-approval-20261102'),run=resolve(area,'run-'+randomUUID().replaceAll('-',''));await mkdir(run,{recursive:true});
+const prefix='VivUs013Approval_20261102_'+run.split('run-').at(-1).slice(0,10),project=prefix+'_Project',job=project+'_Build';
+const owner='us013-approval-20261102',suffix=run.split('run-').at(-1).slice(0,10);
+const network='vivarium-us013-reported-net-'+suffix,agentContainer='vivarium-us013-reported-agent-'+suffix,agentName=prefix+'_Agent';
+const server='vivarium-p0-rest-teamcity-2026-1-3',serverId='a98f4443f2a5cddbe614fb442e4e8d644ce5a92ebc7bf085c40df51f1cb89cce';
+const serverImage='sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a';
+const agentImage='jetbrains/teamcity-minimal-agent@sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765';
+const docker=(...args)=>execFileSync('docker',args,{encoding:'utf8',timeout:120000,windowsHide:true,stdio:['ignore','pipe','pipe']}).trim();
+const profile='vivarium-teamcity-lab-202613',target='http://127.0.0.1:18111',privateState=resolve('artifacts/p0-rest-first/teamcity-lab/cli-state');
+if(resolve(process.env.APPDATA??'').toLowerCase()!==resolve(privateState,'roaming').toLowerCase()||resolve(process.env.LOCALAPPDATA??'').toLowerCase()!==resolve(privateState,'local').toLowerCase())throw Error('Private lab profile required.');
+const sha=b=>createHash('sha256').update(b).digest('hex'),source=await readFile(new URL(import.meta.url));await writeFile(resolve(run,'probe.mjs'),source);
+const receipt={kind:'BOUNDED_APPROVAL_REFERENCE_NOT_PRODUCT_CONFORMANCE',profile,target,prefix,project,job,sourcePin:'b158fe03eab3c31982a21b36c278f690f6b541d9',sourceSha256:sha(source),setup:[],cases:[],cleanup:[],observations:[],runtimeInputs:[],resources:{owner,network,agentContainer,agentName,agentImage,serverId},limits:'One named administrator, owned approval configuration and zero Agents. Tests approval independently of capacity, invalid approver, repeat and bounded timeout. No restricted-user/group/chain-wide/untrusted approval acceptance.'};
+const acquisition=resolve('artifacts/p0-rest-first/reference/cli-acquisition');
+for(const dir of ['src','dist/src','node_modules/@eyeauras/cli-factory/dist/src'])for(const p of (await readdir(resolve(acquisition,dir),{recursive:true})).filter(p=>/\.(?:js|ts)$/.test(p)).sort()){
+ const full=resolve(acquisition,dir,p);receipt.runtimeInputs.push({path:full,sha256:sha(await readFile(full))});
+}
+for(const p of ['package.json','package-lock.json','node_modules/@eyeauras/cli-factory/package.json']){const full=resolve(acquisition,p);receipt.runtimeInputs.push({path:full,sha256:sha(await readFile(full))});}
+let active,verified=false,created=false,cleanup=false,buildId,initial,failure,agentId,networkAttempted=false,connected=false,agentAttempted=false;
+const ownedBuilds=new Set(),problemsByBuild=new Map();
+const signal=AbortSignal.timeout(300000),save=()=>writeFile(resolve(run,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');
+const app=createTeamCityCli({fetch:async(input,init)=>{
+ const request=new Request(input,init),url=new URL(request.url),method=request.method,body=['GET','HEAD'].includes(method)?undefined:await request.clone().text();
+ if(url.origin!==target||url.username||url.password||url.hash)throw Error('Wrong target.');const path=decodeURIComponent(url.pathname);
+ const ownedBuild=[...ownedBuilds].some(id=>['/app/rest/builds/id:'+id,'/app/rest/buildQueue/id:'+id].some(p=>path===p||path.startsWith(p+'/')));
+ const problem=/^\/app\/rest\/problemOccurrences\/build:\(id:(\d+)\),problem:\(id:(\d+)\)$/.exec(path);
+ const ownedProblem=method==='GET'&&problem&&ownedBuilds.has(Number(problem[1]))&&problemsByBuild.get(Number(problem[1]))===problem[2];
+ const allowed=(method==='GET'&&['/app/rest/server','/app/rest/users/current','/app/rest/agents','/app/rest/projects/id:'+project].includes(path))||
+  (path==='/app/rest/projects'&&method==='POST'&&JSON.parse(body).id===project)||
+  (path==='/app/rest/projects/id:'+project&&method==='DELETE')||
+  (path==='/app/rest/buildTypes'&&method==='POST'&&JSON.parse(body).project?.id===project&&JSON.parse(body).id===job)||
+  (path==='/app/rest/buildTypes/id:'+job&&method==='GET')||
+  (['features','steps'].some(kind=>path==='/app/rest/buildTypes/id:'+job+'/'+kind)&&['GET','PUT'].includes(method))||
+  (agentId&&(path==='/app/rest/agents/id:'+agentId||path.startsWith('/app/rest/agents/id:'+agentId+'/')))||
+  (method==='GET'&&['/app/rest/projects','/app/rest/buildQueue'].includes(path))||
+  (path==='/app/rest/buildQueue'&&method==='POST'&&JSON.parse(body).buildType?.id===job)||ownedBuild||ownedProblem;
+ if(!allowed||(method!=='GET'&&!verified))throw Error('Unowned request: '+method+' '+path);
+ const headers={};for(const name of ['accept','content-type'])if(request.headers.has(name))headers[name]=request.headers.get(name);
+ const exchange={actor:'admin',request:{method,path:url.pathname,query:Object.fromEntries(url.searchParams),headers,...(body===undefined?{}:{body})}};active?.exchanges.push(exchange);
+ const response=await fetch(request,{redirect:'error',signal:cleanup?AbortSignal.timeout(120000):signal}),bytes=Buffer.from(await response.clone().arrayBuffer());
+ if(bytes.length>65536)throw Error('Entity bound exceeded.');const credential=request.headers.get('authorization')?.replace(/^(Bearer|Basic) /,'');
+ if(credential&&credential.length>8&&(bytes.toString().includes(credential)||body?.includes(credential)))throw Error('Credential entity export refused.');
+ exchange.response={status:response.status,headers:{'content-type':response.headers.get('content-type')??''},bodyBase64:bytes.toString('base64'),bodyBytes:bytes.length,bodySha256:sha(bytes)};return response;
+}});
+const invoke=args=>app.execute(['-p',profile,'--json',...args],cleanup?AbortSignal.timeout(120000):signal);
+async function group(kind,id,action){active={id,exchanges:[]};receipt[kind].push(active);try{return await action();}catch(error){active.error=String(error);throw error;}finally{await save();}}
+const observe=async(label,id=buildId)=>{const build=await invoke(['builds','show',String(id)]);if(build.buildTypeId!==job)throw Error('Build ownership differs.');receipt.observations.push({label,build});return build;};
+async function until(state,label,id=buildId){for(let i=0;i<80;i++){const build=await observe(label,id);if(build.state===state)return build;await pause(500);}throw Error('Owned lifecycle observation deadline exceeded: '+state);}
+const terminal=(label,id=buildId)=>until('finished',label,id);
+async function attempt(action){try{return {returned:true,result:await action()};}catch(error){if(typeof error.status!=='number')throw error;return {returned:false,status:error.status};}}
+let username;
+const feature = (rules,timeout=1) => ['jobs','features','replace-all',job,'--item',JSON.stringify({
+ type:'approval-feature',enabled:true,properties:[{name:'rules',value:rules},{name:'timeout',value:String(timeout)},{name:'manualStartIsApproval',value:'false'}]})];
+async function enqueue(label) {
+ const queued=await invoke(['jobs','run',job]);buildId=queued.build?.id;
+ if(!Number.isSafeInteger(buildId)||buildId<=0||queued.build.buildTypeId!==job)throw Error('Owned Build identity differs.');
+ ownedBuilds.add(buildId);await observe(label);return buildId;
+}
+const approval=label=>invoke(['queue','approval','show',String(buildId)]).then(value=>{receipt.observations.push({label,buildId,approval:value});return value;});
+const cancel=()=>invoke(['builds','cancel',String(buildId),'--comment','Owned approval capture cleanup']);
+async function approvalStatus(expected,label,limit=45000) {
+ const end=performance.now()+limit;
+ while(performance.now()<end){const value=await approval(label);if(value.status===expected)return value;await pause(500);}
+ throw Error('Approval status not observed: '+expected);
+}
+try {
+ await group('setup','verify-isolated-idle-reference',async()=>{
+  initial=await invoke(['permissions','list']);if(initial.some(p=>p.name!=='ReadOnly'&&p.enabled)||!initial.find(p=>p.name==='ReadOnly')?.enabled)throw Error('Private baseline gates differ.');
+  const status=await invoke(['server','status']);if(status.version!=='2026.1.3 (build 222742)'||String(status.buildNumber)!=='222742')throw Error('Wrong reference version.');
+  const agents=await invoke(['agents','list','--limit','1']);if(agents.items.length||agents.hasMore)throw Error('Reference approval capture requires zero Agents.');
+  const queue=await invoke(['queue','list','--limit','1']);if(queue.items.length||queue.hasMore)throw Error('Reference queue is not empty.');
+  const me=await invoke(['auth','status']);username=me.identity?.username;if(typeof username!=='string'||!username)throw Error('Missing ordinary named administrator.');
+  const metadata=JSON.parse(docker('inspect',server))[0];if(metadata.Id!==serverId||metadata.Image!==serverImage)throw Error('Reference identity differs.');
+  try{await invoke(['projects','show',project]);throw Error('Project collision.');}catch(error){if(error.status!==404)throw error;}
+  verified=true;await invoke(['permissions','grant','Update']);
+ });
+ await group('setup','create-owned-protected-configuration',async()=>{
+  created=true;await invoke(['projects','create',project,'--name','Owned approval reference']);
+  await invoke(['jobs','create',job,'--project',project,'--name','Owned approval consumer']);
+  await invoke(['jobs','steps','replace-all',job,'--item',JSON.stringify({name:'Owned approval process',type:'simpleRunner',properties:[{name:'script.content',value:'#!/bin/sh\necho owned-approval-only\n'},{name:'use.custom.script',value:'true'}]})]);
+  await invoke(feature('user:'+username));
+ });
+ await group('cases','explicit-approval-is-independent-of-agent-eligibility',async()=>{
+  await enqueue('Before explicit approval');await approvalStatus('waitingForApproval','Waiting for explicit approval');
+  receipt.approved=await invoke(['queue','approval','approve',String(buildId)]);await approvalStatus('approved','After explicit approval');
+  await pause(2000); const after=await observe('Approved but still queued without an Agent'); if(after.state!=='queued')throw Error('Approval must be isolated from absent-Agent eligibility in this source case.');
+  receipt.repeated=await attempt(()=>invoke(['queue','approval','approve',String(buildId)]));await approval('After repeat approval');
+  await cancel();
+ });
+ await group('cases','unknown-approver-keeps-literal-validation-and-error',async()=>{
+  await invoke(feature('user:'+prefix+'_MissingUser'));
+  await enqueue('Invalid approver queued');
+  await approval('Unknown approver literal state');
+  receipt.invalidApprove=await attempt(()=>invoke(['queue','approval','approve',String(buildId)]));await approval('After invalid-rule approve attempt');
+  const unknown=await observe('After unknown-user approval attempt');if(unknown.state==='queued'||unknown.state==='running')await cancel();
+ });
+ await group('cases','approval-timeout-literal-terminal-projection',async()=>{
+  await invoke(feature('user:'+username));await enqueue('Timeout waiting');await approvalStatus('waitingForApproval','Timeout initial approval');
+  const end=performance.now()+125000;let result;
+  do{result=await observe('Timeout lifecycle');if(result.state==='finished')break;await pause(1000);}while(performance.now()<end);
+  if(result.state!=='finished')throw Error('Owned approval timeout terminal state not observed.');
+  receipt.timeoutBuild=result;receipt.timeoutApproval=await attempt(()=>approval('Approval after timeout'));receipt.timeoutProblems=await invoke(['builds','problem-occurrences','list',String(buildId)]);
+ });
+} catch(error){receipt.failure=String(error);process.exitCode=1;}
+finally {
+ cleanup=true;
+ try{await group('cleanup','cancel-owned-queue-and-remove-project',async()=>{
+  if(!verified)return;
+  for(const id of ownedBuilds){const result=await invoke(['builds','show',String(id)]);if(result.buildTypeId!==job)throw Error('Cleanup Build ownership differs.');if(result.state==='queued'||result.state==='running'){buildId=id;await cancel();}}
+  if(created){await invoke(['projects','delete',project]);try{await invoke(['projects','show',project]);throw Error('Owned project remains.');}catch(error){if(error.status!==404)throw error;}}
+ });}catch(error){receipt.cleanupFailure=String(error);process.exitCode=1;}
+ if(verified)try{await invoke(['permissions','revoke','Update']);receipt.initialPermissions=initial;receipt.finalPermissions=await invoke(['permissions','list']);if(JSON.stringify(initial)!==JSON.stringify(receipt.finalPermissions))throw Error('Private gate restoration differs.');}catch(error){receipt.restoreFailure=String(error);process.exitCode=1;}
+ await app.dispose();receipt.complete=!process.exitCode;await save();console.log(JSON.stringify({run,complete:receipt.complete,groups:receipt.cases.length,exchanges:receipt.cases.reduce((n,c)=>n+c.exchanges.length,0),failure:receipt.failure,cleanupFailure:receipt.cleanupFailure,restoreFailure:receipt.restoreFailure}));
+}

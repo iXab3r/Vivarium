@@ -1,0 +1,64 @@
+id = "teamcity-migration"
+title = "Replace the owner's TeamCity build infrastructure with Vivarium"
+status = "parity-requirements-recorded-implementation-not-started"
+captured_date = "2026-10-31"
+vivarium_baseline = "09dd40bb8449261d54cf3bd6261b3b1d4227fee0"
+local_vivarium_head = "09dd40bb8449261d54cf3bd6261b3b1d4227fee0"
+previous_local_vivarium_head = "09997927c45344ee8512655e6998a80dccf4a818"
+working_branch = "bugfix/teamcity-behavior-parity"
+depot_baseline = "2023838"
+chiral_main_baseline = "41137a4"
+depot_chiral_package = "0.1.0-depot.48.1"
+depot_chiral_package_source = "ca5e4582be6b68c4e8bb61ac97a116d30b480eb5"
+lead_roles = ["Reconciliation Lead", "TeamCity", "Persistence/Migrations", "Git/Versioning", "Agent API/SDK", "Test Steward"]
+
+[inventory]
+source = "teamcity-cli 0.5.2, default profile, https://build.eyeauras.net"
+stable_id = "TeamCity build configuration id"
+projects_including_archived = 38
+archived_projects = 3
+build_configurations = 97
+unpaused_configurations = 81
+paused_configurations = 16
+enabled_steps_including_paused_jobs = 352
+snapshot_edges = 62
+artifact_edges = 45
+vcs_roots = 17
+registered_agents = 104
+authorized_connected_agents = 3
+per_job_surfaces = ["steps", "parameters", "agent-requirements", "snapshot-dependencies", "artifact-dependencies", "vcs", "triggers", "features", "templates", "latest-three-builds"]
+snapshot_directory = "artifacts/teamcity-migration"
+generated_inventory = "inventory.tsv"
+generated_dependencies = "dependencies.tsv"
+regenerate = ["pwsh -File .workspace/workstreams/teamcity-migration/collect-teamcity.ps1", "python .workspace/workstreams/teamcity-migration/summarize-teamcity.py", "python .workspace/workstreams/teamcity-migration/analyze-sources.py"]
+
+[parity]
+contract = "docs/design/teamcity-parity.md"
+rest_compatibility_contract = "docs/design/teamcity-rest-compatibility.md"
+client_compatibility = "Existing teamcity-cli and other consumers unchanged except normal server URL and Vivarium credential setup; both reads and writes."
+reported_cli_route_pairs = 449
+route_variant_census_status = "pending; reported client count is not target coverage"
+architecture_decisions = ["D32", "D33"]
+reference_server = "TeamCity 2026.1.3, build 222742"
+requirement_count = 120
+generated_requirement_catalog = "requirement-catalog.tsv"
+generated_configuration_map = "configuration-parity.tsv"
+supplemental_snapshot_directory = "artifacts/teamcity-parity"
+supplemental_reads = 322
+supplemental_read_failures = 0
+runtime_configurations_sampled = 88
+regenerate = ["pwsh -File .workspace/workstreams/teamcity-migration/collect-parity.ps1", "python .workspace/workstreams/teamcity-migration/map-parity.py"]
+
+[classification]
+migration_accepted_jobs = 0
+open_jobs = 97
+unclassified_jobs = 0
+note = "All 97 rows are classified as migration-open. Paused jobs remain visible and require a migrate-or-retire disposition; none were silently excluded."
+
+[constraints]
+production_changes = "The owner now authorized a pre-refactor checkpoint and milestone/issue planning. No TeamCity writes, builds, releases, deployments, credential export or product-code implementation are part of this planning task."
+target_direction = "C# authoring, one initial Host with in-process Chiral nodes, PostgreSQL business state."
+history = "Owner selected full import into Vivarium of all still-retained TeamCity build history, logs and artifacts; an external archive alone does not satisfy shutdown acceptance."
+coexistence = "TeamCity and Vivarium coexist; one initial full import plus explicitly requested repeatable one-way diff-imports."
+import_conflicts = "Keep the entire existing Vivarium entity snapshot or replace it with the TeamCity snapshot; no field merging or bidirectional synchronization."
+evidence_limit = "Metadata census is complete; executable parity and full live script/property-value export are not proven."

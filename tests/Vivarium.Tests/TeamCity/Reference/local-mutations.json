@@ -1,0 +1,855 @@
+{
+  "tool": "@eyeauras/teamcity-cli",
+  "version": "0.5.2+p0-lab-fixture-capture",
+  "sourceRevision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+  "command": "teamcity-cli -p vivarium-teamcity-lab-202613 --json server fixture-capture",
+  "profile": "vivarium-teamcity-lab-202613",
+  "target": "http://127.0.0.1:18111",
+  "fixturePrefix": "VivP0Second_20261101A",
+  "observedAtUtc": "2026-11-01T02:28:13.965Z",
+  "cases": [
+    {
+      "id": "TC-PROJECT-CREATE-READBACK-002",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/projects",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Project\",\"name\":\"Vivarium isolated fixture project\",\"parentProject\":{\"id\":\"_Root\"},\"description\":\"initial project\"}"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwidmlydHVhbCI6ZmFsc2UsImRlc2NyaXB0aW9uIjoiaW5pdGlhbCBwcm9qZWN0IiwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsInBhcmVudFByb2plY3QiOnsiaWQiOiJfUm9vdCIsIm5hbWUiOiI8Um9vdCBwcm9qZWN0PiIsImRlc2NyaXB0aW9uIjoiQ29udGFpbnMgYWxsIG90aGVyIHByb2plY3RzIiwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpfUm9vdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1fUm9vdCJ9LCJidWlsZFR5cGVzIjp7ImNvdW50IjowLCJidWlsZFR5cGUiOltdfSwidGVtcGxhdGVzIjp7ImNvdW50IjowLCJidWlsZFR5cGUiOltdfSwiZGVwbG95bWVudERhc2hib2FyZHMiOnsiY291bnQiOjB9LCJwYXJhbWV0ZXJzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2UDBTZWNvbmRfMjAyNjExMDFBX1Byb2plY3QvcGFyYW1ldGVycyIsImNvdW50IjowLCJwcm9wZXJ0eSI6W119LCJ2Y3NSb290cyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC92Y3Mtcm9vdHM/bG9jYXRvcj1wcm9qZWN0OihpZDpWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCkifSwicHJvamVjdEZlYXR1cmVzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0L3Byb2plY3RGZWF0dXJlcyJ9LCJwcm9qZWN0cyI6eyJjb3VudCI6MH19",
+            "bodyBytes": 960,
+            "bodySha256": "6f184aaf5d1f85edd7053b2517fdbe10762584305cdc76dc2aaf8b27414ce75c"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6ImluaXRpYWwgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "994b5ea42bfe915530837eb2944feb0bb22f42dbca6e0a9b4bf7f9638bdbc9c7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PROJECT-EDIT-READBACK-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project/description",
+            "query": {},
+            "headers": {
+              "accept": "text/plain",
+              "content-type": "text/plain"
+            },
+            "body": "updated project"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "dXBkYXRlZCBwcm9qZWN0",
+            "bodyBytes": 15,
+            "bodySha256": "8ec76c92cf0502f208f16554fb52af906423ae7648190d2f1a5b28e2c2d3597c"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PROJECT-DUPLICATE-ID-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/projects",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Project\",\"name\":\"Duplicate rejected project\",\"parentProject\":{\"id\":\"_Root\"}}"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDAgKEJhZCBSZXF1ZXN0KS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXJTaWRlLmlkZW50aWZpZXJzLkR1cGxpY2F0ZUV4dGVybmFsSWRFeGNlcHRpb246IFByb2plY3QgSUQgXCJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdFwiIGlzIGFscmVhZHkgdXNlZCBieSBhbm90aGVyIHByb2plY3QuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IlByb2plY3QgSUQgXCJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdFwiIGlzIGFscmVhZHkgdXNlZCBieSBhbm90aGVyIHByb2plY3QifV19",
+            "bodyBytes": 372,
+            "bodySha256": "447457dc7260c6e44ae9af9051aae9ebd583217a8a79ee764875e847b4a5845b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PROJECT-MALFORMED-ID-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/projects",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Bad-Project\",\"name\":\"Malformed rejected project\",\"parentProject\":{\"id\":\"_Root\"}}"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJFcnJvciBoYXMgb2NjdXJyZWQgZHVyaW5nIHJlcXVlc3QgcHJvY2Vzc2luZywgc3RhdHVzIGNvZGU6IDUwMCAoSW50ZXJuYWwgU2VydmVyIEVycm9yKS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXJTaWRlLkludmFsaWRJZGVudGlmaWVyRXhjZXB0aW9uOiBQcm9qZWN0IElEIFwiVml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1Qcm9qZWN0XCIgaXMgaW52YWxpZDogY29udGFpbnMgdW5zdXBwb3J0ZWQgY2hhcmFjdGVyICctJy4gSUQgc2hvdWxkIHN0YXJ0IHdpdGggYSBsYXRpbiBsZXR0ZXIgYW5kIGNvbnRhaW4gb25seSBsYXRpbiBsZXR0ZXJzLCBkaWdpdHMgYW5kIHVuZGVyc2NvcmVzIChhdCBtb3N0IDIyNSBjaGFyYWN0ZXJzKS4iLCJzdGFja1RyYWNlIjpudWxsLCJtZXNzYWdlIjoiUHJvamVjdCBJRCBcIlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CYWQtUHJvamVjdFwiIGlzIGludmFsaWQ6IGNvbnRhaW5zIHVuc3VwcG9ydGVkIGNoYXJhY3RlciAnLScuIElEIHNob3VsZCBzdGFydCB3aXRoIGEgbGF0aW4gbGV0dGVyIGFuZCBjb250YWluIG9ubHkgbGF0aW4gbGV0dGVycywgZGlnaXRzIGFuZCB1bmRlcnNjb3JlcyAoYXQgbW9zdCAyMjUgY2hhcmFjdGVycykuIn1dfQ==",
+            "bodyBytes": 658,
+            "bodySha256": "0edc9e429b5f5deeee786cc9a9079c43396a8e8aef9d7f4dcc173255e3e2434f"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:_Root",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIGFsbCBvdGhlciBwcm9qZWN0cyIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1fUm9vdCJ9",
+            "bodyBytes": 162,
+            "bodySha256": "1df75674bc9c1793eb46df527071a84bb2236509182de97c2f8c91b292ea5133"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:($base64:Vml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1Qcm9qZWN0)",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1Qcm9qZWN0Jy4gUHJvamVjdCBjYW5ub3QgYmUgZm91bmQgYnkgZXh0ZXJuYWwgaWQgJ1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CYWQtUHJvamVjdCcuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6Ik5vIHByb2plY3QgZm91bmQgYnkgbG9jYXRvciAnY291bnQ6MSxpZDpWaXZQMFNlY29uZF8yMDI2MTEwMUFfQmFkLVByb2plY3QnLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1Qcm9qZWN0Jy4ifV19",
+            "bodyBytes": 498,
+            "bodySha256": "32d18f65161e5168883226186d136704d107d568915a198a09837885c7f4ea84"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-BUILDTYPE-CREATE-READBACK-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildTypes",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Build\",\"name\":\"Vivarium isolated fixture build\",\"project\":{\"id\":\"VivP0Second_20261101A_Project\"},\"description\":\"initial build\"}"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJpbml0aWFsIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "8780ee1dc7ddf16f70e48c8fa7e8516f71145072ad820824c1ed2ac87aa83d11"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJpbml0aWFsIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "8780ee1dc7ddf16f70e48c8fa7e8516f71145072ad820824c1ed2ac87aa83d11"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-BUILDTYPE-EDIT-READBACK-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build/description",
+            "query": {},
+            "headers": {
+              "accept": "text/plain",
+              "content-type": "text/plain"
+            },
+            "body": "updated build"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "dXBkYXRlZCBidWlsZA==",
+            "bodyBytes": 13,
+            "bodySha256": "3735e9488aa7052a690734c5a582c22acf5e9f1980d8f2f2ec61811c63e41d87"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJ1cGRhdGVkIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "7bcc05ef29a07658ec6fdee54a1a91959d6ef51b02403cd77fde46ed265ec657"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-BUILDTYPE-DUPLICATE-ID-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildTypes",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Build\",\"name\":\"Duplicate rejected build\",\"project\":{\"id\":\"VivP0Second_20261101A_Project\"}}"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDAgKEJhZCBSZXF1ZXN0KS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXJTaWRlLmlkZW50aWZpZXJzLkR1cGxpY2F0ZUV4dGVybmFsSWRFeGNlcHRpb246IFRoZSBidWlsZCBjb25maWd1cmF0aW9uIC8gdGVtcGxhdGUgSUQgXCJWaXZQMFNlY29uZF8yMDI2MTEwMUFfQnVpbGRcIiBpcyBhbHJlYWR5IHVzZWQgYnkgYW5vdGhlciBjb25maWd1cmF0aW9uIG9yIHRlbXBsYXRlLiIsInN0YWNrVHJhY2UiOm51bGwsIm1lc3NhZ2UiOiJUaGUgYnVpbGQgY29uZmlndXJhdGlvbiAvIHRlbXBsYXRlIElEIFwiVml2UDBTZWNvbmRfMjAyNjExMDFBX0J1aWxkXCIgaXMgYWxyZWFkeSB1c2VkIGJ5IGFub3RoZXIgY29uZmlndXJhdGlvbiBvciB0ZW1wbGF0ZSJ9XX0=",
+            "bodyBytes": 458,
+            "bodySha256": "8bdccf3603d4e7fa09ba470437586828f91a4afaee3094878ab9ca261dc74636"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJ1cGRhdGVkIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "7bcc05ef29a07658ec6fdee54a1a91959d6ef51b02403cd77fde46ed265ec657"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-BUILDTYPE-MALFORMED-ID-001",
+      "actor": "admin",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildTypes",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_Bad-Build\",\"name\":\"Malformed rejected build\",\"project\":{\"id\":\"VivP0Second_20261101A_Project\"}}"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJFcnJvciBoYXMgb2NjdXJyZWQgZHVyaW5nIHJlcXVlc3QgcHJvY2Vzc2luZywgc3RhdHVzIGNvZGU6IDUwMCAoSW50ZXJuYWwgU2VydmVyIEVycm9yKS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXJTaWRlLkludmFsaWRJZGVudGlmaWVyRXhjZXB0aW9uOiBCdWlsZCBjb25maWd1cmF0aW9uIG9yIHRlbXBsYXRlIElEIFwiVml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1CdWlsZFwiIGlzIGludmFsaWQ6IGNvbnRhaW5zIHVuc3VwcG9ydGVkIGNoYXJhY3RlciAnLScuIElEIHNob3VsZCBzdGFydCB3aXRoIGEgbGF0aW4gbGV0dGVyIGFuZCBjb250YWluIG9ubHkgbGF0aW4gbGV0dGVycywgZGlnaXRzIGFuZCB1bmRlcnNjb3JlcyAoYXQgbW9zdCAyMjUgY2hhcmFjdGVycykuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IkJ1aWxkIGNvbmZpZ3VyYXRpb24gb3IgdGVtcGxhdGUgSUQgXCJWaXZQMFNlY29uZF8yMDI2MTEwMUFfQmFkLUJ1aWxkXCIgaXMgaW52YWxpZDogY29udGFpbnMgdW5zdXBwb3J0ZWQgY2hhcmFjdGVyICctJy4gSUQgc2hvdWxkIHN0YXJ0IHdpdGggYSBsYXRpbiBsZXR0ZXIgYW5kIGNvbnRhaW4gb25seSBsYXRpbiBsZXR0ZXJzLCBkaWdpdHMgYW5kIHVuZGVyc2NvcmVzIChhdCBtb3N0IDIyNSBjaGFyYWN0ZXJzKS4ifV19",
+            "bodyBytes": 702,
+            "bodySha256": "83e9d74633368cb7cd77309beedcc08781eb42aac1f110ffaf331c80d34efeb5"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:($base64:Vml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1CdWlsZA)",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBidWlsZCB0eXBlIG5vciB0ZW1wbGF0ZSBpcyBmb3VuZCBieSBpZCAnVml2UDBTZWNvbmRfMjAyNjExMDFBX0JhZC1CdWlsZCcuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6Ik5vIGJ1aWxkIHR5cGUgbm9yIHRlbXBsYXRlIGlzIGZvdW5kIGJ5IGlkICdWaXZQMFNlY29uZF8yMDI2MTEwMUFfQmFkLUJ1aWxkJy4ifV19",
+            "bodyBytes": 348,
+            "bodySha256": "57927546a96b5e51a9cfc2f9786077dc48c8638dca9b0cb65456a909bfc9e4ad"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PERMISSION-VIEW-PROJECT-GRANTED-001",
+      "actor": "restricted-token",
+      "exchanges": [
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        },
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJ1cGRhdGVkIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "7bcc05ef29a07658ec6fdee54a1a91959d6ef51b02403cd77fde46ed265ec657"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PERMISSION-EDIT-PROJECT-DENIED-001",
+      "actor": "restricted-token",
+      "exchanges": [
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        },
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project/description",
+            "query": {},
+            "headers": {
+              "accept": "text/plain",
+              "content-type": "text/plain"
+            },
+            "body": "unauthorized project update"
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDMgKEZvcmJpZGRlbikuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyU2lkZS5hdXRoLkFjY2Vzc0RlbmllZEV4Y2VwdGlvbjogWW91IGRvIG5vdCBoYXZlIGVub3VnaCBwZXJtaXNzaW9ucyB0byBlZGl0IHByb2plY3Qgd2l0aCBpZDogVml2UDBTZWNvbmRfMjAyNjExMDFBX1Byb2plY3QuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IllvdSBkbyBub3QgaGF2ZSBlbm91Z2ggcGVybWlzc2lvbnMgdG8gZWRpdCBwcm9qZWN0IHdpdGggaWQ6IFZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0In1dfQ==",
+            "bodyBytes": 376,
+            "bodySha256": "97bc26dde717461e37d0d44771aa2f2fb1d2293387a5a426c57d1ba908251eb1"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PERMISSION-EDIT-BUILDTYPE-DENIED-001",
+      "actor": "restricted-token",
+      "exchanges": [
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJ1cGRhdGVkIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "7bcc05ef29a07658ec6fdee54a1a91959d6ef51b02403cd77fde46ed265ec657"
+          }
+        },
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build/description",
+            "query": {},
+            "headers": {
+              "accept": "text/plain",
+              "content-type": "text/plain"
+            },
+            "body": "unauthorized build update"
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDMgKEZvcmJpZGRlbikuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyU2lkZS5hdXRoLkFjY2Vzc0RlbmllZEV4Y2VwdGlvbjogWW91IGRvIG5vdCBoYXZlIGVub3VnaCBwZXJtaXNzaW9ucyB0byBlZGl0IGJ1aWxkIGNvbmZpZ3VyYXRpb24gd2l0aCBpZDogVml2UDBTZWNvbmRfMjAyNjExMDFBX0J1aWxkLiIsInN0YWNrVHJhY2UiOm51bGwsIm1lc3NhZ2UiOiJZb3UgZG8gbm90IGhhdmUgZW5vdWdoIHBlcm1pc3Npb25zIHRvIGVkaXQgYnVpbGQgY29uZmlndXJhdGlvbiB3aXRoIGlkOiBWaXZQMFNlY29uZF8yMDI2MTEwMUFfQnVpbGQifV19",
+            "bodyBytes": 396,
+            "bodySha256": "1524adbe7edab51c80645acb5a51125387fd6d5db2c112563ad862811c37ef5e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivP0Second_20261101A_Build",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZCIsIm5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIGJ1aWxkIiwicGF1c2VkIjpmYWxzZSwiZGVzY3JpcHRpb24iOiJ1cGRhdGVkIGJ1aWxkIiwicHJvamVjdE5hbWUiOiJWaXZhcml1bSBpc29sYXRlZCBmaXh0dXJlIHByb2plY3QiLCJwcm9qZWN0SWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlAwU2Vjb25kXzIwMjYxMTAxQV9CdWlsZD9tb2RlPWJ1aWxkcyJ9",
+            "bodyBytes": 309,
+            "bodySha256": "7bcc05ef29a07658ec6fdee54a1a91959d6ef51b02403cd77fde46ed265ec657"
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-PERMISSION-CREATE-PROJECT-DENIED-001",
+      "actor": "restricted-token",
+      "exchanges": [
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlAwU2Vjb25kXzIwMjYxMTAxQV9Qcm9qZWN0IiwibmFtZSI6IlZpdmFyaXVtIGlzb2xhdGVkIGZpeHR1cmUgcHJvamVjdCIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6InVwZGF0ZWQgcHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9",
+            "bodyBytes": 243,
+            "bodySha256": "082f7cb78bf6454580b392a53329d75a1e6f70f7c3e21d9b047e02d087ff0b64"
+          }
+        },
+        {
+          "actor": "restricted-token",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/projects",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"id\":\"VivP0Second_20261101A_DeniedProject\",\"name\":\"Unauthorized rejected project\",\"parentProject\":{\"id\":\"_Root\"}}"
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDMgKEZvcmJpZGRlbikuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyU2lkZS5hdXRoLkFjY2Vzc0RlbmllZEV4Y2VwdGlvbjogWW91IGRvIG5vdCBoYXZlIFwiQ3JlYXRlIHN1YnByb2plY3RcIiBwZXJtaXNzaW9uIGluIHByb2plY3Qgd2l0aCBpbnRlcm5hbCBpZDogX1Jvb3QuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IllvdSBkbyBub3QgaGF2ZSBcIkNyZWF0ZSBzdWJwcm9qZWN0XCIgcGVybWlzc2lvbiBpbiBwcm9qZWN0IHdpdGggaW50ZXJuYWwgaWQ6IF9Sb290In1dfQ==",
+            "bodyBytes": 364,
+            "bodySha256": "def7bbfe60dc124c81196b65faccb29833d0c4e48121f98d9dee2b46f70c87dd"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivP0Second_20261101A_DeniedProject",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "content-type": "application/json",
+              "cache-control": "no-store"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2UDBTZWNvbmRfMjAyNjExMDFBX0RlbmllZFByb2plY3QnLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2UDBTZWNvbmRfMjAyNjExMDFBX0RlbmllZFByb2plY3QnLiIsInN0YWNrVHJhY2UiOm51bGwsIm1lc3NhZ2UiOiJObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2UDBTZWNvbmRfMjAyNjExMDFBX0RlbmllZFByb2plY3QnLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2UDBTZWNvbmRfMjAyNjExMDFBX0RlbmllZFByb2plY3QnLiJ9XX0=",
+            "bodyBytes": 506,
+            "bodySha256": "bbcb66921485bbd2499c08296695752ece0dd7c3d7ef0f94e50935a3569a6954"
+          }
+        }
+      ]
+    }
+  ],
+  "entityEncoding": "Original HTTP response entity after fetch content decoding; no reserialization",
+  "server": {
+    "version": "2026.1.3 (build 222742)",
+    "versionMajor": 2026,
+    "versionMinor": 1,
+    "startTime": "20261101T020743+0000",
+    "currentTime": "20261101T022813+0000",
+    "buildNumber": "222742",
+    "role": "main_node",
+    "webUrl": "http://127.0.0.1:18111"
+  },
+  "apiVersion": {
+    "tool": "@eyeauras/teamcity-cli",
+    "version": "0.5.2+p0-reference-capture",
+    "sourceRevision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+    "command": "teamcity-cli --json server reference-capture api-version",
+    "operation": "api-version",
+    "request": {
+      "method": "GET",
+      "path": "/app/rest/apiVersion",
+      "headers": {
+        "accept": "text/plain"
+      }
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "content-type": "text/plain"
+      }
+    },
+    "bodyBase64": "MjAyNi4x",
+    "bodyBytes": 6,
+    "bodySha256": "226fe4d6075c39f1125f08546d92c565a6f2dcee8557921e9a04d5d825860229",
+    "entityEncoding": "HTTP response entity after fetch content decoding; no JSON/XML reserialization"
+  },
+  "restVersion": {
+    "tool": "@eyeauras/teamcity-cli",
+    "version": "0.5.2+p0-reference-capture",
+    "sourceRevision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+    "command": "teamcity-cli --json server reference-capture rest-version",
+    "operation": "rest-version",
+    "request": {
+      "method": "GET",
+      "path": "/app/rest/version",
+      "headers": {
+        "accept": "text/plain"
+      }
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "content-type": "text/plain"
+      }
+    },
+    "bodyBase64": "MjIyNzQy",
+    "bodyBytes": 6,
+    "bodySha256": "7162309caf8ac042899290d4f9f639427cc517ce55bf5359a4b913ff51df9eee",
+    "entityEncoding": "HTTP response entity after fetch content decoding; no JSON/XML reserialization"
+  },
+  "admin": {
+    "actor": {
+      "username": "vivarium-lab-admin",
+      "id": 1
+    },
+    "roles": [
+      {
+        "roleId": "SYSTEM_ADMIN",
+        "scope": "g"
+      }
+    ]
+  },
+  "restrictedActor": {
+    "username": "vivarium-lab-admin",
+    "id": 1,
+    "tokenName": "VivP0Second_20261101A_ViewToken",
+    "restrictions": [
+      {
+        "permission": "VIEW_PROJECT",
+        "project": "VivP0Second_20261101A_Project"
+      }
+    ],
+    "secretStorage": "Existing profile-scoped CLI secret store; never exported"
+  },
+  "actorEvidence": {
+    "id": "ACTOR-RESTRICTION-PROVENANCE",
+    "actor": "admin",
+    "exchanges": [
+      {
+        "actor": "admin",
+        "request": {
+          "method": "GET",
+          "path": "/app/rest/users/current/tokens",
+          "query": {
+            "fields": "count,token(name,creationTime,expirationTime,permissionRestrictions(permissionRestriction(permission(id),project(id),isGlobalScope)))"
+          },
+          "headers": {
+            "accept": "application/json"
+          }
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "content-type": "application/json",
+            "cache-control": "no-store"
+          },
+          "bodyBase64": "eyJjb3VudCI6MiwidG9rZW4iOlt7Im5hbWUiOiJ2aXZhcml1bS1wMC1yZXN0LWxhYi0yMDI2MTMiLCJjcmVhdGlvblRpbWUiOiIyMDI2MTEwMVQwMjEzNTErMDAwMCIsImV4cGlyYXRpb25UaW1lIjoiMjAyNjEyMDFUMDIxMzUxKzAwMDAifSx7Im5hbWUiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfVmlld1Rva2VuIiwiY3JlYXRpb25UaW1lIjoiMjAyNjExMDFUMDIyODE0KzAwMDAiLCJwZXJtaXNzaW9uUmVzdHJpY3Rpb25zIjp7InBlcm1pc3Npb25SZXN0cmljdGlvbiI6W3siaXNHbG9iYWxTY29wZSI6ZmFsc2UsInByb2plY3QiOnsiaWQiOiJWaXZQMFNlY29uZF8yMDI2MTEwMUFfUHJvamVjdCJ9LCJwZXJtaXNzaW9uIjp7ImlkIjoidmlld19wcm9qZWN0In19XX19XX0=",
+          "bodyBytes": 380,
+          "bodySha256": "07bdc7e618f17e0ab226897cca2349ad8dd2ae2aaef46e05cd6ad5adede4b340"
+        }
+      }
+    ]
+  },
+  "completedAtUtc": "2026-11-01T02:28:14.463Z"
+}

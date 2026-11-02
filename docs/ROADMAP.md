@@ -1,7 +1,101 @@
 # Roadmap
 
-Ordered so that every phase ends with something usable. Decision references (D1…D29) point into
+Ordered so that every phase ends with something usable. Decision references (D1…D40) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+**Refactor planning, 2026-10-31:** the owner requested a frozen current-state checkpoint and an
+iterated, Depot-informed replacement plan before implementation. The [draft coordinated plan](../.workspace/workstreams/coherent-refactor/plan.md)
+contains milestone gates, pending decisions, scenarios and issue routing. It does not yet supersede
+accepted decisions or claim that the new implementation exists. Resolve P0 before starting it.
+
+Owner clarifications: D34 accepts Depot authentication/superuser and TeamCity authorization 1:1;
+D35 accepts Chiral configuration ownership, PostgreSQL business state and Depot's actual
+TypeScript/Vite Workbench UI. RF-10 permits each verified milestone to merge separately into main.
+These target decisions are recorded; their runtime replacement is not implemented.
+The [current workstream handover](../.workspace/workstreams/coherent-refactor/handover.md#current-state--2026-11-01)
+separates the existing product, accepted replacement, delivered P0 tooling and remaining gates.
+
+D36 brings resource/identity/state/mutation/protocol REST decomposition into P0 before implementation.
+The first new-stack local server + real Agent lab is R0.1; unchanged CLI smoke execution is R0.2,
+with restart/cleanup proof at R0 exit. The first real product is then the
+[T3Personal PILOT](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md): full
+Prepare/Windows/Release and default publication through UI, direct /app/rest and unchanged CLI.
+The owner chose breadth-first levels across all configurations/surfaces, not Prepare-first or serial
+UI/REST/CLI completion. Near-term order remains accepted P0 → R0 → PILOT. Windows, coherent chain
+artifacts, used Release trigger/coexistence and default publication are early due here. Other families
+and history/diff-import get later milestone allocation before implementation/after predecessor closure.
+R1–R6 retain broader full-scope owners and cumulative gates, not unrelated blanket prerequisites.
+Pull only the needed shared production contributions forward; full IAM/editor/all-runners/history do
+not block this targeted product. R2 completes general source/catalogue behavior; R5 is cumulative
+conformance. See the [concrete local gates](../.workspace/workstreams/coherent-refactor/local-lab.md)
+and [early REST breakdown](../.workspace/workstreams/coherent-refactor/rest-breakdown.md).
+
+D38 makes executable REST compatibility tests the first P0 execution slice: P0.REST.1 freezes
+reference-backed cases, P0.REST.2 implements strict WireMock.Net replay and the shared conformance
+tests, and P0.REST.3 publishes actual Vivarium RED/GREEN/blockers before structural replacement.
+Before bulk expansion, P0.REST.2 proves a minimal deterministic production-code composition with
+scripted external actors/timers, isolation and measured maintenance/runtime cost. WireMock handles
+HTTP replay; it does not become a second scheduler or a required server for every test.
+See [the mandatory TDD/acceptance gate](design/teamcity-rest-test-first.md). Broad coverage should
+produce hundreds/thousands of meaningful variants; no mock-only GREEN or guessed failing oracle.
+UI technology aligns with Depot while useful TeamCity/current-Vivarium composition remains.
+
+D39 binds every milestone to contract → implementation → REST-acceptance tasks and its parent
+closure gate. [Block register](../.workspace/workstreams/coherent-refactor/api-blocks.tsv) and
+[API-ledger delivery](design/api-ledger-delivery.md) define mechanical API-complete, focused tests,
+final independent aggregate and Security/Adversarial review and zero debt before the next milestone.
+The [offline accounting foundation](design/api-ledger-accounting.md) now validates ledger/TRX joins,
+provenance and explicit reuse, with 47 accounting controls. Current assessment: 449 headings,
+15 known cases, five product RED, ten product-blocked and zero GREEN; variant denominator and
+compatibility percentage remain unknown, API-complete false. Full source allocation/due-scope freeze
+and #42 baseline acceptance remain open. No implementation milestone or final review PASS is claimed.
+
+D40 makes [coherent subsystems](design/subsystems.md) the implementation units. REST-contract and
+acceptance subtasks belong to their subsystem slice; milestone blocks aggregate their progress.
+The full discovery ledger retains one primary owner and collaborator links per operation. Track
+subsystem lifecycle/integration and API-complete separately, then milestone/global status. These
+logical owners do not imply extra services/nodes or delayed early REST obligations.
+
+D37 makes Build/Agent semantics a continuously tested TeamCity superset. The
+[business AC](acceptance/README.md) are stable implementation-independent requirements;
+[model/wire/component evidence](design/testing-model.md) supports them. Every milestone preserves
+its implemented base suite and relevant extension neutrality; this check does not wait until R5.
+
+## Immediate priority — replace TeamCity without functional loss (D32)
+
+The accepted build-product contract is [TeamCity behavioral parity](design/teamcity-parity.md).
+The [REST compatibility contract](design/teamcity-rest-compatibility.md) is also required: existing
+`teamcity-cli` and other clients must work through the TeamCity-shaped API without client rewrites.
+C# catalog definitions, in-process Chiral composition and PostgreSQL are the new target; current
+SQLite/YAML execution remains transitional. This priority governs the next unimplemented slices;
+the older Phase-1 sequence below records foundation progress and remaining scope, not a competing
+instruction to finish AgentExplorer/provider work first.
+
+1. Establish the Chiral/PostgreSQL/C# build foundation while preserving queue, identity, ownership,
+   cancellation, audit and result guarantees. Prove a real source-checkout Compile with durable logs,
+   reports and artifacts.
+2. Deliver reusable projects/configurations, inherited/typed run parameters, VCS branches/revisions,
+   requirements and per-Agent compatibility reasons, trigger/queue policy and operational build UI.
+3. Deliver dependency graphs, exact upstream artifact/output selection, build counters/numbers,
+   resource locks and verified publication for the existing real build families.
+4. Deliver .NET/TRX and the currently used JUnit producers, individual test history/duration/details,
+   failure comparison, investigation/mute workflows, structured log search/tail/download and retained
+   statistics. These are migration gates, not optional polish after command execution.
+5. Migrate each family with its API/UI/operator workflow and known failure behavior proven. Preserve
+   paused configurations and rare release paths until explicit disposition.
+6. Import all retained TeamCity build/test/log/artifact history; support repeatable one-way diff-import
+   with whole-entity keep-Vivarium/use-TeamCity choices during coexistence. Close final-delta,
+   standalone history-read and backup/restore gates before shutting TeamCity down.
+
+The checklist in [the parity contract](design/teamcity-parity.md) owns stable acceptance IDs; the
+workstream inventory/ledger owns per-configuration verification. No stage is closed by translating
+files alone. Complete slices should supply usable diagnostics early; the order above is not permission
+to postpone all logs/tests/UI until the final migration. VM/image and expanded AgentExplorer work
+remain later priorities unless an inventoried build requires them.
+
+Implement compatible read and mutation endpoints alongside the corresponding native domain slices.
+Freeze client method/path/variant coverage, then run unchanged-client conformance on isolated fixtures;
+neither matching route names nor native OpenAPI coverage alone closes D33.
 
 ## Phase 0 — Design & skeleton *(complete)*
 
@@ -129,14 +223,14 @@ Phase 1 delivery sequence (completed and remaining):
      setup/recovery UI and local CLI, and removal of legacy credential adapters.
    Dynamic process/network/environment refresh waits for policy, fleet authorization, operation
    persistence, and observation fencing.
-7. **Partial:** complete deployment and release UX, then port the proven flows to React/EyeAuras Workbench.
+7. **Partial:** complete deployment and release UX, then port the proven flows to TypeScript/EyeAuras Workbench.
    The D30 per-Agent central upgrade core is implemented: exact Server-release package import, authenticated
    delivery, pre/post-handoff cancellation semantics, durable drain/restart/probation/two-sided
    commit/rollback history, bounded singleton child supervision, strict local package evidence,
    exact prior/deadline binding, durable failure quarantine, bounded session outboxes, supervised-
    bootstrap capability gating, skew-safe watchdogs, CLI, restart recovery, two-Agent isolation, and real bootstrap success/rollback
    process evidence. Remaining work is installer/stamped archives,
-   fleet rollout/channels, release signing/packaging, previous-version/Windows gates, and the React UI
+   fleet rollout/channels, release signing/packaging, previous-version/Windows gates, and the TypeScript UI
    (D2, D19-D21, D25, D30).
 
 Static typed facts deliberately precede the first Git-backed mutation because they are observed state,
@@ -154,8 +248,8 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   implemented. General identity/RBAC management, runtime operations, remaining configuration mutations,
   and detailed result resources remain. The live CLI build flow now consumes REST/SSE; the gRPC ControlPlane is frozen
   transitional compatibility only (D24, D28).
-- React + EyeAuras Workbench panel as a clean replacement for the current Blazor prototype. Vendor the
-  reviewed core/React/router built packages with exact source commit, license, notice, and reproducible
+- TypeScript + EyeAuras Workbench panel as a clean replacement for the current Blazor prototype. Vendor the
+  reviewed core/TypeScript/router built packages with exact source commit, license, notice, and reproducible
   sync metadata; serve static assets from Kestrel and consume REST/SSE only. The shell uses a narrow
   TeamCity/AgentExplorer/Administration switch rail plus one expandable context pane; Agents is a
   dedicated collection route and every Agent has a separate detail route with Agent-local tabs (D25).
@@ -166,9 +260,11 @@ contracts. The checklist below records the remaining acceptance scope; it does n
 - TeamCity Project and Build Configuration catalog over Git-backed definitions, including ordered
   steps, requirements, parameters, VCS bindings, immutable definition/source revisions, and compatible/
   incompatible-agent explanations (D14, D17, D23).
-- TeamCity-compatible RBAC plus separate fleet/AgentExplorer permissions; one-time local first-admin claim,
-  managed-local Git baseline, durable resumable setup, and explicit bounded Superuser recovery. Migrate
-  coarse admin/submit tokens without widening their authority (D26).
+- Depot-style Identity/OpenIddict OIDC and normal installation-user login; TeamCity role/permission
+  IDs, editability, project/group inheritance and REST behavior 1:1, persisted in PostgreSQL (D34).
+  Replace custom setup/recovery/password/Git-RBAC paths with verified framework composition; migrate
+  existing users and coarse admin/submit consumers under an explicit disposition. Native AgentExplorer
+  extension actions keep distinct permission IDs without changing TeamCity grants.
 - Durable structured audit journal and bounded/redacted diagnostic, build, and AgentExplorer output with
   correlation/idempotency/Git revision linkage (D27).
 - Bootstrap + `setup.ps1` / `setup.sh` one-liners with enroll token and pinned certificate; enroll →
@@ -207,7 +303,7 @@ contracts. The checklist below records the remaining acceptance scope; it does n
   and immutable build snapshots for the earlier parameter model already exist (D8, D16, D23).
 - Live service-message parsing/streaming remains deferred; step status + heartbeats suffice for the
   Phase-1 core (D14).
-- React panel: port the implemented agent/build/result views, then expose the durable TRX-derived
+- TypeScript panel: port the implemented agent/build/result views, then expose the durable TRX-derived
   per-test projection through public REST and add live log tail (plain durable build/cell details and
   artifact downloads exist in the transitional Blazor panel; the full test × scenario view with
   history comes later).
@@ -243,7 +339,8 @@ credentials), provisioning `expected-reboot` resume (requires a durable step cur
 
 ## Phase 4 — More platforms
 
-- Linux guests: same agent, `linux-x64` publish; JUnit adapter for `cargo nextest` payloads.
+- Linux guests: same agent, `linux-x64` publish; extend native payload coverage over the JUnit
+  normalization already required for the current nextest/Node/Vitest/Playwright CI migration (D32).
 - QEMU/KVM driver for a dedicated Linux host.
 
 ## Phase 5 — macOS

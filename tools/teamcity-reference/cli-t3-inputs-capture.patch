@@ -1,0 +1,233 @@
+diff --git a/integrations/teamcity/src/client.ts b/integrations/teamcity/src/client.ts
+--- a/integrations/teamcity/src/client.ts
++++ b/integrations/teamcity/src/client.ts
+@@ -1,4 +1,5 @@
+ import { referenceOperation, referenceCapture } from "./reference-capture.js";
++import { captureT3Inputs, t3Origin } from "./t3-inputs-capture.js";
+ import { teamCityUrl } from "./server-url.js";
+ import * as triage from "./triage-models.js";
+ import * as admin from "./admin-models.js";
+@@ -3985,6 +3986,12 @@
+     const response = await this.#response("GET", operation.path, "fields" in operation ? { fields: operation.fields } : {}, undefined, operation.accept, operation.accept, true);
+     return referenceCapture(name, response, this.#token, this.#signal);
+   }
++  public async captureT3Inputs() {
++    if (this.#baseUrl !== t3Origin || this.#guest) throw new Error("T3 capture requires the exact reference origin and authenticated access.");
++    const signal = AbortSignal.any([AbortSignal.timeout(30000), ...(this.#signal ? [this.#signal] : [])]);
++    const bounded = new TeamCityClient({ baseUrl: this.#baseUrl, token: this.#token!, fetch: this.#fetch, signal });
++    return captureT3Inputs((path, fields) => bounded.#response("GET", path, { fields }, undefined, "application/json", "application/json", true), this.#token, signal);
++  }
+   async #response(
+     method: HttpMethod,
+     path: string,
+diff --git a/integrations/teamcity/src/system-commands.ts b/integrations/teamcity/src/system-commands.ts
+--- a/integrations/teamcity/src/system-commands.ts
++++ b/integrations/teamcity/src/system-commands.ts
+@@ -6,6 +6,7 @@
+   type OptionDefinition,
+ } from "@eyeauras/cli-factory";
+ import type { TeamCityClient } from "./client.js";
++import { assertT3Profile } from "./t3-inputs-capture.js";
+ import { clientLeaf, option, text, repeatOption, jsonOption } from "./command-support.js";
+ export function createSystemCommands(
+   clientFor: (c: CommandContext) => Promise<TeamCityClient>,
+@@ -149,6 +150,10 @@
+     ),
+   ]);
+   const server = [
++    command("t3-inputs-capture", "Capture only the fixed T3Personal reference input cohort", async (_input, context) => {
++      assertT3Profile(context.profile.name, context.profile.values.url);
++      return (await clientFor(context)).captureT3Inputs();
++    }, { permission: R }),
+     leaf("reference-capture <operation>", "Capture fixed read-only version/schema HTTP evidence", R,
+       (c, { args }) => c.captureReference(args.operation)),
+     leaf("rest-info", "Read relative REST landing metadata", R, (c) => c.getRestInfo()),
+diff --git a/integrations/teamcity/src/t3-inputs-capture.ts b/integrations/teamcity/src/t3-inputs-capture.ts
+new file mode 100644
+--- /dev/null
++++ b/integrations/teamcity/src/t3-inputs-capture.ts
+@@ -0,0 +1,77 @@
++import { createHash } from "node:crypto";
++import { readResponseBody } from "@eyeauras/cli-factory";
++
++export const t3Origin = "https://build.eyeauras.net";
++export function assertT3Profile(name: string, url: unknown) {
++  if (name !== "default" || url !== t3Origin) throw new Error("T3 capture requires the exact default profile and verified URL.");
++}
++const identity = "id,buildTypeId,number,state,status";
++const revision = "version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id)";
++export const t3BuildFields = `${identity},settingsHash,currentSettingsHash,revisions(count,revision(${revision})),versionedSettingsRevision(${revision}),snapshot-dependencies(count,build(${identity})),artifact-dependencies(count,build(${identity}))`;
++const modeFields = "synchronizationMode,buildSettingsMode,vcsRootId,settingsPath,format,allowUIEditing,applyChangesInDependenciesAndVcsSettings";
++const operations = [
++  { path: "/app/rest/server", fields: "version,buildNumber,webUrl", maxBytes: 1024, kind: "server" },
++  ...[[32726, "T3Personal_Release"], [32725, "T3Personal_Windows"], [32724, "T3Personal_Prepare"]].map(([id, job]) => ({ path: `/app/rest/builds/id:${id}`, fields: t3BuildFields, maxBytes: 16384, kind: "build", id, job })),
++  { path: "/app/rest/projects/id:T3Personal/versionedSettings/config/effective", fields: `project(id),config(${modeFields})`, maxBytes: 4096, kind: "config" },
++] as const;
++
++type Shape = "string" | "number" | "boolean" | { [key: string]: Shape } | readonly [Shape];
++const buildIdentity: Shape = { id: "number", buildTypeId: "string", number: "string", state: "string", status: "string" };
++const revisionShape: Shape = { version: "string", internalVersion: "string", vcsBranchName: "string", "checkout-rules": "string", "vcs-root-instance": { id: "string", "vcs-root-id": "string" } };
++const dependencies: Shape = { count: "number", build: [buildIdentity] };
++const buildShape: Shape = { ...buildIdentity, settingsHash: "string", currentSettingsHash: "string", revisions: { count: "number", revision: [revisionShape] }, versionedSettingsRevision: revisionShape, "snapshot-dependencies": dependencies, "artifact-dependencies": dependencies };
++const configShape: Shape = { project: { id: "string" }, config: { synchronizationMode: "string", buildSettingsMode: "string", vcsRootId: "string", settingsPath: "string", format: "string", allowUIEditing: "boolean", applyChangesInDependenciesAndVcsSettings: "boolean" } };
++
++function validate(value: unknown, shape: Shape): void {
++  if (typeof shape === "string") {
++    if (typeof value !== shape || (shape === "number" && (!Number.isSafeInteger(value) || Number(value) < 0))) throw new Error("Unexpected projected scalar.");
++    return;
++  }
++  if (Array.isArray(shape)) {
++    if (!Array.isArray(value) || value.length > 8) throw new Error("Unexpected projected collection.");
++    for (const item of value) validate(item, shape[0]!);
++    return;
++  }
++  if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error("Unexpected projected object.");
++  for (const [key, item] of Object.entries(value)) {
++    if (!Object.hasOwn(shape, key)) throw new Error("Unrequested response field; capture refused.");
++    validate(item, (shape as Record<string, Shape>)[key]!);
++  }
++  if ("count" in value) {
++    const collection = value as { count: number; build?: unknown[]; revision?: unknown[] };
++    if (collection.count > 8 || collection.count !== (collection.build ?? collection.revision ?? []).length) throw new Error("Unexpected incomplete collection; no automatic paging.");
++  }
++}
++
++/** Fixed independent reference cohort. No supplied locator/path, parameters, logs or traversal. */
++export async function captureT3Inputs(
++  request: (path: string, fields: string) => Promise<Response>, token: string | undefined, signal: AbortSignal,
++) {
++  const exchanges: Array<{ request: { method: string; path: string; query: { fields: string } }; response: { status: number; headers: Record<string, string> }; bodyBase64?: string; bodyBytes?: number; bodySha256?: string; bodyOmitted?: string }> = [];
++  for (const op of operations) {
++    const response = await request(op.path, op.fields);
++    const contentType = response.headers.get("content-type");
++    const headers: Record<string, string> = {};
++    if (contentType) {
++      if (contentType.length > 200 || (token && contentType.includes(token)) || !/^[A-Za-z0-9.+-]+\/[A-Za-z0-9.+-]+(?:;\s*charset=[A-Za-z0-9_-]+)?$/.test(contentType)) throw new Error("Unexpected or unsafe media header.");
++      headers["content-type"] = contentType;
++    }
++    const metadata = { request: { method: "GET", path: op.path, query: { fields: op.fields } }, response: { status: response.status, headers } };
++    if (response.status !== 200) {
++      void response.body?.cancel().catch(() => undefined);
++      exchanges.push({ ...metadata, bodyOmitted: "Non-200 payload omitted; remaining fixed reads not attempted." });
++      return { complete: false, exchanges };
++    }
++    if (!contentType || contentType.split(";")[0]?.toLowerCase() !== "application/json") throw new Error("Expected projected JSON media header.");
++    const bytes = await readResponseBody(response, { maxBytes: op.maxBytes, signal });
++    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
++    if ((token && text.includes(token)) || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(text)) throw new Error("Unsafe reference payload.");
++    const value = JSON.parse(text) as Record<string, unknown>;
++    if (token && JSON.stringify(value).includes(token)) throw new Error("Credential in decoded reference payload.");
++    validate(value, op.kind === "server" ? { version: "string", buildNumber: "string", webUrl: "string" } : op.kind === "build" ? buildShape : configShape);
++    if (op.kind === "server" && (value.version !== "2026.1.3 (build 222742)" || value.buildNumber !== "222742" || value.webUrl !== t3Origin + "/")) throw new Error("Unexpected reference version or canonical origin.");
++    if ("id" in op && (value.id !== op.id || value.buildTypeId !== op.job)) throw new Error("Unexpected reference Build identity.");
++    exchanges.push({ ...metadata, bodyBase64: Buffer.from(bytes).toString("base64"), bodyBytes: bytes.length, bodySha256: createHash("sha256").update(bytes).digest("hex") });
++  }
++  return { complete: true, exchanges };
++}
+diff --git a/integrations/teamcity/tests/t3-inputs-capture.test.ts b/integrations/teamcity/tests/t3-inputs-capture.test.ts
+new file mode 100644
+--- /dev/null
++++ b/integrations/teamcity/tests/t3-inputs-capture.test.ts
+@@ -0,0 +1,102 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { TeamCityClient } from "../src/client.js";
++import { createTestRuntime } from "./support.js";
++
++const origin = "https://build.eyeauras.net";
++const server = { version: "2026.1.3 (build 222742)", buildNumber: "222742", webUrl: origin + "/" };
++const builds: Record<string, string> = { "32726": "T3Personal_Release", "32725": "T3Personal_Windows", "32724": "T3Personal_Prepare" };
++function response(url: URL) {
++  if (url.pathname === "/app/rest/server") return server;
++  if (url.pathname.endsWith("/effective")) return { project: { id: "T3Personal" }, config: { synchronizationMode: "enabled", buildSettingsMode: "useFromVCS" } };
++  const id = url.pathname.split(":").at(-1)!;
++  return { id: Number(id), buildTypeId: builds[id], state: "finished", status: "SUCCESS", revisions: { count: 1, revision: [{ version: "a".repeat(40) }] }, "snapshot-dependencies": { count: 0 }, "artifact-dependencies": { count: 0 } };
++}
++function client(fetch: typeof globalThis.fetch, baseUrl = origin) {
++  return new TeamCityClient({ baseUrl, token: "fixture-token", fetch });
++}
++
++test("fixed receipt uses five bounded GETs and preserves original entities without session headers", async () => {
++  const paths: string[] = [];
++  const result = await client(async (input, init) => {
++    const url = new URL(String(input)); paths.push(url.pathname);
++    assert.equal(url.origin, origin); assert.equal(init?.method, "GET"); assert.equal(init?.redirect, "manual");
++    assert.equal(new Headers(init?.headers).get("authorization"), "Bearer fixture-token");
++    assert.ok(init?.signal);
++    assert.doesNotMatch(url.searchParams.get("fields")!, /parameters|properties|token|password/);
++    return new Response(JSON.stringify(response(url)), { headers: { "content-type": "application/json", "set-cookie": "private-cookie" } });
++  }).captureT3Inputs();
++  assert.deepEqual(paths, ["/app/rest/server", "/app/rest/builds/id:32726", "/app/rest/builds/id:32725", "/app/rest/builds/id:32724", "/app/rest/projects/id:T3Personal/versionedSettings/config/effective"]);
++  assert.equal(result.exchanges.length, 5);
++  for (const exchange of result.exchanges) assert.deepEqual(JSON.parse(Buffer.from(exchange.bodyBase64!, "base64").toString()), response(new URL(exchange.request.path, origin)));
++  assert.doesNotMatch(JSON.stringify(result), /fixture-token|private-cookie/);
++});
++
++test("denied ReadOnly stops before authentication; wrong profile prevents network", async t => {
++  for (const permissions of [[], ["ReadOnly"]]) {
++    const fixture = await createTestRuntime(t, { profiles: [{ name: "other", url: origin, permissions }], tokens: permissions.length ? { other: "fixture-token" } : {} });
++    fixture.runtime.fetch = async () => { throw new Error("network must not run"); };
++    await assert.rejects(fixture.createCli().execute(["server", "t3-inputs-capture"]), permissions.length ? /exact default profile/ : /Permission 'ReadOnly'/);
++  }
++});
++
++test("wrong origin and mismatched server fail before build reads", async () => {
++  let calls = 0;
++  const fetch = async () => { calls++; return Response.json({ ...server, buildNumber: "other" }); };
++  await assert.rejects(client(fetch, "https://other.test").captureT3Inputs(), /exact reference origin/);
++  assert.equal(calls, 0);
++  await assert.rejects(client(fetch).captureT3Inputs(), /reference version/);
++  assert.equal(calls, 1);
++});
++
++test("redirect is never followed and error payload is omitted", async () => {
++  let calls = 0;
++  await assert.rejects(client(async () => { calls++; return new Response(null, { status: 302, headers: { location: "https://other.test" } }); }).captureT3Inputs());
++  assert.equal(calls, 1);
++  const result = await client(async () => new Response("private-error", { status: 403 })).captureT3Inputs();
++  assert.equal(result.exchanges.length, 1); assert.equal(result.exchanges[0]!.response.status, 403);
++  assert.doesNotMatch(JSON.stringify(result), /private-error/); assert.equal(result.complete, false);
++});
++
++test("oversize, credentials and unexpected response fields are refused", async () => {
++  for (const body of ["x".repeat(1025), JSON.stringify({ ...server, version: "fixture-token" }), JSON.stringify({ ...server, properties: { password: "secret" } })]) {
++    await assert.rejects(client(async () => new Response(body, { headers: { "content-type": "application/json" } })).captureT3Inputs());
++  }
++});
++
++test("missing selected fields stay absent; truncated collections fail closed", async () => {
++  for (const truncated of [false, true]) {
++    const c = client(async input => {
++      const url = new URL(String(input)); const value = response(url);
++      if (url.pathname.includes("/builds/")) {
++        delete (value as Record<string, unknown>).revisions;
++        if (truncated) (value as Record<string, unknown>)["snapshot-dependencies"] = { count: 1 };
++      }
++      return Response.json(value);
++    });
++    if (truncated) await assert.rejects(c.captureT3Inputs(), /incomplete collection/);
++    else {
++      const result = await c.captureT3Inputs();
++      assert.equal("revisions" in JSON.parse(Buffer.from(result.exchanges[1]!.bodyBase64!, "base64").toString()), false);
++    }
++  }
++});
++
++test("different selected dependency IDs are recorded without extra traversal", async () => {
++  let calls = 0;
++  const result = await client(async input => {
++    calls++; const url = new URL(String(input)); const value = response(url);
++    if (url.pathname.endsWith("32726")) (value as Record<string, unknown>)["artifact-dependencies"] = { count: 1, build: [{ id: 99999, buildTypeId: "T3Personal_Windows" }] };
++    return Response.json(value);
++  }).captureT3Inputs();
++  assert.equal(calls, 5);
++  assert.equal(JSON.parse(Buffer.from(result.exchanges[1]!.bodyBase64!, "base64").toString())["artifact-dependencies"].build[0].id, 99999);
++});
++
++test("JSON-escaped credentials in otherwise allowed revision fields are refused", async () => {
++  await assert.rejects(client(async input => {
++    const url = new URL(String(input)); const value = response(url);
++    if (url.pathname.includes("/builds/")) (value as Record<string, unknown>).revisions = { count: 1, revision: [{ version: "fixture-token" }] };
++    return new Response(JSON.stringify(value).replace("fixture-token", "fixture\\u002dtoken"), { headers: { "content-type": "application/json" } });
++  }).captureT3Inputs(), /Credential in decoded/);
++});

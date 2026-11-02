@@ -38,7 +38,7 @@ Not in scope:
 - Provider-specific CLI/API implementation.
 - User-role definitions, REST representation style, Git workflow details, or log retention policy.
 - Multi-controller consensus or high availability. The target remains one controller and one serialized
-  SQLite writer.
+  PostgreSQL transaction.
 - Multiple independent mutating slots inside one agent. A physical machine and a VM currently have
   mutation capacity one.
 - Exactly-once network delivery. Vivarium uses durable intent, at-least-once delivery, idempotency,
@@ -163,7 +163,7 @@ AgentLease
 
 This is a conceptual contract, not a mandatory single table layout. Its required properties are:
 
-1. SQLite enforces at most one nonterminal lease for a stable `agent_id`; neither session nor
+1. PostgreSQL constraints/transactions enforce at most one nonterminal lease for a stable `agent_id`; neither session nor
    ProviderInstance identity can substitute for that uniqueness key.
 2. Allocating a lease and incrementing its Agent-scoped fence is one serialized transaction.
 3. The lease points to an existing domain record. Domain-specific state and results never move into a
@@ -177,7 +177,7 @@ This is a conceptual contract, not a mandatory single table layout. Its required
    lease/fence. A standalone provider action owns its own lease. When an ownership handoff is required,
    it is one durable compare-and-swap with no unleased schedulable gap.
 
-The controller must not hold the SQLite writer across agent or provider I/O. It performs:
+The controller must not hold a PostgreSQL transaction across agent or provider I/O. It performs:
 
 ```text
 commit intent and fence
@@ -226,7 +226,7 @@ Admission persists:
 
 - caller/principal identity and authentication method reference;
 - Project and Build Configuration stable IDs and immutable definition revision;
-- authorization policy revision and Git commit/content hash;
+- current PostgreSQL authorization decision and versioned settings Git commit/content hash;
 - permitted and selected pool/trust class;
 - the decision reason/rule identifier without embedding secrets.
 
@@ -316,7 +316,8 @@ missing platform does not block unrelated agents. Selection must consider:
 - caller/Project/Build Configuration authorization to the pool/trust class, filtered before all
   compatibility diagnostics;
 - static compatibility;
-- connected/reconciled/authorized/enabled/healthy eligibility;
+- connected/reconciled/authorized/healthy eligibility plus enablement for ordinary automatic work;
+  explicit custom targeting of a disabled suitable Agent follows AC-AG-06 and the frozen profile;
 - current Agent lease;
 - Build Configuration and Project concurrency caps;
 - provider pool and host resource reservations;
@@ -415,7 +416,7 @@ atomically supersedes the old stream; messages already buffered on the old strea
 On controller startup:
 
 1. Load every nonterminal domain record, Agent lease, cancellation intent, deadline, and provider
-   operation from SQLite.
+   operation from PostgreSQL.
 2. Mark their Agents reconciling in the in-memory projection.
 3. Arm persisted startup reconnect grace where required; never derive a fresh unbounded grace on each
    restart.
@@ -589,7 +590,7 @@ following semantics from day one:
   may explicitly request fail-fast admission, which returns a conflict without creating hidden work.
 - A completed operation remains queryable according to retention policy; reconnecting clients never
   depend on the original HTTP connection.
-- `correlation_id` is returned to the caller and propagated to all durable transitions, SQLite audit
+- `correlation_id` is returned to the caller and propagated to all durable transitions, PostgreSQL audit
   rows, and operational logs.
 
 Illustrative resources, subject to REST Expert naming review:
@@ -609,7 +610,7 @@ masquerade as durable mutating operations.
 ## Audit and correlation
 
 Ordinary process logs are not the action journal. From the first REST/Git/UI mutation surface, the
-controller maintains a minimal append-only SQLite `audit_events` table (or equivalently an audit
+controller maintains a minimal append-only PostgreSQL `audit_events` table (or equivalently an audit
 outbox feeding that table). A domain state transition and its audit row are written in the same
 serialized transaction. Caller, security, and configuration actions without a domain transition are
 persisted before success is returned. An exporter may tail an outbox cursor, but delivery failure
@@ -645,7 +646,7 @@ Do not put access tokens, full environment values, secrets, payload bytes, or un
 arguments in the audit row or scheduling logs. Heartbeats are high volume: persist/audit only
 connection or liveness state changes and aggregated missed-heartbeat diagnostics, not every heartbeat.
 Payload stdout/stderr belongs to the Build/operation log stream, not the audit table. Operational logs
-may mirror audit events for diagnostics, but SQLite remains the local source of action history.
+may mirror audit events for diagnostics, but PostgreSQL remains the local source of action history.
 
 ## Failure and retry policy
 
@@ -691,7 +692,7 @@ All coordination code is covered at the lowest useful tier with virtual time. Re
 - Historical target snapshot retains Agent/provider capabilities, actual image/checkpoint, session,
   trust class, and authorization/config revisions after live facts change.
 - Async REST idempotency replay and cancellation replay.
-- Atomic domain-transition plus SQLite audit/outbox write, including crash/replay behavior, correlated
+- Atomic domain-transition plus PostgreSQL audit/outbox write, including crash/replay behavior, correlated
   from request to terminal/release without secret-bearing values.
 
 Tier-2 protocol tests must eventually run against the previous released agent version so new workload
@@ -708,7 +709,7 @@ fields remain backward compatible after pool checkpoint restore.
 | Git/Versioning | Effective policy object, Git provenance, reconcile/apply semantics, stale-repo behavior |
 | UI | Honest starting/reconnecting/cancelling/releasing/unknown phases and machine-busy explanations |
 | User Roles / Admin | Pre-compatibility caller/Project/Configuration access to pools/trust classes; permissions for submit, cancel, priority override, force, emergency drain, provider and maintenance actions |
-| Logs | Durable SQLite audit/outbox schema, operational-log projection, redaction, sampling/rate limits, retention/export |
+| Logs | Durable PostgreSQL audit/outbox schema, operational-log projection, redaction, sampling/rate limits, retention/export |
 | Platform | Process-tree kill, reboot, power, restore/clone identity, post-operation readiness on each OS/provider |
 | Reconciliation Lead | Startup, reconnect, rollback, ambiguity, partial failure, and unknown-state review |
 | Docs | Architecture decision reconciliation and current-versus-target accuracy |
@@ -729,7 +730,7 @@ fields remain backward compatible after pool checkpoint restore.
    terminal state and which must remain `UNKNOWN` until an operator inspects the host?
 7. What is the explicit irreversible commit point for restore, hard power, destroy, software mutation,
    and future file writes?
-8. What is the retention/export policy for the mandatory SQLite audit table, and which sensitive
+8. What is the retention/export policy for the mandatory PostgreSQL audit table, and which sensitive
    read-only AgentExplorer actions require individual rather than aggregated audit rows?
 9. Which scheduling settings are farm-wide Git desired state versus repository-local
    `vivarium.yaml`, and how are conflicting scopes resolved?

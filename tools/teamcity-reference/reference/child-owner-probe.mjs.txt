@@ -1,0 +1,366 @@
+import { createTeamCityCli } from '../p0-rest-first/reference/cli-acquisition/dist/src/cli.js';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { execFileSync } from 'node:child_process';
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { setTimeout as pause } from 'node:timers/promises';
+
+const area = resolve('artifacts/us013-child-owner-20261102');
+const run = resolve(area, 'run-' + randomUUID().replaceAll('-', ''));
+await mkdir(run, { recursive: true });
+const suffix = run.split('run-').at(-1).slice(0, 10);
+const prefix = 'VivUs013ChildOwner_20261102_' + suffix;
+const project = prefix + '_Project', job = project + '_Build';
+const child = project + '_Child', childJob = child + '_Build', rootId = project + '_Git';
+const target = 'http://127.0.0.1:18111', profile = 'vivarium-teamcity-lab-202613';
+const owner = 'us013-child-owner-20261102';
+const server = 'vivarium-p0-rest-teamcity-2026-1-3';
+const network = 'vivarium-us013-mode-net-' + suffix, transport = 'vivarium-us013-mode-git-' + suffix;
+const image = 'jetbrains/teamcity-server@sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a';
+const gitRoot = resolve(run, 'git'), bare = resolve(gitRoot, 'settings.git'), work = resolve(run, 'work');
+const expectedState = resolve('artifacts/p0-rest-first/teamcity-lab/cli-state');
+if (resolve(process.env.APPDATA ?? '').toLowerCase() !== resolve(expectedState, 'roaming').toLowerCase() ||
+    resolve(process.env.LOCALAPPDATA ?? '').toLowerCase() !== resolve(expectedState, 'local').toLowerCase())
+  throw new Error('Isolated lab credential/profile store required.');
+const command = (exe, args, cwd) => execFileSync(exe, args, { cwd, encoding: 'utf8', timeout: 120000,
+  stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }).trim();
+const git = (...args) => command('git', args);
+const docker = (...args) => command('docker', args);
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const acquisition = resolve('artifacts/p0-rest-first/reference/cli-acquisition');
+const scriptBytes = await readFile(new URL(import.meta.url));
+await writeFile(resolve(run, 'probe.mjs'), scriptBytes);
+const runtimeInputs = [];
+for (const directory of ['src', 'dist/src', 'node_modules/@eyeauras/cli-factory/dist/src']) {
+  for (const path of (await readdir(resolve(acquisition, directory), { recursive: true })).filter(p => /\.(?:js|ts)$/.test(p)).sort()) {
+    const full = resolve(acquisition, directory, path);
+    runtimeInputs.push({ path: full, sha256: sha(await readFile(full)) });
+  }
+}
+for (const path of ['package.json', 'package-lock.json', 'node_modules/@eyeauras/cli-factory/package.json']) {
+  const full = resolve(acquisition, path); runtimeInputs.push({ path: full, sha256: sha(await readFile(full)) });
+}
+const receipt = { kind: 'BOUNDED_REFERENCE_OBSERVATION_NOT_PRODUCT_CONFORMANCE', profile, target, prefix,
+  observedAtUtc: new Date().toISOString(), repositoryBase: git('rev-parse', 'HEAD'),
+  cliUpstreamRevision: JSON.parse(await readFile('.workspace/workstreams/coherent-refactor/source-union-checkpoint.json', 'utf8')).cli_source_revision,
+  cliSourceProvenance: 'Upstream revision declared by retained acquisition pin, with prior capture-only patches; extracted directory is not an independent Git checkout. Current source/runtime bytes fingerprinted separately.',
+  runtimeInputs,
+  scriptSha256: sha(scriptBytes),
+  acquisitionVariant: 'Pinned acquisition CLI transport; fixed owned git-daemon URL and bounded status diagnostic projection; empty-204 effective-config projection failure is recorded and handled only for acquisition. No installed/acceptance CLI change or unchanged-client claim.',
+  actor: 'Administrator hierarchy fixture; no current-grant or distinct-user proof.',
+  setup: [], cases: [], cleanup: [], sourceSnapshots: [], observations: [] };
+await writeFile(resolve(area, 'latest-run.txt'), run + '\n');
+const save = () => writeFile(resolve(run, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
+let active, phase = 'setup', verified = false, gateChanged = false;
+let networkAttempted = false, transportAttempted = false, connected = false, serverId;
+const context = new AsyncLocalStorage();
+const normalSignal = AbortSignal.timeout(900000);
+let sequence = 0, barrier, lastAppliedHead;
+const nativeFetch = globalThis.fetch;
+function client(clientName) {
+  return createTeamCityCli({ fetch: async (input, init) => {
+    let request = new Request(input, init);
+    let url = new URL(request.url);
+    if (url.origin !== target) throw new Error('Wrong origin refused.');
+    if (request.method === 'GET' && url.pathname === `/app/rest/projects/id:${project}/versionedSettings/status`) {
+      url.searchParams.set('fields', 'type,timestamp,dslOutdated,missingContextParameters,message,versionedSettingsError(message,type,file)');
+      request = new Request(url, request);
+    }
+    if (request.method === 'POST' && url.pathname === '/app/rest/vcs-roots') {
+      const root = await request.clone().json();
+      if (root.id !== rootId) throw new Error('Unexpected VCS root refused.');
+      root.properties.property.find(p => p.name === 'url').value = `git://${transport}/settings.git`;
+      request = new Request(request, { body: JSON.stringify(root) });
+    }
+    url = new URL(request.url);
+    const body = ['GET', 'HEAD'].includes(request.method) ? undefined : await request.clone().text();
+    if (request.method !== 'GET' && (!verified || !(url.pathname.includes(prefix) || body?.includes(prefix))))
+      throw new Error('Unverified/non-fixture mutation refused.');
+    const headers = {};
+    for (const name of ['accept', 'content-type', 'if-match', 'if-none-match', 'idempotency-key'])
+      if (request.headers.has(name)) headers[name] = request.headers.get(name);
+    const exchange = { actor: 'admin', client: clientName, command: context.getStore()?.label,
+      request: { method: request.method, path: url.pathname, query: Object.fromEntries(url.searchParams), headers,
+        ...(body === undefined ? {} : { body }) }, preparedSequence: ++sequence, preparedMs: performance.now() };
+    active.exchanges.push(exchange);
+    if (barrier && request.method === 'PUT' && barrier.match(url.pathname)) {
+      const current = barrier;
+      if (++current.ready === 2) current.release();
+      await current.promise;
+    }
+    exchange.sentSequence = ++sequence; exchange.sentMs = performance.now();
+    const response = await nativeFetch(request, { redirect: 'error' });
+    if (response.status >= 300 && response.status < 400) throw new Error('Redirect refused.');
+    const bytes = Buffer.from(await response.clone().arrayBuffer());
+    if (bytes.length > 65536) throw new Error('Entity bound exceeded.');
+    const text = bytes.toString('utf8');
+    const auth = request.headers.get('authorization');
+    if ((auth && [auth, auth.replace(/^(Bearer|Basic) /, '')].some(s => s.length > 8 && (text.includes(s) || body?.includes(s)))) ||
+        /"(?:token|password|access_token)"\s*:/i.test(text)) throw new Error('Secret-bearing capture refused.');
+    exchange.completedSequence = ++sequence; exchange.completedMs = performance.now();
+    const responseHeaders = {};
+    for (const name of ['content-type', 'etag', 'last-modified', 'location'])
+      if (response.headers.has(name)) responseHeaders[name] = response.headers.get(name);
+    exchange.response = { status: response.status, headers: { 'content-type': '', ...responseHeaders },
+      bodyBase64: bytes.toString('base64'), bodyBytes: bytes.length, bodySha256: sha(bytes) };
+    return response;
+  }});
+}
+const main = client('main'), a = client('A'), b = client('B');
+async function invoke(args, app = main, label = args.join(' ')) {
+  return context.run({ label }, () => app.execute(['-p', profile, '--json', ...args],
+    phase === 'cleanup' ? AbortSignal.timeout(120000) : normalSignal));
+}
+async function group(id, action, kind = 'cases') {
+  phase = kind; active = { id, exchanges: [] }; receipt[kind].push(active);
+  try { await action(); } catch (error) { active.error = String(error); throw error; }
+  finally { await save(); }
+}
+const parameters = (action, name, value, targetJob = job) => ['jobs', 'parameters', action, targetJob,
+  ...(name ? [name] : []), ...(value === undefined ? [] : ['--value', value])];
+const vs = (...args) => ['projects', 'versioned-settings', ...args];
+const head = () => git('--git-dir', bare, 'rev-parse', 'main');
+async function sourceSnapshot(label) {
+  const revision = head(), files = {};
+  for (const path of git('--git-dir', bare, 'ls-tree', '-r', '--name-only', revision).split('\n').filter(p => p.startsWith('.teamcity/'))) {
+    const bytes = execFileSync('git', ['--git-dir', bare, 'show', revision + ':' + path], { timeout: 10000 });
+    if (bytes.length > 65536) throw new Error('Source bound exceeded.');
+    files[path] = { bodyBase64: bytes.toString('base64'), bytes: bytes.length, sha256: sha(bytes) };
+  }
+  const value = { label, revision, observedMs: performance.now(), files };
+  receipt.sourceSnapshots.push(value); await save(); return value;
+}
+async function status() {
+  await invoke(vs('status', project));
+  return JSON.parse(Buffer.from(active.exchanges.at(-1).response.bodyBase64, 'base64'));
+}
+async function until(description, predicate) {
+  const deadline = performance.now() + 120000;
+  while (!await predicate()) {
+    if (performance.now() >= deadline) throw new Error('Not observed: ' + description);
+    await pause(500, undefined, { signal: normalSignal });
+  }
+}
+async function applied() {
+  await invoke(vs('check-changes', project));
+  await until('applied settings revision', async () => {
+    const observed = await status();
+    const revision = head();
+    if (observed.message?.startsWith('Changes from VCS are applied to project settings,') && observed.message.includes(revision)) {
+      lastAppliedHead = revision; return true;
+    }
+    if (lastAppliedHead === revision && observed.message?.includes("wasn't committed, repository is up-to-date")) {
+      receipt.observations.push({ label: 'unchanged-already-applied-source', revision,
+        basis: 'Previously observed exact applied revision; HEAD unchanged and current control request/readback captured. No new source commit or reapplication claimed.' });
+      return true;
+    }
+    return false;
+  });
+}
+async function sourceContains(marker, label) {
+  await until('Git source effect ' + marker, async () => git('--git-dir', bare, 'ls-tree', '-r', '--name-only', 'main')
+    .split('\n').filter(p => p.endsWith('.kts')).some(p => git('--git-dir', bare, 'show', 'main:' + p).includes(marker)));
+  return sourceSnapshot(label);
+}
+async function attempt(args, label) {
+  const start = active.exchanges.length;
+  try { const result = await invoke(args, main, label); return { returned: true, result }; }
+  catch (error) {
+    const exchange = active.exchanges.slice(start).findLast(e => e.response?.status >= 400);
+    if (!exchange) throw error;
+    const body = Buffer.from(exchange.response.bodyBase64, 'base64').toString('utf8');
+    return { returned: false, status: exchange.response.status, readOnly: body.includes('ReadOnlyEntityException'), error: String(error) };
+  }
+}
+async function effective(id) {
+  const start = active.exchanges.length;
+  try { return await invoke(vs('config', 'effective', id)); }
+  catch (error) {
+    const exchange = active.exchanges.slice(start).at(-1);
+    if (exchange?.request.path.endsWith('/versionedSettings/config/effective') && exchange.response?.status === 204 && exchange.response.bodyBytes === 0) {
+      receipt.observations.push({ label: 'empty-effective-config', project: id, status: 204,
+        typedCliProjectionFailure: String(error), qualification: 'Wire response preserved; acquisition handles only this empty-204 projection failure.' });
+      return undefined;
+    }
+    throw error;
+  }
+}
+const config = (mode, editing) => ({ synchronizationMode: 'enabled', vcsRootId: rootId, format: 'kotlin',
+  buildSettingsMode: mode, allowUIEditing: editing, importDecision: 'overrideInVCS', storeSecureValuesOutsideVcs: true });
+async function simultaneous(label, commands, match) {
+  const latch = Promise.withResolvers();
+  const timer = setTimeout(() => latch.reject(new Error('Both clients did not reach dispatch barrier.')), 10000);
+  barrier = { match, ready: 0, promise: latch.promise, release: latch.resolve };
+  try {
+    const results = await Promise.allSettled([invoke(commands[0], a, label + '-A'), invoke(commands[1], b, label + '-B')]);
+    receipt.observations.push({ label, results: results.map(r => r.status === 'fulfilled' ? { status: r.status, value: r.value } : { status: r.status, error: String(r.reason) }) });
+    if (results.some(r => r.status !== 'fulfilled')) throw new Error('Concurrent request failed; retain as diagnostic, not accepted reference.');
+  } finally { clearTimeout(timer); barrier = undefined; }
+}
+async function editSource(label, transform) {
+  git('-C', work, 'fetch', bare, 'main');
+  git('-C', work, 'merge', '--ff-only', 'FETCH_HEAD');
+  if (git('-C', work, 'status', '--porcelain')) throw new Error('Dirty owned source checkout.');
+  const file = resolve(work, '.teamcity/settings.kts');
+  const before = await readFile(file, 'utf8'), after = transform(before);
+  if (before === after) throw new Error('Source transformation made no change.');
+  await writeFile(file, after); git('-C', work, 'add', '.teamcity/settings.kts');
+  git('-C', work, 'commit', '-m', 'fixture: ' + label); git('-C', work, 'push', bare, 'main');
+  await sourceSnapshot(label);
+}
+try {
+  await group('verify-isolated-reference-and-empty-owner', async () => {
+    const info = await invoke(['server', 'status']);
+    if (info.buildNumber !== '222742' || info.webUrl !== target) throw new Error('Wrong reference version/origin.');
+    try { await invoke(['projects', 'show', project]); throw new Error('Fixture collision.'); }
+    catch (error) { if (!String(error).includes('404')) throw error; }
+    receipt.initialPermissions = await invoke(['permissions', 'list']);
+    if (receipt.initialPermissions.some(p => p.name !== 'ReadOnly' && p.enabled)) throw new Error('Lab gate baseline differs.');
+    verified = true;
+    await invoke(['permissions', 'grant', 'Update']); gateChanged = true;
+    const actual = JSON.parse(docker('inspect', server))[0];
+    if (actual.Config.Image !== image) throw new Error('Wrong retained server image.');
+    serverId = actual.Id;
+    await mkdir(gitRoot); await mkdir(work);
+    git('-C', work, 'init', '-b', 'main'); git('-C', work, 'config', 'core.autocrlf', 'false');
+    git('-C', work, 'config', 'user.name', 'Vivarium reference fixture'); git('-C', work, 'config', 'user.email', 'fixture@example.invalid');
+    await writeFile(resolve(work, 'README'), 'Owned US-013 mode/concurrency reference only.\n');
+    git('-C', work, 'add', 'README'); git('-C', work, 'commit', '-m', 'fixture: initialize owned source');
+    git('clone', '--bare', '--no-hardlinks', work, bare); git('--git-dir', bare, 'config', 'daemon.receivepack', 'true');
+    networkAttempted = true; docker('network', 'create', '--label', 'vivarium.owner=' + owner, network);
+    docker('network', 'connect', network, server); connected = true;
+    transportAttempted = true;
+    docker('run', '--detach', '--pull', 'never', '--name', transport, '--label', 'vivarium.owner=' + owner,
+      '--user', '0', '--network', network, '--mount', `type=bind,source=${gitRoot},target=/proof`, '--entrypoint', 'git', image,
+      '-c', 'safe.directory=/proof/settings.git', 'daemon', '--reuseaddr', '--export-all', '--enable=receive-pack', '--base-path=/proof', '/proof');
+    receipt.transportReadiness = docker('exec', server, 'git', 'ls-remote', `git://${transport}/settings.git`);
+    receipt.ownedResources = { serverId, network, transport, image, bare, work };
+  }, 'setup');
+  await group('disabled-and-default-inheritance', async () => {
+    await invoke(['projects', 'create', project, '--name', 'US013 mode/concurrency reference']);
+    await invoke(['jobs', 'create', job, '--project', project, '--name', 'Mode proof']);
+    await invoke(['projects', 'parameters', 'create', project, 'env.MODE', '--value', 'base']);
+    await invoke(parameters('set', 'env.MODE', 'disabled-value'));
+    await invoke(parameters('list')); await invoke(vs('config', 'show', project)); await effective(project);
+    await invoke(parameters('create', 'env.LEFT', 'left-seed'));
+    await invoke(parameters('create', 'env.RIGHT', 'right-seed'));
+    await invoke(['projects', 'create', child, '--name', 'Inherited child', '--parent', project]);
+    await invoke(['jobs', 'create', childJob, '--project', child, '--name', 'Child mode proof']);
+    await invoke(parameters('create', 'env.CHILD', 'child-seed', childJob));
+    await invoke(vs('config', 'show', child)); await effective(child);
+    await sourceSnapshot('before-binding');
+  });
+  await group('enable-generated-kotlin-and-observe-initial-fence', async () => {
+    await invoke(['vcs', 'roots', 'create', rootId, '--name', 'Owned settings', '--project', project,
+      '--url', 'https://us013-fixture.invalid/settings.git', '--branch', 'refs/heads/main']);
+    await invoke(vs('config', 'replace', project, '--item', JSON.stringify(config('alwaysUseCurrent', true))));
+    const outcome = await attempt(parameters('set', 'env.MODE', 'initial-write'), 'during-initialization');
+    receipt.observations.push({ label: 'during-initialization', outcome });
+    await invoke(parameters('list')); await applied(); await sourceSnapshot('initial-applied');
+    await invoke(vs('config', 'show', project)); await effective(project);
+    await until('successful editable post-initialization write', async () => {
+      const current = await attempt(parameters('set', 'env.MODE', 'ready-after-initialization'), 'post-initialization-ready-write');
+      if (current.returned) return true;
+      if (current.status === 500 && current.readOnly) return false;
+      throw new Error('Unexpected post-initialization response: ' + JSON.stringify(current));
+    });
+    await sourceContains('ready-after-initialization', 'ready-after-initialization');
+    await applied();
+  });
+  await group('parent-readonly-before-child-override', async () => {
+    await invoke(vs('config', 'replace', project, '--item', JSON.stringify(config('useFromVCS', false))));
+    const observed = await invoke(vs('config', 'show', project)); await effective(project);
+    if (observed.allowUIEditing !== false || observed.buildSettingsMode !== 'useFromVCS') throw new Error('Parent control readback differs.');
+    receipt.observations.push({ label: 'parent-control-only-mode-change', observed, revision: head(), lastAppliedHead, qualification: 'No source change is inferred from control config update; exact prior source application is retained.' }); await save();
+  });
+  await group('inherited-readonly-and-child-override-after-parent-ready', async () => {
+    await invoke(vs('config', 'show', child)); await effective(child);
+    const inherited = await attempt(parameters('set', 'env.CHILD', 'inherited-attempt', childJob), 'child-inherited-write');
+    await invoke(parameters('list', undefined, undefined, childJob));
+    const disabled = await attempt(vs('config', 'replace', child, '--item', JSON.stringify({ synchronizationMode: 'disabled', storeSecureValuesOutsideVcs: true })), 'child-disable-sync');
+    await invoke(vs('config', 'show', child)); await effective(child);
+    const local = await attempt(parameters('set', 'env.CHILD', 'disabled-child-write', childJob), 'child-disabled-write');
+    await invoke(parameters('list', undefined, undefined, childJob));
+    receipt.observations.push({ label: 'child-scope', inherited, disabled, local }); await sourceSnapshot('child-scope');
+  });
+  await group('parent-write-after-child-disabled', async () => {
+    await invoke(vs('config', 'replace', project, '--item', JSON.stringify(config('useFromVCS', true))));
+    const observed = await invoke(vs('config', 'show', project)); await effective(project);
+    if (observed.allowUIEditing !== true) throw new Error('Parent editing not enabled.');
+    await invoke(parameters('set', 'env.MODE', 'parent-after-child-disable'));
+    const snapshot = await sourceContains('parent-after-child-disable', 'parent-write-after-child-disabled');
+    await applied();
+    const childReadback = await invoke(parameters('list', undefined, undefined, childJob));
+    const sourceText = Buffer.from(snapshot.files['.teamcity/settings.kts'].bodyBase64, 'base64').toString('utf8');
+    receipt.observations.push({ label: 'child-after-fenced-parent-export', childReadback,
+      sourceIncludesLocalChildWrite: sourceText.includes('disabled-child-write'),
+      sourceIncludesOriginalChildSeed: sourceText.includes('child-seed'), revision: snapshot.revision });
+    await save();
+  });
+  await group('ancestor-source-import-with-disabled-child', async () => {
+    await editSource('explicit-parent-source-change', text => text.replace('parent-after-child-disable', 'ancestor-source-parent-value'));
+    await applied();
+    const childReadback = await invoke(parameters('list', undefined, undefined, childJob));
+    const parentReadback = await invoke(parameters('list'));
+    const childSettings = await invoke(vs('config', 'show', child));
+    await effective(child);
+    receipt.observations.push({ label: 'child-after-ancestor-source-import', childReadback, parentReadback, childSettings });
+    await sourceSnapshot('after-ancestor-source-import'); await save();
+  });
+  await group('ancestor-explicitly-reintroduces-disabled-child', async () => {
+    const initial = receipt.sourceSnapshots.find(s => s.label === 'initial-applied');
+    const original = Buffer.from(initial.files['.teamcity/settings.kts'].bodyBase64, 'base64').toString('utf8');
+    const start = original.indexOf('object Child : Project');
+    if (start < 0 || !original.includes('child-seed')) throw new Error('Original child declaration not found.');
+    const childDeclarations = original.slice(start).replace('child-seed', 'ancestor-reintroduced-child-value');
+    await editSource('source-explicitly-reintroduces-disabled-child', text => {
+      if (text.includes('object Child : Project') || text.includes('subProject(Child)')) throw new Error('Child already exists in ancestor source.');
+      return text.replace('project {', 'project {\n    subProject(Child)') + '\n' + childDeclarations;
+    });
+    await invoke(vs('check-changes', project));
+    let observed;
+    await until('explicit child import accepted or rejected', async () => {
+      observed = await status();
+      return observed.type === 'error' || (observed.message?.startsWith('Changes from VCS are applied to project settings,') && observed.message.includes(head()));
+    });
+    const childReadback = await attempt(parameters('list', undefined, undefined, childJob), 'child-read-after-reintroduction');
+    const childSettings = await attempt(vs('config', 'show', child), 'child-control-after-reintroduction');
+    receipt.observations.push({ label: 'child-after-explicit-source-reintroduction', observed, childReadback, childSettings });
+    await sourceSnapshot('after-child-reintroduction'); await save();
+  });
+} catch (error) { receipt.failure = { group: active?.id, message: String(error) }; process.exitCode = 1; }
+finally {
+  try { await group('delete-owned-project', async () => {
+    if (!verified) return;
+    try { await invoke(['projects', 'show', project]); } catch (e) { if (String(e).includes('404')) return; throw e; }
+    receipt.cleanupDisable = await attempt(vs('config', 'replace', project, '--item', JSON.stringify({ synchronizationMode: 'disabled', storeSecureValuesOutsideVcs: true })), 'cleanup-disable-sync');
+    await invoke(['projects', 'delete', project]);
+    try { await invoke(['projects', 'show', project]); throw new Error('Project remains.'); } catch (e) { if (!String(e).includes('404')) throw e; }
+  }, 'cleanup'); } catch (error) { receipt.cleanupFailure = String(error); process.exitCode = 1; }
+  if (gateChanged) try { await invoke(['permissions', 'revoke', 'Update']); receipt.finalPermissions = await invoke(['permissions', 'list']); }
+  catch (error) { receipt.gateRestoreFailure = String(error); process.exitCode = 1; }
+  try {
+    if (transportAttempted) {
+      const inspected = docker('container', 'ls', '-a', '--filter', 'name=^/' + transport + '$', '--format', '{{.ID}}');
+      if (inspected) {
+        if (docker('inspect', transport, '--format', '{{index .Config.Labels "vivarium.owner"}}') !== owner) throw new Error('Transport ownership differs.');
+        docker('rm', '--force', transport);
+      }
+    }
+    if (connected) {
+      if (docker('inspect', server, '--format', '{{.Id}}') !== serverId) throw new Error('Retained server identity changed.');
+      docker('network', 'disconnect', network, server);
+    }
+    if (networkAttempted && docker('network', 'ls', '--filter', 'name=^' + network + '$', '--format', '{{.ID}}')) {
+      if (docker('network', 'inspect', network, '--format', '{{index .Labels "vivarium.owner"}}') !== owner) throw new Error('Network ownership differs.');
+      docker('network', 'rm', network);
+    }
+    receipt.resourceCleanup = 'Owned transport/network removed; retained server and unrelated containers untouched.';
+  } catch (error) { receipt.resourceCleanupFailure = String(error); process.exitCode = 1; }
+  await Promise.allSettled([main.dispose(), a.dispose(), b.dispose()]);
+  receipt.complete = !process.exitCode; await save();
+  console.log(JSON.stringify({ run, complete: receipt.complete, groups: receipt.cases.length,
+    exchanges: receipt.cases.reduce((n, c) => n + c.exchanges.length, 0), failure: receipt.failure,
+    cleanupFailure: receipt.cleanupFailure, resourceCleanupFailure: receipt.resourceCleanupFailure }));
+}

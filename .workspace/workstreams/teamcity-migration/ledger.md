@@ -1,0 +1,46 @@
+# TeamCity migration gap ledger
+
+Baseline: Vivarium `09dd40b`; live TeamCity census on 2026-10-31. This is a recommendation and
+requirements ledger, not a set of adopted architecture decisions or completed implementations.
+The owner direction has subsequently graduated to D32 and `docs/design/teamcity-parity.md`. The
+120 stable `TC-*` requirements are the behavioral acceptance contract; these `G*` rows group work.
+`configuration-parity.tsv` maps candidate gates to all 97 source configurations, without marking
+any migration verified. Runtime samples with no tests never waive test-producer/history review.
+All 97 IDs in `inventory.tsv` are **migration-open**; 0 accepted, 0 silently excluded. The 16 paused
+configurations require explicit migrate-or-retire disposition. Metadata coverage is not execution parity.
+
+| ID | Required capability and current gap | Priority / owner | Required closure evidence |
+|---|---|---|---|
+| G01 | Adopt one Chiral-composed Host and PostgreSQL/EF Core. Current stores and transaction contracts depend on SQLite and a serialized writer. Chiral InMemory is not a durable queue. | P0, Platform + Persistence + Scheduling | Real PostgreSQL restart/transaction tests preserve queue, owner/fences, cancellation, audit and idempotency; private restart-bound node settings use the pinned Chiral API. |
+| G02 | C# definition SDK and bounded out-of-process plan evaluation. Current authoring is strict YAML; no C# configuration compiler or supported C# step runner exists. | P0, TeamCity + Git + Security + Agent API | Trusted C# commit produces a validated immutable plan; bad source/timeout/oversized output never activates; package/SDK/plan versions are pinned; C# steps execute only on the chosen Agent. |
+| G03 | Durable Project/BuildConfiguration catalog, hierarchy, shared defaults/templates, typed prompted parameters and configuration revisions. Current submission carries project/configuration strings. | P0, TeamCity + Git + REST | Import hierarchy and 97 IDs without duplicate identities; freeze effective inherited definition per run; CAS activation and last-known-good behavior; do not maintain parallel YAML/C# authoring authorities. |
+| G04 | Controller-owned VCS polling/revision selection and Agent-side source checkout, submodules, checkout rules, private Git and workspace/cache policy. Current CLI packages local payloads. | P0, TeamCity + Agent API + Platform + Security | Exact commits and submodule revisions checked out on both Windows and Linux; queued runs do not drift to new HEAD; credentials never enter snapshots/logs; concurrent checkouts are isolated. |
+| G05 | Durable build-chain DAG and per-edge failure/reuse/revision/affinity policy. Current matrix is a fan-out of independent children, not a chain engine. | P0, Scheduling + TeamCity + Persistence | CLink and EyeAuras chains select exact upstream runs; restart/cancel races do not duplicate children; same-Agent constraints do not deadlock; reuse key includes effective definition/source/parameters. |
+| G06 | Artifact dependencies and TeamCity-style mapping/archive rules. Existing blobs and manifests provide bytes and integrity, not upstream selection/staging. | P0, Results/Artifacts + TeamCity | Same-chain, explicit-build and required latest-successful selection are frozen; include/exclude, rename/archive/extract and clean destination work; publish deploys verified bytes without rebuilding. |
+| G07 | Build counters/numbers, output parameters, dependency references, late step values and typed step conditions. Current environment is mostly static per assignment. | P0, TeamCity + Results + Agent API | Preserve version counters and dependency-derived versions; output parameter is durably acknowledged before dependent execution; declared metadata cannot change authorization or source provenance. |
+| G08 | VCS, finish-build and timezone-aware scheduled triggers, change cursors and de-duplication. No durable trigger engine exists. | P0, TeamCity + Scheduling | 7 enabled VCS, 1 finish and 3 schedule triggers on unpaused jobs retain policy; burst handling, restart and DST/misfire cases cannot double-publish or silently drop work. |
+| G09 | Process/PowerShell/.NET/NuGet/C# adapters, Docker build/tag/push, and container-wrapped ordinary steps. Current process runner is a reusable base. | P0, Agent API + Platform | All seven observed runner types have an explicit command mapping or replacement; CLI.Factory/Workbench container steps preserve mounts, UID, IPC, env, exit status and cleanup; no need to clone TeamCity plugins. |
+| G10 | Requirements beyond equality, max concurrency, shared locks, cache/workspace ownership, disk admission and desktop-session compatibility. | P0, Scheduling + Platform | `exists`, `equals`, `does-not-equal`, `contains` match the fleet; shared npm release lock and chain affinity survive restart; 60-GB PoEBane disk policy is enforced; interactive Windows tests run under the correct session. |
+| G11 | Project-scoped execution secrets, inheritance rules, current authorization, publisher trust and masking. Current coarse credentials do not implement a build secret-binding service. | P0, Security + User Roles + Git | Inventory names/references only; explicitly rebind private Git/feed/npm/SSH/signing secrets through protected input; no values in Git/plans/logs/artifacts; fork/PR source cannot access privileged publication credentials. |
+| G12 | Durable sequenced logs, live tail, structured blocks/test/status messages, authoritative report ingestion and build-problem/failure policy. Current BuildTracker retains a bounded in-memory log; TRX projection exists. | P0, Logs + Results + Persistence | Agent/controller restart retains logs or explicit durable gaps; failed tests cannot appear green; TRX plus actually required producers are supported; handle escaping/interleaving; output is not allowed to grant privileges. |
+| G13 | Artifact/log retention, release pinning, GC, backup/restore, package feeds and Depot integration. Content hashes alone are not retention or safe publication. | P0 for cutover, Results + Storage + Platform | Retained releases keep source/manifest/blobs; backup restores links and credentials/settings; determine consumers of TeamCity NuGet indexer; move those feeds to Depot or prove them unused. |
+| G14 | Operational build UI/CLI: project tree, run with parameters, branches/revisions, chain graph, queue/reason, logs/tests/artifacts, rerun and publish gating. | P0 for cutover, UI + REST + TeamCity | A human can operate every migrated family without direct DB/service calls; direct links and resumed event/log streams work. Complete AgentExplorer UI is not a prerequisite. |
+| G15 | Fleet enrollment, coexistence, cutover and rollback. Three real authorized agents must replace TeamCity capacity without overlapping shared workspaces or double publication. | P0 for cutover, Platform + Agent API + Reconciliation | Windows/Linux installation/restart; only one CI owns a publisher/trigger at a time; isolated shadow verification; can switch one family back; owner disposes every paused/archived item. |
+| G16 | Full retained history/log/artifact import plus repeatable one-way diff-import during TeamCity/Vivarium coexistence. Current census samples only three builds per job and no complete byte inventory. | P0 for shutdown, Reconciliation + Persistence + Results + Logs + REST/UI | Complete source manifest, stable IDs, resumable idempotent transfer, new/unchanged/changed detection, whole-entity keep-Vivarium or use-TeamCity policy, no field merge, verified bytes, recorded kept differences, no deletion from source cleanup, final delta and independent history/restore reads. No implicit trigger/publisher activation. See `history-import.md`. |
+| G17 | TeamCity REST wire compatibility for unchanged teamcity-cli and other existing clients, including reads and mutations. Native API feature parity is insufficient. | P0 for client migration, REST + TeamCity + Security + Git + Test Steward | Freeze method/path/request-variant census; compatible locators/fields/media types/paging/status/auth/files and shared-service mutations; run unchanged CLI and other actual consumers on isolated fixtures. Source CLI's reported 449 route pairs are a discovery baseline, not implemented coverage. See D33 and `docs/design/teamcity-rest-compatibility.md`. |
+
+P0 means required before the affected workload/final shutdown, not that all rows must land in the
+first implementation slice. Existing queue, AgentHub, blob, cancellation and upgrade invariants
+should be preserved and reused. No gap is marked closed merely because a design document describes it.
+
+## Behavioral acceptance routing
+
+| Work groups | Durable requirement families |
+|---|---|
+| G01-G04 | TC-CAT, TC-DEF, TC-VCS, TC-PAR |
+| G05-G08 | TC-CHN, TC-ART, TC-PAR, TC-TRG, TC-QUE |
+| G09-G11 | TC-EXE, TC-AG, TC-REL, TC-OPS |
+| G12 | TC-LOG, TC-TST, TC-TRI; TRX-only does not close the current JUnit producers |
+| G13-G14 | TC-ART, TC-STA, TC-API, TC-OPS; history/diagnostics UI is mandatory |
+| G15-G16 | TC-IMP, TC-REL, TC-OPS; coexistence, simple diff-import and final shutdown |
+| G17 | TC-WIR-01 through TC-WIR-12 plus TC-API-05; unchanged-client HTTP compatibility over shared services |

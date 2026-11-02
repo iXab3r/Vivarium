@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Vivarium.Controller/Vivarium.Controller.csproj" />
+    <ProjectReference Include="../../src/Vivarium.Cli/Vivarium.Cli.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="../Vivarium.Tests/TeamCity/CurrentController.cs" Link="CurrentController.cs" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.83.0" />
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+</Project>

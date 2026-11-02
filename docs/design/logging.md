@@ -7,6 +7,12 @@
 
 This design specializes observability behavior without replacing numbered architecture decisions.
 
+D32's [behavioral parity contract](teamcity-parity.md#8-build-logs) requires durable live/historical
+log viewing, step/block/flow hierarchy, search and filters, timestamp modes, raw download and stable
+test/problem anchors. An in-memory tail or a stored artifact link alone does not satisfy log parity.
+PostgreSQL is the new business-persistence target; current SQLite details remain implementation
+evidence until migration. Output bytes remain outside business tables under their storage owner.
+
 ## 1. Purpose and scope
 
 Vivarium coordinates long-running builds and remote operations across physical agents, managed VMs,
@@ -31,20 +37,23 @@ Phase 1 has useful fragments but no complete logging contract:
 - agent and bootstrap diagnostics are unstructured console text;
 - the AgentHub protocol has `LogChunk { build_id, step_index, stream, data }`, but no sequence,
   acknowledgement, timestamp, resume cursor, compression, or explicit gap marker;
-- `BuildTracker` concatenates received output into an in-memory string; build-log durability, retention,
-  and quotas described by the architecture are not implemented yet;
+- `BuildTracker` retains the first 1,048,576 characters of each Build's live output in memory and
+  reports the dropped-character count through `GetLog`; this per-Build character bound does not
+  provide durable logs, retention or the byte/global quotas described by the architecture;
 - terminal build results and ownership are durable, but diagnostic and build logs are not part of the
   same crash-safe story;
 - the minimal append-only SQLite audit journal records current legacy authentication/authorization,
   enrollment, Agent administration, and caller-requested build submit/cancel actions. Required success
   records share the domain transaction, fields are bounded/redacted, retries avoid duplicate success,
   and automatic lifecycle activity remains outside the journal;
-- there is no public audit query/retention/export contract, REST request event policy, centralized
-  agent diagnostic surface, or AgentExplorer operation-output contract.
+- protected `GET /api/v1/audit-events` provides bounded cursor-paged reads with actor, action,
+  target, outcome and time filters; the current legacy `AgentManage` permission mapping admits
+  administrator principals. Full audit retention/export, REST request event policy, centralized
+  agent diagnostics and AgentExplorer operation-output contracts remain incomplete.
 
 Consequently, current console output is development evidence, not the target audit or historical-log
 system. Existing raw submit/enroll token printing must not be carried into the target design. The one
-permitted secret emission is the purpose-built first-run super-user token described in §8.
+permitted secret emission is the private installation-account startup password described in §8.
 
 ## 3. Invariants
 
@@ -67,7 +76,7 @@ permitted secret emission is the purpose-built first-run super-user token descri
 
 ### 4.1 Audit journal
 
-The audit journal is **minimal append-only SQLite metadata** answering **which caller attempted which
+The target audit journal is **minimal append-only PostgreSQL metadata** answering **which caller attempted which
 security- or configuration-significant action against which target, from which revision, and with what
 immediate outcome**. It covers authentication and authorization decisions, permission and token
 changes, agent authorization/enablement/registration administration, Git-backed configuration
@@ -76,7 +85,7 @@ retention-policy changes, and sensitive log exports.
 
 Audit records are structured, compact, append-only rows and are not controlled by the diagnostic log
 level. When a caller-visible success requires audit, Persistence writes the audit row atomically with
-the domain mutation or durable external-operation intent through the serialized SQLite writer. If that
+the domain mutation or durable external-operation intent in the owning PostgreSQL transaction. If that
 transaction cannot commit, the caller action fails. Denied security actions record a bounded failure
 row without fabricating a successful domain mutation.
 
@@ -199,7 +208,7 @@ Durations use a monotonic local clock and are stored as elapsed values, not by s
 Audit events are emitted independently of level. An expected denied action is an audit outcome
 `denied`; it does not automatically become a diagnostic error.
 
-## 8. Redaction and the first-run token
+## 8. Redaction and the installation-account startup password
 
 Redaction is field-aware and applied at the source. The following never enter ordinary log records:
 
@@ -221,22 +230,22 @@ Encoding, transformed, split-across-chunk, or previously unknown secrets cannot 
 the product documentation must say so. Chunk-boundary masking retains a small overlap without retaining
 unbounded text.
 
-### First-run super-user token exception
+### Installation-account startup password exception
 
-The Admin/SuperUser design may require a generated token to bootstrap the first login, following the
-TeamCity experience. It is the only allowed raw-secret log emission and must satisfy all of these:
+D34 permits one narrow raw-secret log disclosure: the reserved installation account's newly
+generated password, after successful framework persistence at each enabled startup. It is not a
+first-admin-only, one-use token and it does not stop rotating once an ordinary administrator exists.
 
-1. generated only while no durable administrator identity exists;
-2. emitted once per token issuance to a dedicated local startup sink, with an unmistakable warning;
-3. written neither as a structured property nor into audit, REST, browser, agent, or exported support
-   logs;
-4. protected by controller data-directory permissions and never printed by normal status endpoints;
-5. independently revocable and bounded by the lifetime/one-time-use policy owned by Admin/SuperUser;
-6. covered by a negative test scanning every other sink and endpoint for the token bytes.
+Only the intended private local startup entry receives the value. Exclude it from structured
+properties, audit, REST/status, browser diagnostics, agent/build output and exported support logs.
+Protect the private sink and its retention as secret material. Disabled mode grants no installation
+authority, including to existing sessions. Password replacement and stock cookie stamp retirement
+have distinct timing; do not promise instantaneous retirement of every old cookie.
 
-The current controller also prints long-lived submit and admin tokens and a single-use enroll token.
-That behavior is development-only debt: the target startup path replaces it with the single narrowly
-defined super-user exception and secure token-management surfaces.
+Failure to initialize the fresh password must not fall back to an earlier password. Test disclosure
+ordering and absence of the bytes in every other sink. Ordinary account/API-token plaintext is not
+another log exception. The current startup submit/admin/enrollment output is legacy debt, not a
+target pattern. See [first-run administration](first-run-administration.md).
 
 ## 9. Persistence, limits, and retention
 
@@ -248,7 +257,7 @@ unbounded ingestion.
 |---|---:|---:|---|
 | Controller diagnostics | 32 MiB × 10 segments, 320 MiB total | 14 days, whichever limit comes first | Rotate; delete oldest complete segment; count deletion |
 | Agent diagnostics | 16 MiB × 8 segments, 128 MiB total | 7 days, whichever limit comes first | Rotate locally; delete oldest; retain a counter/summary |
-| Audit journal | 1 GiB SQLite budget with 32 MiB export segments | 365 days by default | Alert at 80/90%; reject caller actions whose success requires audit rather than silently discard |
+| Audit journal | 1 GiB metadata budget (provisional policy, not a database file limit) with 32 MiB export segments | 365 days by default | Alert at 80/90%; reject caller actions whose success requires audit rather than silently discard |
 | Build output | 256 MiB per child build and 64 MiB per step | Same lifecycle as retained build | Preserve bounded head and tail plus a gap record; never grow further |
 | AgentExplorer operation output | 16 MiB per operation | 30 days by default | Preserve bounded head and tail plus a gap record; audit summary remains |
 | Disconnected agent workload spool | 128 MiB global and no more than the workload's server quota | Until acknowledged or terminal retention expires | Drop oldest unacknowledged output by priority, record exact sequence gap |
@@ -279,12 +288,22 @@ audit row per deletion. Legal/compliance retention is a future policy, not impli
 
 ### Terminal watermarks and the release barrier
 
-Every terminal build or AgentExplorer operation result carries immutable final watermarks for all logical
+Every producer-reported terminal build or AgentExplorer operation result carries immutable final watermarks for all logical
 output streams. A watermark entry identifies workload, step or operation scope, stdout/stderr stream,
 `final_sequence_exclusive`, and total produced bytes. `0` closes an empty stream. All sequence values
 below the exclusive watermark must resolve to either a durably persisted output chunk or a durably
 persisted gap record. The first accepted terminal result freezes these watermarks; a retry must match,
 and a conflicting retry is a fenced protocol error rather than a new history.
+
+An unreachable/crashed producer is different: the controller cannot manufacture its final watermark,
+exit code or exact lost byte count. After the bounded output-finalization deadline it records the
+known persisted/gapped prefix and an explicit unknown terminal tail, preserving that the end was
+not observed. Native output represents that gap with a null exclusive sequence end and
+`producer-lost`, then seals `complete_with_gaps`. This closes only the output barrier; process-stop,
+lease fencing, workload reconciliation and health quarantine still control machine reuse. A late
+message cannot rewrite the sealed history into an apparently complete log. A never-dispatched
+cancelled workload can instead be proven empty; do not apply that conclusion to an uncertain
+assignment/start or an unreachable process.
 
 Terminal-result acknowledgement and output acknowledgement are independent contracts. Persisting and
 acknowledging a result does not acknowledge output. The agent retains each unacknowledged output range
@@ -508,7 +527,7 @@ At minimum, implementation needs deterministic tests for:
 - process stdout exceeding step/build quotas without deadlock or outcome corruption;
 - REST request correlation propagation and negative proof that body, query, auth, cookie, and secret
   bytes appear in no sink;
-- first-run super-user token present only in its dedicated startup sink and absent from audit,
+- installation-account startup password present only in its dedicated private startup sink and absent from audit,
   diagnostics, REST, UI payloads, agent output, and support exports;
 - restart-safe retention and audit-full behavior rejecting new mutations;
 - mixed-version protocol behavior when sequence/ack/gap fields are introduced: stale agents must remain
@@ -568,7 +587,7 @@ asserted through both a gap marker and a metric.
   immutable revision fields to audit.
 - Admin/SuperUser and User Roles Experts define identity, token lifetime, and access policy; Logs Expert
   prevents leakage and requires denied/accepted actions to remain attributable.
-- Persistence Expert owns audit/log schemas, SQLite transactions, indexes, migrations, WAL recovery,
+- Persistence Expert owns audit/log schemas, PostgreSQL transactions, indexes, migrations, recovery,
   and blob atomicity; Logs Expert owns taxonomy, redaction, quotas, retention, and observable failure
   behavior rather than prescribing the storage implementation.
 - Results Expert owns terminal evidence semantics, result status/badges, and what incomplete output

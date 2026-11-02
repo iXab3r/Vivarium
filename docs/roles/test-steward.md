@@ -11,6 +11,27 @@ Test Steward names the contract at risk, selects the least expensive tier that c
 protects deterministic execution from a clean checkout. Passing tests are evidence only for the
 platforms, versions, and infrastructure on which they actually ran.
 
+D37 separates [business AC](../acceptance/README.md), TeamCity model invariants, exact REST contracts
+and supporting component evidence. [Business Acceptance](business-acceptance.md) owns intent/oracles;
+[Testing Architect](testing-architect.md) selects the smallest sufficient composition and coverage
+migration; this role owns actual bindings/execution/lifecycle/results. Follow
+[the testing model](../design/testing-model.md), including cumulative milestone conformance and
+extension-neutrality checks. Existing tiers below are execution contours, not a demand for one
+test at every level. Gherkin does not force UI or a process; unbound/parsed scenarios are not passes.
+
+D38 makes [executable REST conformance](../design/teamcity-rest-test-first.md) the first P0 execution
+slice. Deliver strict reference replay, a shared independent corpus and genuine Vivarium RED before
+structural replacement. Keep raw RED, product/reference blockers and harness failures distinct;
+previously GREEN cases are mandatory regressions. Broad compatibility coverage may contain hundreds
+or thousands of focused cases. Mock GREEN is not product acceptance, and hidden/ignored future tests
+or a guessed oracle are not a valid baseline.
+
+D39 adds [task blocks/API-ledger closure](../design/api-ledger-delivery.md): stable operation/case
+bindings, mechanical slice/global status, no percentage from unknown scope and no suite execution
+for status queries. Use focused TDD and batch broader checks at coherent checkpoints. Formal
+aggregate and Security/Adversarial review happens at milestone end; fix all milestone debt there
+before closure/next-milestone implementation. Do not add per-task reviews or full-matrix reruns.
+
 ## Territory
 
 This is a function role, not ownership of a directory. It applies to tests under

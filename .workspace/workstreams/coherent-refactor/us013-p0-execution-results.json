@@ -1,0 +1,681 @@
+{
+  "schemaVersion": 1,
+  "kind": "US013_P0_REFERENCE_SOURCE_AND_BASELINE_CHECKPOINT",
+  "sourceHead": "781887676b2c378bccd245ec934ee3313b33f5c7",
+  "workingTree": "Evidence/test-helper/prototype changes; no product source or deployed Host change",
+  "finalCheckInputs": {
+    "path": "artifacts/us013-p0/final-check-inputs.json",
+    "sha256": "ba7da2e09f2bc1506aae43fd959bca080884d677da508aaa119fdc89706b397a"
+  },
+  "inputFilesStableAcrossFinalChecks": 255,
+  "referenceCorpus": {
+    "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+    "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+    "observationGroups": 35,
+    "selectedExchanges": 505,
+    "materializedConformanceCasesAdded": 0,
+    "scope": "Literal reference observations and strict replay; not Vivarium runtime GREEN"
+  },
+  "definitionExperiment": {
+    "receipt": {
+      "path": "artifacts/us013-p0/representation-run-80674564678e4492b76ea2a3a8a0aebc/receipt.json",
+      "sha256": "3e936b45e9235430d7e705232171718d0588336ed44800b050df8036ac7c258a"
+    },
+    "result": {
+      "status": "REPRESENTABILITY_PROVED_BOUNDED",
+      "events": [
+        {
+          "name": "blank-project",
+          "control": "0d502684ff3ab06f6ed3dfca87597d751b5763b8",
+          "settings": "0d502684ff3ab06f6ed3dfca87597d751b5763b8",
+          "settingsRepository": "control",
+          "settingsPath": ".vivarium/unbound/T3Personal/Settings.g.cs",
+          "effectiveSha256": "50307ed7d8c3036d573b2fd1d79a3425c4ed8a55b30b915c33e8bd611b0f990a"
+        },
+        {
+          "name": "unbound-configuration",
+          "control": "a68651c09e68af76131259b162fd90d22f6028a9",
+          "settings": "a68651c09e68af76131259b162fd90d22f6028a9",
+          "settingsRepository": "control",
+          "settingsPath": ".vivarium/unbound/T3Personal/Settings.g.cs",
+          "effectiveSha256": "9c6f29fbb45c23c0a918f57362a6c94d8126f8117a4724d1f5db50946e636492"
+        },
+        {
+          "name": "three-unbound",
+          "control": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+          "settings": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+          "settingsRepository": "control",
+          "settingsPath": ".vivarium/unbound/T3Personal/Settings.g.cs",
+          "effectiveSha256": "8ee8bfdf7bbaaf854d39db42349b5f7b24b5006054722793d10f966092eb1d07"
+        },
+        {
+          "name": "prepared-not-bound",
+          "control": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+          "settings": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+          "settingsRepository": "control",
+          "settingsPath": ".vivarium/unbound/T3Personal/Settings.g.cs",
+          "effectiveSha256": "8ee8bfdf7bbaaf854d39db42349b5f7b24b5006054722793d10f966092eb1d07"
+        },
+        {
+          "name": "bound-three",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "bd8b05055f02e9ae30e88efd38d7ef0e6be700da",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "8177c4468a95fc9bed608bf6bc8901e9ede59ebe5767b77a9e480fed4a7242c2"
+        },
+        {
+          "name": "overrides",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "eee601240c31b9028ad5ea8d7d261b40379cf209",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "1756b5483675e4ec2f9201817b256489066f0c357961d14c5a768bf3271492d7"
+        },
+        {
+          "name": "escaped-literal",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "c71c8f925ea2475016fd9ac201e3147b927f3211",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "1bf4c2337e09042a75960030aadd124d125e3e4381e1bf6dba295efbb2890aea"
+        },
+        {
+          "name": "reset",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "03a1114fc5586cc3380789fedc38976d8948eeb1",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "c5a626e289c7ae64f79db22a2cd9c8e7abfd197e7338f9410b9494d3001705df"
+        },
+        {
+          "name": "ordered",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "9c542736af5205e14b09b5beececc7bbe9077d1b",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "94ca711286a6e95c0bf4ba5b32db7f0bc5643d400c65861c21598f646a74ef19"
+        },
+        {
+          "name": "reordered",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "eee7099f2d57e7b69493858f545f4490c733a26f",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "d7a01941b512f3da12d3683efa67614971416aacbfba3a0b72a79fb5266432d2"
+        },
+        {
+          "name": "omitted",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "83fb027922a6bac118fb402add1bd9487b52b717",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "c5a626e289c7ae64f79db22a2cd9c8e7abfd197e7338f9410b9494d3001705df"
+        },
+        {
+          "name": "known-good-restart",
+          "control": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+          "settings": "83fb027922a6bac118fb402add1bd9487b52b717",
+          "settingsRepository": "product",
+          "settingsPath": ".vivarium/settings/Settings.g.cs",
+          "effectiveSha256": "c5a626e289c7ae64f79db22a2cd9c8e7abfd197e7338f9410b9494d3001705df"
+        }
+      ],
+      "invalidRevision": "cb838a6cb0ae75fc8fd8ad903ae25ee9bc7c6435",
+      "collisionRevision": "2113541723669525988025859487b5bcd8a7bd04",
+      "userCodeSha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+      "seconds": 64.15,
+      "productActivation": "NOT_PROVED",
+      "startedUtc": "2026-11-01T18:52:49.181929+00:00",
+      "completedUtc": "2026-11-01T18:53:53.336727+00:00",
+      "sourceHead": "781887676b2c378bccd245ec934ee3313b33f5c7",
+      "sourceInputs": [
+        {
+          "path": "tools/definition-proof/Control.g.cs",
+          "sha256": "1afd38b644f55f4a0e040508d62b6c835a08e9f72c3e35d3b70ee15dd2426a26"
+        },
+        {
+          "path": "tools/definition-proof/Model.cs",
+          "sha256": "649867cb7258c5e1babc82f3ebc67677e46c264f2d423401d72c9a3af32372e2"
+        },
+        {
+          "path": "tools/definition-proof/Program.cs",
+          "sha256": "f25b99e915ecdb9906256c1cdf02ccb6622b83729540edb2ca0f15b8d9e7ed6d"
+        },
+        {
+          "path": "tools/definition-proof/Settings.g.cs",
+          "sha256": "85443dece6059c64590c9d01ffbd228354879b3dbbcb03f61d6119af66323cfa"
+        },
+        {
+          "path": "tools/definition-proof/UserCode.cs",
+          "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6"
+        },
+        {
+          "path": "tools/definition-proof/Evaluator.csproj",
+          "sha256": "cc209a916dc84338ed2dd2c3e620666954fd30b43be575abcff3f5f6d056fa0f"
+        },
+        {
+          "path": "tools/definition-proof/probe.py",
+          "sha256": "48c72bdc49a0d2d2d32cfecf5a944a72eefd3e49f9971003b146d0081cb922c7"
+        },
+        {
+          "path": "tools/definition-proof/render.py",
+          "sha256": "cb3efe2949d264339d719652228dd80b0765fcd0c529e2a24fbcf87e3bba6bda"
+        },
+        {
+          "path": "global.json",
+          "sha256": "e43ef3bfdcacfa29ee23e2fd88d58f81df93490168702ba9b74f5216f25d4ccc"
+        },
+        {
+          "path": "Directory.Build.props",
+          "sha256": "7f19a87890a4d93125d6a7f1bb3112027da17ab84d326e1bd43b52bb6ffa0d17"
+        }
+      ],
+      "authorization": "NOT_PROVED",
+      "securitySandbox": "NOT_CLAIMED",
+      "sourceRecipe": "Focused representation seed; not the final executable T3 recipe",
+      "limits": "No HTTP/OIDC/PG/Chiral activation, mode mutability or cross-repository product transaction proof."
+    },
+    "selectedSourceBytes": [
+      {
+        "event": "blank-project",
+        "settingsRevision": "0d502684ff3ab06f6ed3dfca87597d751b5763b8",
+        "files": [
+          {
+            "path": ".vivarium/unbound/T3Personal/Settings.g.cs",
+            "bytes": 173,
+            "sha256": "b230005bfacfb1293841e28ca1d2088042b5e428e7737248fdfed9e95344929c",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbnVsbCwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFtdKTsKfQo="
+          },
+          {
+            "path": ".vivarium/unbound/T3Personal/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "0d502684ff3ab06f6ed3dfca87597d751b5763b8",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 180,
+          "sha256": "dd527ac465d6e48a96b9bea42f5d23bdce4fcc26be1821ffc8d2e549c5e30bc7",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbnVsbCk7Cn0K"
+        }
+      },
+      {
+        "event": "unbound-configuration",
+        "settingsRevision": "a68651c09e68af76131259b162fd90d22f6028a9",
+        "files": [
+          {
+            "path": ".vivarium/unbound/T3Personal/Settings.g.cs",
+            "bytes": 467,
+            "sha256": "dbd3271fb8683a47bf4b49ab1f53ec940bcfe913e8d8e192c4b10978202bc529",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbnVsbCwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtuZXcoImVudi5NT0RFIiwgbnVsbCwgImZpeHR1cmUtbW9kZSIpXSwgW25ldygiUHJlcGFyZV9zdGVwIiwgIlByZXBhcmUiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAiYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHJlcGFyZS5zaCAlYnVpbGQuY291bnRlciUiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJDdmF0IildLCBbXSwgW10sIDkwLCBbXSkKICAgICAgICBdKTsKfQo="
+          },
+          {
+            "path": ".vivarium/unbound/T3Personal/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "a68651c09e68af76131259b162fd90d22f6028a9",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 180,
+          "sha256": "dd527ac465d6e48a96b9bea42f5d23bdce4fcc26be1821ffc8d2e549c5e30bc7",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbnVsbCk7Cn0K"
+        }
+      },
+      {
+        "event": "three-unbound",
+        "settingsRevision": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+        "files": [
+          {
+            "path": ".vivarium/unbound/T3Personal/Settings.g.cs",
+            "bytes": 1538,
+            "sha256": "85443dece6059c64590c9d01ffbd228354879b3dbbcb03f61d6119af66323cfa",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtuZXcoImVudi5NT0RFIiwgbnVsbCwgImZpeHR1cmUtbW9kZSIpXSwgW25ldygiUHJlcGFyZV9zdGVwIiwgIlByZXBhcmUiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAiYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHJlcGFyZS5zaCAlYnVpbGQuY291bnRlciUiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJDdmF0IildLCBbXSwgW10sIDkwLCBbXSksCiAgICAgICAgICAgIG5ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIldpbmRvd3MiLCBbXSwgW25ldygiV2luZG93c19zdGVwIiwgIldpbmRvd3MiLCAiamV0YnJhaW5zX3Bvd2Vyc2hlbGwiLCBbbmV3KCJqZXRicmFpbnNfcG93ZXJzaGVsbF9zY3JpcHRfZmlsZSIsICJzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2Uvd2luZG93cy5wczEiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJsYXB0b3AtZzE1IildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiQ0FOQ0VMIiwgIkNBTkNFTCIpXSwgW25ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgInByZXBhcmUvKiogPT4gY2ktaW5wdXQvcHJlcGFyZSIsIHRydWUpXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1JlbGVhc2UiLCAiUmVsZWFzZSIsIFtuZXcoImVudi5UM19QVUJMSVNIIiwgInJlbGVhc2UiLCBudWxsKV0sIFtuZXcoIlJlbGVhc2Vfc3RlcCIsICJSZWxlYXNlIiwgInNpbXBsZVJ1bm5lciIsIFtuZXcoInNjcmlwdC5jb250ZW50IiwgIm5vZGUgc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3J1bi5tanMgc3RhZ2UtcmVsZWFzZVxuYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHVibGlzaC5zaCIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAid2luZG93cy8qKiA9PiBjaS1pbnB1dC93aW5kb3dzIiwgdHJ1ZSksIG5ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgImxpbnV4LyoqID0+IGNpLWlucHV0L2xpbnV4IiwgdHJ1ZSldLCAxNSwgW25ldygidmNzIiwgIis6PGRlZmF1bHQ+IiwgNjApXSkKICAgICAgICBdKTsKfQo="
+          },
+          {
+            "path": ".vivarium/unbound/T3Personal/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "37b3a14ebe40fe3c49e5bc937d3509e1f62d6f7a",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 180,
+          "sha256": "dd527ac465d6e48a96b9bea42f5d23bdce4fcc26be1821ffc8d2e549c5e30bc7",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbnVsbCk7Cn0K"
+        }
+      },
+      {
+        "event": "bound-three",
+        "settingsRevision": "bd8b05055f02e9ae30e88efd38d7ef0e6be700da",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1538,
+            "sha256": "85443dece6059c64590c9d01ffbd228354879b3dbbcb03f61d6119af66323cfa",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtuZXcoImVudi5NT0RFIiwgbnVsbCwgImZpeHR1cmUtbW9kZSIpXSwgW25ldygiUHJlcGFyZV9zdGVwIiwgIlByZXBhcmUiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAiYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHJlcGFyZS5zaCAlYnVpbGQuY291bnRlciUiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJDdmF0IildLCBbXSwgW10sIDkwLCBbXSksCiAgICAgICAgICAgIG5ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIldpbmRvd3MiLCBbXSwgW25ldygiV2luZG93c19zdGVwIiwgIldpbmRvd3MiLCAiamV0YnJhaW5zX3Bvd2Vyc2hlbGwiLCBbbmV3KCJqZXRicmFpbnNfcG93ZXJzaGVsbF9zY3JpcHRfZmlsZSIsICJzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2Uvd2luZG93cy5wczEiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJsYXB0b3AtZzE1IildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiQ0FOQ0VMIiwgIkNBTkNFTCIpXSwgW25ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgInByZXBhcmUvKiogPT4gY2ktaW5wdXQvcHJlcGFyZSIsIHRydWUpXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1JlbGVhc2UiLCAiUmVsZWFzZSIsIFtuZXcoImVudi5UM19QVUJMSVNIIiwgInJlbGVhc2UiLCBudWxsKV0sIFtuZXcoIlJlbGVhc2Vfc3RlcCIsICJSZWxlYXNlIiwgInNpbXBsZVJ1bm5lciIsIFtuZXcoInNjcmlwdC5jb250ZW50IiwgIm5vZGUgc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3J1bi5tanMgc3RhZ2UtcmVsZWFzZVxuYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHVibGlzaC5zaCIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAid2luZG93cy8qKiA9PiBjaS1pbnB1dC93aW5kb3dzIiwgdHJ1ZSksIG5ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgImxpbnV4LyoqID0+IGNpLWlucHV0L2xpbnV4IiwgdHJ1ZSldLCAxNSwgW25ldygidmNzIiwgIis6PGRlZmF1bHQ+IiwgNjApXSkKICAgICAgICBdKTsKfQo="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "overrides",
+        "settingsRevision": "eee601240c31b9028ad5ea8d7d261b40379cf209",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1542,
+            "sha256": "02350324cc4081654c69bb285570f34be24b50749b6a62d83f439a04a0e20ef0",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtuZXcoImVudi5NT0RFIiwgIm1hbmFnZWQtb3ZlcnJpZGUiLCBudWxsKV0sIFtuZXcoIlByZXBhcmVfc3RlcCIsICJQcmVwYXJlIiwgInNpbXBsZVJ1bm5lciIsIFtuZXcoInNjcmlwdC5jb250ZW50IiwgImJhc2ggc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3ByZXBhcmUuc2ggJWJ1aWxkLmNvdW50ZXIlIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAiQ3ZhdCIpXSwgW10sIFtdLCA5MCwgW10pLAogICAgICAgICAgICBuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJXaW5kb3dzIiwgW10sIFtuZXcoIldpbmRvd3Nfc3RlcCIsICJXaW5kb3dzIiwgImpldGJyYWluc19wb3dlcnNoZWxsIiwgW25ldygiamV0YnJhaW5zX3Bvd2Vyc2hlbGxfc2NyaXB0X2ZpbGUiLCAic2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3dpbmRvd3MucHMxIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAibGFwdG9wLWcxNSIpXSwgW25ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgIkNBTkNFTCIsICJDQU5DRUwiKV0sIFtuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJwcmVwYXJlLyoqID0+IGNpLWlucHV0L3ByZXBhcmUiLCB0cnVlKV0sIDkwLCBbXSksCiAgICAgICAgICAgIG5ldygiVDNQZXJzb25hbF9SZWxlYXNlIiwgIlJlbGVhc2UiLCBbbmV3KCJlbnYuVDNfUFVCTElTSCIsICJyZWxlYXNlIiwgbnVsbCldLCBbbmV3KCJSZWxlYXNlX3N0ZXAiLCAiUmVsZWFzZSIsICJzaW1wbGVSdW5uZXIiLCBbbmV3KCJzY3JpcHQuY29udGVudCIsICJub2RlIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9ydW4ubWpzIHN0YWdlLXJlbGVhc2VcbmJhc2ggc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3B1Ymxpc2guc2giLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJDdmF0IildLCBbbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAiQ0FOQ0VMIiwgIkNBTkNFTCIpXSwgW25ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgIndpbmRvd3MvKiogPT4gY2ktaW5wdXQvd2luZG93cyIsIHRydWUpLCBuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJsaW51eC8qKiA9PiBjaS1pbnB1dC9saW51eCIsIHRydWUpXSwgMTUsIFtuZXcoInZjcyIsICIrOjxkZWZhdWx0PiIsIDYwKV0pCiAgICAgICAgXSk7Cn0K"
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "escaped-literal",
+        "settingsRevision": "c71c8f925ea2475016fd9ac201e3147b927f3211",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1601,
+            "sha256": "48661e635db97979caa398c05e2e1dff885eef8c5642fc64acbef5881fa8c51c",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtuZXcoImVudi5NT0RFIiwgIlwiOyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbihcImRhdGFcIik7IC8vXFxwYXRoXG5uZXh0XHUyMDI4bGluZSIsIG51bGwpXSwgW25ldygiUHJlcGFyZV9zdGVwIiwgIlByZXBhcmUiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAiYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHJlcGFyZS5zaCAlYnVpbGQuY291bnRlciUiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJDdmF0IildLCBbXSwgW10sIDkwLCBbXSksCiAgICAgICAgICAgIG5ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIldpbmRvd3MiLCBbXSwgW25ldygiV2luZG93c19zdGVwIiwgIldpbmRvd3MiLCAiamV0YnJhaW5zX3Bvd2Vyc2hlbGwiLCBbbmV3KCJqZXRicmFpbnNfcG93ZXJzaGVsbF9zY3JpcHRfZmlsZSIsICJzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2Uvd2luZG93cy5wczEiLCBudWxsKV0pXSwgW25ldygidGVhbWNpdHkuYWdlbnQubmFtZSIsICJsYXB0b3AtZzE1IildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiQ0FOQ0VMIiwgIkNBTkNFTCIpXSwgW25ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgInByZXBhcmUvKiogPT4gY2ktaW5wdXQvcHJlcGFyZSIsIHRydWUpXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1JlbGVhc2UiLCAiUmVsZWFzZSIsIFtuZXcoImVudi5UM19QVUJMSVNIIiwgInJlbGVhc2UiLCBudWxsKV0sIFtuZXcoIlJlbGVhc2Vfc3RlcCIsICJSZWxlYXNlIiwgInNpbXBsZVJ1bm5lciIsIFtuZXcoInNjcmlwdC5jb250ZW50IiwgIm5vZGUgc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3J1bi5tanMgc3RhZ2UtcmVsZWFzZVxuYmFzaCBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcHVibGlzaC5zaCIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAid2luZG93cy8qKiA9PiBjaS1pbnB1dC93aW5kb3dzIiwgdHJ1ZSksIG5ldygiVDNQZXJzb25hbF9QcmVwYXJlIiwgInNhbWVDaGFpbk9yTGFzdEZpbmlzaGVkIiwgImxpbnV4LyoqID0+IGNpLWlucHV0L2xpbnV4IiwgdHJ1ZSldLCAxNSwgW25ldygidmNzIiwgIis6PGRlZmF1bHQ+IiwgNjApXSkKICAgICAgICBdKTsKfQo="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "reset",
+        "settingsRevision": "03a1114fc5586cc3380789fedc38976d8948eeb1",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1501,
+            "sha256": "8361fa8aa843b5398c8b19056290e2d785c9c6740482d0f5a88947fb8412a61b",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtdLCBbbmV3KCJQcmVwYXJlX3N0ZXAiLCAiUHJlcGFyZSIsICJzaW1wbGVSdW5uZXIiLCBbbmV3KCJzY3JpcHQuY29udGVudCIsICJiYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wcmVwYXJlLnNoICVidWlsZC5jb3VudGVyJSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtdLCBbXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAiV2luZG93cyIsIFtdLCBbbmV3KCJXaW5kb3dzX3N0ZXAiLCAiV2luZG93cyIsICJqZXRicmFpbnNfcG93ZXJzaGVsbCIsIFtuZXcoImpldGJyYWluc19wb3dlcnNoZWxsX3NjcmlwdF9maWxlIiwgInNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS93aW5kb3dzLnBzMSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgImxhcHRvcC1nMTUiKV0sIFtuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAicHJlcGFyZS8qKiA9PiBjaS1pbnB1dC9wcmVwYXJlIiwgdHJ1ZSldLCA5MCwgW10pLAogICAgICAgICAgICBuZXcoIlQzUGVyc29uYWxfUmVsZWFzZSIsICJSZWxlYXNlIiwgW25ldygiZW52LlQzX1BVQkxJU0giLCAicmVsZWFzZSIsIG51bGwpXSwgW25ldygiUmVsZWFzZV9zdGVwIiwgIlJlbGVhc2UiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAibm9kZSBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcnVuLm1qcyBzdGFnZS1yZWxlYXNlXG5iYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wdWJsaXNoLnNoIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAiQ3ZhdCIpXSwgW25ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIkNBTkNFTCIsICJDQU5DRUwiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJ3aW5kb3dzLyoqID0+IGNpLWlucHV0L3dpbmRvd3MiLCB0cnVlKSwgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAibGludXgvKiogPT4gY2ktaW5wdXQvbGludXgiLCB0cnVlKV0sIDE1LCBbbmV3KCJ2Y3MiLCAiKzo8ZGVmYXVsdD4iLCA2MCldKQogICAgICAgIF0pOwp9Cg=="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "reordered",
+        "settingsRevision": "eee7099f2d57e7b69493858f545f4490c733a26f",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1633,
+            "sha256": "09760ccbabdb7ed1c43c9f1395fc66fe91cb3f992ad048b324b6ee11a4335592",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtdLCBbbmV3KCJzZWNvbmQiLCAiU2Vjb25kIiwgInNpbXBsZVJ1bm5lciIsIFtuZXcoInNjcmlwdC5jb250ZW50IiwgImJhc2ggc2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3ByZXBhcmUuc2ggJWJ1aWxkLmNvdW50ZXIlIiwgbnVsbCldKSwgbmV3KCJQcmVwYXJlX3N0ZXAiLCAiUHJlcGFyZSIsICJzaW1wbGVSdW5uZXIiLCBbbmV3KCJzY3JpcHQuY29udGVudCIsICJiYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wcmVwYXJlLnNoICVidWlsZC5jb3VudGVyJSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtdLCBbXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAiV2luZG93cyIsIFtdLCBbbmV3KCJXaW5kb3dzX3N0ZXAiLCAiV2luZG93cyIsICJqZXRicmFpbnNfcG93ZXJzaGVsbCIsIFtuZXcoImpldGJyYWluc19wb3dlcnNoZWxsX3NjcmlwdF9maWxlIiwgInNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS93aW5kb3dzLnBzMSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgImxhcHRvcC1nMTUiKV0sIFtuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAicHJlcGFyZS8qKiA9PiBjaS1pbnB1dC9wcmVwYXJlIiwgdHJ1ZSldLCA5MCwgW10pLAogICAgICAgICAgICBuZXcoIlQzUGVyc29uYWxfUmVsZWFzZSIsICJSZWxlYXNlIiwgW25ldygiZW52LlQzX1BVQkxJU0giLCAicmVsZWFzZSIsIG51bGwpXSwgW25ldygiUmVsZWFzZV9zdGVwIiwgIlJlbGVhc2UiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAibm9kZSBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcnVuLm1qcyBzdGFnZS1yZWxlYXNlXG5iYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wdWJsaXNoLnNoIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAiQ3ZhdCIpXSwgW25ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIkNBTkNFTCIsICJDQU5DRUwiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJ3aW5kb3dzLyoqID0+IGNpLWlucHV0L3dpbmRvd3MiLCB0cnVlKSwgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAibGludXgvKiogPT4gY2ktaW5wdXQvbGludXgiLCB0cnVlKV0sIDE1LCBbbmV3KCJ2Y3MiLCAiKzo8ZGVmYXVsdD4iLCA2MCldKQogICAgICAgIF0pOwp9Cg=="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "omitted",
+        "settingsRevision": "83fb027922a6bac118fb402add1bd9487b52b717",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1501,
+            "sha256": "8361fa8aa843b5398c8b19056290e2d785c9c6740482d0f5a88947fb8412a61b",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtdLCBbbmV3KCJQcmVwYXJlX3N0ZXAiLCAiUHJlcGFyZSIsICJzaW1wbGVSdW5uZXIiLCBbbmV3KCJzY3JpcHQuY29udGVudCIsICJiYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wcmVwYXJlLnNoICVidWlsZC5jb3VudGVyJSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtdLCBbXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAiV2luZG93cyIsIFtdLCBbbmV3KCJXaW5kb3dzX3N0ZXAiLCAiV2luZG93cyIsICJqZXRicmFpbnNfcG93ZXJzaGVsbCIsIFtuZXcoImpldGJyYWluc19wb3dlcnNoZWxsX3NjcmlwdF9maWxlIiwgInNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS93aW5kb3dzLnBzMSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgImxhcHRvcC1nMTUiKV0sIFtuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAicHJlcGFyZS8qKiA9PiBjaS1pbnB1dC9wcmVwYXJlIiwgdHJ1ZSldLCA5MCwgW10pLAogICAgICAgICAgICBuZXcoIlQzUGVyc29uYWxfUmVsZWFzZSIsICJSZWxlYXNlIiwgW25ldygiZW52LlQzX1BVQkxJU0giLCAicmVsZWFzZSIsIG51bGwpXSwgW25ldygiUmVsZWFzZV9zdGVwIiwgIlJlbGVhc2UiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAibm9kZSBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcnVuLm1qcyBzdGFnZS1yZWxlYXNlXG5iYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wdWJsaXNoLnNoIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAiQ3ZhdCIpXSwgW25ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIkNBTkNFTCIsICJDQU5DRUwiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJ3aW5kb3dzLyoqID0+IGNpLWlucHV0L3dpbmRvd3MiLCB0cnVlKSwgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAibGludXgvKiogPT4gY2ktaW5wdXQvbGludXgiLCB0cnVlKV0sIDE1LCBbbmV3KCJ2Y3MiLCAiKzo8ZGVmYXVsdD4iLCA2MCldKQogICAgICAgIF0pOwp9Cg=="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      },
+      {
+        "event": "known-good-restart",
+        "settingsRevision": "83fb027922a6bac118fb402add1bd9487b52b717",
+        "files": [
+          {
+            "path": ".vivarium/settings/Settings.g.cs",
+            "bytes": 1501,
+            "sha256": "8361fa8aa843b5398c8b19056290e2d785c9c6740482d0f5a88947fb8412a61b",
+            "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIE1hbmFnZWQKewogICAgcHVibGljIHN0YXRpYyBTZXR0aW5ncyBEZWNsYXJlKCkgPT4gbmV3KCJUM1BlcnNvbmFsIiwgbmV3KCJUM1BlcnNvbmFsX0dpdCIsICJodHRwczovL2dpdGh1Yi5jb20vaVhhYjNyL3QzY29kZS5naXQiLCAicmVmcy9oZWFkcy9tYWluIiwgIis6LlxuLToucmVwb3MiKSwKICAgICAgICBbbmV3KCJlbnYuTU9ERSIsICJiYXNlIiwgbnVsbCldLAogICAgICAgIFsKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAiUHJlcGFyZSIsIFtdLCBbbmV3KCJQcmVwYXJlX3N0ZXAiLCAiUHJlcGFyZSIsICJzaW1wbGVSdW5uZXIiLCBbbmV3KCJzY3JpcHQuY29udGVudCIsICJiYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wcmVwYXJlLnNoICVidWlsZC5jb3VudGVyJSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgIkN2YXQiKV0sIFtdLCBbXSwgOTAsIFtdKSwKICAgICAgICAgICAgbmV3KCJUM1BlcnNvbmFsX1dpbmRvd3MiLCAiV2luZG93cyIsIFtdLCBbbmV3KCJXaW5kb3dzX3N0ZXAiLCAiV2luZG93cyIsICJqZXRicmFpbnNfcG93ZXJzaGVsbCIsIFtuZXcoImpldGJyYWluc19wb3dlcnNoZWxsX3NjcmlwdF9maWxlIiwgInNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS93aW5kb3dzLnBzMSIsIG51bGwpXSldLCBbbmV3KCJ0ZWFtY2l0eS5hZ2VudC5uYW1lIiwgImxhcHRvcC1nMTUiKV0sIFtuZXcoIlQzUGVyc29uYWxfUHJlcGFyZSIsICJDQU5DRUwiLCAiQ0FOQ0VMIildLCBbbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAicHJlcGFyZS8qKiA9PiBjaS1pbnB1dC9wcmVwYXJlIiwgdHJ1ZSldLCA5MCwgW10pLAogICAgICAgICAgICBuZXcoIlQzUGVyc29uYWxfUmVsZWFzZSIsICJSZWxlYXNlIiwgW25ldygiZW52LlQzX1BVQkxJU0giLCAicmVsZWFzZSIsIG51bGwpXSwgW25ldygiUmVsZWFzZV9zdGVwIiwgIlJlbGVhc2UiLCAic2ltcGxlUnVubmVyIiwgW25ldygic2NyaXB0LmNvbnRlbnQiLCAibm9kZSBzY3JpcHRzL3BlcnNvbmFsLXJlbGVhc2UvcnVuLm1qcyBzdGFnZS1yZWxlYXNlXG5iYXNoIHNjcmlwdHMvcGVyc29uYWwtcmVsZWFzZS9wdWJsaXNoLnNoIiwgbnVsbCldKV0sIFtuZXcoInRlYW1jaXR5LmFnZW50Lm5hbWUiLCAiQ3ZhdCIpXSwgW25ldygiVDNQZXJzb25hbF9XaW5kb3dzIiwgIkNBTkNFTCIsICJDQU5DRUwiKV0sIFtuZXcoIlQzUGVyc29uYWxfV2luZG93cyIsICJzYW1lQ2hhaW5Pckxhc3RGaW5pc2hlZCIsICJ3aW5kb3dzLyoqID0+IGNpLWlucHV0L3dpbmRvd3MiLCB0cnVlKSwgbmV3KCJUM1BlcnNvbmFsX1ByZXBhcmUiLCAic2FtZUNoYWluT3JMYXN0RmluaXNoZWQiLCAibGludXgvKiogPT4gY2ktaW5wdXQvbGludXgiLCB0cnVlKV0sIDE1LCBbbmV3KCJ2Y3MiLCAiKzo8ZGVmYXVsdD4iLCA2MCldKQogICAgICAgIF0pOwp9Cg=="
+          },
+          {
+            "path": ".vivarium/settings/UserCode.cs",
+            "bytes": 317,
+            "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6",
+            "bodyBase64": "bmFtZXNwYWNlIERlZmluaXRpb25Qcm9vZjsKCnB1YmxpYyBzdGF0aWMgY2xhc3MgVXNlckNvZGUKewogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgRXZhbHVhdGUoc3RyaW5nIGV4cHJlc3Npb24pID0+IGV4cHJlc3Npb24gc3dpdGNoCiAgICB7CiAgICAgICAgImZpeHR1cmUtbW9kZSIgPT4gc3RyaW5nLkpvaW4oIiIsIG5ld1tdIHsgImNvbXB1dGVkIiwgIi1tb2RlIiB9KSwKICAgICAgICBfID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJVbmtub3duIGNvbXB1dGVkIHBhcmFtZXRlcjogIiArIGV4cHJlc3Npb24pLAogICAgfTsKfQo="
+          }
+        ],
+        "controlRevision": "d1af2cbd68c8389829b2ab080d0c69e4523a6a25",
+        "controlSource": {
+          "path": "Control.g.cs",
+          "bytes": 278,
+          "sha256": "3f1e7b23d885dd5a0302016ac8872864101bb633521b2f10a93469bdec6079fd",
+          "bodyBase64": "dXNpbmcgRGVmaW5pdGlvblByb29mOwpwdWJsaWMgc3RhdGljIGNsYXNzIENvbnRyb2wKewogICAgcHVibGljIHN0YXRpYyBQcm9qZWN0IERlY2xhcmUoKSA9PiBuZXcoIlQzUGVyc29uYWwiLCAiX1Jvb3QiLCAiVDNQZXJzb25hbCIsICJQMCBzb3VyY2UgcmVwcmVzZW50YXRpb24gY2FuZGlkYXRlIiwgbmV3KCJwcm9kdWN0LXByb29mIiwgIi52aXZhcml1bS9zZXR0aW5ncy9TZXR0aW5ncy5nLmNzIiwgIm1haW4iLCAibG9jYWwtb3duZWQiLCAiY3JlZGVudGlhbC1yZWYtb25seSIpKTsKfQo="
+        }
+      }
+    ]
+  },
+  "checks": {
+    "rootBuild": {
+      "path": "artifacts/us013-p0/final-root-build.log",
+      "sha256": "dbdeb9b4809732b785012bb32ee14c0d10382fe39e87bf43bc08218a63446073",
+      "exitCode": 0
+    },
+    "rootTest": {
+      "path": "artifacts/us013-p0/results/us013-final-root.trx",
+      "sha256": "823042d153a4609f3601fc93ae20c4c40ba5e2345871b273985f2290cf5d20f7",
+      "counters": {
+        "total": "471",
+        "executed": "459",
+        "passed": "459",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "outcomes": {
+        "Passed": 459,
+        "Failed": 0,
+        "NotExecuted": 12
+      }
+    },
+    "focusedReplay": {
+      "path": "artifacts/us013-p0/results/us013-replay-complete.trx",
+      "sha256": "d111675f1718c0924e71f769ef856acb199dca060c91a36b615e1ada6ff163d9",
+      "counters": {
+        "total": "53",
+        "executed": "53",
+        "passed": "53",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "outcomes": {
+        "Passed": 53,
+        "Failed": 0,
+        "NotExecuted": 0
+      }
+    },
+    "rawConformance": {
+      "path": "artifacts/us013-p0/results/us013-final-raw.trx",
+      "sha256": "a0f683895504999a2e6c1b3c4c20588b176a60e3d223b83aca7178364916701a",
+      "counters": {
+        "total": "5",
+        "executed": "5",
+        "passed": "0",
+        "failed": "5",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "outcomes": {
+        "Passed": 0,
+        "Failed": 5,
+        "NotExecuted": 0
+      }
+    },
+    "executedAssembliesAndDependencies": [
+      {
+        "path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+        "sha256": "fbb0c9895e85fa185e016a0db2881e46811290fe94958c0050bc671a8f460bf5"
+      },
+      {
+        "path": "src/Vivarium.Agent/bin/Debug/net10.0/Vivarium.Agent.dll",
+        "sha256": "1f4f0ef278d2571c9635e48be0d18b6894a49cd760a9dfb48066eb7da44b3d34"
+      },
+      {
+        "path": "src/Vivarium.Cli/bin/Debug/net10.0/Vivarium.Cli.dll",
+        "sha256": "9e94e9c41da2560c9b93c46340a54c83ec4201bd5b4528c871ccd4ee7590f414"
+      },
+      {
+        "path": "src/Vivarium.Contracts/bin/Debug/net10.0/Vivarium.Contracts.dll",
+        "sha256": "d0808387fd1cf8b7d5dcc8a79d0aba4f0e72d339f6a63791d7bcb11bafc3c78e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+        "sha256": "17bdbb6efe6eda5483a246c729f84de7a7e2d2131947c5060418d4aca5f735dd"
+      },
+      {
+        "path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.deps.json",
+        "sha256": "3d47c3d2b6e61d7384c8e42c772b297f2d036eb4d0d46aa919be8943c781f7f9"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+        "sha256": "51bd0a2aee299dacdbf07bdaa752c66d8308b1f5dcd0eb3fb77cb8240690cfe9"
+      }
+    ]
+  },
+  "originalEvidence": {
+    "receipt": {
+      "path": ".workspace/workstreams/coherent-refactor/rest-ledger-results.json",
+      "sha256": "debf7fd8b7ce07ff72e49a54a9320897d505619b1e1d91186f468a852d0eb1a7"
+    },
+    "caseIdsOrExpectedValuesChanged": false,
+    "productSourceChanged": false,
+    "oldInputByteChanges": [
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationCases.cs",
+        "from_sha256": "414beedaad5df072fb9e6fa369502debf3cc087d44abfbe1b7e11eee71acf1c0",
+        "to_sha256": "f2ddfad827d91594a890bb023bf2546b18ac564ac416756ae270dc5111989a66"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationReplayTests.cs",
+        "from_sha256": "1c899971b92a791bea21309ef8891a61c8ae60617aa9590a20c9bd16a9395f18",
+        "to_sha256": "d5ab7da36f93adf92a031605dcde212653222b6bcdfb732885cdad75bb2a3a01"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ReplayControlTests.cs",
+        "from_sha256": "be7a1a2d9833da92000b00e77f936580558f314bb152bb6cdb448c2a4a6d8a8c",
+        "to_sha256": "80af763c492d1ae949fb2ecb310a70ed9d58b12c873cf5ab2168c751551adaaa"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RestResponseAssert.cs",
+        "from_sha256": "4793f479c24ab35d065f03aaa97a02a9c8fe72a955541d3d8e6d0a6e901a06bb",
+        "to_sha256": "9c8de06393aebacbb261afa002fad9debd22c1154cbb438fbc8e27c002f7a94d"
+      }
+    ],
+    "reuseAssessment": "Original fifteen cases unchanged. Changed loader/assertion/control support adds explicit empty/headerless cases; old nonempty JSON/text requests retain their semantics. Fresh root/replay/raw execution is separately recorded above, not relabelled as original execution. Legacy accounting reuse covers only its original fifteen-case joins, not these new observations or prototype."
+  },
+  "cleanup": {
+    "status": "PASS",
+    "observedUtc": "2026-11-01T18:59:15.8940966Z",
+    "removedContainers": [
+      {
+        "name": "vivarium-us013-p0-reference-agent",
+        "id": "fc8ec4fabc50a6d12bc1dd5feca618bcd7ccffab0db9cb78f2798a6b4e1f9879",
+        "image": "sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765"
+      },
+      {
+        "name": "vivarium-us013-p0-git",
+        "id": "0dada18d306636471966b8a7058e74a0e613d67a62a2b1cae490c346f06dc90c",
+        "image": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a"
+      },
+      {
+        "name": "vivarium-us013-p0-settings-git",
+        "id": "7e99b5fb7d7a129315f1a19d869d61202b1de1ff754af0b095cc79ce7fa6230c",
+        "image": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a"
+      }
+    ],
+    "removedNetwork": "6ad8f4d2c331db6779656f992d335e3149c6778d1538ba68f50efa7d64ab4d34",
+    "remainingAgents": 0,
+    "queued": 0,
+    "running": 0,
+    "labServerRetained": "222742",
+    "permissions": [
+      {
+        "name": "ReadOnly",
+        "enabled": true,
+        "description": "Read remote state without changing it"
+      },
+      {
+        "name": "Update",
+        "enabled": false,
+        "description": "Perform operations that may change remote state"
+      },
+      {
+        "name": "Admin",
+        "enabled": false,
+        "description": "Change remote accounts, access policy and server administration"
+      },
+      {
+        "name": "Credentials",
+        "enabled": false,
+        "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+      }
+    ],
+    "agentCredentialAclProtected": true,
+    "retained": "Original lab server, immutable evidence, owned Git/definition source repositories and private conf; no production or unrelated resources changed"
+  },
+  "acceptance": {
+    "story": "US-013/#78",
+    "phase": "P0_IN_PROGRESS",
+    "productAvailability": "NOT_AVAILABLE",
+    "knownMaterializedCases": 15,
+    "productGreen": 0,
+    "productRed": 5,
+    "productPrerequisiteBlocked": 10,
+    "normalizedDenominator": "UNKNOWN",
+    "independentMilestoneReview": "NOT_DONE",
+    "mainMerge": "NONE",
+    "remaining": "Native/matrix identity adoption, full real C#/Git activation/recovery and due variant/source/ledger/closure gates; R0/PILOT not started"
+  },
+  "taskReadback": {
+    "path": "artifacts/us013-p0/task-update/readback.json",
+    "sha256": "f6c3e83052069d29fc90b1edb7eb8b365e5f3c4e12e8e272c72f20417fa59074",
+    "issues": [
+      78,
+      110,
+      111,
+      112
+    ],
+    "originalBodiesAndMetadataRetained": true
+  },
+  "referenceClientInputs": [
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/src/client.ts",
+      "sha256": "cdd3618f2682e6e2a3e9ad7ecf45773d15baf370f9ad7c6041efce9b3a102749"
+    },
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/src/cli.ts",
+      "sha256": "55c3cd3af82383b818ee2756f377aa19676483bc208fa3577df79ba74794984f"
+    },
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/dist/src/client.js",
+      "sha256": "c7ba1379ab558eb7e32a8bc17d3a2ae8bd8284fd5b4a245351d0f61c129244be"
+    },
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/dist/src/cli.js",
+      "sha256": "04ad98f4b4acb0b92fc65c932d13adf252c2c4304fd0b4b064a99fa7d9cfc6e1"
+    },
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/package.json",
+      "sha256": "f80740d08d89ca6a1aa9a39b614753a7b8bab8b8ddcb0d4f360d713af92fe949"
+    },
+    {
+      "path": "artifacts/p0-rest-first/reference/cli-acquisition/package-lock.json",
+      "sha256": "489683522d22e9c6b7959f6edc9e19e974747b195f23631054ae0b5329644c79"
+    }
+  ]
+}

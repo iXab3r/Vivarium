@@ -3,13 +3,21 @@
 > Status: **Accepted**
 > Implementation: **Partial — reads, Agent enablement/deployment, build/blob mutations, build SSE, and CLI flows implemented**
 > Maintainer role: [Vivarium REST Expert](../roles/vivarium-rest-expert.md)
-> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D30
+> Related architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md) D4, D7, D8, D14, D22-D30, D32-D33
 
 ## 1. Purpose
 
-Vivarium needs one automation-grade management surface from day one. The React panel, `viv-cli`,
-CI integrations, operators, and third-party clients should manage both product domains through the
-same REST API:
+D34/D35 refine the target below: Depot-style Identity/OpenIddict and installation user, TeamCity
+authorization 1:1 with live PostgreSQL identity/RBAC, Chiral-owned private resource settings, and
+TypeScript/Vite Workbench UI. Existing setup/recovery/Git-RBAC endpoints are legacy implementation
+evidence to replace. Only versioned desired settings use Git activation; identity/role mutations use
+the common PG authorization/audit path, and resource configuration uses Chiral.
+
+Vivarium needs one automation-grade management model. The TypeScript panel and `viv-cli` use native
+`/api/v1`; D33 additionally requires a [TeamCity-compatible facade](teamcity-rest-compatibility.md)
+for unchanged existing clients. Both HTTP contracts call the same application services and current
+authorization/Git/audit rules. The facade is planned; it is not provided by the current ControlPlane
+adapter. Both product domains remain managed through this shared model:
 
 - **TeamCity:** projects, build configurations, builds, queue, cancellation, artifacts, and results.
 - **AgentExplorer:** agents/hosts, inventory, status, processes, network endpoints, and later remote
@@ -27,7 +35,7 @@ Browser / viv-cli / CI / integrations
    Controller application services
        |                  |
        v                  v
-Git desired state   SQLite runtime state
+Git desired state   PostgreSQL business state
        |                  |
        +--------+---------+
                 |
@@ -97,7 +105,7 @@ ambiguous behavior.
   `activate` or `rollback` directive after handoff. `viv-cli` consumes the public management resources for
   package publication and upgrade/status commands.
 - General identity/RBAC management, all other desired-configuration mutations, generic AgentExplorer
-  runtime operations, detailed result resources, and the React client remain planned.
+  runtime operations, detailed result resources, and the TypeScript client remain planned.
 
 ### Target
 
@@ -124,22 +132,24 @@ decisions remain authoritative.
 
 1. **One domain implementation.** REST, a transitional gRPC ControlPlane, background reconciliation,
    and controller UI hosting call the same application services and enforce the same invariants.
-2. **No direct storage access.** Clients and REST handlers never access SQLite, the Git working tree,
+2. **No direct storage access.** Clients and REST handlers never access PostgreSQL, the Git working tree,
    blob files, or live session objects directly.
 3. **Reverse connection stays.** Agent-backed requests are dispatched over the already established
    AgentHub stream. A REST request never makes the controller dial into a host.
 4. **Bulk bytes stay out of JSON.** REST describes payloads and artifacts by hash, size, media type,
    and authenticated link; bytes travel through `/blobs/{sha256}`.
 5. **Configuration is Git-backed.** A successful desired-state write identifies the resulting commit
-   or pending change. Applying a write only to SQLite is a defect.
+   or pending change. Applying a write only to PostgreSQL is a defect.
 6. **Secrets are not configuration files.** Token plaintext, password plaintext, private keys, and
    secret values never enter Git. Git may contain stable secret references and non-secret metadata.
 7. **Runtime history is immutable.** Builds retain exact definition and assigned-agent snapshots.
    Later Git or agent changes do not rewrite them.
-8. **Retries are safe.** A client timeout and retry cannot create duplicate side effects.
-   Authentication and object-level authorization are evaluated again on every replay; a stored
-   response is not an authorization grant. Secret plaintext is never persisted for replay.
-9. **Conflicts are visible.** A stale mutation fails; last-writer-wins is not accepted for settings.
+8. **Retry semantics are operation-specific.** Adopted TeamCity operations keep frozen repetition/
+   retry behavior, including two intentional unkeyed identical runs where admitted. Explicit native
+   idempotency workflows prevent keyed duplicates, recheck current authority and never persist secret
+   plaintext for replay. No blanket deduplication is added to the shared semantic processing.
+9. **Version checking is explicit.** Native version-checked workflows (AC-CFG-03) reject stale edits;
+   operations without that opt-in preserve the frozen TeamCity concurrency/default behavior.
 10. **Every action is attributable.** Mutations, denials, Git changes, dispatch, cancellation, and
     terminal outcomes share correlation and actor information.
 11. **Collections and streams are bounded.** Pagination, retention, and cursor expiry are part of the
@@ -149,7 +159,17 @@ decisions remain authoritative.
 13. **A blob hash is not authority.** Logical staging, assignment, build ownership, or artifact
     visibility grants access to shared content-addressed bytes.
 
-## 4. Protocol and representation conventions
+## 4. Native protocol and representation conventions
+
+Sections 4–7 specify `/api/v1`. They do not prescribe `/app/rest` IDs, envelopes, media,
+error/status shapes, paging, headers or mutation completion. The compatible facade follows the
+[frozen wire contract](teamcity-rest-compatibility.md) and [early domain profile](teamcity-rest-domain.md)
+without requiring client changes. Both surfaces share domain effects and current authorization.
+The native idempotency/version-check conventions below apply to explicitly declared native workflows;
+they do not redefine adopted TeamCity operation handling through either projection. Error envelopes
+may be native ProblemDetails; compatible errors retain exact reference status/media/body. An absent
+native option preserves the base behavior, and AC-CFG-03 is an opt-in version-checked workflow.
+
 
 ### 4.1 Base URL and media types
 
@@ -281,7 +301,7 @@ Rules:
 
 ### 4.4 Idempotency
 
-`Idempotency-Key` is required for non-idempotent requests that create side effects, including build
+For the explicitly keyed native workflows below, `Idempotency-Key` is required, including native build
 submission, inventory refresh, future remote command execution, token creation, and configuration
 change creation.
 
@@ -337,9 +357,9 @@ subresources return an observation ETag. Builds and operations return a runtime 
 resources may contain all three named revisions, but they are read-only aggregation points and do not
 offer an ambiguous aggregate `If-Match` mutation.
 
-Clients send `If-Match` for desired-state updates and destructive operations whose meaning depends on
-observed state. Missing preconditions return `428`; a stale precondition returns `412` with the
-current revision from that same domain but not a sensitive current representation. A new heartbeat
+Clients opting into a declared native version-checked workflow send `If-Match` in its documented
+revision domain. That workflow returns `428` for a missing required precondition and `412` for stale
+input, with the current revision from that same domain but not a sensitive current representation. A new heartbeat
 therefore cannot conflict with an agent settings edit, and a Git settings commit cannot pretend that
 a process snapshot is still current.
 
@@ -457,8 +477,7 @@ The following are desired configuration and must be Git-backed from their first 
 - Agent display names, enabled/disabled desired state, custom parameters, tags, and policy.
 - AgentExplorer collection and operation policy, including what sensitive inventory may be read.
 - Machine providers, pools, image recipes/references, scheduling policy, and retention settings.
-- Users, groups, project role assignments, and non-secret token policy metadata.
-- System configuration that is safe and meaningful to review as text.
+- Non-secret versioned build/fleet policy; resource connections/settings use Chiral instead.
 
 The following are not committed to Git:
 
@@ -466,20 +485,22 @@ The following are not committed to Git:
 - Connection, heartbeat, health observation, queue occupancy, build progress, agent inventory, and
   metrics.
 - Builds, runtime operations, results, logs, audit records, and idempotency records.
-- One-time authorization/enrollment ceremonies and emergency SuperUser bootstrap events.
+- One-time authorization/enrollment ceremonies and installation-account startup events.
+- Users, external bindings, groups, editable roles/permissions, scoped assignments and framework
+  credential metadata: PostgreSQL application authority.
+- Host/database/Identity/Storage resource configuration and private secrets: Chiral managed settings.
 
-Authorization is deliberately split: Git may state that a known Agent is desired/authorized
-and which policy applies, but credential issuance/revocation remains a security operation in the
-durable credential store and audit journal. The User Roles, Admin/SuperUser, Git/Versioning, and
-Reconciliation experts must ratify the exact atomic transition before implementation.
+Agent registration/credential authorization is an audited security action; desired enablement and
+custom properties are versioned settings. Define their shared concurrency/activation boundary without
+inventing a Git authority over users or credentials. Current authorization comes from PostgreSQL.
 
-`vivarium.yaml` in the tested source repository remains the authoritative submitted build snapshot
-under D17. A future controller catalog may index repository-backed configurations, but REST must not
-silently rewrite a product repository without an explicit configured Git workflow.
+C# replaces submitted YAML for the new catalog (D32). Existing `vivarium.yaml` snapshots are legacy
+evidence, not a permanent target schema. C# editability and compatible mutations must be settled in
+P0 before implementing the catalog; writes target the owning repository and its configured workflow.
 
 ### 5.2 Public change model
 
-A desired-state REST edit creates a `configuration-change` rather than mutating a SQLite projection:
+A desired-state REST edit creates a `configuration-change` rather than mutating a PostgreSQL projection:
 
 ```json
 {
@@ -609,6 +630,92 @@ range/cursor reads, and a resumable tail. Large completed logs belong in the blo
 retain or replay unlimited stdout. Audit events use their own collection and permission because they
 may reveal sensitive operational metadata.
 
+### 7.1. Selected R0 durable Build output
+
+**Specified target, not implemented or accepted.** R0's real LocalSmoke execution needs a separate
+output resource; the existing Build SSE contains lifecycle projections, not stdout/stderr. This
+bounded contribution belongs to SS-LOG with SS-RUN/EXEC/BLOB/IAM under #113/#114/#115. Search,
+archive rendering, general AgentExplorer output and the compatible TeamCity log renderer remain with
+their full owners; they are not prerequisites for the selected native read/resume journey.
+
+`GET /api/v1/builds/{buildId}/output?cursor=...&limit=...` returns `application/json` with the normal
+`items`/`page` collection envelope. The default limit is 50; a supplied limit must be an integer from
+1 through 200, otherwise 400 `invalid_query`. Additional top-level `output`
+metadata contains `state` (`open`, `sealing`, `complete`, `complete-with-gaps`) and `resumeCursor`.
+`page.nextCursor` continues available rows; at the current end it is null. `output.resumeCursor`
+denotes the position after the last returned row (or the unchanged starting position for an empty
+page). Poll with that cursor to receive later rows without replaying or skipping earlier output.
+Queued and genuinely empty Builds return an empty page, not an invented output row. A finished Build
+may still have `sealing` output; terminal result acceptance is not output completion.
+
+Each item has an opaque stable `id`, `kind` (`data` or `gap`), immutable `buildId`/`stepIndex` scope,
+`stream` (`stdout` or `stderr`), `sourceSequenceStart`, `sourceSequenceEndExclusive` and controller
+`receivedAt` (RFC3339 UTC). Optional `observedAt` is the producer observation time and never establishes
+cross-source order. Sequence endpoints are nonnegative decimal strings, with an exclusive end, so
+JSON clients cannot round uint64 values. Data items cover exactly one source sequence and expose
+`content: { href, length, sha256 }`, with length an integer byte count and SHA256 lowercase hex. A gap
+omits `content` and has `reason`: `delivery-deadline`, `quota-exceeded`, `spool-overflow`,
+`storage-failure`, `producer-lost` or `retention`. Data items omit `reason`. Only an unknown terminal
+tail may have `sourceSequenceEndExclusive: null` and `reason: producer-lost`: this explicitly says
+that the final producer watermark/amount of missing output was not observed, not that zero bytes
+were lost. Known retained ranges stay exact. Publication order is durable and append-only;
+within one source stream it preserves sequence order. Delayed input cannot rebase already published
+positions; bounded pending ranges resolve to bytes or explicit gaps. Different streams do not acquire
+a fabricated total source-clock order.
+
+`GET /api/v1/builds/{buildId}/output/{entryId}/content` returns the exact persisted, already-redacted
+bytes as `application/octet-stream`, with matching length and SHA-256 metadata. A data item is at most
+64 KiB; collections contain metadata, never inline/base64 output. The relative link conveys no
+authority. Both metadata and every content read authenticate and evaluate current Build/Project
+`view_project`, including inherited permissions and current account/credential eligibility. They do
+not require `view_file_content` or `view_build_runtime_data` in addition to project visibility.
+An invisible or absent Build/entry returns 404; a missing/invalid/expired/revoked credential returns
+401 under the common authentication contract, including a currently disabled account. Links, cursors, old success responses and possession
+of a content hash do not preserve access after rights withdrawal. Eligibility/authentication denial
+runs before output bytes are read; output does not introduce an independent account policy.
+
+Cursors follow section 4's integrity/principal/filter/snapshot binding. They record retained durable
+positions, survive an ordinary Host restart and do not snapshot permissions. Malformed/tampered or
+cross-resource cursors return 400 `invalid_cursor`; a formerly valid cursor outside retained history
+returns 410 `cursor_expired` with a `recovery` extension containing the current authorized relative
+output-resource link. A fresh read reports retained output and its completeness,
+never substitutes missing output with an empty complete log. Byte reads of known expired content
+likewise report 410 after current access checks. Unknown/hidden identities remain 404. Full retention
+policy stays with SS-LOG/BLOB; R0 must prove expiry behavior with controlled time rather than waiting
+or changing the machine clock.
+Retention changes the availability view/epoch, never the original producer evidence. A fresh view
+contains explicit `retention` gaps for purged ranges and reports retained completeness; it does not
+relabel an empty retained tail as a complete original log. Cursors identify the retained view they
+can resume. Retention markers are availability metadata, not late producer bytes rewriting a sealed log.
+
+The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
+registered-secret masking before transport/persistence, per-stream sequence identity, independent
+output acknowledgement and the terminal watermark barrier. Persist content before publishing its
+PG reference; acknowledge only persisted ranges or durable gaps. Replayed identical chunks do not
+duplicate output; conflicting same-sequence content is a protocol failure. A sink/quota/deadline
+failure must produce explicit gap evidence, never false completeness or unbounded capacity retention.
+If the producer disappears without a final watermark, the controller may seal a durable unknown-tail
+gap at the bounded finalization deadline and report `complete-with-gaps`. It must retain that origin,
+never invent a producer watermark, exit code or known byte total, and reject data that would rewrite
+a sealed log. Workload/process reconciliation and quarantine still gate Agent reuse independently;
+sealing missing output is not proof that an unreachable process stopped. Registered exact-value
+masking uses the native marker `[REDACTED]`; lengths and hashes describe the post-mask persisted bytes.
+Agent API/SDK owns the additive capability/protocol extension: current sequence-free `LogChunk`
+cannot satisfy this contract. Preserve existing AgentHub/Bootstrap compatibility; do not assign a
+new output-required workload to an Agent that lacks the negotiated capability.
+
+The independent [installed log-access observations](../../.workspace/workstreams/coherent-refactor/us013-log-access-results.json)
+show that a P-restricted PAT with `view_project` alone can read actual running and finished logs;
+the protected Q log is hidden with 404, and the unchanged revoked PAT gets 401 while administrator
+controls still read real output. These establish narrow access facts, not native rendering, cursor,
+durability or OIDC acceptance. The root TeamCity download route accepts Bearer in this capture while
+its `/httpAuth` variant rejects that form with 401. The HTML 404 entity is intentionally omitted and
+cannot be used as a full literal wire fixture. The selected CLI exposes no log-download command.
+
+Before R0 exposure, bind the native read/resume, current-principal, restart/replay, explicit-gap,
+redaction and expiry variants in the R0 manifest to actual services/Agent/PG/Storage. Planned cases
+are not GREEN. HTTP replay of formatted TeamCity log text cannot substitute for these native effects.
+
 WebSockets are reserved for future genuinely bidirectional interactive features, such as a terminal.
 They are not required for inventory, build watch, queue, or ordinary command output. SignalR may be
 an internal UI convenience only if it does not become a private management contract or diverge from
@@ -627,39 +734,20 @@ Supported client forms:
 - Agent credentials: accepted only for AgentHub and explicitly agent-scoped blob operations, not the
   human management API unless a future reviewed use case says otherwise.
 
-The User Roles Expert owns TeamCity-like role definitions and permission inheritance. The REST API
-must map every operation to a canonical permission and publish/test that matrix. Representative
-canonical permissions include:
-
-```text
-project.view
-project.settings.propose
-build.run
-build.cancel
-fleet.summary.view
-fleet.inventory.view
-fleet.environment-names.view
-fleet.environment-values.view
-fleet.command.execute
-fleet.agent.authorize
-fleet.agent.manage
-git.repository.bind
-git.change.reconcile
-audit.view
-tokens.manage-all
-server.manage
-```
-
-These names are placeholders until User Roles review. They must not accidentally imply that a build
-submission token can obtain an interactive shell or read environment secrets.
+The [authorization model](authorization-model.md) owns exact TeamCity role/permission IDs,
+editable role includes, groups and project inheritance. Do not implement the old placeholder
+`project.view`/`build.run` catalog as a substitute for the reference permissions. AgentExplorer adds
+explicit permission IDs without narrowing existing TeamCity meanings. Both surfaces check the same
+current PostgreSQL account and effective permissions, not a Git RBAC snapshot or stale role claims.
 
 Authorization is resource-scoped where TeamCity semantics require project boundaries. Listing
 returns only visible resources and pagination remains correct after filtering by permission. The API
 does not reveal whether a hidden resource exists. The same current authorization and object-visibility
 checks run before an idempotency replay is disclosed. Token creation attempts plaintext delivery
 exactly once; only a hash, non-secret metadata, and the secret-free idempotency receipt remain durable.
-SuperUser first-login and recovery behavior is owned by the Admin/SuperUser Expert and must use the
-same audit/correlation boundary.
+Installation-account startup, ordinary OIDC, sessions and keys follow
+[first-run administration](first-run-administration.md) and the same audit/correlation boundary.
+There is no target setup-claim/recovery-token API or Git first-admin saga.
 
 ## 9. Audit and correlation
 
@@ -697,14 +785,14 @@ share infrastructure but are distinct records with different retention and acces
   idempotency and precondition requirements, examples, and enum descriptions.
 - Schemas document sensitivity and redaction. Secret plaintext response fields carry an explicit
   one-time-delivery extension, are absent from replay schemas, and never appear in examples.
-- CLI and React UI consume generated types/clients from the reviewed OpenAPI contract. Handwritten
+- CLI and TypeScript UI consume generated types/clients from the reviewed OpenAPI contract. Handwritten
   wrappers may add UX behavior but may not invent endpoints or response shapes.
 - UI and CLI integration tests run against a real Kestrel REST host. In-process method calls do not
   count as public contract coverage.
 - External integrations may use plain HTTP without the Vivarium CLI. `curl` examples remain a design
   acceptance test for non-streaming operations.
 
-The React/Workbench UI uses REST for data and mutations and SSE for live projections. The CLI build
+The TypeScript/Workbench UI uses REST for data and mutations and SSE for live projections. The CLI build
 flow now implements the following coherent path:
 
 1. `viv-cli login` stores REST trust/credentials using the same pinned-controller identity rules; no CLI
@@ -772,7 +860,7 @@ release note rather than being hidden as a compatibility change.
 Before declaring the first REST slice complete, provide:
 
 1. A numbered architecture update reconciling D4, component descriptions, protocol sketch, and the
-   React/public-API panel model.
+   TypeScript/public-API panel model.
 2. OpenAPI snapshot validation and a breaking-change check in CI.
 3. Tier-2 Kestrel tests for authentication, anti-forgery, authorization, validation, and problem
    details.
@@ -791,7 +879,7 @@ Before declaring the first REST slice complete, provide:
 10. Endpoint/permission matrix tests supplied with User Roles review.
 11. Audit tests correlating HTTP request, Git change or runtime operation, agent dispatch, and terminal
     outcome while proving secret redaction and bounded log volume.
-12. CLI and React smoke tests that use REST rather than database or private in-process shortcuts,
+12. CLI and TypeScript smoke tests that use REST rather than database or private in-process shortcuts,
     including `viv-cli run` upload/submit/watch, local Ctrl+C, and explicit `viv-cli cancel` semantics.
 13. Blob discovery/staging tests proving cross-principal non-disclosure, hash verification, immutable
     build references, fenced assignment download, owned artifact upload, reconnect, cancellation
@@ -803,21 +891,27 @@ Before declaring the first REST slice complete, provide:
 
 - Replacing AgentHub gRPC with polling, inbound SSH, WinRM, or REST calls into agents.
 - Moving payload, artifact, or completed large-log bytes into JSON.
-- Exposing SQLite tables, generic CRUD, arbitrary SQL, or repository filesystem paths.
+- Exposing PostgreSQL tables, generic CRUD, arbitrary SQL, or repository filesystem paths.
 - Inventing a generic workflow language in the REST layer.
 - Defining TeamCity, AgentExplorer, platform, user-role, or agent capability semantics without their
   owning experts.
 - Storing runtime state, observations, audit records, generated status, or secrets in Git merely to
   say that everything is versioned.
-- Requiring GitHub, GitLab, or any other external service. A local repository and direct/change-branch
-  workflow must remain functional offline.
+- Requiring an external Git forge such as GitHub or GitLab. Managed-local Git and its direct/change-
+  branch workflow remain usable without a forge. The accepted PostgreSQL/Storage resource
+  prerequisites still apply; this is not a no-external-service server restriction.
 - Promising multi-controller clustering or cross-tenant isolation in the first release.
 - Shipping placeholder remote-file or remote-command APIs before their safety and agent contracts.
 - Treating SSE as permanent event sourcing or an exactly-once transport.
 
-## 15. Initial delivery sequence
+## 15. Historical native delivery sequence — superseded order
 
-1. Establish versioned SQLite migrations, the minimal D27 `audit_events` journal, request actor and
+The following records the earlier `/api/v1` slice order, not the new refactor schedule. D36 and the
+[active roadmap](../ROADMAP.md) require early wire/domain decomposition, R0 real Host+Agent and
+compatible seeded execution before the complete catalog. Use that schedule for new work.
+
+
+1. Establish versioned PostgreSQL migrations, the minimal D27 `audit_events` journal, request actor and
    correlation context, and one authorization evaluator beneath the existing ControlPlane, panel, and
    blob boundaries. Map legacy credentials without widening their authority.
 2. Establish shared HTTP conventions, Problem Details, authentication, deterministic OpenAPI, cursor
@@ -834,7 +928,7 @@ Before declaring the first REST slice complete, provide:
 6. Complete first-run administration and RBAC, then implement restart-safe runtime actions such as
    Agent inventory refresh with idempotency, durable operation state, AgentHub dispatch, fencing, and
    audit. Dynamic sensitive inventory does not ride on the static-facts shortcut.
-7. Expand TeamCity and AgentExplorer surfaces and port proven views to React only after their experts
+7. Expand TeamCity and AgentExplorer surfaces and port proven views to TypeScript only after their experts
    approve each lifecycle and the Agent API/SDK Expert supplies the required capabilities.
 8. Remove the transitional gRPC ControlPlane after CLI migration and before the first supported public
    release; keep AgentHub and the object-authorized blob data plane.

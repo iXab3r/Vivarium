@@ -2,6 +2,11 @@
 
 ## Mission
 
+D37 requires executable base-model and wire conformance in every affected milestone, with business
+AC/TCM/variant traceability and independent expected results. A green route/DTO/HTTP fixture cannot
+replace domain-effect, permission or byte checks. Preserve extension-neutral base/client behavior;
+R5 is cumulative coverage, not the first drift review. See [testing model](../design/testing-model.md).
+
 Own the public REST management contract through which people, automation, the CLI, and the web UI
 manage Vivarium. The contract covers both TeamCity-shaped build management and AgentExplorer fleet
 management without collapsing those domains into one model.
@@ -56,24 +61,28 @@ role file become a second architecture document.
   Expert; this expert owns their public HTTP contract.
 - Log retention and sink design. Those belong to the Logs Expert; this expert owns log retrieval,
   correlation, and bounded streaming contracts.
-- React and Workbench implementation. Those belong to the UI Expert, which must consume this API.
+- TypeScript and Workbench implementation. Those belong to the UI Expert, which must consume this API.
 - OS-specific collectors and process/network/file semantics. Those belong to the Platform Expert.
-- Direct database schema design. REST must call application services and never become a SQLite API.
+- Direct database schema design. REST must call application services and never become a PostgreSQL API.
 
 ## Non-negotiable invariants
 
 1. UI and CLI behavior available to external callers is backed by the same public REST contract.
-2. No REST handler writes SQLite, Git, the blob directory, or a live agent session directly. It calls
+2. No REST handler writes PostgreSQL, Git, the blob directory, or a live agent session directly. It calls
    a domain/application service that enforces the same invariant for every transport.
-3. Desired configuration changes are Git-backed and return their Git/change revision. Runtime facts,
+3. Versioned build/fleet desired-setting changes are Git-backed and identify their Git/change revision.
+   Identity/RBAC changes use PostgreSQL; private resource settings use Chiral. Compatible clients retain
+   their frozen wire/completion contract without new native headers or envelopes. Runtime facts,
    builds, operations, audit records, credentials, and secret values are not committed to Git.
 4. Every mutating request is authenticated, authorized, correlated, and auditable. Sensitive values
    never appear in URLs, problem details, audit records, or ordinary logs.
-5. Retried requests cannot accidentally create two builds, two commands, or two Git commits. A replay
-   re-authenticates and re-authorizes the caller before returning any stored outcome. Secret plaintext
-   is neither persisted nor replayed.
-6. Concurrent writers cannot silently overwrite each other. Git-backed `configurationRevision`,
-   agent `observationRevision`, and workflow `runtimeRevision` are distinct precondition domains.
+5. Retry, repetition and duplicate effects follow each frozen operation's TeamCity handling. Two
+   intentional unkeyed identical runs must remain two runs where the reference admits them. Explicit
+   native idempotency workflows honor their keys, re-authenticate/re-authorize stored outcome access
+   and never persist/replay secret plaintext; no blanket body-hash deduplication or exactly-once claim.
+6. Concurrent edits follow the frozen reference operation. Explicit native version-checked workflows
+   (AC-CFG-03) use the documented revision domain; absent opt-in preserves reference behavior.
+   Git `configurationRevision`, Agent `observationRevision` and `runtimeRevision` stay distinct.
 7. AgentHub remains the reverse-connect execution channel. REST never assumes the controller can
    dial directly into an agent.
 8. Payloads and artifacts remain SHA-256-addressed blob transfers. REST returns metadata and links,
@@ -135,13 +144,13 @@ and explicit subresources. Do not invent a second REST-only domain model.
 A REST change is not complete without evidence appropriate to its surface:
 
 - OpenAPI validation and a reviewed contract diff.
-- HTTP contract tests for success and RFC 9457 problem responses.
+- HTTP contract tests for success and frozen compatible errors; RFC 9457 applies to native errors only.
 - Endpoint/permission matrix tests, including denial and secret-redaction paths.
-- Persisted idempotency replay tests across controller restart for side-effecting POST requests,
-  including current-authorization rechecks and one-time-secret responses that never persist or replay
-  plaintext.
-- Optimistic-concurrency races proving that stale writers receive `412` rather than overwriting and
-  that a heartbeat observation cannot spuriously conflict with a configuration edit.
+- Operation-specific repetition/retry/concurrency evidence against frozen TeamCity behavior;
+  explicit native idempotency workflows prove restart/current-authorization/secret replay controls.
+- Explicit native version-checked workflows prove stale `412` and correct revision-domain races;
+  compatible operations prove their actual reference conflict/default behavior. No universal `412`,
+  `If-Match`, idempotency header or native ProblemDetails requirement is imposed on TeamCity calls.
 - Blob tests proving principal-scoped staging, cross-project non-disclosure, assignment/build
   ownership, reconnect fencing, and denial of raw hash possession as authority.
 - Git integration tests proving base-revision conflicts, commit/PR creation, validation failure, and
@@ -149,7 +158,7 @@ A REST change is not complete without evidence appropriate to its surface:
 - Cursor pagination and stream resume tests, including expired cursors.
 - Async operation cancellation and duplicate-cancel tests.
 - Audit correlation from incoming request through Git change or runtime operation to terminal result.
-- Verification that the CLI and UI use public REST and do not access SQLite or private controller
+- Verification that the CLI and UI use public REST and do not access PostgreSQL or private controller
   services directly.
 - Compatibility tests against the previous released `/api/v1` contract once releases exist.
 
@@ -167,14 +176,18 @@ Escalate a proposal when it:
   sufficient current authority.
 - Requires incompatible `/api/v1` semantics without a versioning and migration plan.
 
-Reject direct database endpoints, arbitrary SQL/filter passthrough, secrets in query strings,
-unversioned public routes, and UI-only management routes.
+Reject direct database endpoints, arbitrary SQL/filter passthrough, secrets in query strings and
+UI-only management routes. Native API routes follow `/api/v1`; compatible routes preserve the frozen
+TeamCity path/version conventions instead of being rejected as unversioned native routes.
 
 ## Current focus
 
-The immediate assignment is to establish the target REST conventions in
-[`../design/rest-api.md`](../design/rest-api.md), then drive a narrow vertical slice that exposes
-read-only agents/builds plus one Git-backed configuration mutation and one restart-safe runtime
-operation. Preserve the existing AgentHub and blob endpoints throughout that work.
+The immediate execution deliverable is #35's [reference-backed corpus and real RED baseline](../design/teamcity-rest-test-first.md),
+with #32–#34/#36 supplying affected [shared contracts](../design/teamcity-rest-domain.md) alongside
+verified cohorts; do not wait for a whole-API prose freeze. Resolve structural/R0 identities/states,
+authority, C# editability and exact due wire variants before structural replacement. R0 then proves
+a real local Host+Agent and unchanged-client seeded execution; domain families grow their public and
+compatible contracts together. Native conventions do not redefine TeamCity wire behavior. Preserve
+required AgentHub/blob consumers until their explicit replacement/disposition is proven.
 The gRPC ControlPlane is a frozen migration adapter, not a second public target; add no new management
 features to it and remove it after the current CLI is migrated to REST.

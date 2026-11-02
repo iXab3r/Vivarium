@@ -38,7 +38,7 @@ The architecture already accepts the target shape:
 - D15-D16 define provider acquisition, static physical capacity, revert-pool and clone-per-build
   lifecycle modes, and capacity one per Agent.
 - D19 defines controller-distributed agent/bootstrap packages; D20 names FakeMachineProvider and real-
-  hypervisor test tiers. D22-D28 add shared coordination, Git, REST, React UI, RBAC, audit, and the
+  hypervisor test tiers. D22-D28 add shared coordination, Git, REST, TypeScript UI, RBAC, audit, and the
   stable Agent/provider-instance identity split.
 
 Implementation evidence is intentionally smaller:
@@ -203,7 +203,7 @@ declared memory is part of scenario identity for checkpointed pools.
 Scheduling owns durable capacity reservation and fairness. The provider supplies dimensions,
 availability, and reconciliation. A create/clone operation receives an already-durable reservation
 identity; after restart, reservations are reconstructed from provider actual state before new capacity
-is admitted. The SQLite writer is never held across driver I/O.
+is admitted. No PostgreSQL transaction is held across driver I/O.
 
 ## Pool growth, drain, and replacement
 
@@ -293,7 +293,7 @@ Changing bytes in place is forbidden. A repair is another provisioning Build and
 ## Image artifact storage and distribution
 
 Git stores recipes, policy, aliases, and digests/references; it never stores multi-gigabyte VM disks.
-SQLite stores registry metadata, lineage, operation state, and replica observations. Image bytes live
+PostgreSQL stores registry metadata, lineage, operation state, and replica observations. Image bytes live
 in an `ImageStore` abstraction rooted in explicitly configured controller/provider-host storage.
 
 The first implementation may use one controller-owned local image directory as the authoritative
@@ -431,7 +431,8 @@ The following are desired state from their first implementation:
   maintenance windows;
 - image recipes, parent pins, network/resource shape, expected facts, secret references, canary,
   promotion aliases, deprecation, and retention policy;
-- image-store locations/policy, replica count/placement, cache budgets, and transfer limits;
+- versioned image-store policy, replica count/placement, cache budgets, and transfer limits;
+  private Storage locations/connections and secrets are Chiral resource settings;
 - console policy and provider action enablement.
 
 Exact paths and commit workflow belong to Git/Versioning. Required semantics are:
@@ -479,7 +480,7 @@ Runtime actions such as pool reconcile, create, restore, power, seal, replicate,
 canary-now, or console-access creation return `202 Accepted` operation resources, require idempotency
 keys, and expose commit-point/cancelability plus durable progress. Configuration changes use the Git
 mutation/change resource and return the candidate/applied revision; `PATCH /providers/{id}` must not
-silently mutate SQLite.
+silently mutate PostgreSQL.
 
 Resources expose stable IDs, capability/availability reasons, desired/applied Git revisions, health,
 observed-at timestamps, capacity/reservations, image lineage/digests, operation correlation, and stale/

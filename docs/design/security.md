@@ -58,6 +58,7 @@ controller or hypervisor.
 | Agent → controller | hello facts, inventory, logs, status, results, artifacts | agent identity, session fencing, schemas, size bounds, output escaping, provenance |
 | Controller → agent | build and AgentExplorer operations | pinned TLS, authenticated session, durable lease, operation policy, idempotency, deadline |
 | Git remote → controller | refs, commits, trees, metadata, hooks/config | safe invocation, credential isolation, immutable revision, size/path limits, optional signature policy |
+| Project C# → evaluator | committed source and typed non-secret context | D43 Linux/Docker isolation for compilation and execution; no network, Host data or credentials; non-root, resource/output bounds and owned cleanup |
 | Build submitter → agent OS | payloads, commands, environment, globs | target authorization, trust class, path hardening, timeout/quota, secret minimization |
 | Agent OS → filesystem/process manager | files, exec, terminate, software changes | allowed roots/targets, canonical identity, policy, privilege gate, audit |
 | Browser → controller | cookies, mutations, rendered logs/results | HttpOnly/Secure cookies, CSRF, restrictive CORS, CSP, escaping, object authorization |
@@ -204,7 +205,7 @@ Mutations start disabled by default:
   verification status and allowed signer identity for the applied revision. A signature does not
   replace Vivarium authorization or branch/revision policy.
 - A commit created outside Vivarium that changes security-sensitive desired configuration (including
-  RBAC, agent-pool/trust policy, AgentExplorer policy, repository trust, secret references, or server
+  agent-pool/trust policy, AgentExplorer policy, repository trust, secret references, or server
   security settings) is not applied merely because it is reachable from an allowed branch. The
   revision requires an attestation that maps its immutable commit ID to an authorized Vivarium actor
   or review decision. As an explicit alternative, a repository policy may declare every repository
@@ -215,7 +216,16 @@ Mutations start disabled by default:
 
 ### S8. REST and browser security from day one
 
-- REST uses versioned resource paths and the same authorization decisions as gRPC. Authentication is
+D43 isolates project C# compilation and evaluation from the Host. A trusted coordinator supplies
+bounded committed source to a pinned Linux/Docker image with no network, Host mounts, Docker socket
+or inherited Host secrets. It controls the build project/dependencies and validates the returned
+plan as untrusted data. Container CPU/memory/process/storage/time/output bounds and cancellation/
+restart cleanup are mandatory; failure retains last-known-good settings and never runs C# on Host
+as a fallback. The Docker daemon and kernel remain trusted infrastructure. Existing trusted-source
+process studies prove neither this isolation nor a production evaluator.
+
+- Native REST uses versioned resource paths; compatible REST preserves its frozen TeamCity wire.
+  Both use the same current domain authorization decisions as any remaining gRPC adapter. Authentication is
   not enough: every request checks access to each addressed project, agent, build, artifact, Git
   repository, or operation.
 - Mutations accept caller idempotency keys where retry can duplicate effects and optimistic revision
@@ -224,7 +234,7 @@ Mutations start disabled by default:
 - Browser sessions use `Secure`, `HttpOnly`, restrictive `SameSite` cookies, bounded lifetime, login
   throttling, and logout/revocation behavior. Cookie-authenticated mutations require CSRF protection.
 - CORS is denied by default. If enabled later, origins, methods, and credentials are explicit; `*`
-  with credentials is forbidden. A restrictive CSP and output escaping protect React/Workbench and
+  with credentials is forbidden. A restrictive CSP and output escaping protect TypeScript/Workbench and
   any legacy server-rendered surface.
 - Bearer tokens are accepted in the Authorization header, never query strings. Responses and errors
   omit secrets and do not reveal whether an inaccessible object exists.
@@ -236,12 +246,14 @@ Mutations start disabled by default:
 - The User Roles Expert owns the TeamCity-compatible permission catalog and role templates. Security
   requires deny-by-default evaluation, global vs project scope, explicit agent-pool/AgentExplorer target
   scope, and no privilege derived from display names or Git authorship.
-- A SuperUser/bootstrap token may be printed to the controller log only while no administrator account
-  exists. It is short-lived or claim-once, grants only the first-admin ceremony, is rate-limited, and
-  is revoked after successful claim. It is not the permanent admin REST/gRPC token.
-- Service tokens are first-class principals, not anonymous shared strings. Creation reveals plaintext
-  once; the controller stores a verifier and metadata. Rotation can overlap briefly and revocation is
-  immediate for new operations.
+- D34 replaces the custom claim/recovery credential model with Depot's reserved Identity installation
+  user: startup password generation/reset through the framework, private intended log disclosure
+  after persistence, normal sign-in, and current enabled/authority checks. There is no second verifier
+  store or setup-only token engine in the target. Ordinary credentials use Identity/OpenIddict stores
+  and lifecycle; required TeamCity token semantics are proven against actual clients.
+- D34 requires TeamCity authorization 1:1, including editable roles and permissions, project/group
+  inheritance and compatible mutations; current rights live in PostgreSQL, not Git or token claims.
+  AgentExplorer-only permissions extend the catalogue without silently changing TeamCity grants.
 - Long-lived build/CI credentials cannot authorize AgentExplorer exec, file access, software management,
   agent authorization, Git credential changes, role changes, or secret reveal unless those permissions
   are separately and explicitly granted.
@@ -326,7 +338,7 @@ The following is evidence in the repository at the date above, not a claim about
 | Agent update | Durable per-Agent drain/operation, Agent-scoped package reads, exact-session health acceptance/confirmation, LKG rollback, restart recovery, and cross-Agent denial are implemented/tested | Initial installer trust, release signing, Windows process evidence, previous-version CI, and fleet rollout policy remain |
 | API scopes | One evaluator maps current `agent`, `submit`, and `admin` bearer principals beneath gRPC, panel, and blob handlers without widening their legacy authority | No users, project RBAC, durable service-principal metadata, token expiry/rotation, or REST API |
 | Panel | Secure/HttpOnly/SameSite-strict cookie auth and ASP.NET authorization are enabled | The permanent admin token is printed at every start; first-admin bootstrap separation and login throttling are absent |
-| CSRF | ASP.NET antiforgery middleware protects the component surface | Login/logout explicitly disable antiforgery; the future React REST surface needs a deliberate CSRF contract |
+| CSRF | ASP.NET antiforgery middleware protects the component surface | Login/logout explicitly disable antiforgery; the future TypeScript REST surface needs a deliberate CSRF contract |
 | Blobs | SHA-256 names are validated and PUT bodies are hash-verified before atomic commit | Any valid bearer can GET/PUT any known hash; there are no body/quota/rate bounds |
 | Payloads | Extraction rejects traversal, rooted paths, duplicate/type conflicts, Windows aliases/devices, and link pivots | No archive entry/expanded-byte/compression-ratio bound; post-execution artifact link escape needs a separate guarantee |
 | Execution | Structured program/args, relative cwd checks, timeouts, cancellation, and whole-process-tree kill exist | Submitted code inherits the agent account; no physical-agent trust-class authorization exists yet |

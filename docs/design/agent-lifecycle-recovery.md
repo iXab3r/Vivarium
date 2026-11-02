@@ -38,7 +38,7 @@ Scheduling requires all relevant axes to be positive. The target UI and REST exp
 so an operator can distinguish an offline machine, a live but wedged Agent, a known unhealthy machine,
 and a healthy Agent intentionally drained for maintenance. The current REST slice adds operational
 health, quarantine, and reason to the existing connection/activity view; the complete lifecycle and
-occupancy projection, React presentation, and actions remain target work.
+occupancy projection, TypeScript presentation, and actions remain target work.
 
 ## Build stop contract
 

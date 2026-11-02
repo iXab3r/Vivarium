@@ -293,7 +293,8 @@ and authorization against the target fleet/pool and provider projection.
 
 ## 8. Git-backed configuration and observed state
 
-All durable AgentExplorer settings are desired state in Git, including:
+Versioned AgentExplorer fleet policy is desired state in Git. Private resource connections use
+Chiral; users/roles/grants and observations use PostgreSQL. Git-owned policy includes:
 
 - host/group display settings and custom labels;
 - AgentExplorer enablement and capability policy;
@@ -304,7 +305,7 @@ All durable AgentExplorer settings are desired state in Git, including:
 The exact repository layout, branch/approval flow, commit signing, UI commit workflow, rollback, and
 conflict strategy belong to the Git/Versioning Expert. AgentExplorer requires these invariants:
 
-1. SQLite stores an indexed applied projection and observed state, never an independent editable copy.
+1. PostgreSQL stores an indexed applied projection and observed state, never an independent editable copy.
 2. Every applied desired-state projection records repository identity, commit SHA, path/key, schema
    version, validation result, and reconciliation time.
 3. UI and REST changes produce Git commits through the sanctioned versioning workflow; there is no
@@ -370,7 +371,7 @@ Requirements for the REST Expert:
 - asynchronous operation resources instead of keeping an HTTP request open for long work;
 - correlation IDs linking REST requests, agent requests, operations, audit, and bounded logs;
 - cookie plus anti-forgery protection for UI writes and bearer-token scopes for API clients;
-- no requirement to load React in order to test or use the API.
+- no requirement to load TypeScript in order to test or use the API.
 
 ## 10. Permissions, audit, and logs
 

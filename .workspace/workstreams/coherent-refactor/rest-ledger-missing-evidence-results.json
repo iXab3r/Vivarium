@@ -1,0 +1,209 @@
+{
+  "recorded_utc": "2026-11-01T10:21:24.135260+00:00",
+  "candidate": {
+    "git_base": "06da23a82bcfa99d8d4ca44950244d491e68c4b9",
+    "state": "Uncommitted one-line offline accounting fix and one pure-file regression; no product source or fixture changes",
+    "candidate_id": "ledger-missing-evidence-working-tree",
+    "accounting_source_inputs": [
+      {
+        "path": "tools/Vivarium.ApiLedger/Ledger.cs",
+        "sha256": "4fda1467412e3ba859db9dfa872748a027b592a7e8771238477d67b4453732da"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Program.cs",
+        "sha256": "d225295beb4a461a685c0ecfbc1206cd99c9583031510bc1177bf05d316c0b5c"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Vivarium.ApiLedger.csproj",
+        "sha256": "c978813609c077b4b2e19e6e48f925f5c51d7eea7c46cd63195690a672774a41"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ApiLedgerTests.cs",
+        "sha256": "042ea6e5fa326f29486f0a5e8b6912042ded0cb9690de59d41a5d934225e7a23"
+      },
+      {
+        "path": "Vivarium.slnx",
+        "sha256": "cf53109196dc66724df7c2d2620959d4af9a2322f26436f026b61c6423c7e597"
+      },
+      {
+        "path": "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+        "sha256": "853ad4c78cefd0b845956cfed51cab3e32debf25f8aeda074bede7c22fa6cc6f"
+      }
+    ],
+    "accounting_changes": [
+      {
+        "path": "tools/Vivarium.ApiLedger/Ledger.cs",
+        "from_sha256": "71d8614623d69ed5031e21c2979e767bb6915118739abc04bd78be75454a5ce7",
+        "to_sha256": "4fda1467412e3ba859db9dfa872748a027b592a7e8771238477d67b4453732da"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ApiLedgerTests.cs",
+        "from_sha256": "78ca87d03decb3444409e6dfd315eaf07614159371f05cc2870a74796dd2c6bd",
+        "to_sha256": "042ea6e5fa326f29486f0a5e8b6912042ded0cb9690de59d41a5d934225e7a23"
+      }
+    ],
+    "retained_assemblies": [
+      {
+        "recorded_path": "tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll",
+        "artifact": "artifacts/p0-ledger-missing-evidence/assemblies/Vivarium.ApiLedger.dll",
+        "sha256": "ec035e09941f9abebeba3f60ebd7f6c4d23a8d52c2c40a93e5af98bee623e8a1"
+      },
+      {
+        "recorded_path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+        "artifact": "artifacts/p0-ledger-missing-evidence/assemblies/Vivarium.Tests.dll",
+        "sha256": "fb18a013d653104d1c3355be17f61fbd0bc93bd5afb617149626ffe0e6ca96f8"
+      }
+    ]
+  },
+  "finding": {
+    "id": "API-LEDGER-MISSING-SENTINEL-001",
+    "owning_task": 36,
+    "milestone": "P0",
+    "observation": "Absent files returned literal MISSING. A malformed receipt/oracle declaring SHA MISSING could compare equal and preserve synthetic product GREEN.",
+    "reproduction": "Start with valid raw product GREEN and real production input. Add missing-oracle.json with sha256 MISSING, point reference capture/hash at that missing file, recompute receipt source fingerprint and explicit from fingerprint. Before fix the report retained no errors.",
+    "fix": "Absent Hash now returns null, which cannot equal a required declared string hash.",
+    "regression": "ApiLedgerTests.Missing_oracle_cannot_match_a_declared_missing_hash_sentinel",
+    "origin": "Introduced by bounded offline ledger implementation at06da23a",
+    "disposition": "Fixed in working tree; author verification only, awaiting root verification/commit. P0 closure and independent final review remain open."
+  },
+  "results": {
+    "red_reproduction": {
+      "artifact": "artifacts/p0-ledger-missing-evidence/red/missing-oracle-red.trx",
+      "sha256": "1785565d028d3be65892c30e06598848058b24636490f54c79218c513027b19c",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --no-restore --filter FullyQualifiedName~Missing_oracle_cannot_match_a_declared_missing_hash_sentinel --logger trx;LogFileName=missing-oracle-red.trx --results-directory artifacts/p0-ledger-missing-evidence/red",
+      "exit_code": 1,
+      "result_row_outcomes": {
+        "Failed": 1
+      },
+      "counters": {
+        "total": 1,
+        "executed": 1,
+        "passed": 0,
+        "failed": 1,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "times": {
+        "creation": "2026-11-01T11:19:54.4144185+01:00",
+        "queuing": "2026-11-01T11:19:54.4144187+01:00",
+        "start": "2026-11-01T11:19:53.9094657+01:00",
+        "finish": "2026-11-01T11:19:54.4177697+01:00"
+      },
+      "failures": [
+        {
+          "name": "Missing_oracle_cannot_match_a_declared_missing_hash_sentinel",
+          "message": "  Assert.That(report.Errors, Is.Not.Empty)\r\n  Expected: not <empty>\r\n  But was:  <empty>\r\n"
+        }
+      ]
+    },
+    "current_ledger_controls": {
+      "artifact": "artifacts/p0-ledger-missing-evidence/controls/ledger-missing-evidence.trx",
+      "sha256": "9d8a668c9fe6012bc48c154ff656b9be1d1a4771b865c72747fb7c8693cc7f99",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --no-restore --filter TestCategory=ApiLedgerControl --logger trx;LogFileName=ledger-missing-evidence.trx --results-directory artifacts/p0-ledger-missing-evidence/controls",
+      "exit_code": 0,
+      "result_row_outcomes": {
+        "Passed": 47
+      },
+      "counters": {
+        "total": 47,
+        "executed": 47,
+        "passed": 47,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "times": {
+        "creation": "2026-11-01T11:20:07.4277202+01:00",
+        "queuing": "2026-11-01T11:20:07.4277204+01:00",
+        "start": "2026-11-01T11:20:06.9109539+01:00",
+        "finish": "2026-11-01T11:20:07.6017023+01:00"
+      },
+      "failures": []
+    },
+    "root_build": {
+      "command": "dotnet build",
+      "artifact": "artifacts/p0-ledger-missing-evidence/root-build.log",
+      "sha256": "80f4966c216e0321b789288b8472d4683b7abde5dacba0d26d7ea6e0f91d896a",
+      "exit_code": 0
+    }
+  },
+  "evidence_reuse": {
+    "from_receipt": ".workspace/workstreams/coherent-refactor/rest-ledger-results.json",
+    "from_receipt_sha256": "debf7fd8b7ce07ff72e49a54a9320897d505619b1e1d91186f468a852d0eb1a7",
+    "from_base": "e9bf12c5040b4020dd6b5ff267945ee903acc209",
+    "from_source_fingerprint": "a2ed282f7ae4c5c204c4f0b1dd5a3935261afda149ca027fca12b38f03922806",
+    "from_candidate": "ledger-accounting@06da23a82bcfa99d8d4ca44950244d491e68c4b9",
+    "to_candidate": "ledger-missing-evidence-working-tree",
+    "expected_head": "06da23a82bcfa99d8d4ca44950244d491e68c4b9",
+    "action": "reuse",
+    "assessor": "Test Steward implementation assessment; no final independent milestone/Security acceptance",
+    "impacts": {
+      "production": "unchanged",
+      "shared_services": "unchanged",
+      "fixture_oracle": "unchanged",
+      "reference_client": "unchanged",
+      "environment": "unchanged"
+    },
+    "verified_producer_input_count": 183,
+    "rationale": "Only the offline Hash absence representation and one isolated synthetic negative control changed. All183 production/harness/reference byte hashes remain identical, as do prior raw/control/ordinary artifacts. The current47 ledger controls and root build validate the changed helper; reuse unaffected product raw/replay/composition and ordinary runtime groups without relabeling them fresh. New missing-sentinel evidence is harness-control TDD, not product RED.",
+    "linked_affected_reruns": [
+      {
+        "artifact": "artifacts/p0-ledger-missing-evidence/controls/ledger-missing-evidence.trx",
+        "sha256": "9d8a668c9fe6012bc48c154ff656b9be1d1a4771b865c72747fb7c8693cc7f99"
+      }
+    ]
+  },
+  "preserved_results": {
+    "ordinary_baseline": {
+      "artifact": "artifacts/p0-ledger/ordinary/ordinary-ledger.trx",
+      "sha256": "55745b7c0fc3b7e673d8d3984c73f0fc1980916f86a1433311060d2c73939cdf",
+      "result_row_outcomes": {
+        "Passed": 420,
+        "NotExecuted": 12
+      }
+    },
+    "controls": {
+      "artifact": "artifacts/p0-ledger/controls/controls-ledger.trx",
+      "sha256": "82c3112008757f4d4d6dd1428f0862f49097c2adc94c5a8f6f2b127085ffd791",
+      "result_row_outcomes": {
+        "Passed": 77
+      }
+    },
+    "raw": {
+      "artifact": "artifacts/p0-ledger/raw/raw-ledger.trx",
+      "sha256": "98106decd8c1bafc55c44fc7c004de8e19fb065e58102011562e496955b1a670",
+      "result_row_outcomes": {
+        "Failed": 5
+      }
+    }
+  },
+  "environment": {
+    "sdk": "10.0.303",
+    "os": "Microsoft Windows NT 10.0.26200.0",
+    "impact": "same host/private SDK/session; no environment modification"
+  },
+  "remaining_gates": "P0/#36/#42 remain open: source-union allocation, frozen due variants/history, model/editability, broader composition, delivered-compatible GREEN and final aggregate/Security/debt/main closure.",
+  "new_full_ordinary_runs": 0,
+  "new_raw_product_runs": 0,
+  "new_reference_composition_runs": 0
+}

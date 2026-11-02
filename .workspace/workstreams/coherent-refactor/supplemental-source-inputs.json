@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "producer_source": {
+    "path": "artifacts/us013-producer-source-20261102/interface-assessment.json",
+    "sha256": "020ab1e1328211928f2b46af9a2bb3036541e5c907d45576eb5828bb5f9d2281"
+  },
+  "selected_source_delta": {
+    "path": "artifacts/us013-cli056-20261102/source-selection-assessment.json",
+    "sha256": "78e42b8d050b41d138b17969a662282b8f314e3322435a9ec1a4e144d0295830"
+  },
+  "selected_core_blobs": {
+    "path": "artifacts/us013-output-source-20261102/selected-core-source.json",
+    "sha256": "8811fac291261e81b4213bee46bf859cf5c83aeac3894bacb8d867bc5c5068e9"
+  },
+  "scope": "Finite known external producer/consumer source files and selected Core delta; not exhaustive API/branch/runtime coverage."
+}

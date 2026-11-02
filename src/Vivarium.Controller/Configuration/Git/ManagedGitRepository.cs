@@ -996,8 +996,9 @@ public sealed class ManagedGitRepository : IConfigurationRepository
         }
 
         var trailers = new Dictionary<string, List<string>>(StringComparer.Ordinal);
-        foreach (var line in message.Split('\n'))
+        foreach (var rawLine in message.Split('\n'))
         {
+            var line = rawLine.TrimEnd('\r');
             foreach (var key in ControllerTrailerKeys)
             {
                 var prefix = key + ": ";
@@ -1103,7 +1104,7 @@ public sealed class ManagedGitRepository : IConfigurationRepository
             Vivarium-Actor-ID: {metadata.ActorId}
             Vivarium-Actor-Type: {metadata.ActorType}
 
-            """;
+            """.ReplaceLineEndings("\n");
         var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
             ["GIT_AUTHOR_NAME"] = metadata.DisplayName,

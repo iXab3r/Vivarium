@@ -578,7 +578,7 @@ public sealed class AgentDesiredConfigurationTests
         spec:
           enabled: {enabled.ToString().ToLowerInvariant()}
 
-        """;
+        """.ReplaceLineEndings("\n");
 
     private static async Task<byte[]> ReadGitFileAsync(
         string repositoryPath,

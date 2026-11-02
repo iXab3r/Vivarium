@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "kind": "P0_REST_2_COMPOSITION_EVIDENCE_NOT_PRODUCT_COMPATIBILITY",
+  "recorded_utc": "2026-11-02T18:04:28.320615+00:00",
+  "producer": {
+    "path": "D:/Work/Vivarium/artifacts/us013-source-ownership-20261102/record-composition.py",
+    "sha256": "4f5ad67a41bae79829e9753f26619351ea2e24bdf1d986ba091826a23886109d"
+  },
+  "source_checkpoints": [
+    {
+      "path": ".workspace/workstreams/coherent-refactor/us013-source-ownership-results.json",
+      "sha256": "dcf560dca003b5258c4bdd0c9e81d7577d38505cc149f87dc5f0950ed19245b4"
+    },
+    {
+      "path": "artifacts/us013-source-ownership-20261102/physical-reuse.json",
+      "sha256": "95ff690c0d1d0bef4ee6d53c34f2ee0203306ca8250dfa1904fec1adc09bbdb6"
+    }
+  ],
+  "current_source_files": [
+    {
+      "path": "tests/Vivarium.Tests/TeamCity/AgentDeliveryCompositionTests.cs",
+      "sha256": "5c1db4dca7a8a607e1830dde4309cd99dfb6394e2016807761f6ad41e86ba946"
+    },
+    {
+      "path": "tests/Vivarium.Tests/TeamCity/ProductionCompositionTests.cs",
+      "sha256": "fa307cd0db074281279570e15d288095f69fd9f0e20c7976182ac0911639a50f"
+    },
+    {
+      "path": "tests/Vivarium.Tests/TeamCity/ProductionSubmissionCompositionTests.cs",
+      "sha256": "60bd20142ba8c4a7239f8fbc8f0d782861ed2c30058881ab1a8134f82f69c193"
+    },
+    {
+      "path": "tests/Vivarium.Tests/TeamCity/CurrentController.cs",
+      "sha256": "e2bce580faf588e4eced7b246fb034ad9fdb931d2246c02a986684154fb88628"
+    }
+  ],
+  "rows": [
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionCompositionTests",
+      "test_name": "Native_readiness_uses_real_auth_and_cleans_up_its_controller",
+      "outcome": "Passed",
+      "duration": "00:00:02.6109760",
+      "measurements": [
+        "Production Kestrel/Git/SQLite setup/readiness: 2566ms; process working set 611069952 bytes",
+        "Including cleanup: 2610ms"
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionCompositionTests",
+      "test_name": "Production_queue_monitor_uses_controlled_timers_and_isolated_databases",
+      "outcome": "Passed",
+      "duration": "00:00:00.2205510",
+      "measurements": [
+        "Two isolated production SQLite monitors, 20 virtual seconds, setup/run/cleanup: 219ms"
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(False,\"cancel\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.1191880",
+      "measurements": [
+        "Composition minimal-services/cancel: setup 103ms; setup+action 111ms; allocated 1559272 bytes; process working set 614436864 bytes.",
+        "Including disposal/cleanup: 118ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(True,\"retry\")",
+      "outcome": "Passed",
+      "duration": "00:00:01.8810210",
+      "measurements": [
+        "Composition real-host/retry: setup 1830ms; setup+action 1837ms; allocated 9689752 bytes; process working set 612331520 bytes.",
+        "Including disposal/cleanup: 1880ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(True,\"denied\")",
+      "outcome": "Passed",
+      "duration": "00:00:03.6914480",
+      "measurements": [
+        "Composition real-host/denied: setup 3634ms; setup+action 3639ms; allocated 9639152 bytes; process working set 612511744 bytes.",
+        "Including disposal/cleanup: 3691ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(False,\"denied\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.1178780",
+      "measurements": [
+        "Composition minimal-services/denied: setup 102ms; setup+action 107ms; allocated 1493896 bytes; process working set 612454400 bytes.",
+        "Including disposal/cleanup: 117ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(False,\"retry\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.1155350",
+      "measurements": [
+        "Composition minimal-services/retry: setup 101ms; setup+action 107ms; allocated 1539192 bytes; process working set 612491264 bytes.",
+        "Including disposal/cleanup: 115ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(True,\"cancel\")",
+      "outcome": "Passed",
+      "duration": "00:00:01.7670800",
+      "measurements": [
+        "Composition real-host/cancel: setup 1718ms; setup+action 1727ms; allocated 9858744 bytes; process working set 614498304 bytes.",
+        "Including disposal/cleanup: 1766ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(True,\"submit\")",
+      "outcome": "Passed",
+      "duration": "00:00:01.9559490",
+      "measurements": [
+        "Composition real-host/submit: setup 1908ms; setup+action 1913ms; allocated 9703536 bytes; process working set 612519936 bytes.",
+        "Including disposal/cleanup: 1955ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/source-ownership-root.trx",
+        "sha256": "12b6a646e72e750734ea269820bc5b75ce73adb57ff56ad05f26331ee4ce1d23"
+      },
+      "class": "Vivarium.Tests.TeamCity.ProductionSubmissionCompositionTests",
+      "test_name": "Native_submission_has_the_same_effects_in_minimal_and_real_Host_compositions(False,\"submit\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.1205390",
+      "measurements": [
+        "Composition minimal-services/submit: setup 104ms; setup+action 109ms; allocated 1450184 bytes; process working set 612417536 bytes.",
+        "Including disposal/cleanup: 117ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/r0-contract-final-controls.trx",
+        "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
+      },
+      "class": "Vivarium.Tests.TeamCity.AgentDeliveryCompositionTests",
+      "test_name": "Assignment_delivery_result_replay_and_missing_ack_agree_at_service_and_real_Hub_boundaries(True,False)",
+      "outcome": "Passed",
+      "duration": "00:00:03.6323890",
+      "measurements": [
+        "Agent composition Kestrel-AgentHub/result-replay: setup 3565ms; action 32ms; allocated 15260896 bytes. Scripted reports, no process-execution or TeamCity wire claim.",
+        "Owned teardown complete; total 3631ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/r0-contract-final-controls.trx",
+        "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
+      },
+      "class": "Vivarium.Tests.TeamCity.AgentDeliveryCompositionTests",
+      "test_name": "Assignment_delivery_result_replay_and_missing_ack_agree_at_service_and_real_Hub_boundaries(False,True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.1632630",
+      "measurements": [
+        "Agent composition production-services/missing-ACK: setup 127ms; action 23ms; allocated 1524768 bytes. Scripted reports, no process-execution or TeamCity wire claim.",
+        "Owned teardown complete; total 162ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/r0-contract-final-controls.trx",
+        "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
+      },
+      "class": "Vivarium.Tests.TeamCity.AgentDeliveryCompositionTests",
+      "test_name": "Assignment_delivery_result_replay_and_missing_ack_agree_at_service_and_real_Hub_boundaries(True,True)",
+      "outcome": "Passed",
+      "duration": "00:00:02.1266040",
+      "measurements": [
+        "Agent composition Kestrel-AgentHub/missing-ACK: setup 1925ms; action 25ms; allocated 12655864 bytes. Scripted reports, no process-execution or TeamCity wire claim.",
+        "Owned teardown complete; total 2126ms."
+      ]
+    },
+    {
+      "trx": {
+        "path": "artifacts/us013-source-ownership-20261102/results/r0-contract-final-controls.trx",
+        "sha256": "1edefd0007570469557b93f8984d86974c28ac78913487e6d51d73026fcf1f0b"
+      },
+      "class": "Vivarium.Tests.TeamCity.AgentDeliveryCompositionTests",
+      "test_name": "Assignment_delivery_result_replay_and_missing_ack_agree_at_service_and_real_Hub_boundaries(False,False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.2783800",
+      "measurements": [
+        "Agent composition production-services/result-replay: setup 225ms; action 35ms; allocated 1921112 bytes. Scripted reports, no process-execution or TeamCity wire claim.",
+        "Owned teardown complete; total 271ms."
+      ]
+    }
+  ],
+  "matrix": [
+    {
+      "question": "Read/projection and real readiness",
+      "boundary": "Actual Kestrel native /api/v1/system, production bearer auth/Git/SQLite; invalid-token positive/negative control",
+      "oracle": "Existing native API v1 contract; explicit apiVersion v1 and401 invalid bearer; no /app/rest GREEN",
+      "selection": "Use actual HTTP for routing/auth/projection; strict reference replay remains HTTP-control only. No invented minimal fake auth/projection service."
+    },
+    {
+      "question": "Mutation/readback/denial and retry/cancel",
+      "boundary": "Same production submission/cancellation/authorization services, minimal isolated DB versus real Host-owned composition;8 cases",
+      "oracle": "Existing native immutable request-key semantics, durable matrix/Build/queue rows, permission_denied/no mutation, retained cancelled history",
+      "selection": "Pure ownership/guard cases use minimal real services; selected real native HTTP/actual Agent execution is separately retained in root SessionLoopTests. Host-owned service overlap is not labeled HTTP mutation proof."
+    },
+    {
+      "question": "Work-bearing external actor and fault overlap",
+      "boundary": "Production BuildTracker/registry/store with scripted external Agent messages versus pinned-TLS real Kestrel/AgentHub;4 cases",
+      "oracle": "Existing D4/D31 assignment/result ACK, duplicate-result immutability and15s ACK deadline/quarantine/force containment contract; no process execution or TeamCity response claim",
+      "selection": "Small message/state variants use owning services and fake time; one real transport overlap for result replay and withheld ACK detects composition drift."
+    },
+    {
+      "question": "Timer scheduling/reset isolation",
+      "boundary": "Two actual queue timeout monitors/SQLite databases with identical IDs and independently scheduled FakeTimeProvider timers",
+      "oracle": "Existing10s deadline and infrastructure failure, other fixture remains queued until its own advance",
+      "selection": "Advance registered production timers, not machine time or real waits; bounded wall watchdog only for async work. Fresh DB/directories plus duplicate IDs prove reset."
+    },
+    {
+      "question": "PG/Git durability/concurrency and source feasibility",
+      "boundary": "Original real Git/PostgreSQL17.10 and isolated C# physical target;9 unchanged consumed-input rosters/29 tests explicitly reused",
+      "oracle": "Independent source bytes/plan expectations, ref CAS, transaction/crash/restart/identity/collision invariants",
+      "selection": "Reuse physical-reuse.json/original execution receipt and binaries. No SQLite replacement-storage claim or fresh29 execution; production concurrent activation remains R0/PILOT obligation."
+    }
+  ],
+  "cost_interpretation": "Observed one-machine setup/action/cleanup and process-wide GC/working-set diagnostics, not benchmarks, isolated memory budgets or promises. Minimal actor cases163/278ms versus actual Hub2.1/3.6s in this retained run. Maintain one production service model and ordinary NUnit/Test SDK; WireMock only replays HTTP, no scheduler or role engine. Use minimal adequate seam before bulk variants, retain decisive real HTTP/process/PG overlaps.",
+  "initial_harness_failures": {
+    "paths": [
+      "agent-composition-first.trx",
+      "agent-composition-final.trx",
+      "agent-composition-diagnostic.trx"
+    ],
+    "reason": "Minimal fixture passed empty string as current workload; real Hub normalizes no workload to null. Corrected fixture uses actual no-work state, mirrors capability observation and surfaces dispatch faults before waiting. No product bug/RED allowance."
+  },
+  "status": "EVIDENCE_READY_INDEPENDENT_P0_REVIEW_RENEWAL_PENDING",
+  "source_change_assessment": {
+    "changed_since_actor_run": "Added explicit cancellation of the owned watchdog during teardown; request/actor/expected-effect logic unchanged.",
+    "required_rerun": "New coherent root run executes the actor cases and all required checks. Retained measurements are original-run data, not a fresh timing claim."
+  }
+}

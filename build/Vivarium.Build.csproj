@@ -9,5 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.Frosting" Version="6.2.0" />
+    <!-- Patch Cake/NuGet's transitive CMS dependency (CVE-2026-70162 / CVE-2026-84008). -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 </Project>

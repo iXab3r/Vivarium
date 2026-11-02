@@ -1,0 +1,229 @@
+{
+  "captured_utc": "2026-10-31T17:57:04.591924+00:00",
+  "source": "JetBrains public REST documentation sitemap and generated API pages",
+  "live_reference_version": "2026.1.3 build 222742",
+  "documentation_profile": "rolling public documentation; observed help header 2026.2; not the frozen live Swagger",
+  "resources": 30,
+  "documented_operations": 449,
+  "sources": [
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/agentapi.html",
+      "sha256": "3a4e02a3b98c8f7e79465bf244c4f1d72011b0447e48759f341f7b4e1fabbd8a",
+      "operations": 15
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/agentpoolapi.html",
+      "sha256": "3f9ab63802ba0e61c62e32db2dd915ea2c6a7c5445195fbb10b73be6e1d63473",
+      "operations": 14
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/agenttypeapi.html",
+      "sha256": "33ecb1048146beace5a1ead2d4a22dca901656bf610731ed80e748490365483d",
+      "operations": 1
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/auditapi.html",
+      "sha256": "fddbd4f0a1685ba19c4f7f77a343b70acbb186959793be73ec3284649f72d1c9",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/avatarapi.html",
+      "sha256": "0f81eb290649887b82eda7f6d2de31b0ceb7dc7f129a768793862bb989157122",
+      "operations": 4
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/buildapi.html",
+      "sha256": "5116982de71d1404b76f17d85fb350e03231ce33990148d55ed04b34ac024ea6",
+      "operations": 57
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/buildqueueapi.html",
+      "sha256": "4b609b34eb4b333a78ff21d209a9053ce71599b2396a9be1c4c56db11b31f805",
+      "operations": 15
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/buildtypeapi.html",
+      "sha256": "e7403e0ca201f715eeae93319a1ed6a358504b97233fdab06b9a90675639e9cf",
+      "operations": 109
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/changeapi.html",
+      "sha256": "52a0d25aeb0799f5ed2ec4a0d8e251636c41cbcd1dd358642d93c6865e8a8fc3",
+      "operations": 10
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/cloudinstanceapi.html",
+      "sha256": "3bdf0e69e69a38ef671642e0f35ea163af8fe49fb95e5a408b000893c138fa2f",
+      "operations": 10
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/deploymentdashboardapi.html",
+      "sha256": "2f4ebb739ca0e7d7d77266a2f69700553216dd6d218a639009e2610c0da2b7d3",
+      "operations": 9
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/globalserversettingsapi.html",
+      "sha256": "f3568f09b4d9ae68af8f8224495f2bbe2ee06e9cb854acbafb9d86b3ef06b20f",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/groupapi.html",
+      "sha256": "da6182f706e0d094e545a645a6726e0a7ebe0a69b83716afddd2cf71b8f22d49",
+      "operations": 16
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/healthapi.html",
+      "sha256": "457d9004b77f8530f642824b9c184e2d30dd50b19840d444bb76eeff93cc08a1",
+      "operations": 4
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/investigationapi.html",
+      "sha256": "3b5c0786d2c67d0d743c6b2ad6e389031424d0509cf82d2d823ed53dc5347ecc",
+      "operations": 6
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/muteapi.html",
+      "sha256": "887ea9dd03b2568f1dc34893dc5300bb145ed02cd83c7aae3c9beb11b941e71b",
+      "operations": 6
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/nodeapi.html",
+      "sha256": "9c71d845ae894ff97eb6d5814e7c4c97481d9682254b383bc078cad10070d65a",
+      "operations": 6
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/problemapi.html",
+      "sha256": "79fd46881bf1ef1ef6304a1212b5b4a129d2e10f390f581b226fe1522cbf6671",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/problemoccurrenceapi.html",
+      "sha256": "d61853e2ab2be3f227c6b6a68958620f2d6fb9085d8adfa32e14348a0d84e992",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/projectapi.html",
+      "sha256": "bc98ad61259099ff302f27641534f4dbd41d82372cae02379f598857cdc63776",
+      "operations": 48
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/roleapi.html",
+      "sha256": "d6d22511f2b8d9d591ddb7aa7c482dfa025aea3d1590432a9008ce3bf63c2088",
+      "operations": 8
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/rootapi.html",
+      "sha256": "f144877703ad93e59d4d0b33e53d97aa82b5ddb5cb3be53d25fe59a94661e398",
+      "operations": 4
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/serverapi.html",
+      "sha256": "89e765e16c51a5223d8af7708ea3a4a7ee8511363acdf1114601e06496433aac",
+      "operations": 18
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/serverauthenticationsettingsapi.html",
+      "sha256": "157045a425b3e6b342cd6ce8676e600ef540fa22d474735f41a1fb19fa8d313a",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/testapi.html",
+      "sha256": "86240c41a8fda9f65b1176a3cf62eed12d3c6b28ea373c8ae949cd174e71e162",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/testoccurrenceapi.html",
+      "sha256": "3867785ef1ef620ee6fb0c55198cd26cb2f8b31bc2f9060b9060061234791dfd",
+      "operations": 2
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/userapi.html",
+      "sha256": "125811205e125a800f149dadb50b4d16049b7a18688b281a3b34b9390d4f5bce",
+      "operations": 28
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/vcsrootapi.html",
+      "sha256": "8b7a7e34fde7c2ff00c44d38d7910353336a246424fe876dc22c23a17845bd5e",
+      "operations": 14
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/vcsrootinstanceapi.html",
+      "sha256": "7376fbf1febdf97ff6aa2947c19e3cc222a25314ae63ea1f7b26452cd7929a7d",
+      "operations": 17
+    },
+    {
+      "source_url": "https://www.jetbrains.com/help/teamcity/rest/versionedsettingsapi.html",
+      "sha256": "c6dae652b256eeeb5161ac38f8477fa6e2356371d341e9752aa50d6d88dfab44",
+      "operations": 16
+    }
+  ],
+  "limitations": [
+    "Documented operation headings, not a normalized HTTP method/path/variant census",
+    "No reference mutation or runtime contract execution",
+    "No guarantee public documentation exactly matches installed plugins/permissions/version",
+    "No API compatibility or business acceptance coverage percentage"
+  ],
+  "business_ac_baseline": "f4c8c97",
+  "canonical_business_criteria": 110,
+  "review_rows": 36,
+  "classification_meaning": "Specification gaps relative to discovered operations, not implementation/test coverage",
+  "installed_cli": "@eyeauras/teamcity-cli 0.5.2; server status/rest-info read only; no Swagger-export command exposed",
+  "source_server_mutations": 0,
+  "recommendations": {
+    "status": "reference-behavior-required-implementation-options-proposed",
+    "count": 36,
+    "reference_findings_remain_open": true,
+    "document": "docs/design/teamcity-rest-recommendations.md",
+    "canonical_features_changed": true,
+    "api_version_observed": "2026.1",
+    "rest_plugin_version_observed": "222742",
+    "cloud_scope_read": {
+      "date": "2026-10-31",
+      "profiles": {
+        "visible_count": 0,
+        "hasMore": false
+      },
+      "instances": {
+        "visible_count": 0,
+        "hasMore": false
+      },
+      "limit": "Current credential-visible pages only; not proof about hidden or historical resources"
+    },
+    "public_rest_java_source": {
+      "revision": "fc730e618ccd4b57dbbaf03425bb79a9580d19d2",
+      "commit_date": "2024-03-04",
+      "files_inspected": 6,
+      "not_installed_version_proof": true
+    },
+    "runtime_conformance_executed": false,
+    "source_mutations": 0,
+    "owner_clarification": {
+      "date": "2026-10-31",
+      "behavior_authority": "TeamCity 2026.1.3 reference profile",
+      "shared_native_and_compatible_processing": true,
+      "blanket_scope_exceptions_accepted": false,
+      "unknown_reference_results_are_policy_choices": false,
+      "runtime_conformance_executed": false
+    },
+    "canonical_feature_changes": [
+      "AC-AUTO-01: shared reference behavior",
+      "AC-CFG-03: explicit version-checked extension"
+    ],
+    "canonical_feature_ids_preserved": 110
+  },
+  "early_rest_tdd_gate": {
+    "decision": "D38",
+    "checkpoints": [
+      "P0.REST.1",
+      "P0.REST.2",
+      "P0.REST.3"
+    ],
+    "status": "accepted-direction-implementation-not-started",
+    "new_conformance_cases_materialized": 0,
+    "new_conformance_cases_executed": 0,
+    "product_red_baseline_recorded": false,
+    "replay_library_preferred": "WireMock.Net",
+    "test_stack": "existing NUnit / Microsoft.NET.Test.Sdk",
+    "code_dependency_added": false
+  }
+}

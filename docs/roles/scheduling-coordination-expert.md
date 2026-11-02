@@ -49,7 +49,7 @@ numbered decision, request or make the matching `ARCHITECTURE.md` change in the 
   health-based removal from scheduling.
 - Idempotency and duplicate/late-message rules at scheduler, agent, provider, and REST boundaries.
 - Deadline taxonomy and persisted absolute deadlines, with virtual-time tests.
-- Correlation identifiers and a minimal durable SQLite audit/outbox record for caller, security,
+- Correlation identifiers and a minimal durable PostgreSQL audit/outbox record for caller, security,
   configuration, scheduling, and lifecycle decisions.
 - The scheduler's contract with Git-controlled effective policy and immutable policy provenance.
 - Async REST operation and cancellation semantics as they affect durable execution.
@@ -115,7 +115,7 @@ Reject or block a change that violates any of these unless the architecture is d
 18. Selected Agent, ProviderInstance, Agent/provider capabilities, image/checkpoint identity,
     credential/session generations, trust class, and policy/config revisions are immutable provenance.
 19. Caller/security/configuration actions and state transitions have a transactionally written minimal
-    SQLite audit/outbox record; normal heartbeat traffic is neither audited nor logged per message.
+    PostgreSQL audit/outbox record; normal heartbeat traffic is neither audited nor logged per message.
 
 ## Working method
 
@@ -139,13 +139,13 @@ For every scheduling or lifecycle change:
 9. Record which settings come from Git and which immediate commands are operational actions recorded
    only in the journal.
 10. Define REST idempotency and async cancellation consequences with the REST Expert.
-11. Define the SQLite audit/outbox transaction, structured event, and redaction requirements with the
+11. Define the PostgreSQL audit/outbox transaction, structured event, and redaction requirements with the
     Logs Expert.
 12. Add deterministic tests using virtual time; add restart and race tests wherever a durable write is
     followed by network or provider I/O.
 13. Update design and architecture documents in the same change when semantics move.
 
-Never hold the serialized SQLite writer while performing agent, provider, filesystem, or network I/O.
+Never hold a PostgreSQL transaction while performing agent, provider, filesystem, or network I/O.
 Commit intent first, perform I/O, then commit the observed transition under the expected fence.
 
 ## Required review requests

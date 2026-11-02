@@ -1,0 +1,456 @@
+{
+  "recorded_utc": "2026-11-01T02:44:58.554667+00:00",
+  "scope": "Bounded local mutation increment; original receipts unchanged; no full API/P0 completion",
+  "candidate": {
+    "state": "Uncommitted working tree; no commit/push/main transfer",
+    "git_base": "26e55a1eadecc44af1631f1cfccdf56c4b561f0b",
+    "source_inputs": [
+      {
+        "path": "Directory.Build.props",
+        "sha256": "7f19a87890a4d93125d6a7f1bb3112027da17ab84d326e1bd43b52bb6ffa0d17"
+      },
+      {
+        "path": "global.json",
+        "sha256": "e43ef3bfdcacfa29ee23e2fd88d58f81df93490168702ba9b74f5216f25d4ccc"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/RawTeamCityTests.cs",
+        "sha256": "30ce26f269e2e9b0ba0cda52cdd5bac26be9250896d2d3ee209d62ca6d05df36"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj",
+        "sha256": "d314b3d31e37b711e3a7398551590600ec3b3dfd8ae38e70e44a7ec37e672082"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/CurrentController.cs",
+        "sha256": "ef007c680ca1dfa8290f29361f024c7247dce9fbff1eed4836edab6c60b71f30"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProductionCompositionTests.cs",
+        "sha256": "fa307cd0db074281279570e15d288095f69fd9f0e20c7976182ac0911639a50f"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProjectCreationContract.cs",
+        "sha256": "b81f1386ba2690d95a9330752dc33516f311ad4906a4b402bc76cd99a9731cbe"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationCases.cs",
+        "sha256": "414beedaad5df072fb9e6fa369502debf3cc087d44abfbe1b7e11eee71acf1c0"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationReplayTests.cs",
+        "sha256": "1c899971b92a791bea21309ef8891a61c8ae60617aa9590a20c9bd16a9395f18"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/api-version.json",
+        "sha256": "40eb42235522216140b4d6ffca53a805f4c476a2a7f6c549323945386ebbe891"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/local-mutations.json",
+        "sha256": "28610c0a014d3c7c206506275f25c4e1057fa7201f8b10e5cacdd05056a0bceb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/project-create-schema-excerpt.json",
+        "sha256": "dcd840b3049b03ee53884edc4ddfea0ed8e822eef7547243cc1328005d41a63a"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/root-project.json",
+        "sha256": "0079aa0a8009ad1db3855af989e0ecbdf2752410ecd934cef5b425bae7c3630e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ReplayControlTests.cs",
+        "sha256": "be7a1a2d9833da92000b00e77f936580558f314bb152bb6cdb448c2a4a6d8a8c"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RestResponseAssert.cs",
+        "sha256": "4793f479c24ab35d065f03aaa97a02a9c8fe72a955541d3d8e6d0a6e901a06bb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/TeamCityCases.cs",
+        "sha256": "22fc2a6bc0b06ecac505836defb05538ddc25ef465be5bf494b8142cb6ff8e19"
+      },
+      {
+        "path": "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+        "sha256": "70780b116f05eac11831bff074b4c6b51b52d71b6f2911f8d136dae56bfea1f9"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-lab-fixture-capture.patch",
+        "sha256": "9f855e9b2baf6d6eac71b4173463dfda5f48ec52c2d2d135de6364ea65098d84"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-reference-capture.patch",
+        "sha256": "0ac38fa6a925472874870b8cc55844861438bcf3aec025279c9a03a22883b6c4"
+      }
+    ],
+    "source_fingerprint_sha256": "7e53b49a962a24be0af49a27c97bbed21bacd09fecbaeb793996b15706a64c8d",
+    "production_tree": "c8372bb6ff6bed7315ed7f9c217fa44bf9a83a87",
+    "production_impact": "No production source changes relative to base; raw case source/csproj and new fixture/control sources are changed and independently fingerprinted. Historical receipts retain their own source hashes; no blanket prior-hash equality claimed.",
+    "assemblies": [
+      {
+        "path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+        "sha256": "a3d2791b9804ccb8688051c6b4b8cdf7f774c642b2bc968e26a6d5306fc355d8"
+      },
+      {
+        "path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+        "sha256": "e41d9a0df6f6161594f7803e593d6a0b42eb1a2300727e4356b60b67c14c1b46"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+        "sha256": "3d5893b752958ff99878c8333a9cf99cc16812c0bb188e5057348ca785134710"
+      }
+    ]
+  },
+  "reference": {
+    "cli_tests": {
+      "skipped": 0,
+      "passed": 662,
+      "seconds": 63.144
+    },
+    "response_entity_bytes": 9692,
+    "patch": "tools/teamcity-reference/cli-lab-fixture-capture.patch",
+    "profile": "vivarium-teamcity-lab-202613",
+    "server": "2026.1.3 build 222742",
+    "capture": "tests/Vivarium.Tests/TeamCity/Reference/local-mutations.json",
+    "cases": 12,
+    "permission": "Separate administrator-owned PAT; exactly view_project on owned project; isGlobalScope:false; no PAT values exported",
+    "api": "2026.1",
+    "actor_provenance_exchanges": 1,
+    "case_exchanges": 28,
+    "database": "Disposable reference TeamCity internal HSQL evaluation database",
+    "tool": "@eyeauras/teamcity-cli 0.5.2 plus bounded source patches at b158fe03eab3c31982a21b36c278f690f6b541d9",
+    "target": "http://127.0.0.1:18111",
+    "capture_ms": 663,
+    "capture_sha256": "28610c0a014d3c7c206506275f25c4e1057fa7201f8b10e5cacdd05056a0bceb",
+    "patch_lf_sha256": "9f855e9b2baf6d6eac71b4173463dfda5f48ec52c2d2d135de6364ea65098d84",
+    "rest_plugin": "222742"
+  },
+  "status": {
+    "global_api_complete": false,
+    "mechanical_ledger_validator": "Not implemented; #36",
+    "product_ready": 5,
+    "product_red": 5,
+    "required_variant_denominator": null,
+    "final_independent_review": "NOT_REVIEWED; P0 remains incomplete",
+    "product_prerequisite_blocked": 10,
+    "new_observed_cases": 12,
+    "product_green": 0,
+    "compatibility_percent": null,
+    "original_cases": 3,
+    "known_materialized_cases": 15,
+    "ordinary_platform_prerequisites": "Retain original TRX/console units: existing platform-gated tests may appear as12NotExecuted in TRX and11Skipped in console; no new skip/placeholder introduced.",
+    "advisories": "Existing package advisories remain; no dependency changes or Security/Adversarial PASS claimed."
+  },
+  "boundary": "Actual healthy production Kestrel TLS-pin/auth/Git/transitional SQLite; native administrator200 and invalid-token401 readiness. No compatible catalog, PG, Chiral, scoped-PAT, Agent or execution claim.",
+  "case_register": ".workspace/workstreams/coherent-refactor/rest-local-mutation-cases.tsv",
+  "expected_value_rules": "Exact captured semantic JSON fields/values/types/array order and non-JSON bytes, including errors and full mutation response. Only each public webUrl origin maps to the target origin. IDs, strings, error messages and queries are preserved.",
+  "query_limit": "Fixed parsed query objects have no repeated parameters; duplicate/raw-query-order dimensions remain outside this cohort",
+  "result_classification": "Five source-backed request mismatches share missing compatible routes/catalog as root cause, not five independent defects. Ten dependent reference workflows remain replay-bound product-prerequisite-blocked, no ignored/placeholder product tests. No scoped denial is attempted with the native administrator.",
+  "unchanged_records": [
+    "tests/Vivarium.Tests/TeamCity/Reference/api-version.json",
+    "tests/Vivarium.Tests/TeamCity/Reference/root-project.json",
+    "tests/Vivarium.Tests/TeamCity/Reference/project-create-schema-excerpt.json",
+    ".workspace/workstreams/coherent-refactor/rest-first-cohort-results.json"
+  ],
+  "remaining_gates": [
+    "Broad cross-family independently frozen corpus/allocation/normalization",
+    "Mechanical scope/results/reuse validator #36",
+    "Real compatible catalog/state/scoped-PAT bindings for ten dependent cases",
+    "Representative scripted Agent/fault and PG/Storage/concurrency/isolation/cost proof",
+    "Nonempty delivered-compatible GREEN selection",
+    "Structural/editability contracts and final independent P0 aggregate/Security review"
+  ],
+  "results": {
+    "root_build": {
+      "command": "dotnet build",
+      "artifact": "artifacts/p0-rest-second/results/root-build-final.log",
+      "sha256": "3fa80018b1663e31f245a0a812031346d6a19eec34fd84db8181bb7f20d87883",
+      "exit_code": 0
+    },
+    "ordinary": {
+      "artifact": "artifacts/p0-rest-second/results/ordinary/ordinary-final.trx",
+      "sha256": "e2ed2a7b41e0d55690b6fd53eae8e49fa610cd776fe122cd7d58d3a1f070f6cc",
+      "command": "dotnet test --no-build --no-restore --logger trx;LogFileName=ordinary-final.trx --results-directory artifacts/p0-rest-second/results/ordinary",
+      "exit_code": 0,
+      "counters": {
+        "total": 386,
+        "executed": 374,
+        "passed": 374,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 374,
+        "NotExecuted": 12
+      },
+      "times": {
+        "creation": "2026-11-01T03:38:59.5218183+01:00",
+        "queuing": "2026-11-01T03:38:59.5218188+01:00",
+        "start": "2026-11-01T03:38:56.2513838+01:00",
+        "finish": "2026-11-01T03:44:12.9135339+01:00"
+      },
+      "failures": [],
+      "metrics": [
+        "Production Kestrel/Git/SQLite setup/readiness: 1402ms; process working set 604381184 bytes",
+        "Including cleanup: 1432ms",
+        "Two isolated production SQLite monitors, 20 virtual seconds, setup/run/cleanup: 362ms"
+      ]
+    },
+    "controls": {
+      "artifact": "artifacts/p0-rest-second/results/controls/controls-final.trx",
+      "sha256": "40899afa23132c5eef65c523b21d15144fd9ca8acc67179d8f791b05c30b5966",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --no-restore --filter TestCategory=TeamCityReplayControl|TestCategory=TeamCityCompositionControl --logger trx;LogFileName=controls-final.trx --results-directory artifacts/p0-rest-second/results/controls",
+      "exit_code": 0,
+      "counters": {
+        "total": 31,
+        "executed": 31,
+        "passed": 31,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 31
+      },
+      "times": {
+        "creation": "2026-11-01T03:38:49.6699346+01:00",
+        "queuing": "2026-11-01T03:38:49.6699351+01:00",
+        "start": "2026-11-01T03:38:46.7951809+01:00",
+        "finish": "2026-11-01T03:38:49.7812968+01:00"
+      },
+      "failures": [],
+      "metrics": [
+        "Production Kestrel/Git/SQLite setup/readiness: 1761ms; process working set 131743744 bytes",
+        "Including cleanup: 1788ms",
+        "Two isolated production SQLite monitors, 20 virtual seconds, setup/run/cleanup: 256ms"
+      ]
+    },
+    "raw": {
+      "artifact": "artifacts/p0-rest-second/results/raw/raw-final.trx",
+      "sha256": "1db32293e250f965ffab6126bba077faa0922f9ceca4099fe99111617f8a0941",
+      "command": "dotnet test tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj --no-build --no-restore --logger trx;LogFileName=raw-final.trx --results-directory artifacts/p0-rest-second/results/raw",
+      "exit_code": 1,
+      "counters": {
+        "total": 5,
+        "executed": 5,
+        "passed": 0,
+        "failed": 5,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Failed": 5
+      },
+      "times": {
+        "creation": "2026-11-01T03:44:32.6262636+01:00",
+        "queuing": "2026-11-01T03:44:32.6262640+01:00",
+        "start": "2026-11-01T03:44:30.6410828+01:00",
+        "finish": "2026-11-01T03:44:32.6306440+01:00"
+      },
+      "failures": [
+        {
+          "name": "Current_product_matches_ready_local_reference_workflow(TCREST-PROJECT-CREATE-READBACK-002)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        },
+        {
+          "name": "TCREST-PROJECT-CREATE-READBACK-JSON-001",
+          "message": "  installed addProject contract: explicit project creation\r\nAssert.That(created.StatusCode, Is.EqualTo(HttpStatusCode.OK))\r\n  Expected: OK\r\n  But was:  NotFound\r\n"
+        },
+        {
+          "name": "Current_product_matches_ready_local_reference_workflow(TCREST-PROJECT-MALFORMED-ID-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 500, actual 404\"\r\n"
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-SERVER-API-VERSION-TEXT-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n"
+        }
+      ],
+      "metrics": [
+        "Current product: https://127.0.0.1:61939; production Kestrel/auth/Git/SQLite; setup 1495ms; process working set 118013952 bytes",
+        "Raw target total 1567ms"
+      ]
+    },
+    "diagnostic_ordinary": {
+      "artifact": "artifacts/p0-rest-second/results/ordinary/ordinary-local.trx",
+      "sha256": "175ffd54e96f94641dbcc7f65abc1f11cabde14c2909ed6a9c8601caff69c3ba",
+      "command": "Superseded first ordinary run; old actorEvidence control incorrectly indexed a captured object as an array; corrected and covered by focused controls before final checkpoint",
+      "exit_code": 1,
+      "counters": {
+        "total": 386,
+        "executed": 374,
+        "passed": 373,
+        "failed": 1,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 373,
+        "NotExecuted": 12,
+        "Failed": 1
+      },
+      "times": {
+        "creation": "2026-11-01T03:31:42.2823128+01:00",
+        "queuing": "2026-11-01T03:31:42.2823134+01:00",
+        "start": "2026-11-01T03:31:38.9372351+01:00",
+        "finish": "2026-11-01T03:38:37.6394421+01:00"
+      },
+      "failures": [
+        {
+          "name": "Captured_restricted_actor_has_only_the_observed_project_view_permission",
+          "message": "System.InvalidOperationException : The requested operation requires an element of type 'Array', but the target element has type 'Object'."
+        }
+      ],
+      "metrics": [
+        "Production Kestrel/Git/SQLite setup/readiness: 1511ms; process working set 592711680 bytes",
+        "Including cleanup: 1528ms",
+        "Two isolated production SQLite monitors, 20 virtual seconds, setup/run/cleanup: 367ms"
+      ]
+    },
+    "diagnostic_notes": "Earlier replay-local.trx had one deliberately-corrupt-readback control using NUnit Assert.ThrowsAsync around a nested assertion; NUnit retained its assertion-context failure. Replaced with the existing DifferenceAsync comparator and proved actual matched create/read exchange. Initial root-build.log failed selection-control NUnit2022 IEnumerable Count analyzer; corrected to unique-ID array Length. These are harness diagnostics, never product RED or current GREEN."
+  },
+  "cleanup": {
+    "artifact": "artifacts/p0-rest-second/cleanup-receipt.json",
+    "agent_actions": 0,
+    "subsequent_project_and_configuration_reads": 404,
+    "owned_pat_revoked": true,
+    "owned_project_and_configuration_removed": true,
+    "builds_executed": 0,
+    "elapsed_ms": 12598.4715,
+    "production_mutations": 0,
+    "local_gates": "ReadOnly on; Update/Admin/Credentials off",
+    "sha256": "d73c38748105ce44d6dbe83e36aa36533784e2f149c115d3f9838432301dbfa6",
+    "container": "Still running"
+  },
+  "environment": {
+    "sdk": "10.0.303",
+    "tooling": "Private ignored SDK via activate-sdk.ps1; process-local DOTNET_ROOT/DOTNET_ROOT_X64/PATH/CLI_HOME; no installed SDK changes",
+    "os": "Microsoft Windows NT 10.0.26200.0"
+  },
+  "cost": {
+    "new_csharp_files": [
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationCases.cs",
+        "physical_lines": 125,
+        "bytes": 6085
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationReplayTests.cs",
+        "physical_lines": 127,
+        "bytes": 6863
+      }
+    ],
+    "raw_binding_added_csharp_lines": 6,
+    "new_product_hooks": 0,
+    "new_fixture_bytes": 40663,
+    "reference_capture_ms": 663,
+    "reference_cleanup_ms": 12598.4715,
+    "metrics_limit": "Local Windows measurements and process working-set snapshots; no memory peak, per-case allocation, cross-platform, bulk-scaling, PG or completed representative composition claim."
+  },
+  "evidence_decision": "Fresh final root build/ordinary, focused controls and ready raw execution for the separately fingerprinted current candidate. Original captures/receipt remain immutable with their own base/source identities; original two reads and source-only locator POST case executed again. No transfer to main/future revision claimed. Ten dependent workflows have real reference/replay evidence only, no guessed product actor or catalog fixture.",
+  "documentation_task_sync": {
+    "recorded_utc": "2026-11-01T02:50:05.670860+00:00",
+    "scope": "Global current status and task-body evidence reconciliation only; no runtime/source/assembly/result change or suite execution.",
+    "readbacks": [
+      {
+        "issue": 33,
+        "url": "https://github.com/iXab3r/Vivarium/issues/33",
+        "state": "OPEN",
+        "milestone": 1,
+        "body_prefix_preserved": true,
+        "body_readback_exact": true,
+        "after_snapshot": "artifacts/p0-rest-second/tasks/issue-33-after.json",
+        "after_snapshot_sha256": "7e84b8eab522bf57f1906f2fa6bef69b69f37b9e7467782c6d65c97c087a6f64",
+        "updatedAt": "2026-11-01T02:49:20Z"
+      },
+      {
+        "issue": 35,
+        "url": "https://github.com/iXab3r/Vivarium/issues/35",
+        "state": "OPEN",
+        "milestone": 1,
+        "body_prefix_preserved": true,
+        "body_readback_exact": true,
+        "after_snapshot": "artifacts/p0-rest-second/tasks/issue-35-after.json",
+        "after_snapshot_sha256": "5eef59e24589669048fdac270a7c01872e72047e67499d4364c4552fcddd5ed4",
+        "updatedAt": "2026-11-01T02:49:22Z"
+      },
+      {
+        "issue": 42,
+        "url": "https://github.com/iXab3r/Vivarium/issues/42",
+        "state": "OPEN",
+        "milestone": 1,
+        "body_prefix_preserved": true,
+        "body_readback_exact": true,
+        "after_snapshot": "artifacts/p0-rest-second/tasks/issue-42-after.json",
+        "after_snapshot_sha256": "c6c7fb702eae04297f18069fbf14c480649008531a715cb41e4cb4567294d536",
+        "updatedAt": "2026-11-01T02:49:24Z"
+      },
+      {
+        "issue": 45,
+        "url": "https://github.com/iXab3r/Vivarium/issues/45",
+        "state": "OPEN",
+        "milestone": 3,
+        "body_prefix_preserved": true,
+        "body_readback_exact": true,
+        "after_snapshot": "artifacts/p0-rest-second/tasks/issue-45-after.json",
+        "after_snapshot_sha256": "dfb0003b5a9fb81faa478fde1bc77cf6c89576b895be5851d0114dcbb34dff28",
+        "updatedAt": "2026-11-01T02:49:26Z"
+      },
+      {
+        "issue": 47,
+        "url": "https://github.com/iXab3r/Vivarium/issues/47",
+        "state": "OPEN",
+        "milestone": 4,
+        "body_prefix_preserved": true,
+        "body_readback_exact": true,
+        "after_snapshot": "artifacts/p0-rest-second/tasks/issue-47-after.json",
+        "after_snapshot_sha256": "bf3da050aa5d994d5d932a3cc65cf66cfe51f579a2d723c15d570f14ae3f34b0",
+        "updatedAt": "2026-11-01T02:49:28Z"
+      }
+    ],
+    "snapshot_note": "GitHub-owned live task state read back exactly; original planning issues.json remains historical. Prefixes/title/state/milestone preserved; all five issues Open; no acceptance/closure/main delivery."
+  }
+}

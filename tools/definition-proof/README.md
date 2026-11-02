@@ -1,0 +1,73 @@
+# Bounded C# representation experiment (US-013 / P0)
+
+`ContextSourceTests` additionally compiles exact control/product Git pairs with typed non-secret
+context inputs on the control binding. The same product commit evaluates to different effective
+values for two context revisions and the default; actual context reads retain default provenance.
+Configured but unused context is distinguished, and cold evaluation of the original pair remains
+identical. This does not prove REST editability/authorization, a public SDK or production activation.
+
+This is the RF-05/#34 representability experiment, not the public definition SDK, a catalog engine,
+HTTP implementation or accepted Host activation. It uses the existing pinned .NET SDK, ordinary Git
+and a short Python invocation; it introduces no test framework or scenario language.
+
+From the repository root, with Python, Git and the already prepared private SDK 10.0.303 available:
+
+```powershell
+python tools/definition-proof/probe.py
+```
+
+The exact SDK executable is `artifacts/p0-rest-first/tooling/dotnet/dotnet.exe`. All experiment output
+and two new owned Git repositories stay under a unique `artifacts/us013-p0/representation-run-*`.
+The probe does not reset existing repositories, contact GitHub/TeamCity, use credentials or run T3.
+
+`Control.g.cs` owns Project identity/metadata/binding. `Settings.g.cs` owns the product-scoped
+declarations; `UserCode.cs` owns the explicitly named computation. Both managed declarations are real
+C#, compiled and read in a separate process. The editor renders typed declarations, never rewrites
+arbitrary user C#. Evaluator JSON is transient output, never an editable/persisted settings authority.
+The probe checks canonical round-trip, inherited/local/computed parameter changes, ordered collection
+replacement/reordering/omission, binding without duplicate ownership, invalid C#, duplicate identity
+and reevaluation of the exact prior usable Git revisions in a fresh child. User-code bytes remain
+unchanged and are selected from the owning Git revision together with managed settings.
+
+The original `Settings.g.cs` three-definition seed represents a focused subset of the pinned T3 settings: identities, runners,
+script references, requirements, dependencies, selection rules, timeouts and used trigger. It is not
+the complete executable/adapted T3 recipe; Docker/process properties, runtime substitution, secret
+resolution and complete template/mode behavior still need their owning proof. Its representative
+computed parameter is an attributed experiment addition.
+
+`T3Recipe.cs` is a separate literal translation of **all explicit product declarations** in the
+vendored [historical Kotlin fixture](reference/NOTICE.md). The existing `RecipeSourceTests` NUnit
+target compiles real committed C#, round-trips every declared field through the same managed editor,
+edits source/Agent/cache/trigger inputs for an owned configuration candidate, and reevaluates the old
+Git revision. Checkout mode, source name and quiet-period/rule fields are explicit; Docker and
+PowerShell options remain ordinary typed runner properties. This does not resolve implicit TeamCity
+defaults or execute runners. Its stable step IDs are attributed experiment IDs. The workload scripts
+still require the separately recorded repository/tool-path/no-launch adaptations before a real T3
+build. The original computed/inheritance and physical-recovery experiment continues to use its own
+smaller seed.
+
+`ComputedSourceTests` studies a second representation form over the same experimental model and
+compiler: untouched user-owned `UserCode.Declare()` plus one typed C# `Managed.Edits` declaration.
+The existing renderer emits only named scalar/parameter/step edits. The transient `declared`
+projection reads the actual compiled edit list so a subsequent mutation can retain prior local
+removals and unrelated overrides. The test covers later user computations, inherited reset,
+collection/scalar edits, author clearing of edits and cold old-commit evaluation. This is a bounded
+source-preservation candidate, not an adopted SDK, general patch language or proof of reference
+modes/current permissions. See [the P0 source study](../../.workspace/workstreams/coherent-refactor/us013-computed-source.md).
+
+Separate processes and deadlines are **not** an OS security sandbox. These are known trusted fixture
+sources; do not use this probe to evaluate untrusted repositories. The prototype neither authorizes
+mutations nor implements PG projection, Git-ref/PG atomicity, crash recovery, REST completion or a
+cross-repository activation saga. Preparing then changing a binding demonstrates source ownership;
+reevaluation demonstrates reproducibility, not production recovery. The active/applied authorities
+must be proved through the real owning services before P0 acceptance. No business AC or product
+conformance is made GREEN by this experiment. Keep this temporary proof separate from R2's engine.
+
+`ChildOwnerSourceTests` adds a fixed parent/child source-owner candidate after the
+[independent hierarchy observation](../../tests/Vivarium.Tests/TeamCity/Reference/child-owner-observations.json).
+The parent chooses product Git; the unbound child chooses its control Git and retains its parent ID.
+Parent source edits/foreign child declarations cannot overwrite that selection. Own child edits
+and cold old-revision reads stay independent. The study compiler deliberately admits only these
+two fixed project identities and one local child owner; it is not a generic hierarchy importer or
+effective cross-project parameter evaluator. It runs trusted committed C# and proves no public
+mode/permission API, public SDK or production activation behavior.

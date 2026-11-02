@@ -52,7 +52,7 @@ Role consultation is bounded to the contracts actually touched. A role is a pers
 | Platform Expert | [platform-expert.md](platform-expert.md) | [platform.md](../design/platform.md) | Windows, Linux, or macOS behavior, packaging, permissions, process/network/file semantics, or platform evidence changes. |
 | Security Expert | [security-expert.md](security-expert.md) | [security.md](../design/security.md) | Trust boundaries, secrets, elevated-agent attack surface, remote management, or security review changes. |
 | Scheduling/Coordination Expert | [scheduling-coordination-expert.md](scheduling-coordination-expert.md) | [scheduling-coordination.md](../design/scheduling-coordination.md) | Leases, fencing, queueing, cancellation, reconnect, rollback ordering, maintenance, or capacity changes. |
-| Persistence/Migrations Expert | [persistence-migrations-expert.md](persistence-migrations-expert.md) | [persistence.md](../design/persistence.md) | SQLite/blob schemas, transactions, migrations, recovery, retention, backup, or projections change. |
+| Persistence/Migrations Expert | [persistence-migrations-expert.md](persistence-migrations-expert.md) | [persistence.md](../design/persistence.md) | PostgreSQL/Storage schemas, identity and runtime durability, migrations, recovery, retention, backup, or Git projections change. |
 
 ## Governance and function roles
 
@@ -60,7 +60,10 @@ Role consultation is bounded to the contracts actually touched. A role is a pers
 |---|---|---|
 | Docs Expert | [docs-expert.md](docs-expert.md) | Decisions, status, document authority, context routing, or durable handoff guidance changes. |
 | Reconciliation Lead | [reconciliation-lead.md](reconciliation-lead.md) | A migration, replacement, parity effort, or broad audit must close a known universe in evidence-gated phases. |
+| Story Delivery Lead | [story-delivery-lead.md](story-delivery-lead.md) | Actor goals, surface scenarios and API evidence need a clear next usable result across existing subsystem owners. |
 | Test Steward | [test-steward.md](test-steward.md) | Tests, fixtures, runners, CI gates, compatibility evidence, or verification policy change. |
+| Business Acceptance | [business-acceptance.md](business-acceptance.md) | Highest-level user-language system AC, independent expected outcomes and acceptance scope change. |
+| Testing Architect | [testing-architect.md](testing-architect.md) | Evidence boundary/oracle, pyramid, shared fixture/runner selection, coverage migration or execution-cost policy changes. |
 
 ## Routing rules
 

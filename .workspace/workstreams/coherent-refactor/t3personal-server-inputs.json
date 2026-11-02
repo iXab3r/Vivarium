@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "kind": "BOUNDED_REFERENCE_OBSERVATION_NOT_PRODUCT_CONFORMANCE",
+  "issue": "https://github.com/iXab3r/Vivarium/issues/85",
+  "repository_base": "01aa708dc99623b0a7cfccc7b6354ff501588221",
+  "receipt_saved_utc": "2026-11-01T16:37:54.973172+00:00",
+  "tool": {
+    "name": "@eyeauras/teamcity-cli",
+    "version": "0.5.2 + unpublished fixed T3 input capture",
+    "upstream_revision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+    "requires_patch": "tools/teamcity-reference/cli-reference-capture.patch",
+    "increment_patch": "tools/teamcity-reference/cli-t3-inputs-capture.patch",
+    "increment_patch_sha256_lf": "a1694f178b6823937cf85c497fc8ac76df6de3c16fad4b114d22a461268b60ad",
+    "command": "node artifacts/p0-rest-first/reference/cli-acquisition/dist/src/bin.js -p default --json server t3-inputs-capture"
+  },
+  "profile": {
+    "name": "default",
+    "configured_url": "https://build.eyeauras.net",
+    "default_profile_changed": false,
+    "credentials_exported": false
+  },
+  "bounds": {
+    "method": "GET",
+    "fixed_requests": 5,
+    "total_timeout_ms": 30000,
+    "entity_max_bytes": [
+      1024,
+      16384,
+      16384,
+      16384,
+      4096
+    ],
+    "collection_max_items": 8,
+    "redirects": "REFUSED",
+    "paging_or_dependency_traversal": "NONE",
+    "response_headers_exported": [
+      "content-type"
+    ],
+    "error_bodies": "OMITTED",
+    "secret_parameters_logs_binary_artifacts": "NOT_REQUESTED"
+  },
+  "entity_encoding": "Original HTTP response entity after fetch content decoding; base64 without JSON reserialization",
+  "current_vs_historical": "Build revisions and dependencies are server-reported historical build fields. Effective versioned settings configuration and currentSettingsHash are observations at acquisition, not the historical mode or full build definition.",
+  "settings_source": {
+    "revision": "7495b6859c91952ad91478a2428be805a4e48f1a",
+    "url": "https://github.com/iXab3r/t3code/blob/7495b6859c91952ad91478a2428be805a4e48f1a/.teamcity/settings.kts",
+    "sha256_lf": "6d7ab6a1dbbdf2a465e4c26f2adcab305f9160b4a1c8ec0286037f5cb0921b7f",
+    "git_blob_sha1_lf": "2eccef048973d5151c93aba0df0b96c913bfd20d",
+    "same_bytes_as_product_revision_settings": true,
+    "comparison_product_revision": "7ff65cada80dd817aa5d7467b85e78ec30c578a9",
+    "source_not_execution_attestation": true
+  },
+  "complete": true,
+  "exchanges": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/server",
+        "query": {
+          "fields": "version,buildNumber,webUrl"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "bodyBase64": "eyJ2ZXJzaW9uIjoiMjAyNi4xLjMgKGJ1aWxkIDIyMjc0MikiLCJidWlsZE51bWJlciI6IjIyMjc0MiIsIndlYlVybCI6Imh0dHBzOi8vYnVpbGQuZXllYXVyYXMubmV0LyJ9",
+      "bodyBytes": 99,
+      "bodySha256": "0a7131a15c7527d2dfd84b2157c622ec9728311e59e256c2a34c585632f975f1"
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/builds/id:32726",
+        "query": {
+          "fields": "id,buildTypeId,number,state,status,settingsHash,currentSettingsHash,revisions(count,revision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id))),versionedSettingsRevision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id)),snapshot-dependencies(count,build(id,buildTypeId,number,state,status)),artifact-dependencies(count,build(id,buildTypeId,number,state,status))"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "bodyBase64": "eyJpZCI6MzI3MjYsImJ1aWxkVHlwZUlkIjoiVDNQZXJzb25hbF9SZWxlYXNlIiwibnVtYmVyIjoiMC4xLjYtbmlnaHRseS4yMDI2MTEwMS4xNiIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6IjdmZjY1Y2FkYTgwZGQ4MTdhYTVkNzQ2N2I4NWU3OGVjMzBjNTc4YTkiLCJpbnRlcm5hbFZlcnNpb24iOiI3ZmY2NWNhZGE4MGRkODE3YWE1ZDc0NjdiODVlNzhlYzMwYzU3OGE5IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjciLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiKzouXG4tOi5yZXBvcyJ9XX0sInZlcnNpb25lZFNldHRpbmdzUmV2aXNpb24iOnsidmVyc2lvbiI6Ijc0OTViNjg1OWM5MTk1MmFkOTE0NzhhMjQyOGJlODA1YTRlNDhmMWEiLCJpbnRlcm5hbFZlcnNpb24iOiI3NDk1YjY4NTljOTE5NTJhZDkxNDc4YTI0MjhiZTgwNWE0ZTQ4ZjFhIiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjYiLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNzI1LCJidWlsZFR5cGVJZCI6IlQzUGVyc29uYWxfV2luZG93cyIsIm51bWJlciI6IjAuMS42LW5pZ2h0bHkuMjAyNjExMDEuMTYiLCJzdGF0dXMiOiJTVUNDRVNTIiwic3RhdGUiOiJmaW5pc2hlZCJ9XSwiY291bnQiOjF9LCJhcnRpZmFjdC1kZXBlbmRlbmNpZXMiOnsiYnVpbGQiOlt7ImlkIjozMjcyNSwiYnVpbGRUeXBlSWQiOiJUM1BlcnNvbmFsX1dpbmRvd3MiLCJudW1iZXIiOiIwLjEuNi1uaWdodGx5LjIwMjYxMTAxLjE2Iiwic3RhdHVzIjoiU1VDQ0VTUyIsInN0YXRlIjoiZmluaXNoZWQifSx7ImlkIjozMjcyNCwiYnVpbGRUeXBlSWQiOiJUM1BlcnNvbmFsX1ByZXBhcmUiLCJudW1iZXIiOiIwLjEuNi1uaWdodGx5LjIwMjYxMTAxLjE2Iiwic3RhdHVzIjoiU1VDQ0VTUyIsInN0YXRlIjoiZmluaXNoZWQifV0sImNvdW50IjoyfSwic2V0dGluZ3NIYXNoIjoiMjk4N2VhMzllNTBiN2IyMTFmNDhhZDY1ZDhmY2U2NzkzMWQ2ZDc0ZiIsImN1cnJlbnRTZXR0aW5nc0hhc2giOiI2M2MxZmEzNjhhMzQ3MGUxZDFhMDAwMzBhNDI1Zjk0NTFmN2JmZDBiIn0=",
+      "bodyBytes": 1250,
+      "bodySha256": "c49c58917d4032677430d611541f9f4f6566380b4e6b645681b763c276500a55"
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/builds/id:32725",
+        "query": {
+          "fields": "id,buildTypeId,number,state,status,settingsHash,currentSettingsHash,revisions(count,revision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id))),versionedSettingsRevision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id)),snapshot-dependencies(count,build(id,buildTypeId,number,state,status)),artifact-dependencies(count,build(id,buildTypeId,number,state,status))"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "bodyBase64": "eyJpZCI6MzI3MjUsImJ1aWxkVHlwZUlkIjoiVDNQZXJzb25hbF9XaW5kb3dzIiwibnVtYmVyIjoiMC4xLjYtbmlnaHRseS4yMDI2MTEwMS4xNiIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6IjdmZjY1Y2FkYTgwZGQ4MTdhYTVkNzQ2N2I4NWU3OGVjMzBjNTc4YTkiLCJpbnRlcm5hbFZlcnNpb24iOiI3ZmY2NWNhZGE4MGRkODE3YWE1ZDc0NjdiODVlNzhlYzMwYzU3OGE5IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjciLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiKzouXG4tOi5yZXBvcyJ9XX0sInZlcnNpb25lZFNldHRpbmdzUmV2aXNpb24iOnsidmVyc2lvbiI6Ijc0OTViNjg1OWM5MTk1MmFkOTE0NzhhMjQyOGJlODA1YTRlNDhmMWEiLCJpbnRlcm5hbFZlcnNpb24iOiI3NDk1YjY4NTljOTE5NTJhZDkxNDc4YTI0MjhiZTgwNWE0ZTQ4ZjFhIiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjYiLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNzI0LCJidWlsZFR5cGVJZCI6IlQzUGVyc29uYWxfUHJlcGFyZSIsIm51bWJlciI6IjAuMS42LW5pZ2h0bHkuMjAyNjExMDEuMTYiLCJzdGF0dXMiOiJTVUNDRVNTIiwic3RhdGUiOiJmaW5pc2hlZCJ9XSwiY291bnQiOjF9LCJhcnRpZmFjdC1kZXBlbmRlbmNpZXMiOnsiYnVpbGQiOlt7ImlkIjozMjcyNCwiYnVpbGRUeXBlSWQiOiJUM1BlcnNvbmFsX1ByZXBhcmUiLCJudW1iZXIiOiIwLjEuNi1uaWdodGx5LjIwMjYxMTAxLjE2Iiwic3RhdHVzIjoiU1VDQ0VTUyIsInN0YXRlIjoiZmluaXNoZWQifV0sImNvdW50IjoxfSwic2V0dGluZ3NIYXNoIjoiZjYwZmI5MjAwZWYxMzgxMjFmOGI2YTE2ZTAxODE0ZThkNDYxOGZhMCIsImN1cnJlbnRTZXR0aW5nc0hhc2giOiJmMGMxZGJmNGZhMzVhMDVkODQ3OGFjZTUwYjlkM2EzOTdmZDFlOGVlIn0=",
+      "bodyBytes": 1127,
+      "bodySha256": "c40dcb43c5ad5a7283597f63565a03ac6e8c288adb5b5cc65c65a4573a8a45e9"
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/builds/id:32724",
+        "query": {
+          "fields": "id,buildTypeId,number,state,status,settingsHash,currentSettingsHash,revisions(count,revision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id))),versionedSettingsRevision(version,internalVersion,vcsBranchName,checkout-rules,vcs-root-instance(id,vcs-root-id)),snapshot-dependencies(count,build(id,buildTypeId,number,state,status)),artifact-dependencies(count,build(id,buildTypeId,number,state,status))"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "bodyBase64": "eyJpZCI6MzI3MjQsImJ1aWxkVHlwZUlkIjoiVDNQZXJzb25hbF9QcmVwYXJlIiwibnVtYmVyIjoiMC4xLjYtbmlnaHRseS4yMDI2MTEwMS4xNiIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6IjdmZjY1Y2FkYTgwZGQ4MTdhYTVkNzQ2N2I4NWU3OGVjMzBjNTc4YTkiLCJpbnRlcm5hbFZlcnNpb24iOiI3ZmY2NWNhZGE4MGRkODE3YWE1ZDc0NjdiODVlNzhlYzMwYzU3OGE5IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjciLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiKzouXG4tOi5yZXBvcyJ9XX0sInZlcnNpb25lZFNldHRpbmdzUmV2aXNpb24iOnsidmVyc2lvbiI6Ijc0OTViNjg1OWM5MTk1MmFkOTE0NzhhMjQyOGJlODA1YTRlNDhmMWEiLCJpbnRlcm5hbFZlcnNpb24iOiI3NDk1YjY4NTljOTE5NTJhZDkxNDc4YTI0MjhiZTgwNWE0ZTQ4ZjFhIiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiNjYiLCJ2Y3Mtcm9vdC1pZCI6IlQzUGVyc29uYWxfR2l0In0sImNoZWNrb3V0LXJ1bGVzIjoiIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W10sImNvdW50IjowfSwiYXJ0aWZhY3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9LCJzZXR0aW5nc0hhc2giOiI0YTU4NWNiZGE4NjAxMzNmZjczNGUxOTlhMjAwNGI4OTFkNTkzMTYzIiwiY3VycmVudFNldHRpbmdzSGFzaCI6IjRhNTg1Y2JkYTg2MDEzM2ZmNzM0ZTE5OWEyMDA0Yjg5MWQ1OTMxNjMifQ==",
+      "bodyBytes": 883,
+      "bodySha256": "62c2794da5f97c8a32e6ecd2769d6b6de556882eb59c2449d30cc9d5ebc30a16"
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/projects/id:T3Personal/versionedSettings/config/effective",
+        "query": {
+          "fields": "project(id),config(synchronizationMode,buildSettingsMode,vcsRootId,settingsPath,format,allowUIEditing,applyChangesInDependenciesAndVcsSettings)"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "bodyBase64": "eyJwcm9qZWN0Ijp7ImlkIjoiVDNQZXJzb25hbCJ9LCJjb25maWciOnsiYWxsb3dVSUVkaXRpbmciOmZhbHNlLCJhcHBseUNoYW5nZXNJbkRlcGVuZGVuY2llc0FuZFZjc1NldHRpbmdzIjp0cnVlLCJzeW5jaHJvbml6YXRpb25Nb2RlIjoiZW5hYmxlZCIsInZjc1Jvb3RJZCI6IlQzUGVyc29uYWxfR2l0IiwiYnVpbGRTZXR0aW5nc01vZGUiOiJhbHdheXNVc2VDdXJyZW50IiwiZm9ybWF0Ijoia290bGluIn19",
+      "bodyBytes": 231,
+      "bodySha256": "fa0aebe314dfd4785d40b188dc0b150f20e06e8a3044b98ce1b2558e345da7fb"
+    }
+  ],
+  "limits": [
+    "No per-file historical consumption or binary-byte proof. Existing producer manifests remain separately attributed.",
+    "Returned snapshot-dependencies lists are retained literally; no inferred transitive closure or reason for reuse/selection.",
+    "Current settings mode is not proof of the mode at execution. No source/settings equality or hash-to-revision meaning is assumed.",
+    "No product conformance case, recipe freeze, milestone acceptance, TeamCity mutation, build execution or publication."
+  ]
+}

@@ -48,8 +48,9 @@ the expert that owns the affected contract.
 4. **Secrets are data, not prose.** Tokens, authorization headers, cookies, credentials, secret
    parameters, environment values, and request bodies never enter ordinary logs. Structured fields
    use allowlists. Redaction runs before persistence and transport, not only when a UI renders data.
-5. **The first-run super-user token is one deliberate exception.** It may be emitted once through the
-   dedicated local startup channel defined by the Admin/SuperUser design. It is never an ordinary
+5. **The installation-account startup password is one deliberate exception.** D34 permits disclosure
+   after successful persistence at each enabled startup through the dedicated private local sink.
+   It is not a first-admin-only or one-use token. It is never an ordinary
    structured property, REST event, audit field, browser event, or agent event. No other secret may
    cite this exception.
 6. **Distributed time is not trusted for ordering.** Agent-observed UTC is useful evidence, but
@@ -96,8 +97,8 @@ parsing human messages later.
 
 ## Collaboration
 
-- **Admin/SuperUser Expert:** owns first-run identity and token lifetime; Logs Expert owns the single
-  startup emission path, filesystem protection, and proof that the token cannot leak elsewhere.
+- **Admin/SuperUser Expert:** owns installation identity, startup rotation and normal session validity;
+  Logs Expert owns the private disclosure path, protection and absence from other sinks.
 - **Git/Versioning Expert:** owns Git mutation mechanics; Logs Expert requires accepted/rejected commit
   identity, repository identity, base revision, and conflict outcome in the audit event.
 - **Agent API/SDK Expert:** owns wire compatibility and deployment; Logs Expert specifies sequence,

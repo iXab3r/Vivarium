@@ -1,11 +1,16 @@
 # End-to-end walkthrough: cross-OS integration tests
 
-The normative UX document. Scenario: you have a program (`myapp`, any language) that must work on
+The normative UX document, with target and transitional journeys explicitly scoped below.
+Scenario: you have a program (`myapp`, any language) that must work on
 Windows, Linux, and macOS, and an NUnit integration-test project that can verify it. You want to set
 the check up once and run it on demand — locally or from CI.
 
-This is the normative Phase 1 target UX for persistent machines; §7 shows how the same setup grows
-into pristine snapshots at Phase 2. The durable queue, `vivarium.yaml`, `viv-cli run`, agent lifecycle,
+The D32–D36 target uses Git-owned C# definitions, editable through UI/native and compatible REST,
+over shared validation/activation; [the catalog journey](#2-describe-the-check--git-owned-c-catalog)
+describes that target. The detailed YAML/payload commands in §§2.1–7 document the transitional
+Phase-1 persistent-machine journey, with future snapshot behavior scoped separately. They are not
+the new catalog authority or a ban on UI authoring. The durable queue, `vivarium.yaml`, `viv-cli run`,
+agent lifecycle,
 explicit matrix cancellation, raw build/artifact results, and the per-Agent D30 central upgrade core
 exist now. Installer/Downloads flows, fleet rollout automation/UI, public per-test result presentation,
 and `viv-cli exec` are marked below where they remain work. The controller already persists a bounded internal TRX projection with restart catch-up;
@@ -14,29 +19,32 @@ Decision references (D…) point into [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## 0. Install the controller — one machine, once
 
-Any always-on box you own (your dev machine is fine to start):
+Use the supported Host package and provision PostgreSQL and Storage resources. Configure their
+connections, the trusted OIDC provider and private key locations through the same Chiral resource
+settings used by the Host. The [local lab](../.workspace/workstreams/coherent-refactor/local-lab.md)
+defines R0 preparation and real server/Agent checkpoints; this walkthrough is target UX, not an
+installer that exists today. A self-contained server needs no .NET SDK, but that does not eliminate
+its resource prerequisites.
 
-```
-viv-server.exe                 # self-contained; creates ./vivarium-data (SQLite + blobs)
-```
+Start the Host, check its reported readiness and open the panel on its HTTPS origin. If installation
+access is enabled, obtain the newly generated reserved account password from the intended private
+startup log and sign in normally. Let the intended administrator sign in through OIDC to create
+their ordinary unprivileged account; grant that account the standard system-administrator role
+through Access. The first visitor is never promoted automatically. Administrators then use their
+own accounts; the installation account can be disabled using its resource setting and documented
+restart lifecycle.
 
-First run prints the panel URL and an admin token:
+The startup password is refreshed on every enabled startup, not a one-time first-run admin token.
+It is never public status or an API response. Use the supported credential-management surface to
+issue a scoped automation credential; do not copy startup submit/admin bearer tokens from the old
+prototype. Configure the CLI's server URL, verified TLS trust and that credential. Unchanged
+TeamCity clients use the compatible API on the same installation with their own supported credentials.
 
-```
-Vivarium controller listening on https://192.168.1.10:8443
-Panel: https://192.168.1.10:8443  (admin token: k3v9…)
-Submit token: s7d2…
-TLS:   self-signed, fingerprint SHA256:9F3A…
-Enroll token (single-use): e5a1…
-Data:  ./vivarium-data
-```
-
-On your workstation, point the CLI at it once — the fingerprint is confirmed on first contact and
-pinned from then on:
-
-```
-viv-cli login https://192.168.1.10:8443
-```
+Missing/invalid resources explain their readiness failure. Operator-local repair uses the same
+settings modules; it does not create a database-independent superuser login or a public setup wizard.
+See [installation AC](acceptance/installation/server.feature),
+[authentication AC](acceptance/authentication/installation-account.feature) and
+[first-run administration](design/first-run-administration.md).
 
 ## 1. Connect three machines — five minutes each
 
@@ -83,9 +91,24 @@ exact health confirmation or one-shot rollback from the server/CLI. Fleet/group 
 the installation UX are not complete yet, so operators currently start those per-Agent operations
 centrally rather than touching hosts.
 
-## 2. Describe the check — `vivarium.yaml` in your repo
+## 2. Describe the check — Git-owned C# catalog
 
-Build configurations are code, versioned next to the thing they test (D17):
+For the accepted target, create or register the project and its settings repository, author the
+configuration in C#, and validate/apply it through the one Git activation path. The UI, native REST
+and TeamCity-compatible settings edits use that same representation and validation; they can author
+the supported editable fields. Read back the applied/effective settings and freeze their revision
+with each run. R0 seeds LocalSmoke through that approved representation; R2 delivers full catalog
+authoring/evaluation and exact source checkout. See [catalog AC](acceptance/configuration/catalog.feature),
+[shared model/editability contract](design/teamcity-rest-domain.md) and P0 representation proof #34.
+The exact runnable SDK syntax and managed/user-source editing boundary remain #34 deliverables;
+this walkthrough does not invent a C# example before that proof.
+
+### 2.1 Transitional Phase-1 payload definition — `vivarium.yaml`
+
+The following is implemented D17 payload submission evidence, retained for current clients and
+explicit migration handling. It is not the new TeamCity catalog format. The examples through §7
+continue this payload journey; claimed future UI/provider behavior remains marked below.
+Build configurations in this transitional path are YAML beside the tested program:
 
 ```yaml
 # vivarium.yaml
@@ -128,8 +151,9 @@ configurations:
 
 ## 3. Build the payloads
 
-Tests are published **self-contained** — the target machines have no SDKs, no runtimes, and never will
-(D3). The SUT rides along inside the same folder:
+This example publishes tests **self-contained** so these test machines need no SDK/runtime for that payload.
+Other build configurations may require SDK-equipped agents, as ordinary TeamCity CI does. Do not turn
+this example into a system-wide ban on toolchains (D3/D32). The SUT rides along inside the same folder:
 
 ```
 dotnet publish tests/IntegrationTests -c Release -r win-x64   --self-contained -o out/win-x64
@@ -279,10 +303,13 @@ Rule of thumb for where a parameter belongs: values only the test process cares 
 `[TestCase]`; Vivarium parameterizes what the process cannot — the environment, the invocation, the
 machine.
 
-## UX decisions this walkthrough pins (D17, D18)
+## UX decisions and their scope (D17, D18, D32–D36)
 
-1. Configuration-as-code: `vivarium.yaml` in the tested repo; the panel manages the fleet and shows
-   results, it does not author test configurations (v1).
+1. Target configuration-as-code is Git-owned C#, with UI/native/compatible REST authoring through one
+   activation path. `vivarium.yaml` and the old no-configuration-authoring panel describe only the
+   transitional Phase-1 payload implementation, pending verified replacement/migration. Items 2–7
+   below describe that payload journey and its explicitly planned extensions, not an alternative
+   TeamCity catalog/state model.
 2. Payload/steps specialization per cell via template variables (`{rid}`, `{exe}`, …), not per-cell
    copy-paste; `rid:` is declared per cell so payload resolves at upload time.
 3. `viv-cli run` = upload (deduped) + enqueue + live matrix in the terminal; nonzero exit on any red cell.

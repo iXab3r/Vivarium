@@ -1,0 +1,161 @@
+id = "coherent-refactor"
+status = "US-013-P0-execution-in-progress"
+captured_date = "2026-10-31"
+checkpoint_commit = "cbb285a55701e0be0c726c57d9daccd8bfb529e7"
+checkpoint_tag = "checkpoint/pre-refactor-2026-10-31"
+runtime_baseline = "09dd40bb8449261d54cf3bd6261b3b1d4227fee0"
+depot_reference = "20238384013326cddb3296963a6d101a0970efc0"
+automation_reference = "c09facd10b413e6a3ebfd117379009e11c00b4b4"
+working_branch = "bugfix/teamcity-behavior-parity"
+lead = "Reconciliation Lead"
+coheld_roles = ["TeamCity", "REST", "UI", "Platform", "Persistence", "Git/Versioning", "Identity", "Business Acceptance", "Testing Architect", "Test Steward", "Docs"]
+
+[universe]
+source_configurations = 97
+accepted_configurations = 0
+behavioral_requirements = 120
+rest_fixture_rows = 456
+rest_fixture_state = "discovered-unverified; not route coverage"
+business_acceptance_criteria = 110
+business_acceptance_state = "specified-unbound; canonical business Gherkin, no execution claimed"
+technical_scenario_candidates = 38
+teamcity_model_invariants = 10
+poebane_testing_reference = "2984e1f84cd8e5042dfa976c23e75a26ad63cb1d"
+implementation_milestones_accepted = 0
+planning_gate = "P0 executable reference-backed REST corpus, minimal deterministic production-code composition/cost proof and genuine RED baseline precede structural replacement (D38), alongside D36 model/protocol/mutation gates. D34/D35 accept shared authentication/storage/UI technologies while preserving TeamCity/Vivarium UX. RF-10 accepts separate milestone merges."
+continuous_conformance = "D37: TeamCity Build/Agent semantic superset; every affected milestone proves business AC, TCM/wire cases, cumulative implemented base and relevant extension neutrality."
+milestone_delivery = "D39: REST contract/code/REST acceptance task blocks, mechanical slice/global API-complete, focused checks and final aggregate + Security/Adversarial review; zero milestone debt before closure and next implementation."
+subsystem_delivery = "D40: 16 logical subsystem owners/17 slices; implement complete lifecycles/integrations, native REST contract/acceptance children; preserve one full API ledger and separate subsystem/milestone/global evidence."
+accepted_choices = ["RF-01", "RF-02", "RF-03-direction", "RF-04-direction", "RF-10", "RF-12", "RF-13-direction", "RF-14-direction", "RF-15-direction", "RF-16-direction", "RF-17-direction"]
+
+[authority]
+current_assignment = "2026-11-01: owner assigned autonomous US-013/#78 execution with 'let's work' after accepting all seven scope/environment/autonomy choices. Execute the integrated P0 proof/model/contract/evidence block, then remaining P0 closure before R0/PILOT. Actual bounded reference execution, replay and C#/Git source experiments are recorded in us013-p0-execution.md. Product availability remains NOT_AVAILABLE; no milestone acceptance or main merge. Historical planning-only restrictions are not a new approval gate."
+planning_snapshot_authorized = "Original planning assignment: read-only discovery, current-state checkpoint, target plan, milestones and issues for iteration."
+planning_snapshot_excluded = "That planning assignment did not execute product implementation, production mutation, TeamCity writes, publishers, live migration/cutover or deletion."
+interpretation = "Historical scope snapshot, not a permanent implementation prohibition or a grant of future authority. A current implementation assignment authorizes its scoped local work under D38-D40; do not ask again merely because this old planning snapshot excluded code. Production/release/fleet/cutover/merge actions keep their separate actual authorization."
+delivery_model = "RF-10 accepted by owner on 2026-10-31: each verified milestone may merge separately into main; its issues close after its own main acceptance. Replacement cleanup belongs to the replacing milestone; production cutover is separate."
+
+[status_authority]
+tracked = "Source universe and case/evidence facts: API ledger/results; contracts: architecture/designs. Workstream summaries follow those authorities."
+external = "D39: GitHub issues/milestones own live task and closure state; api-blocks.tsv/issue snapshots record verified links, not a competing task board."
+
+[pilot]
+key = "PILOT"
+status = "owner-selected-breadth-first-full-T3Personal; all-levels-NOT_AVAILABLE"
+order = "accepted P0 -> accepted R0 -> PILOT; later business stories allocated before implementation after predecessor closure; R1-R6 full-scope completion backlog, not blanket prerequisites"
+integration_slice = "SS-RUN@PILOT"
+parent_issue = 78
+implementation_issue = 116
+story_issues = [79, 80, 81]
+contract_issue = 117
+acceptance_issue = 118
+targeted_addendum = "t3personal-pilot.md: three newly observed configurations, separate from historical97; no current global100 or migration acceptance claim"
+breadth_levels = "whole-chain recipe/capability/AC+wire matrix -> truthful all-config/all-surface visibility -> real build/package DAG/runners/artifacts/staging/test-repository publication, no built-app launch -> fault/recovery/access/cumulative acceptance; no serial surface completion"
+delivery_unit = "US-013/#78; selected actor-goal story, not individual technical card"
+current_work_block = "Integrated definition/model/reference-case/evidence preparation across existing P0 owners and #117; open, not satisfied by prose or #85 alone"
+delivery_plan = "t3personal-pilot.md#current-story-delivery-plan"
+unclear_route = "Resolve the story plan and required proof, then continue connected authorized work without leaf-card handoffs"
+
+[autonomous_delivery]
+state = "P0_EXECUTION_IN_PROGRESS; bounded reference/source/physical proof and referential story/source/dependency accounting exist; model/mode/concurrency, exact actor/effect/variant/source proof, 78 source gaps and closure remain due"
+acceptance_publication = "TEST_REPOSITORY_SUFFICIENT; no production iXab3r/t3code publication required"
+workload = "Frequent small-chain checks plus one actual T3 build/package E2E"
+built_application_execution = "EXCLUDED; explicit test-recipe delta removes T3 GUI/CLI launch smoke checks"
+environment = "Current Windows machine plus available Linux/Docker; separately owned test Agent processes, no existing fleet"
+interactive_windows = "NOT_REQUIRED"
+installation = "FRESH_ISOLATED; no existing-data migration or TeamCity cutover in US-013"
+merge_policy = "Agent merges verified milestones to main after all due gates and independent review; no merge during planning"
+ui_authoring = "CONFIRMED: C#/Git preparation; UI inspects/runs/cancels builds and reads logs/artifacts; configuration editor is a separate story"
+end_to_end = "Independent small-chain UI/REST/unchanged-CLI entries; one heavy T3 CLI submission with UI/REST readbacks"
+current_execution = "Owned isolated reference Agent/Git fixtures, real source/authoring/lifecycle/byte observations, strict replay, bounded C#/Git representation and separate real Git/PostgreSQL single-worker recovery study; no target Host/R0/PILOT delivery"
+execution_evidence = "us013-p0-execution.md"
+execution_plan = "t3personal-pilot.md#autonomous-delivery-plan--ready-for-p0-execution"
+test_repository_default = "New private iXab3r/vivarium-us013-e2e or unique owned suffix; verify ownership before reuse; create only during execution"
+merge_enforcement = "Re-read policy/check state; require exact-revision checks/evidence and independent verdicts even if GitHub main is unprotected"
+
+[story_transition]
+assignment = "2026-11-01: Stage 1 actor-goal stories, API inventory preparation and dependencies; Stage 2 self-contained implementation tasks and useful discussion transfer; Stage 3 redundant-task cleanup after preservation/delta verification. All three planning stages complete; no product/runtime work. Historical stage counts below retain their original checkpoint meaning."
+catalogue = "stories.md"
+registry = "stories.tsv"
+inventory_preparation = "api-inventory-preparation.md"
+source_head = "9f5f36859f6a90309b117168db343abf14ae44df"
+actor_goals = 25
+new_unscheduled_issues = 24
+retained_priority_story = "US-013 / #78; #79 UI, #80 direct compatible REST, #81 unchanged CLI are shared acceptance tracks"
+canonical_ac_intent_links = 110
+documented_heading_intent_links = 449
+installed_http_occurrences = 449
+normalized_union_denominator = "UNKNOWN"
+dependency_records = 52
+old_issues_retained = 84
+old_native_child_links_retained = 75
+old_comments_retained = 12
+discussion_transfer = "COMPLETE at planning boundary: 1497 source blocks and all twelve original comments retained; superseded sources closed administratively without deletion. See story-source-cleanup.md; no behavioral acceptance."
+verification = "story-stage1-verification.md"
+
+[source_union_continuation]
+source_head = "defaffec72dc1718c937bc37c49b5362a7998f8f"
+summary = "story-transition-stage2.md"
+cli_source_revision = "b158fe03eab3c31982a21b36c278f690f6b541d9"
+cli_fixture_candidate_rows = 456
+cli_rows_with_multiple_structural_candidates = 125
+cli_suffix_binding_qualifications = 17
+native_literal_http_declarations = 40
+agent_envelope_alternatives = 20
+surface_scenario_candidates = 160
+normalized_denominator = "UNKNOWN"
+proposed_task_issues = [110, 111, 112]
+task_activation = "Historical first packet; reconciled ownership is now active under story_task_ownership"
+partial_transfer_units = 11
+old_issue_bodies_and_assignments_retained = 108
+old_native_edges_retained = 75
+new_native_task_edges = 3
+verification = "story-stage2-verification.md"
+
+[story_task_ownership]
+source_head = "1f0421357334be4330e7440b08b23fc12f56a598"
+summary = "story-task-migration.md"
+state = "ACTIVE_PLANNING_OWNER; no runtime or milestone acceptance"
+actor_goals_linked = 25
+subsystem_slices = 18
+active_packet_tasks = 54
+story_contribution_links = 61
+source_body_count = 66
+source_block_occurrences = 1497
+legacy_sources_labelled = 62
+retained_discussion_comments = 12
+intentional_evidence_helper_reparents = 9
+open_issues_at_readback = 162
+source_cleanup = "COMPLETE; 62 superseded sources closed not_planned with original bodies/comments/history retained; no deletion or product acceptance"
+normalized_denominator = "UNKNOWN"
+verification = "story-task-migration-verification.md"
+
+[source_cleanup]
+source_head = "b2551e8235c349929e35de8f9073bd0c6f4ffa41"
+summary = "story-source-cleanup.md"
+closure_register = "source-supersession.tsv"
+superseded_sources_closed = 62
+closure_reason = "not_planned"
+active_issues_open = 100
+total_issue_records = 162
+open_milestones = 9
+original_comments_unchanged = 12
+prior_timeline_entries_retained = 1349
+postclosure_timeline_entries = 1411
+product_acceptance = "NONE"
+source_deletion = "NONE"
+
+[server_input_reference]
+issue = 85
+owner = 111
+source_head = "01aa708dc99623b0a7cfccc7b6354ff501588221"
+summary = "t3personal-server-inputs.md"
+receipt = "t3personal-server-inputs.json"
+state = "AVAILABLE_BOUNDED_REFERENCE; issue remains Open until P0 delivery"
+fixed_get_exchanges = 5
+entity_bytes = 3590
+build_source_revision = "7ff65cada80dd817aa5d7467b85e78ec30c578a9"
+build_settings_revision = "7495b6859c91952ad91478a2428be805a4e48f1a"
+per_file_consumption = "NOT_PROVED"
+historical_settings_mode = "NOT_PROVED; effective config is current observation"
+product_conformance_change = "NONE; original fifteen cases/results unchanged"

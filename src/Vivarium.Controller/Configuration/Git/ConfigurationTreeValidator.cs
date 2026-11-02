@@ -180,7 +180,7 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
             if (string.Equals(document.Path, RepositoryManifestPath, StringComparison.Ordinal))
             {
                 var expected = RenderRepositoryManifest(repositoryId);
-                if (!document.Utf8Bytes.Span.SequenceEqual(expected))
+                if (!MatchesCanonicalDocument(document.Utf8Bytes.Span, expected))
                 {
                     diagnostics.Add(Diagnostic(
                         "CONFIG_REPOSITORY_MANIFEST_INVALID",
@@ -260,7 +260,7 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
                 - RoleBinding
                 - User
 
-            """);
+            """.ReplaceLineEndings("\n"));
 
     internal static byte[] RenderAgent(string id, bool enabled) =>
         StrictUtf8.GetBytes($"""
@@ -270,7 +270,7 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
             spec:
               enabled: {enabled.ToString().ToLowerInvariant()}
 
-            """);
+            """.ReplaceLineEndings("\n"));
 
     internal static byte[] RenderUser(
         string id,
@@ -285,7 +285,7 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
               displayName: {JsonSerializer.Serialize(displayName)}
               active: {active.ToString().ToLowerInvariant()}
 
-            """);
+            """.ReplaceLineEndings("\n"));
 
     internal static byte[] RenderRoleBinding(
         string id,
@@ -304,7 +304,7 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
               scopeType: {scopeType}
               scopeId: {scopeId}
 
-            """);
+            """.ReplaceLineEndings("\n"));
 
     private static bool TryNormalizeResource(
         string text,
@@ -335,13 +335,13 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
             return false;
         }
 
-        if (!original.Span.SequenceEqual(parsed!.CanonicalBytes))
+        if (!MatchesCanonicalDocument(original.Span, parsed!.CanonicalBytes))
         {
             diagnostic = Diagnostic(
                 "CONFIG_DOCUMENT_NOT_CANONICAL",
                 path,
                 null,
-                $"The {parsed.Kind} document must use canonical UTF-8, LF line endings, field order, and spacing.");
+                $"The {parsed.Kind} document must use canonical UTF-8, uniform LF or legacy CRLF line endings, field order, and spacing.");
             return false;
         }
 
@@ -350,11 +350,15 @@ internal sealed partial class ConfigurationTreeValidator(string repositoryId)
             ApiVersion,
             parsed.Kind,
             parsed.Id,
-            Hash(parsed.CanonicalBytes),
-            parsed.CanonicalBytes,
+            Hash(original.Span),
+            original.ToArray(),
             parsed.ScalarFields);
         return true;
     }
+
+    private static bool MatchesCanonicalDocument(ReadOnlySpan<byte> original, byte[] canonical) =>
+        original.SequenceEqual(canonical) || original.SequenceEqual(StrictUtf8.GetBytes(
+            StrictUtf8.GetString(canonical).Replace("\n", "\r\n", StringComparison.Ordinal)));
 
     private static bool TryParseResource(
         string text,

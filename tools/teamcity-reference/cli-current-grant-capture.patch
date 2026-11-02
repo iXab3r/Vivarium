@@ -1,0 +1,206 @@
+--- a/integrations/teamcity/src/cli.ts
++++ b/integrations/teamcity/src/cli.ts
+@@ -13,6 +13,7 @@
+ } from "@eyeauras/cli-factory";
+ import { teamCityUrl, teamCityUrlHelp } from "./server-url.js";
+ import { TeamCityClient } from "./client.js";
++import { captureGrantFixture } from "./grant-fixture-capture.js";
+ import { createAuthoringCommands } from "./authoring-commands.js";
+ import { createOperatorCommands } from "./operator-commands.js";
+ import { createBulkConfigurationCommands } from "./bulk-configuration-commands.js";
+@@ -190,6 +191,7 @@
+       ["Triage", ["changes", "investigations", "mutes", "tests", "problems"]],
+     ], [
+       command("server", "Inspect the TeamCity server", [
++        command("grant-fixture-capture", "Capture fixed owned current-grant fixture only", (_input, context) => captureGrantFixture(context), { permission: "Credentials" }),
+         ...admin.server,
+         ...infrastructure.server,
+         ...system.server,
+--- /dev/null
++++ b/integrations/teamcity/src/grant-fixture-capture.ts
+@@ -0,0 +1,185 @@
++import { createHash, randomBytes, randomUUID } from "node:crypto";
++import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
++import { resolve } from "node:path";
++import { HttpError, ProfileStore, type CommandContext } from "@eyeauras/cli-factory";
++import { TeamCityClient } from "./client.js";
++import { issuedTokenKey, issuedTokenName, readIssuedToken } from "./admin-models.js";
++
++const target = "http://127.0.0.1:18111", profile = "vivarium-teamcity-lab-202613";
++const sha = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
++
++export async function captureGrantFixture(context: CommandContext) {
++  if (context.profile.name !== profile || context.profile.values.url !== target)
++    throw new Error("Only the fixed isolated reference profile/target is allowed.");
++  for (const [key, leaf] of [["APPDATA", "roaming"], ["LOCALAPPDATA", "local"]])
++    if (resolve(context.environment[key!] ?? "").toLowerCase() !== resolve("artifacts/p0-rest-first/teamcity-lab/cli-state", leaf!).toLowerCase())
++      throw new Error("The isolated private CLI store is required.");
++  const permissions = await new ProfileStore({ applicationId: "teamcity-cli", appArguments: context.appArguments }).getPermissions(profile);
++  for (const permission of ["ReadOnly", "Update", "Admin", "Credentials"])
++    if (!(permissions ?? []).includes(permission as never)) throw new Error("Required local gate is disabled: " + permission);
++  const run = resolve("artifacts/us013-access-20261102", "run-" + randomUUID().replaceAll("-", ""));
++  await mkdir(run, { recursive: true });
++  await writeFile(resolve("artifacts/us013-access-20261102/latest-run.txt"), run + "\n");
++  const prefix = "VivUs013Access_20261102_" + run.split("run-").at(-1)!.slice(0, 12);
++  const project = prefix + "_P", protectedProject = prefix + "_Q", username = (prefix + "_User").toLowerCase();
++  const tokenName = prefix + "_Token", alias = prefix + "_Token";
++  const adminToken = await context.secrets.require("token");
++  const password = randomBytes(32).toString("base64url");
++  const secrets = [adminToken, password];
++  let userId: string | undefined, verified = false, cleanup = false;
++  let active: { id: string; exchanges: unknown[] } | undefined;
++  const receipt: Record<string, any> = {
++    kind: "BOUNDED_CURRENT_GRANT_REFERENCE_NOT_PRODUCT_CONFORMANCE", target, profile, prefix,
++    observedAtUtc: new Date().toISOString(), username, project, protectedProject, tokenName, alias,
++    sourcePin: "b158fe03eab3c31982a21b36c278f690f6b541d9", setup: [], cases: [], cleanup: [], privateSetup: [],
++    acquisitionVariant: "Existing CLI client/auth/gates/transport with a fixed capture-only setup: random password added only to the owned user creation and Basic used only to issue that same user's scoped PAT. Credential exchange entities are excluded. Captured policy cases use one normal unchanged client with that PAT. Installed/acceptance CLI and original acquisition remain unchanged.",
++    limits: ["Owned-user current grants with explicit scoped PAT restrictions; not target OIDC/JWT or Agent/workload proof.", "Private credential setup is deliberately not a literal conformance case; no secret entities/Authorization headers exported."]
++  };
++  const acquisition = resolve(new URL("../..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"));
++  receipt.runtimeInputs = [];
++  for (const dir of ["src", "dist/src", "node_modules/@eyeauras/cli-factory/dist/src"])
++    for (const item of (await readdir(resolve(acquisition, dir), { recursive: true })).filter(p => /\.(js|ts)$/.test(p)).sort()) {
++      const path = resolve(acquisition, dir, item);
++      receipt.runtimeInputs.push({ path, sha256: sha(await readFile(path)) });
++    }
++  for (const item of ["package.json", "package-lock.json", "node_modules/@eyeauras/cli-factory/package.json"]) {
++    const path = resolve(acquisition, item); receipt.runtimeInputs.push({ path, sha256: sha(await readFile(path)) });
++  }
++  await writeFile(resolve(run, "capture-source.ts"), await readFile(resolve(acquisition, "src/grant-fixture-capture.ts")));
++  await writeFile(resolve(run, "capture-runtime.js"), await readFile(new URL(import.meta.url)));
++  const save = async () => {
++    const data = JSON.stringify(receipt, null, 2) + "\n";
++    if (secrets.some(secret => data.includes(secret))) throw new Error("Secret export guard rejected receipt.");
++    await writeFile(resolve(run, "receipt.json"), data);
++  };
++  const signal = AbortSignal.any([context.signal, AbortSignal.timeout(300000)]);
++  function allowed(path: string, method: string, body: string) {
++    if (method === "GET" && ["/app/rest/server", "/app/rest/users/current", "/app/rest/users"].includes(path)) return;
++    if (path === "/app/rest/users/current/tokens" && ["GET", "POST"].includes(method)) return;
++    if (path === "/app/rest/users" && method === "POST") {
++      if (JSON.parse(body).username !== username) throw new Error("Unowned user body."); return;
++    }
++    if (userId && path === "/app/rest/users/id:" + userId && method === "DELETE") return;
++    if (userId && path.startsWith("/app/rest/users/id:" + userId + "/roles/")) {
++      if (!["PUT", "DELETE"].includes(method) || !path.endsWith("/PROJECT_ADMIN/p:" + project)) throw new Error("Unowned role mutation."); return;
++    }
++    if (path === "/app/rest/projects" && method === "POST") {
++      if (![project, protectedProject].includes(JSON.parse(body).id)) throw new Error("Unowned project body."); return;
++    }
++    if ([project, protectedProject].some(id => path === "/app/rest/projects/id:" + id) && ["GET", "DELETE"].includes(method)) return;
++    if (path === "/app/rest/projects/id:" + project + "/description" && ["GET", "PUT"].includes(method)) return;
++    throw new Error("Unrelated reference request rejected: " + method + " " + path);
++  }
++  function transport(actor: string): typeof fetch {
++    return async (input, init) => {
++      let request = new Request(input, init);
++      const url = new URL(request.url), method = request.method;
++      if (url.origin !== target || url.username || url.password || url.hash) throw new Error("Non-lab target rejected.");
++      const path = decodeURIComponent(url.pathname);
++      let body = ["GET", "HEAD"].includes(method) ? "" : await request.clone().text();
++      allowed(path, method, body);
++      const privateExchange = (path === "/app/rest/users" && method === "POST") || path === "/app/rest/users/current/tokens" && method === "POST";
++      if (path === "/app/rest/users" && method === "POST") {
++        body = JSON.stringify({ ...JSON.parse(body), password }); request = new Request(request, { body });
++      }
++      if (actor === "owned-basic-bootstrap") {
++        if (!privateExchange || path !== "/app/rest/users/current/tokens") throw new Error("Basic is restricted to private token bootstrap.");
++        const headers = new Headers(request.headers); headers.set("Authorization", "Basic " + Buffer.from(username + ":" + password).toString("base64"));
++        request = new Request(request, { headers });
++      }
++      const response = await context.fetch(request, { redirect: "manual" });
++      if (response.status >= 300 && response.status < 400) throw new Error("Redirect rejected.");
++      if (privateExchange) {
++        receipt.privateSetup.push({ actor, method, path: url.pathname, status: response.status, entityExport: "OMITTED_PRIVATE_CREDENTIAL_SETUP" });
++        await save(); return response;
++      }
++      const bytes = Buffer.from(await response.clone().arrayBuffer());
++      if (bytes.length > 65536) throw new Error("Entity byte bound exceeded.");
++      if (secrets.some(secret => bytes.toString("utf8").includes(secret) || body.includes(secret))) throw new Error("Secret entity guard rejected export.");
++      const selected = (headers: Headers) => Object.fromEntries(["accept", "content-type", "etag", "location"].flatMap(k => headers.has(k) ? [[k, headers.get(k)!]] : []));
++      active?.exchanges.push({ actor, request: { method, path: url.pathname, query: Object.fromEntries(url.searchParams), headers: selected(request.headers), bodyBase64: Buffer.from(body).toString("base64"), bodyBytes: Buffer.byteLength(body), bodySha256: sha(Buffer.from(body)) },
++        response: { status: response.status, headers: selected(response.headers), bodyBase64: bytes.toString("base64"), bodyBytes: bytes.length, bodySha256: sha(bytes) } });
++      await save(); return response;
++    };
++  }
++  const admin = new TeamCityClient({ baseUrl: target, token: adminToken, fetch: transport("admin"), signal });
++  const cleanupAdmin = new TeamCityClient({ baseUrl: target, token: adminToken, fetch: transport("admin-cleanup"), signal: AbortSignal.timeout(120000) });
++  async function group(kind: "setup" | "cases" | "cleanup", id: string, action: () => Promise<void>) {
++    active = { id, exchanges: [] }; receipt[kind].push(active);
++    try { await action(); } catch (error) { Object.assign(active, { error: error instanceof HttpError ? "HTTP " + error.status : String(error) }); throw error; }
++    finally { await save(); }
++  }
++  async function absent(action: () => Promise<unknown>) {
++    try { await action(); } catch (error) { if (error instanceof HttpError && error.status === 404) return; throw error; }
++    throw new Error("Owned target already exists; no mutations permitted.");
++  }
++  async function attempt(action: () => Promise<unknown>) {
++    try { return { returned: true, result: await action() }; }
++    catch (error) { if (error instanceof HttpError) return { returned: false, status: error.status }; throw error; }
++  }
++  try {
++    await group("setup", "verify-reference-and-owned-target-absence", async () => {
++      const server = await admin.getServerStatus();
++      if (server.version !== "2026.1.3 (build 222742)" || String(server.buildNumber) !== "222742") throw new Error("Pinned server version differs.");
++      await absent(() => admin.getProject(project)); await absent(() => admin.getProject(protectedProject));
++      const users = await admin.listAccountUsers({ limit: 100 });
++      if (users.hasMore || users.items.some((u: any) => u.username === username)) throw new Error("User preflight is not safely bounded/absent.");
++      if (await readIssuedToken(context.secrets, alias) !== undefined) throw new Error("Local fixture alias already exists.");
++      verified = true;
++    });
++    await group("setup", "create-owned-identity-projects-and-current-user-token", async () => {
++      await admin.createProject(project, { name: "Owned access P", description: "before" });
++      await admin.createProject(protectedProject, { name: "Owned protected Q" });
++      const user = await admin.createAccountUser(username, "Owned current-grant fixture"); userId = String(user.id); receipt.createdIdentityMetadata = user;
++      if (!/^\d+$/.test(userId) || user.username !== username) throw new Error("Unexpected owned user identity."); receipt.userId = userId;
++      await admin.grantAccountRole("users", userId, { roleId: "PROJECT_ADMIN", project });
++      const bootstrap = new TeamCityClient({ baseUrl: target, token: "owned-basic-bootstrap-placeholder", fetch: transport("owned-basic-bootstrap"), signal });
++      await bootstrap.createCurrentUserToken({ name: tokenName, alias, expires: new Date(Date.now() + 3600000).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "+0000"), restrictions: [{ permission: "view_project", project }, { permission: "edit_project", project }] }, context.secrets);
++      const stored = await readIssuedToken(context.secrets, alias);
++      if (!stored || issuedTokenName(stored) !== tokenName) throw new Error("Private token persistence identity differs.");
++      const value = JSON.parse(stored).value; if (typeof value !== "string" || !value) throw new Error("Private token missing."); secrets.push(value);
++      const actor = new TeamCityClient({ baseUrl: target, token: value, fetch: transport("owned-scoped-pat"), signal });
++      receipt.credentialUse = "One owned-scoped-pat client and unchanged bearer value for every subsequent case.";
++      await admin.revokeAccountRole("users", userId, { roleId: "PROJECT_ADMIN", project });
++      await group("cases", "same-credential-before-grant", async () => {
++        const current = await actor.currentUser(); if (String(current.id) !== userId || current.username !== username) throw new Error("Actor is not the owned ordinary user.");
++        await actor.getProject(project);
++        receipt.beforeGrant = await attempt(() => actor.setProjectField(project, "description", "denied-before"));
++        receipt.protectedBefore = await attempt(() => actor.getProject(protectedProject));
++        await admin.getProject(project); await admin.getProject(protectedProject);
++      });
++      await group("cases", "same-credential-after-current-grant", async () => {
++        await admin.grantAccountRole("users", userId!, { roleId: "PROJECT_ADMIN", project });
++        receipt.afterGrant = await attempt(() => actor.setProjectField(project, "description", "allowed-after-grant"));
++        await actor.getProject(project); receipt.protectedAfter = await attempt(() => actor.getProject(protectedProject)); await admin.getProject(protectedProject);
++      });
++      await group("cases", "same-credential-after-current-revoke", async () => {
++        await admin.revokeAccountRole("users", userId!, { roleId: "PROJECT_ADMIN", project });
++        receipt.afterRevoke = await attempt(() => actor.setProjectField(project, "description", "denied-after-revoke"));
++        await actor.getProject(project); await admin.getProject(project);
++      });
++    });
++  } catch (error) { receipt.failure = error instanceof HttpError ? "HTTP " + error.status : String(error); }
++  finally {
++    cleanup = true;
++    try { await group("cleanup", "delete-only-owned-remote-and-local-fixture", async () => {
++      if (!verified) return;
++      if (!userId) {
++        const users = await cleanupAdmin.listAccountUsers({ limit: 100 }); if (users.hasMore) throw new Error("Cleanup user lookup exceeds bound.");
++        const owned = users.items.find((u: any) => u.username === username); if (owned) userId = String(owned.id);
++      }
++      if (userId) await cleanupAdmin.deleteAccountUser(userId);
++      const stored = await readIssuedToken(context.secrets, alias);
++      if (stored !== undefined) { if (issuedTokenName(stored) !== tokenName) throw new Error("Cleanup alias identity differs."); await context.secrets.delete(issuedTokenKey(alias)); }
++      for (const id of [project, protectedProject]) {
++        const found = await attempt(() => cleanupAdmin.getProject(id));
++        if (found.returned) await cleanupAdmin.deleteProject(id); else if (found.status !== 404) throw new Error("Unexpected cleanup project lookup.");
++        await absent(() => cleanupAdmin.getProject(id));
++      }
++      receipt.localAliasRemoved = await readIssuedToken(context.secrets, alias) === undefined;
++    }); } catch (error) { receipt.cleanupFailure = String(error); }
++    receipt.complete = !receipt.failure && !receipt.cleanupFailure; await save();
++  }
++  if (!receipt.complete) throw new Error("Owned current-grant capture failed; inspect private receipt " + resolve(run, "receipt.json"));
++  return { complete: true, receipt: resolve(run, "receipt.json"), beforeGrant: receipt.beforeGrant, afterGrant: receipt.afterGrant, afterRevoke: receipt.afterRevoke, protectedBefore: receipt.protectedBefore, protectedAfter: receipt.protectedAfter };
++}

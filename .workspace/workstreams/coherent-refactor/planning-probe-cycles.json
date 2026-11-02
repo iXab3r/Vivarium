@@ -1,0 +1,90 @@
+{
+  "kind": "bounded-planning-probe-provenance",
+  "recorded_date": "2026-11-01",
+  "report_artifact_scope": "All report paths below are local ignored artifacts, not tracked files or portable Git links. SHA-256 identifies unchanged raw report bytes; a clone may not contain them.",
+  "cycles": [
+    {
+      "cycle": "C1",
+      "source_revision": "b50d47a13f9da2911a7680efe114f10089ba6719",
+      "probe_angles": [
+        "Executable-first pickup",
+        "Incremental subsystem integration",
+        "Evidence/accounting and milestone closure"
+      ],
+      "raw_reports": [
+        {
+          "path": "artifacts/depot-refactor-study/probing-cycles/c1-start.md",
+          "sha256": "653cbf79121144da94509f1215dd0877ec3b06cbbb647e98cacaf9481715fc68"
+        },
+        {
+          "path": "artifacts/depot-refactor-study/probing-cycles/c1-subsystem.md",
+          "sha256": "1b0bcba50854a5d1092f2526231b4a77e1e4e856c52f251b72248b0bde48eeaf"
+        },
+        {
+          "path": "artifacts/depot-refactor-study/probing-cycles/c1-accounting.md",
+          "sha256": "c175e98578171f0a151c72c6ac4ff3fcf33604b54cca42e1d32a0a930c1d88a4"
+        }
+      ],
+      "dispositions": [
+        "Added accountable early R0/R2 contributions and partial Agent/artifact AC routing, retaining full-domain owners and later scope.",
+        "Defined evidence reuse/main transfer, due raw execution, discovery allocation versus due freeze and bounded debt classification.",
+        "Scoped native idempotency/preconditions/errors; reconciled C#/Git/UI target with transitional YAML and reference-compatible Versioned Settings.",
+        "Assigned approved pinned schema/raw HTTP acquisition to existing P0 tasks; no invented commands or ready fixtures."
+      ],
+      "fix_revision": "c33ae7cf9f6006691bcb78d0cf88f8a38c263a0c",
+      "actual_checks": "134 cheap assertions; 98 local Markdown destinations; 18 canonical adapter links; 14 issue bodies re-read with state/milestone retained; diff checks clean. No product checks.",
+      "verdict": "Concrete planning defects repaired; execution and acceptance unverified."
+    },
+    {
+      "cycle": "C2",
+      "source_revision": "c33ae7cf9f6006691bcb78d0cf88f8a38c263a0c",
+      "probe_angles": [
+        "Blank-install Project/BuildType/binding authoring",
+        "Settings collection/edit/retry semantics",
+        "Early CFG step-edit ownership"
+      ],
+      "raw_reports": [
+        {
+          "path": "artifacts/depot-refactor-study/probing-cycles/c2-authoring.md",
+          "sha256": "c2bff14c24712aa869f012b014bf579595c0008c066d5ecae49935549b32c25b"
+        }
+      ],
+      "dispositions": [
+        "Separated requested selections from resolved immutable actual execution provenance for immediate/later collection; exact defaults/timing remain P0 work.",
+        "Preserved internal Git CAS/recovery while scoping native caller preconditions/async completion; intentional enqueue commands do not promise distinct optimized Build IDs/executions.",
+        "Clarified existing D23 Project control versus product settings authority and assigned concrete unbound/binding ownership/diff proof without inventing paths/schema/SDK.",
+        "Added EXEC-to-CFG R2 step-edit contribution under #18/#47/#48, retaining primary #22/full R3 scope; current register has 12 unfrozen contributions."
+      ],
+      "fix_revision": "46a63a6104a16d38f7fbb947df6ffdbe9e7584e2",
+      "actual_checks": "136 cheap assertions; 47 local Markdown destinations; 18 canonical adapter links; 7 issue bodies re-read with state/milestone retained; diff checks clean. Root independently reran the 136 checks. No product checks.",
+      "verdict": "Concrete authoring/ownership defects repaired; format/reference proofs remain assigned."
+    },
+    {
+      "cycle": "C3",
+      "source_revision": "46a63a6104a16d38f7fbb947df6ffdbe9e7584e2",
+      "probe_angles": [
+        "Assignment-to-main delivery and bottom-up closure",
+        "Reuse/invalidation, later gaps, reachable old debt and early contributions"
+      ],
+      "raw_reports": [
+        {
+          "path": "artifacts/depot-refactor-study/probing-cycles/c3-closure.md",
+          "sha256": "3f55cf177e57dc9a3164d18a4dc657bd47232648c5901666b9666c01fdad4fcc"
+        }
+      ],
+      "dispositions": [
+        "No material contradiction or omission established in the bounded closure-planning sample; no further semantic repair requested."
+      ],
+      "fix_revision": null,
+      "actual_checks": "Read-only repository/status and five live-task sample (#2/#36/#42/#14/#44); local ignored report path checked. Root read/compared the report. No executable product or promised negative-control checks.",
+      "verdict": "NO_MATERIAL_DEFECT_IN_BOUNDED_SAMPLE"
+    }
+  ],
+  "limits": "These were independent planning probes with bounded source/task samples, not exhaustive repository/graph audits or independent milestone/security reviews. No runtime/API/milestone/security PASS, API percentage, debt clearance or task closure follows. The final provenance record is not a fourth probe.",
+  "remaining_p0_deliverables": [
+    "#35: exact SDK/baseline, independently sourced executable cohorts, actual supported acquisition/harness commands, representative production composition/cost controls and genuine raw product RED results.",
+    "#32/#33/#34: pinned resource/state/protocol and exact variant/default/timing facts, C# editability and blank-install/unbound/binding ownership/diff proof.",
+    "#36/#42: normalized due allocations, machine-checkable gaps, executable ledger/result binding and real reuse/invalidation/negative-control evidence; #39 retains business/oracle reconciliation."
+  ],
+  "current_status": "449 discovery rows still unallocated; normalized denominator unknown; zero materialized/executed replacement-conformance cases; no raw baseline; validator/result binding unimplemented; 110 AC specified-unbound. Existing P0 gates and #35 executable-first pickup remain."
+}

@@ -1,0 +1,3785 @@
+{
+  "kind": "BOUNDED_APPROVAL_OBSERVATIONS_NOT_PRODUCT_ACCEPTANCE",
+  "reference": {
+    "version": "2026.1.3",
+    "build": "222742",
+    "target": "http://127.0.0.1:18111",
+    "profile": "vivarium-teamcity-lab-202613"
+  },
+  "capture": {
+    "path": "artifacts/us013-approval-20261102/run-19d5ba595377420eaa95ad3f51f89d84/receipt.json",
+    "sha256": "688187466e7669f80107aff022829d0078bc61f2551a60393924863c9fded3d0"
+  },
+  "source": {
+    "path": "tools/teamcity-reference/reference/approval-probe.mjs.txt",
+    "sha256": "a2a82880861b2aec18d2c3a0eb5df7b8b756eb7390b165011ec33e732189fe6f"
+  },
+  "metadata": {
+    "prefix": "VivUs013Approval_20261102_19d5ba5953",
+    "project": "VivUs013Approval_20261102_19d5ba5953_Project",
+    "job": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+    "observations": [
+      {
+        "label": "Before explicit approval",
+        "build": {
+          "id": 60,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/60",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054016+0000"
+        }
+      },
+      {
+        "label": "Waiting for explicit approval",
+        "buildId": 60,
+        "approval": {
+          "status": "waitingForApproval",
+          "canBeApprovedByCurrentUser": true,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054116+0000"
+        }
+      },
+      {
+        "label": "After explicit approval",
+        "buildId": 60,
+        "approval": {
+          "status": "approved",
+          "canBeApprovedByCurrentUser": false,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054116+0000"
+        }
+      },
+      {
+        "label": "Approved but still queued without an Agent",
+        "build": {
+          "id": 60,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/60",
+          "queuePosition": 1,
+          "waitReason": "There are no idle compatible agents which can run this build",
+          "queuedDate": "20261102T054016+0000"
+        }
+      },
+      {
+        "label": "After repeat approval",
+        "buildId": 60,
+        "approval": {
+          "status": "approved",
+          "canBeApprovedByCurrentUser": false,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054116+0000"
+        }
+      },
+      {
+        "label": "Invalid approver queued",
+        "build": {
+          "id": 61,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "number": "N/A",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Approval_20261102_19d5ba5953_Project_Build/61",
+          "statusText": "Failed to start",
+          "queuedDate": "20261102T054018+0000",
+          "startDate": "20261102T054018+0000",
+          "finishDate": "20261102T054018+0000",
+          "agent": {
+            "name": "N/A"
+          }
+        }
+      },
+      {
+        "label": "Unknown approver literal state",
+        "buildId": 61,
+        "approval": {
+          "status": "waitingForApproval",
+          "canBeApprovedByCurrentUser": false,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054018+0000"
+        }
+      },
+      {
+        "label": "After invalid-rule approve attempt",
+        "buildId": 61,
+        "approval": {
+          "status": "waitingForApproval",
+          "canBeApprovedByCurrentUser": false,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054018+0000"
+        }
+      },
+      {
+        "label": "After unknown-user approval attempt",
+        "build": {
+          "id": 61,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "number": "N/A",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Approval_20261102_19d5ba5953_Project_Build/61",
+          "statusText": "Failed to start build",
+          "queuedDate": "20261102T054018+0000",
+          "startDate": "20261102T054018+0000",
+          "finishDate": "20261102T054018+0000",
+          "agent": {
+            "name": "N/A"
+          }
+        }
+      },
+      {
+        "label": "Timeout waiting",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout initial approval",
+        "buildId": 62,
+        "approval": {
+          "status": "waitingForApproval",
+          "canBeApprovedByCurrentUser": true,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054119+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/build/62",
+          "queuePosition": 1,
+          "waitReason": "This build should be approved before it may start",
+          "queuedDate": "20261102T054019+0000"
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "state": "unknown",
+          "failedToStart": false,
+          "personal": false
+        }
+      },
+      {
+        "label": "Timeout lifecycle",
+        "build": {
+          "id": 62,
+          "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+          "number": "N/A",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Approval_20261102_19d5ba5953_Project_Build/62",
+          "statusText": "Failed to start build",
+          "queuedDate": "20261102T054019+0000",
+          "startDate": "20261102T054119+0000",
+          "finishDate": "20261102T054119+0000",
+          "agent": {
+            "name": "N/A"
+          }
+        }
+      },
+      {
+        "label": "Approval after timeout",
+        "buildId": 62,
+        "approval": {
+          "status": "timedOut",
+          "canBeApprovedByCurrentUser": false,
+          "configurationValid": true,
+          "timeoutTimestamp": "20261102T054119+0000"
+        }
+      }
+    ],
+    "approved": {
+      "status": "approved",
+      "canBeApprovedByCurrentUser": false,
+      "configurationValid": true,
+      "timeoutTimestamp": "20261102T054116+0000"
+    },
+    "repeated": {
+      "returned": false,
+      "status": 400
+    },
+    "invalidApprove": {
+      "returned": true,
+      "result": {
+        "status": "waitingForApproval",
+        "canBeApprovedByCurrentUser": false,
+        "configurationValid": true,
+        "timeoutTimestamp": "20261102T054018+0000"
+      }
+    },
+    "timeoutBuild": {
+      "id": 62,
+      "buildTypeId": "VivUs013Approval_20261102_19d5ba5953_Project_Build",
+      "number": "N/A",
+      "status": "FAILURE",
+      "state": "finished",
+      "failedToStart": true,
+      "personal": false,
+      "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Approval_20261102_19d5ba5953_Project_Build/62",
+      "statusText": "Failed to start build",
+      "queuedDate": "20261102T054019+0000",
+      "startDate": "20261102T054119+0000",
+      "finishDate": "20261102T054119+0000",
+      "agent": {
+        "name": "N/A"
+      }
+    },
+    "timeoutApproval": {
+      "returned": true,
+      "result": {
+        "status": "timedOut",
+        "canBeApprovedByCurrentUser": false,
+        "configurationValid": true,
+        "timeoutTimestamp": "20261102T054119+0000"
+      }
+    },
+    "timeoutProblems": [
+      {
+        "id": "build:(id:62),problem:(id:6)",
+        "type": "PREPARATION_FAILURE_TYPE",
+        "identity": "-315753047",
+        "currentlyMuted": false,
+        "problem": {
+          "id": "6"
+        },
+        "build": {
+          "id": 62
+        }
+      }
+    ],
+    "complete": true,
+    "initialPermissions": [
+      {
+        "name": "ReadOnly",
+        "enabled": true,
+        "description": "Read remote state without changing it"
+      },
+      {
+        "name": "Update",
+        "enabled": false,
+        "description": "Perform operations that may change remote state"
+      },
+      {
+        "name": "Admin",
+        "enabled": false,
+        "description": "Change remote accounts, access policy and server administration"
+      },
+      {
+        "name": "Credentials",
+        "enabled": false,
+        "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+      }
+    ],
+    "finalPermissions": [
+      {
+        "name": "ReadOnly",
+        "enabled": true,
+        "description": "Read remote state without changing it"
+      },
+      {
+        "name": "Update",
+        "enabled": false,
+        "description": "Perform operations that may change remote state"
+      },
+      {
+        "name": "Admin",
+        "enabled": false,
+        "description": "Change remote accounts, access policy and server administration"
+      },
+      {
+        "name": "Credentials",
+        "enabled": false,
+        "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+      }
+    ]
+  },
+  "runtimeInputs": [
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\admin-commands.ts",
+      "sha256": "d88fa350a4c6814bc15d3759e9bd63a57b4c39117a02e70f09a3cd4eda78f266"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\admin-models.ts",
+      "sha256": "8895efd9fb80a2fa6419420f4160a3fb8f881c29d296b8aafa7ebfbeceea87c5"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\advanced-authoring-commands.ts",
+      "sha256": "141602a4014a27bdabf15b589125c5bb306d6486ecc798f000536989e7b23979"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\advanced-authoring-models.ts",
+      "sha256": "eb4599d76b9c1816653a7c69222a817914fa24f1e5890a000d0a7d7f2be97335"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\authoring-commands.ts",
+      "sha256": "3aaf6dfac760181a0dc3b74b9d0203a90dbbe736b21f32fd6d773336267fe324"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\authoring-models.ts",
+      "sha256": "db326d2b2fea341396fcef473663309fe265884e0aabf0bb79c3beac4d5ba192"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\bin.ts",
+      "sha256": "84091c73d597f4872a3bdb0b130d4d541317d33e75dd6ba1b6f0ad39ce1105cf"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\build-flow.ts",
+      "sha256": "7a26e32a1f2841d7608bd7f22c2fc873d89d9d48b2bb33e8f1fa10eb51f3900c"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\bulk-configuration-commands.ts",
+      "sha256": "6efd35a22fd1da346770250e44cf0c846620284e96117eae13848e4b7bd8f7b6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\bulk-configuration-models.ts",
+      "sha256": "bbe2d64e991b40c2b00c9ca66019fdfd406420e8ee5aba894d5ad7997db1a381"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\cli.ts",
+      "sha256": "55c3cd3af82383b818ee2756f377aa19676483bc208fa3577df79ba74794984f"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\client.ts",
+      "sha256": "cdd3618f2682e6e2a3e9ad7ecf45773d15baf370f9ad7c6041efce9b3a102749"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\command-support.ts",
+      "sha256": "bbbde102ebcd235fa3e0035c0f109f61e6b6367f6476e8ba77ac1408366bc756"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\credential-inputs.ts",
+      "sha256": "cddd2ae470721894c456772200846686096a790623dd23e1ebea176a5e8bfaee"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\downloads.ts",
+      "sha256": "e197c81af8aeb6363579ca249134d8b530d33ec6e47e773b82be3d45410b5c98"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\file-commands.ts",
+      "sha256": "7ab7f521b512ac0264ea064200c0c5b30c471f61cbfa6b56bc925eae0c0df97a"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\file-models.ts",
+      "sha256": "4cedfaf186a6bc5fbc77fe91d2364daaea9bcc2f8dbe78ab257c0f292370fb35"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\index.ts",
+      "sha256": "d5fd9f9ed21b2e9c002850f08a4a44d368fb5f060ea653fe162461b85b3d4f67"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\infrastructure-commands.ts",
+      "sha256": "fda140a587457e825a498a6be682fcfdc7804171cd67e4b487ae90a7811207ac"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\infrastructure-models.ts",
+      "sha256": "4f779551a4f1d885b6dace8a632e331609e643d4f93ccadc947cfd078b45fd14"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\locator.ts",
+      "sha256": "4b945188448f9ed16eb1a4c28f7459aaef0e565fad5243afdf7523f3d2fb2b64"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\models.ts",
+      "sha256": "131161b62bc1bd82da8b609ee849f9a9d236052ecea29478c7860f95268212eb"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\operator-commands.ts",
+      "sha256": "f9bd9d3562f2b31fcfdd36104e8bd4666314b5ef98df2d36b995caf23f08e749"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\operator-models.ts",
+      "sha256": "a0ba1446251f5d68ca986459e442660ed3f9f339ffe8f11ec46ab90c80aba282"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\outcome.ts",
+      "sha256": "8f764208645927dbdbcd104a703cf69847173015b1189fc3c613dc3f80f214dd"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\paging.ts",
+      "sha256": "dcca487564719976bc53785fd4fb4fc202ee74c997f7097b9bafd502263bb216"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\presentation.ts",
+      "sha256": "c44d01d02d518bd3777bcaf3f431e5a0d4ed8a2e7afbc2d2417320190522368e"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\reference-capture.ts",
+      "sha256": "e0cb194a91cb8b503c1a1904575cba19cfa7260d71c438aa764ab2df27cc53d6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\server-url.ts",
+      "sha256": "fb19e16374064652853e31025ad09ce13310137a3d1350f3ab619f64fce44559"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\system-commands.ts",
+      "sha256": "d7713ba55683863c975c3a49a116e086f07aef7ac6e4ce36d9ef1520457a3479"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\system-models.ts",
+      "sha256": "193bd7ab7f77ce93059b2cdf672cb7d3fb8edb70005808af811172c1b6338551"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\t3-inputs-capture.ts",
+      "sha256": "ada35c86341d2a4d5d4d9b33cb1db8795e0577216d298d0cc33550f802dd0991"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\triage-commands.ts",
+      "sha256": "c697b4d378e359887d89635b452c1d772be4ce58c0d4492410807d35aa66e3a3"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\src\\triage-models.ts",
+      "sha256": "db4ccaae890e1fc26a9bacea199c01fa3997a0352b7104d36a15fc98caeadb66"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\admin-commands.js",
+      "sha256": "f15576f795fd9e51dabb461615bc800f86d1e7aad55a238d369cb3049ada4578"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\admin-models.js",
+      "sha256": "c1b78cd51872a291fd5b91bd3f420b3b1514f9e4e301eda67dd6516d0d9f824a"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\advanced-authoring-commands.js",
+      "sha256": "bb50779d0c143b97245f7f07f193a69cdae9da36ea8d677bbfa00e09220bed4f"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\advanced-authoring-models.js",
+      "sha256": "813d95995bb01686d35b892957e079648a58a40dd354101fde014e2f4af14ef1"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\authoring-commands.js",
+      "sha256": "1995b23ab745212d31de6f54ae16e7908959cb4f3a2c18cae1822ac84b317c20"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\authoring-models.js",
+      "sha256": "2c039ab04495613c2966525feb37f4d52e19379f5cb70d77c197661a6a575fd0"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\bin.js",
+      "sha256": "e7faccbb9aa8a7519c3ae410670db39e2f95ff4e882e4cbc069c3dba962961cb"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\build-flow.js",
+      "sha256": "cc3b3323b5077ea23d2b47519c19522bf5b46f6ab0e1643559f4f200af005eb6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\bulk-configuration-commands.js",
+      "sha256": "8b1d09dc1713a5a69bae4b61e824f8d4d09bbdee28c5468f47e48089df9f336a"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\bulk-configuration-models.js",
+      "sha256": "ba3d01a6c4dce4563d3ef83b6de3c43942709453baec1a3681c8f13005cb9b88"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\cli.js",
+      "sha256": "04ad98f4b4acb0b92fc65c932d13adf252c2c4304fd0b4b064a99fa7d9cfc6e1"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\client.js",
+      "sha256": "c7ba1379ab558eb7e32a8bc17d3a2ae8bd8284fd5b4a245351d0f61c129244be"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\command-support.js",
+      "sha256": "18843c37c5bc707261329114a7b42efdef8c43f4b97c9bf1a0ae6b01882ffd41"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\credential-inputs.js",
+      "sha256": "168e7a8636a594ae93dd5f4f5d1124b0451990f50b5c391e367bcb6b8ecf1485"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\downloads.js",
+      "sha256": "d5b0dd3c99f02c35701bd0b27f66b2c116f06e2135a112464617ef1225fba850"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\file-commands.js",
+      "sha256": "ef18de6fc1c2031c457d98f369143b76a54828c8fae8043f4c85d1dc440341a6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\file-models.js",
+      "sha256": "2913ce9d4569641454aa02c9351c7770d2a87d780c82b713f9fcaf5d3401b7a7"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\index.js",
+      "sha256": "471dbf6f83a8e66b9ce1c9aff068d8b945fdf3b2cc9e84cb5b98aaeee4673bd2"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\infrastructure-commands.js",
+      "sha256": "84e13088c14eecdfc6fbc2b94911213681b9eae08852e9cad4051d90bd15843a"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\infrastructure-models.js",
+      "sha256": "65202df71ad15fa22b0c31abd4fa0761dc1b359f7e92b2302cc51c45f2056759"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\locator.js",
+      "sha256": "e8a2d4445375e02840b6a6470f5c7c7c60ef9392eda81279d72222e77eb6a1e9"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\models.js",
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\operator-commands.js",
+      "sha256": "4db417a491455ecc2c73656fd3dcc5aa0ed92c567fe6742276a33636a3ea6f00"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\operator-models.js",
+      "sha256": "366be4bc21e63ef8ce41a86c39969af7b87419e477557301c16e7acc5136faed"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\outcome.js",
+      "sha256": "93f1430250ae1fb2bf0e3fec6531287950f1e389604ed97cef36ff0abb590bc3"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\paging.js",
+      "sha256": "ec3b5db8e683b5fe484ff4cd6b3363065c539da17dfe651e23dd83ef8331d9b2"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\presentation.js",
+      "sha256": "dc04cde3a32831d4c992e73d5bbc7bdb5ee3a7f53dfbd9cf03e6808079c650bf"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\reference-capture.js",
+      "sha256": "c2930157cd5904edaca86367a6d5a4929d0a156f27823107bc949ccca751c6b5"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\server-url.js",
+      "sha256": "b04d611e0e147bc8f7756a15697c732d460f445815a453f6c8a86589be7f4fd7"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\system-commands.js",
+      "sha256": "58079a864a039e73e334c56e007910c5f350c7727f9d05ceeb2ca24896955a2a"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\system-models.js",
+      "sha256": "67b3422df64f4551e36d294997a9eff73a6f6e8af8769d76d4d36a24e0f5da6d"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\t3-inputs-capture.js",
+      "sha256": "a0bd75f215ce618553c13b55cc9af37c2d9df1581b2376c6ae8e560feaf3b014"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\triage-commands.js",
+      "sha256": "f62951e1fb2a5703ba19934375e5c58dcbc96be7123233eb551f340d3b40379d"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\dist\\src\\triage-models.js",
+      "sha256": "081b27e49eb35a2142fd4f5358975ef5e09aedb5645113b76284ea823bd25287"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\app-arguments.d.ts",
+      "sha256": "792e12b4ca4f529c615b0ad7451fdd9257a72c32da624d7477dd1cfb16ace8eb"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\app-arguments.js",
+      "sha256": "a646df811e397b9e6b1f9513077a850ff509e728046b8e6453e3d8128d479e56"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\argv.d.ts",
+      "sha256": "ac5ff891a2da1ab925269b929d3d917a1e7ef39377e9cc91339938b59e8dd999"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\argv.js",
+      "sha256": "e0545cedc72b9556d9b57bd97beecfe6d1f939d10e484e0c03f61d0fcb564b8f"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\auth.d.ts",
+      "sha256": "4f61617623205368be24ae7572585eef3d34a6d573ac8594fbbcf623d7c61dcc"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\auth.js",
+      "sha256": "560b8bbf3349bb187d49f798080de9198beeb7db4221ac9e7ba4d2ec3c2db394"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\cli.d.ts",
+      "sha256": "e4605b3e5c427843a44eed2bf0d8feab8033c6aba2e8c60c374804a01a024db0"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\cli.js",
+      "sha256": "d2265314406dd6ba5d3a838574efe3bbac37c22c22230b22b0eea08b2eac6096"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command-gate.d.ts",
+      "sha256": "34312c0f5dcc1eb8cb5f723d7b76d1de70e28f596fc7cb50221055742101dfda"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command-gate.js",
+      "sha256": "b12a3b4ff1785e4859d96a22a2283224a7364d7682d5024f1d4983fc0792b284"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command-input.d.ts",
+      "sha256": "95132e26c8e8cf91142b8323d5baca9d0d562323ba533551f85c5233ffb6cd34"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command-input.js",
+      "sha256": "5f013eaaf222407bee21d46da1e2b1822cf42d32cb80c66212a40d557061aebc"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command.d.ts",
+      "sha256": "01b74ed2a10d10c01e687fc3e82986dd40adc969b687d5ae6dd69fc0f4d3d133"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\command.js",
+      "sha256": "3738c7d43418cbb7d30160fba33c2e8a969c801b37796363c41cbaae5f6382cf"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\errors.d.ts",
+      "sha256": "cfd4071d38b7775d21b8177812407918ace5e4a1919b96640f6165dcab676123"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\errors.js",
+      "sha256": "842437b8dab7e5f659ca87bca2ee6a341ec1a741ffb51c9429e84655513e7cac"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\http.d.ts",
+      "sha256": "ba86da3fc7be61de165517616c1ce0f18652caa13399a70175ec7434b53b34a4"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\http.js",
+      "sha256": "704c3b9063fcd50aa021d4f9ce2606c1aa67f5501711d53c5b8392eaa8accf1d"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\index.d.ts",
+      "sha256": "700a19d501757ccd5b88a88d183a039859dcab8bdcc1f84892502cd766a2df9d"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\index.js",
+      "sha256": "f5b1579a786c977f7f02e237a1750c7c5e2d9e0fd87ca9d0e9fbe82a34b8b875"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\input-normalization.d.ts",
+      "sha256": "b50cc5a3cf5b1c24791e19fa722435b0049e86a301390614ab170fee3e52f760"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\input-normalization.js",
+      "sha256": "f46ee8f76c128c5493868997cdb118e4d147f4fd87c7aa096af0ccdc5eb6a5d6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\json-rpc.d.ts",
+      "sha256": "99a375e509dce6fa9a14983eadd3ac6660b35d3ef7fd04319d86fdf168e64b7b"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\json-rpc.js",
+      "sha256": "44e7790aa746d49edc8d88543419ab1ae7f31809a1da873be01fbe7ad8c20c23"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\lines.d.ts",
+      "sha256": "c9b2dc8c76d5e8f59bce05ed13e3e3548065c734aec5ef51840ac47156291b28"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\lines.js",
+      "sha256": "5673f615623bd959f53ee9232c08c785a3124ba2fd7c44907fe581ef14387ddd"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\option-parsers.d.ts",
+      "sha256": "2016a21c58c6ba4264571cc805f4839e640f8203150ad18ac7176d8f0139d71b"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\option-parsers.js",
+      "sha256": "ccbae99f6fa85c3ffeea35a4e49ce89664d82cbb4e3d11b8f43c2259e63550aa"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\output.d.ts",
+      "sha256": "4e3bcba4a81dda94dbe8f9794171a77f5d1476967003bae420d60e7a97028dbb"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\output.js",
+      "sha256": "db5ef08ecab43e72448e19ae96dcde851062c7573e75a211fb34c0c6cffebe33"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\permissions.d.ts",
+      "sha256": "fbde911c7038ff0e807eb0c6c0ae7cbb934d386020baaf815b0abc889ac8c95c"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\permissions.js",
+      "sha256": "ae7f269a5b70b7bb6b6d26544c69d1f517a38f1ed2284e895aecb57e350fd056"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\private-storage.d.ts",
+      "sha256": "52b54ea495c00c6ef3ff5dc7ce438f52dbf2e2b5d3e24d4a3382c97d6a8f4b93"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\private-storage.js",
+      "sha256": "31de55f0039ca525bbcced852b74d540eaaff457e90c006c8d31a19b78bb168f"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-commands.d.ts",
+      "sha256": "c2de2cccd294ed607fc7e6dd3ad16785324bce36ba6f15c26aa7f9330923785e"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-commands.js",
+      "sha256": "69e04a31f4c19a2074158cc3acaf3089c65590361989322822d918a0ac1454b1"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-file.d.ts",
+      "sha256": "4e21bfee1c5906f8f20087f9ae72e5263fbb0ffffa671ae5c1a8cc1aa11aa6ba"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-file.js",
+      "sha256": "8899b9f57184a6e58bc062f3933a85db91e8a213aee6850f2328c95d5f3de290"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-store.d.ts",
+      "sha256": "09135fbd94c831d7d9d4f49c1f85724c9e878357afc705d33c0905764aef890c"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\profile-store.js",
+      "sha256": "3a7e99c12c914add418aa02a0f786a68b44976d9a415847b900ea76164e629a1"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\proof.d.ts",
+      "sha256": "ad4e0ce17a73a87a9b06cc4474a31f0ccafb51e7d48d3be3a32aa42aac92a3ab"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\proof.js",
+      "sha256": "d291fe192aa4daad4d9afaf8e7db7ee7317167443ee29e9d6438f2fa3284fd6c"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\resources.d.ts",
+      "sha256": "5eb96b948624b3c9df0f53297fba6ee419a5df0b7534602ef287d38ca17bf2fc"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\resources.js",
+      "sha256": "e8eca07e60d78f78322aca49dbf4477d232ed5dabf86bab28401e51b99a85051"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\response-body.d.ts",
+      "sha256": "3d7a623d431bb2d54fa198cac3f515d015a199f0bebaad03333bbde6c7ba7e5b"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\response-body.js",
+      "sha256": "832f94d7cc07c2c16e12d0f7f735ae659fe312b42bf1e4e4a9357c05c5c8f40f"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\secret-store.d.ts",
+      "sha256": "4c18316d12cf78a331b43feb3bff0fb428992aa8262a80b06f573f562ce806ad"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\secret-store.js",
+      "sha256": "a45bedea505695aaff3ad9c91d2781bad8921357d8e2ef06369b8402febd9082"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\target-commands.d.ts",
+      "sha256": "7f450d5d37f29c47a9a51b15e12357a59f3312701535cf67aff862f38b4ab599"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\target-commands.js",
+      "sha256": "060c80aea7d9cb2e70967fc50ebfd9229f7cb375505d6f9022a3aa94224170b1"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\testing-contracts.d.ts",
+      "sha256": "a047c0c75cdf7c06ab00b64a303d2610ad3a20f5dbbd5f265774ea56238e3d39"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\testing-contracts.js",
+      "sha256": "d916ada59c80bbe4086088332602e463a52f409a26271f28c0c927ca6a59f0ee"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\testing.d.ts",
+      "sha256": "98c4757ce4cc613e9620497376c1254b0ce8f0de5d93655c13cb6d7ad0bc1ebd"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\testing.js",
+      "sha256": "09459b7111cdec0f377e97184692ba3a5d10fd70797f89a0495724f8f0ba82ac"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\types.d.ts",
+      "sha256": "10f0c23738cfcf3e8f7f9a1f2c4149ee4adae53e97cd71a54a468afdd1909e7d"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\types.js",
+      "sha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\view.d.ts",
+      "sha256": "bc88aa3aad4f9321537b50dcf82012c62168acf6d3969bb9699445ee9fad5ac6"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\view.js",
+      "sha256": "8f4b56993dd16c5b4068979eb8160621c2d42888ea16f75eaac687b665e5d564"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\windows-dpapi-secret-store.d.ts",
+      "sha256": "54ed3c8518371aad27538dee1db89f5ba6101a71c2f4c89186b9a956d5aa8454"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\dist\\src\\windows-dpapi-secret-store.js",
+      "sha256": "7be98baf26d3100c7403a954dc2e22a8ff7cd2dde394f961c0ba55f3cb82d038"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\package.json",
+      "sha256": "f80740d08d89ca6a1aa9a39b614753a7b8bab8b8ddcb0d4f360d713af92fe949"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\package-lock.json",
+      "sha256": "489683522d22e9c6b7959f6edc9e19e974747b195f23631054ae0b5329644c79"
+    },
+    {
+      "path": "D:\\Work\\Vivarium\\artifacts\\p0-rest-first\\reference\\cli-acquisition\\node_modules\\@eyeauras\\cli-factory\\package.json",
+      "sha256": "4841c8ee946cd4bedd769826e7ea17de3b98ac8ca8185965b21b41df17032a87"
+    }
+  ],
+  "cases": [
+    {
+      "id": "approval:explicit-approval-is-independent-of-agent-eligibility",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"buildType\":{\"id\":\"VivUs013Approval_20261102_19d5ba5953_Project_Build\"}}",
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCJ9fQ==",
+            "bodyBytes": 73,
+            "bodySha256": "222926e629a88e03b5cec82029664bec44e38a84dc4b82b1c055665579534ccb"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjAsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDo2MCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjAiLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCIsIm5hbWUiOiJPd25lZCBhcHByb3ZhbCBjb25zdW1lciIsInByb2plY3ROYW1lIjoiT3duZWQgYXBwcm92YWwgcmVmZXJlbmNlIiwicHJvamVjdElkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3QiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZD9tb2RlPWJ1aWxkcyJ9LCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsImFwcHJvdmFsSW5mbyI6eyJ0aW1lb3V0VGltZXN0YW1wIjoiMjAyNjExMDJUMDU0MTE2KzAwMDAiLCJjb25maWd1cmF0aW9uVmFsaWQiOnRydWUsInVzZXJBcHByb3ZhbHMiOnsiY291bnQiOjEsInVzZXJBcHByb3ZhbCI6W3siYXBwcm92ZWQiOmZhbHNlLCJ1c2VyIjp7InVzZXJuYW1lIjoidml2YXJpdW0tbGFiLWFkbWluIiwiaWQiOjEsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MSJ9fV19LCJncm91cEFwcHJvdmFscyI6eyJjb3VudCI6MCwiZ3JvdXBBcHByb3ZhbCI6W119LCJjb21wb3NpdGVBcHByb3ZhbHMiOnsiY291bnQiOjAsImNvbXBvc2l0ZUFwcHJvdmFsIjpbXX0sImFwcHJvdmFsUmVhc29ucyI6W3siZGVzY3JpcHRpb24iOiJUaGlzIGJ1aWxkIHJlcXVpcmVzIGFwcHJvdmFsIGJlY2F1c2UgaXRzIHBhcmVudCBjb25maWd1cmF0aW9uIGhhcyB0aGUgQnVpbGQgQXBwcm92YWwgZmVhdHVyZSJ9XSwiYnVpbGRDaGFpbkJ1aWxkcyI6W10sInN0YXR1cyI6IndhaXRpbmdGb3JBcHByb3ZhbCJ9LCJxdWV1ZWREYXRlIjoiMjAyNjExMDJUMDU0MDE2KzAwMDAiLCJ0cmlnZ2VyZWQiOnsidHlwZSI6InVzZXIiLCJkYXRlIjoiMjAyNjExMDJUMDU0MDE2KzAwMDAiLCJ1c2VyIjp7InVzZXJuYW1lIjoidml2YXJpdW0tbGFiLWFkbWluIiwiaWQiOjEsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MSJ9fSwiY2hhbmdlcyI6eyJocmVmIjoiL2FwcC9yZXN0L2NoYW5nZXM/bG9jYXRvcj1idWlsZDooaWQ6NjApIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6NjApKSJ9LCJhcnRpZmFjdHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6NjAvYXJ0aWZhY3RzL2NoaWxkcmVuLyJ9LCJ2Y3NMYWJlbHMiOltdLCJjdXN0b21pemF0aW9uIjp7fX0=",
+            "bodyBytes": 1595,
+            "bodySha256": "7aa5e63a78af6dcd250053991935e6f37f34d091a759db639bb6da86e8a77ef1"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:60",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjAsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjAiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTYrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "2d3b9b121c178a4d6010ab4f42103d1051e23afa2069216cd03b8d4b6baa7d36"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:60/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6dHJ1ZSwidGltZW91dFRpbWVzdGFtcCI6IjIwMjYxMTAyVDA1NDExNiswMDAwIiwiY29uZmlndXJhdGlvblZhbGlkIjp0cnVlLCJzdGF0dXMiOiJ3YWl0aW5nRm9yQXBwcm92YWwifQ==",
+            "bodyBytes": 133,
+            "bodySha256": "991fc8f3cefc21298293be9b1bb64b10d3063c30d3733930bc7132ef1b6c2d48"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue/id:60/approve",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp",
+              "approveAll": "false"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "body": "",
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQxMTYrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoiYXBwcm92ZWQifQ==",
+            "bodyBytes": 124,
+            "bodySha256": "a4780637c78636f2f91f94419217b60dbece2938da5489f09b178616bb4c270e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:60/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQxMTYrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoiYXBwcm92ZWQifQ==",
+            "bodyBytes": 124,
+            "bodySha256": "a4780637c78636f2f91f94419217b60dbece2938da5489f09b178616bb4c270e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:60",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjAsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjAiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhlcmUgYXJlIG5vIGlkbGUgY29tcGF0aWJsZSBhZ2VudHMgd2hpY2ggY2FuIHJ1biB0aGlzIGJ1aWxkIiwicXVldWVkRGF0ZSI6IjIwMjYxMTAyVDA1NDAxNiswMDAwIn0=",
+            "bodyBytes": 305,
+            "bodySha256": "5c7da9f3dc3660ff79b4990bc2ffeeccb9b9b80ade7203224d50cfc483453c63"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue/id:60/approve",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp",
+              "approveAll": "false"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "body": "",
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDAgKEJhZCBSZXF1ZXN0KS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXIucmVzdC5lcnJvcnMuQmFkUmVxdWVzdEV4Y2VwdGlvbjogVGhpcyBidWlsZCBjYW5ub3QgYmUgYXBwcm92ZWQsIGFwcHJvdmFsIHN0YXR1cyBpczogYXBwcm92ZWQuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IlRoaXMgYnVpbGQgY2Fubm90IGJlIGFwcHJvdmVkLCBhcHByb3ZhbCBzdGF0dXMgaXM6IGFwcHJvdmVkIn1dfQ==",
+            "bodyBytes": 319,
+            "bodySha256": "5385b9c30684ef9999e5e61695c2a04086657489f826a7563e280dd02d32b99d"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:60/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQxMTYrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoiYXBwcm92ZWQifQ==",
+            "bodyBytes": 124,
+            "bodySha256": "a4780637c78636f2f91f94419217b60dbece2938da5489f09b178616bb4c270e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/builds/id:60",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"comment\":\"Owned approval capture cleanup\",\"readdIntoQueue\":false}",
+            "bodyBase64": "eyJjb21tZW50IjoiT3duZWQgYXBwcm92YWwgY2FwdHVyZSBjbGVhbnVwIiwicmVhZGRJbnRvUXVldWUiOmZhbHNlfQ==",
+            "bodyBytes": 67,
+            "bodySha256": "043577e77e8080c78a1bcf92e10522412b250366c89e1bee52fa697e41020dc0"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjAsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJudW1iZXIiOiJOL0EiLCJzdGF0dXMiOiJVTktOT1dOIiwic3RhdGUiOiJmaW5pc2hlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlVzMDEzQXBwcm92YWxfMjAyNjExMDJfMTlkNWJhNTk1M19Qcm9qZWN0X0J1aWxkLzYwIiwic3RhdHVzVGV4dCI6IkNhbmNlbGVkIiwiY2FuY2VsZWRJbmZvIjp7InRpbWVzdGFtcCI6IjIwMjYxMTAyVDA1NDAxOCswMDAwIn0sInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTYrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAyVDA1NDAxOCswMDAwIiwiZmluaXNoRGF0ZSI6IjIwMjYxMTAyVDA1NDAxOCswMDAwIiwiYWdlbnQiOnsibmFtZSI6Ik4vQSJ9fQ==",
+            "bodyBytes": 481,
+            "bodySha256": "f24f824bac13945a32a40b21a3fdf8ad77c0cd66f503255d1f08492406d11870"
+          }
+        }
+      ],
+      "acquisition_group_id": "explicit-approval-is-independent-of-agent-eligibility"
+    },
+    {
+      "id": "approval:unknown-approver-keeps-literal-validation-and-error",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/buildTypes/id:VivUs013Approval_20261102_19d5ba5953_Project_Build/features",
+            "query": {
+              "fields": "feature(id,type,disabled,inherited,properties(property(name,value,inherited,type(rawValue))))"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"feature\":[{\"type\":\"approval-feature\",\"disabled\":false,\"properties\":{\"property\":[{\"name\":\"rules\",\"value\":\"user:VivUs013Approval_20261102_19d5ba5953_MissingUser\"},{\"name\":\"timeout\",\"value\":\"1\"},{\"name\":\"manualStartIsApproval\",\"value\":\"false\"}]}}]}",
+            "bodyBase64": "eyJmZWF0dXJlIjpbeyJ0eXBlIjoiYXBwcm92YWwtZmVhdHVyZSIsImRpc2FibGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6InJ1bGVzIiwidmFsdWUiOiJ1c2VyOlZpdlVzMDEzQXBwcm92YWxfMjAyNjExMDJfMTlkNWJhNTk1M19NaXNzaW5nVXNlciJ9LHsibmFtZSI6InRpbWVvdXQiLCJ2YWx1ZSI6IjEifSx7Im5hbWUiOiJtYW51YWxTdGFydElzQXBwcm92YWwiLCJ2YWx1ZSI6ImZhbHNlIn1dfX1dfQ==",
+            "bodyBytes": 247,
+            "bodySha256": "05d7f0608a915b3abcda0be09e01a00a72fb8af71fd4e2462718aef788f35714"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJmZWF0dXJlIjpbeyJpZCI6ImFwcHJvdmFsLWZlYXR1cmUiLCJ0eXBlIjoiYXBwcm92YWwtZmVhdHVyZSIsImRpc2FibGVkIjpmYWxzZSwiaW5oZXJpdGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6Im1hbnVhbFN0YXJ0SXNBcHByb3ZhbCIsInZhbHVlIjoiZmFsc2UifSx7Im5hbWUiOiJydWxlcyIsInZhbHVlIjoidXNlcjpWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfTWlzc2luZ1VzZXIifSx7Im5hbWUiOiJ0aW1lb3V0IiwidmFsdWUiOiIxIn1dfX1dfQ==",
+            "bodyBytes": 289,
+            "bodySha256": "522e42964fcff0f5da57afbe168de4f725ed99ddd433c7d87e0fdb927bcba293"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"buildType\":{\"id\":\"VivUs013Approval_20261102_19d5ba5953_Project_Build\"}}",
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCJ9fQ==",
+            "bodyBytes": 73,
+            "bodySha256": "222926e629a88e03b5cec82029664bec44e38a84dc4b82b1c055665579534ccb"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjEsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InVua25vd24iLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCIsIm5hbWUiOiJPd25lZCBhcHByb3ZhbCBjb25zdW1lciIsInByb2plY3ROYW1lIjoiT3duZWQgYXBwcm92YWwgcmVmZXJlbmNlIiwicHJvamVjdElkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3QiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZD9tb2RlPWJ1aWxkcyJ9LCJhcHByb3ZhbEluZm8iOnsidGltZW91dFRpbWVzdGFtcCI6IjIwMjYxMTAyVDA1NDExOCswMDAwIiwiY29uZmlndXJhdGlvblZhbGlkIjp0cnVlLCJ1c2VyQXBwcm92YWxzIjp7ImNvdW50IjoxLCJ1c2VyQXBwcm92YWwiOlt7ImFwcHJvdmVkIjpmYWxzZSwidXNlciI6eyJ1c2VybmFtZSI6IlZpdlVzMDEzQXBwcm92YWxfMjAyNjExMDJfMTlkNWJhNTk1M19NaXNzaW5nVXNlcihkZWxldGVkIHVzZXIpIiwiaWQiOi0xLCJocmVmIjoiL2FwcC9yZXN0L3VzZXJzL2lkOi0xIn19XX0sImdyb3VwQXBwcm92YWxzIjp7ImNvdW50IjowLCJncm91cEFwcHJvdmFsIjpbXX0sImNvbXBvc2l0ZUFwcHJvdmFscyI6eyJjb3VudCI6MCwiY29tcG9zaXRlQXBwcm92YWwiOltdfSwiYXBwcm92YWxSZWFzb25zIjpbeyJkZXNjcmlwdGlvbiI6IlRoaXMgYnVpbGQgcmVxdWlyZXMgYXBwcm92YWwgYmVjYXVzZSBpdHMgcGFyZW50IGNvbmZpZ3VyYXRpb24gaGFzIHRoZSBCdWlsZCBBcHByb3ZhbCBmZWF0dXJlIn1dLCJidWlsZENoYWluQnVpbGRzIjpbXSwic3RhdHVzIjoid2FpdGluZ0ZvckFwcHJvdmFsIn0sImNoYW5nZXMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9jaGFuZ2VzP2xvY2F0b3I9YnVpbGQ6KGlkOjYxKSJ9LCJyZXZpc2lvbnMiOnsiY291bnQiOjB9LCJwcm9ibGVtT2NjdXJyZW5jZXMiOnsiY291bnQiOjEsImhyZWYiOiIvYXBwL3Jlc3QvcHJvYmxlbU9jY3VycmVuY2VzP2xvY2F0b3I9YnVpbGQ6KGlkOjYxKSJ9LCJhcnRpZmFjdHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6NjEvYXJ0aWZhY3RzL2NoaWxkcmVuLyJ9LCJ2Y3NMYWJlbHMiOltdLCJjdXN0b21pemF0aW9uIjp7fX0=",
+            "bodyBytes": 1337,
+            "bodySha256": "a83a4fcf05e44984a15a0f2cf8d5648d19cc3e175a897e85dba33ec18057ddba"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:61",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjEsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJudW1iZXIiOiJOL0EiLCJzdGF0dXMiOiJGQUlMVVJFIiwic3RhdGUiOiJmaW5pc2hlZCIsImZhaWxlZFRvU3RhcnQiOnRydWUsInBlcnNvbmFsIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQvNjEiLCJzdGF0dXNUZXh0IjoiRmFpbGVkIHRvIHN0YXJ0IiwicXVldWVkRGF0ZSI6IjIwMjYxMTAyVDA1NDAxOCswMDAwIiwic3RhcnREYXRlIjoiMjAyNjExMDJUMDU0MDE4KzAwMDAiLCJmaW5pc2hEYXRlIjoiMjAyNjExMDJUMDU0MDE4KzAwMDAiLCJhZ2VudCI6eyJuYW1lIjoiTi9BIn19",
+            "bodyBytes": 435,
+            "bodySha256": "1b56e16b6d76c7445f0444669260ee9587280aaf4e19554008977f646cb510d3"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:61/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQwMTgrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoid2FpdGluZ0ZvckFwcHJvdmFsIn0=",
+            "bodyBytes": 134,
+            "bodySha256": "6bc7d805df9e800fcf73345680cf45e55ad34c990f0f5e4a4f58564d05bafb9e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue/id:61/approve",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp",
+              "approveAll": "false"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "body": "",
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQwMTgrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoid2FpdGluZ0ZvckFwcHJvdmFsIn0=",
+            "bodyBytes": 134,
+            "bodySha256": "6bc7d805df9e800fcf73345680cf45e55ad34c990f0f5e4a4f58564d05bafb9e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:61/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQwMTgrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoid2FpdGluZ0ZvckFwcHJvdmFsIn0=",
+            "bodyBytes": 134,
+            "bodySha256": "6bc7d805df9e800fcf73345680cf45e55ad34c990f0f5e4a4f58564d05bafb9e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:61",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjEsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJudW1iZXIiOiJOL0EiLCJzdGF0dXMiOiJGQUlMVVJFIiwic3RhdGUiOiJmaW5pc2hlZCIsImZhaWxlZFRvU3RhcnQiOnRydWUsInBlcnNvbmFsIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQvNjEiLCJzdGF0dXNUZXh0IjoiRmFpbGVkIHRvIHN0YXJ0IGJ1aWxkIiwicXVldWVkRGF0ZSI6IjIwMjYxMTAyVDA1NDAxOCswMDAwIiwic3RhcnREYXRlIjoiMjAyNjExMDJUMDU0MDE4KzAwMDAiLCJmaW5pc2hEYXRlIjoiMjAyNjExMDJUMDU0MDE4KzAwMDAiLCJhZ2VudCI6eyJuYW1lIjoiTi9BIn19",
+            "bodyBytes": 441,
+            "bodySha256": "74d330a8cc898ebea6b030beefe56db0d5b16c78320c40ef7cd24afa4f9b1e53"
+          }
+        }
+      ],
+      "acquisition_group_id": "unknown-approver-keeps-literal-validation-and-error"
+    },
+    {
+      "id": "approval:approval-timeout-literal-terminal-projection",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/buildTypes/id:VivUs013Approval_20261102_19d5ba5953_Project_Build/features",
+            "query": {
+              "fields": "feature(id,type,disabled,inherited,properties(property(name,value,inherited,type(rawValue))))"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"feature\":[{\"type\":\"approval-feature\",\"disabled\":false,\"properties\":{\"property\":[{\"name\":\"rules\",\"value\":\"user:vivarium-lab-admin\"},{\"name\":\"timeout\",\"value\":\"1\"},{\"name\":\"manualStartIsApproval\",\"value\":\"false\"}]}}]}",
+            "bodyBase64": "eyJmZWF0dXJlIjpbeyJ0eXBlIjoiYXBwcm92YWwtZmVhdHVyZSIsImRpc2FibGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6InJ1bGVzIiwidmFsdWUiOiJ1c2VyOnZpdmFyaXVtLWxhYi1hZG1pbiJ9LHsibmFtZSI6InRpbWVvdXQiLCJ2YWx1ZSI6IjEifSx7Im5hbWUiOiJtYW51YWxTdGFydElzQXBwcm92YWwiLCJ2YWx1ZSI6ImZhbHNlIn1dfX1dfQ==",
+            "bodyBytes": 217,
+            "bodySha256": "ea4d87cc8f28ee84e2d7b85bc502f8af40b337020506a9e831d144b1c539a56b"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJmZWF0dXJlIjpbeyJpZCI6ImFwcHJvdmFsLWZlYXR1cmUiLCJ0eXBlIjoiYXBwcm92YWwtZmVhdHVyZSIsImRpc2FibGVkIjpmYWxzZSwiaW5oZXJpdGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6Im1hbnVhbFN0YXJ0SXNBcHByb3ZhbCIsInZhbHVlIjoiZmFsc2UifSx7Im5hbWUiOiJydWxlcyIsInZhbHVlIjoidXNlcjp2aXZhcml1bS1sYWItYWRtaW4ifSx7Im5hbWUiOiJ0aW1lb3V0IiwidmFsdWUiOiIxIn1dfX1dfQ==",
+            "bodyBytes": 259,
+            "bodySha256": "cae64a50dd1c44a3638774881c4c112785f2a5786c328fc062b66c876b1466c7"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "body": "{\"buildType\":{\"id\":\"VivUs013Approval_20261102_19d5ba5953_Project_Build\"}}",
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCJ9fQ==",
+            "bodyBytes": 73,
+            "bodySha256": "222926e629a88e03b5cec82029664bec44e38a84dc4b82b1c055665579534ccb"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDo2MiIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZCIsIm5hbWUiOiJPd25lZCBhcHByb3ZhbCBjb25zdW1lciIsInByb2plY3ROYW1lIjoiT3duZWQgYXBwcm92YWwgcmVmZXJlbmNlIiwicHJvamVjdElkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3QiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0FwcHJvdmFsXzIwMjYxMTAyXzE5ZDViYTU5NTNfUHJvamVjdF9CdWlsZD9tb2RlPWJ1aWxkcyJ9LCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsImFwcHJvdmFsSW5mbyI6eyJ0aW1lb3V0VGltZXN0YW1wIjoiMjAyNjExMDJUMDU0MTE5KzAwMDAiLCJjb25maWd1cmF0aW9uVmFsaWQiOnRydWUsInVzZXJBcHByb3ZhbHMiOnsiY291bnQiOjEsInVzZXJBcHByb3ZhbCI6W3siYXBwcm92ZWQiOmZhbHNlLCJ1c2VyIjp7InVzZXJuYW1lIjoidml2YXJpdW0tbGFiLWFkbWluIiwiaWQiOjEsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MSJ9fV19LCJncm91cEFwcHJvdmFscyI6eyJjb3VudCI6MCwiZ3JvdXBBcHByb3ZhbCI6W119LCJjb21wb3NpdGVBcHByb3ZhbHMiOnsiY291bnQiOjAsImNvbXBvc2l0ZUFwcHJvdmFsIjpbXX0sImFwcHJvdmFsUmVhc29ucyI6W3siZGVzY3JpcHRpb24iOiJUaGlzIGJ1aWxkIHJlcXVpcmVzIGFwcHJvdmFsIGJlY2F1c2UgaXRzIHBhcmVudCBjb25maWd1cmF0aW9uIGhhcyB0aGUgQnVpbGQgQXBwcm92YWwgZmVhdHVyZSJ9XSwiYnVpbGRDaGFpbkJ1aWxkcyI6W10sInN0YXR1cyI6IndhaXRpbmdGb3JBcHByb3ZhbCJ9LCJxdWV1ZWREYXRlIjoiMjAyNjExMDJUMDU0MDE5KzAwMDAiLCJ0cmlnZ2VyZWQiOnsidHlwZSI6InVzZXIiLCJkYXRlIjoiMjAyNjExMDJUMDU0MDE5KzAwMDAiLCJ1c2VyIjp7InVzZXJuYW1lIjoidml2YXJpdW0tbGFiLWFkbWluIiwiaWQiOjEsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MSJ9fSwiY2hhbmdlcyI6eyJocmVmIjoiL2FwcC9yZXN0L2NoYW5nZXM/bG9jYXRvcj1idWlsZDooaWQ6NjIpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6NjIpKSJ9LCJhcnRpZmFjdHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6NjIvYXJ0aWZhY3RzL2NoaWxkcmVuLyJ9LCJ2Y3NMYWJlbHMiOltdLCJjdXN0b21pemF0aW9uIjp7fX0=",
+            "bodyBytes": 1595,
+            "bodySha256": "04eae9cc1568a401a13cb8569cbfab6a94ee7d34f56cb1bc7f8909ea733e6192"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:62/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6dHJ1ZSwidGltZW91dFRpbWVzdGFtcCI6IjIwMjYxMTAyVDA1NDExOSswMDAwIiwiY29uZmlndXJhdGlvblZhbGlkIjp0cnVlLCJzdGF0dXMiOiJ3YWl0aW5nRm9yQXBwcm92YWwifQ==",
+            "bodyBytes": 133,
+            "bodySha256": "5b39e0aa518bfde8249d13191c81225f1f696c6b5934ad03375f8c1947a572bc"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InF1ZXVlZCIsImZhaWxlZFRvU3RhcnQiOmZhbHNlLCJwZXJzb25hbCI6ZmFsc2UsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGQvNjIiLCJxdWV1ZVBvc2l0aW9uIjoxLCJ3YWl0UmVhc29uIjoiVGhpcyBidWlsZCBzaG91bGQgYmUgYXBwcm92ZWQgYmVmb3JlIGl0IG1heSBzdGFydCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwMlQwNTQwMTkrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "06ac02defa6a1e5e0a5ea91ee306cae847f7b169ef142c42520aa21da1cb338e"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJzdGF0ZSI6InVua25vd24iLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlfQ==",
+            "bodyBytes": 133,
+            "bodySha256": "330ead49c151206b6982ab19e8c94ab96b99bc6bef2a30940508ce66b07425a2"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6NjIsImJ1aWxkVHlwZUlkIjoiVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQiLCJudW1iZXIiOiJOL0EiLCJzdGF0dXMiOiJGQUlMVVJFIiwic3RhdGUiOiJmaW5pc2hlZCIsImZhaWxlZFRvU3RhcnQiOnRydWUsInBlcnNvbmFsIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNBcHByb3ZhbF8yMDI2MTEwMl8xOWQ1YmE1OTUzX1Byb2plY3RfQnVpbGQvNjIiLCJzdGF0dXNUZXh0IjoiRmFpbGVkIHRvIHN0YXJ0IGJ1aWxkIiwicXVldWVkRGF0ZSI6IjIwMjYxMTAyVDA1NDAxOSswMDAwIiwic3RhcnREYXRlIjoiMjAyNjExMDJUMDU0MTE5KzAwMDAiLCJmaW5pc2hEYXRlIjoiMjAyNjExMDJUMDU0MTE5KzAwMDAiLCJhZ2VudCI6eyJuYW1lIjoiTi9BIn19",
+            "bodyBytes": 441,
+            "bodySha256": "d6e8e7809079194a97acd5ce7a62a9ccb916b3504a5a6218c2f9c2b7b2e56b4c"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue/id:62/approvalInfo",
+            "query": {
+              "fields": "status,canBeApprovedByCurrentUser,configurationValid,timeoutTimestamp"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjYW5CZUFwcHJvdmVkQnlDdXJyZW50VXNlciI6ZmFsc2UsInRpbWVvdXRUaW1lc3RhbXAiOiIyMDI2MTEwMlQwNTQxMTkrMDAwMCIsImNvbmZpZ3VyYXRpb25WYWxpZCI6dHJ1ZSwic3RhdHVzIjoidGltZWRPdXQifQ==",
+            "bodyBytes": 124,
+            "bodySha256": "0793d5e0148318988080147aafba8da3c82498f5730f7ec2f1bc6684afe39602"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:62/problemOccurrences",
+            "query": {
+              "fields": "count,problemOccurrence(id,type,identity,currentlyMuted,problem(id),build(id))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjb3VudCI6MSwicHJvYmxlbU9jY3VycmVuY2UiOlt7ImlkIjoiYnVpbGQ6KGlkOjYyKSxwcm9ibGVtOihpZDo2KSIsInR5cGUiOiJQUkVQQVJBVElPTl9GQUlMVVJFX1RZUEUiLCJpZGVudGl0eSI6Ii0zMTU3NTMwNDciLCJjdXJyZW50bHlNdXRlZCI6ZmFsc2UsInByb2JsZW0iOnsiaWQiOiI2In0sImJ1aWxkIjp7ImlkIjo2Mn19XX0=",
+            "bodyBytes": 191,
+            "bodySha256": "3578766982c802374a120058a6224c960f517260b36652afefeaac29622bd807"
+          }
+        }
+      ],
+      "acquisition_group_id": "approval-timeout-literal-terminal-projection"
+    }
+  ],
+  "exchange_count": 83,
+  "limits": [
+    "One administrator, one owned configuration and zero Agents; no restricted principal, group/composite/chain-wide or untrusted approval claim.",
+    "Manual start is explicitly NOT approval; timeout explicitly one minute, not an absent-default observation.",
+    "Timeout reads as finished/FAILURE/failedToStart without canceledInfo; approval status timedOut. Do not replace literal projection with a generic cancelled state from help.",
+    "Unknown-user rule reports configurationValid=true and a deleted-user sentinel, then failed-to-start; this is not a malformed-rule configurationValid=false oracle.",
+    "Repeat approval on the already approved Build returns400. Unknown-user approval request returns200 but remains waitingForApproval; no blanket repeat or success-implies-approved inference.",
+    "Prior two acquisitions failed local guessed observation assertions, with project/gates cleaned. Their immutable diagnostics are not substituted for this completed literal acquisition.",
+    "Reference and replay controls are not Vivarium product GREEN or additional known product cases."
+  ]
+}

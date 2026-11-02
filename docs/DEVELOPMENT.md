@@ -4,7 +4,70 @@ How Vivarium itself is built, tested, released, and upgraded. The *decisions* li
 [`ARCHITECTURE.md`](ARCHITECTURE.md) (D19 — portable distribution, D20 — test tiers); this file is
 the practical companion.
 
+## Acceptance hierarchy and evidence selection (D37)
+
+System AC are canonical English business scenarios in [docs/acceptance](acceptance/README.md).
+They are currently specified-unbound, not passing tests. The [testing model](design/testing-model.md)
+links them to TCM base-model invariants, exact native/TeamCity REST variants and supporting component
+checks. Existing D20 tiers below describe execution boundaries, not the requirement hierarchy.
+
+Choose risk/observable/oracle and smallest sufficient composition before runner/topology. Reuse
+existing tests and Automation/Reqnroll; a business scenario need not be UI/E2E, but actual process/UI/
+storage claims require those real boundaries. Each milestone runs affected checks and a small
+cumulative implemented TeamCity base suite with relevant extension-neutrality checks. Keep long
+correctness, ordinary feedback and cost diagnostics distinct, with explicit commands and gaps.
+
+Current wiring: `Vivarium.Tests` uses NUnit/Test SDK. Reusing Automation/Reqnroll describes the
+pinned external consumer integration to be delivered through #15/#40, not existing executable
+Vivarium Gherkin bindings. P0 #35 starts on the current NUnit stack; specified features remain
+unbound until their actual integration and evidence exist.
+
+## API ledger, review and verification cadence (D39)
+
+Follow [task-backed API delivery](design/api-ledger-delivery.md). Under D40, implement finished
+[subsystems](design/subsystems.md); their slice tasks parent same-milestone REST-contract/acceptance
+subtasks. Milestones aggregate those slices and their parent owns final closure. Publish mechanical slice
+and global API-complete with exact scope and valid case evidence; unknown denominators stay unknown.
+Read ledger/results for status without running tests. During TDD run affected cases; batch broader
+checks at coherent handoff/milestone gates and reuse unchanged valid evidence. Do not duplicate
+full REST/E2E/platform runs or formal reviews per task/edit/reviewer. Required checks still apply.
+
+At milestone end perform independent aggregate correctness/domain/simplicity and explicit
+Security/Adversarial review at the exact revision. Fix all findings and introduced/exposed technical
+tails through same-milestone tasks, verify narrowly, renew affected verdicts, then deliver/close.
+No debts carried into next-milestone implementation; no security follow-up waiver at closure.
+
+The [offline ledger command](design/api-ledger-accounting.md) reads local structured registers,
+standard TRX, hashes and explicit candidate reuse decisions. It does not launch tests/builds or probe
+TeamCity. Its generated status remains partial with unknown global scope and API-complete false.
+
 ## Building
+
+The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
+ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
+invoked `tests/Vivarium.TeamCity.Conformance` project; its raw five-case product-ready run remains nonzero while
+the compatible routes are missing. No delivered TeamCity GREEN selection exists yet, and broader
+P0 composition/accounting/acceptance gates remain open. The [local mutation cohort](design/teamcity-rest-local-mutations.md)
+separately records twelve observed/replay-bound workflows and ten product-prerequisite-blocked variants.
+
+D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first
+P0 harness delivery: standard solution checks, reference-replay control, delivered conformance cases
+and the full raw product report. The implementation must publish exact commands and wire every
+target into required verification. Reuse current NUnit/Test SDK and standard result artifacts; no
+replacement runner is implied. A dedicated conformance target may remain outside the ordinary
+all-GREEN selection while required behavior is unfinished. All targets remain available/buildable;
+execute them at the [declared due checkpoints and reuse rules](design/api-ledger-delivery.md#valid-evidence-reuse-including-delivery-to-main),
+including the mandatory first raw baseline and required real milestone/cumulative acceptance.
+Ordinary handoff is root build/test plus affected checks; target availability imposes no automatic
+full future-known-RED run per task or status query.
+Raw full-suite RED remains visible/nonzero; passing a declared partial gate does not mean full
+compatibility. Setup failures and regressions in previously passing cases cannot be allowed RED.
+
+P0.REST.2 first proves a small deterministic composition around production services/HTTP middleware,
+with controlled timers and scripted external actors. WireMock is the HTTP replay adapter, not a
+required extra hop for every case or a second TeamCity model. Measure code/data/setup/run/cleanup
+cost and prove reset/isolation before expanding the corpus. Real PG/Git/Storage, Kestrel/CLI/Agent
+and process/platform claims retain their corresponding real checks; see the linked D38 contract.
 
 .NET 10 solution; `dotnet build` / `dotnet test` at the root remain the required baseline
 (AGENTS.md → Verification). `global.json` pins the SDK, package references pin Cake.Frosting and
@@ -189,6 +252,12 @@ additional operating systems remain release quality gates. Binaries are unsigned
 SmartScreen/MOTW and macOS Gatekeeper friction remain documented limitations (§13).
 
 ## Upgrading a farm
+
+The controller package instructions immediately below describe the **current legacy SQLite
+prototype**, not the D35 replacement backup contract. The new Host uses PostgreSQL, Storage, private
+Chiral settings and durable authentication keys. Its supported release/restore procedure must prove
+the [complete backup boundary](design/persistence.md#backup-and-restore); copying `vivarium-data/`
+alone is insufficient when resources are external. Agent bootstrap freeze rules remain in force.
 
 - **Controller (Docker)**: back up the `vivarium-data` volume, then run
   `docker compose -f deploy/docker-compose.yml pull` followed by

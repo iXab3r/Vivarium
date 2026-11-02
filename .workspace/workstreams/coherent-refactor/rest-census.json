@@ -1,0 +1,79 @@
+{
+  "reference_revision": "b158fe03eab3c31982a21b36c278f690f6b541d9",
+  "reference_cli_version": "0.5.2",
+  "installed_cli_version": "0.5.2",
+  "installed_client_sha256": "83a06b5d92ad2409bbdaac6f0df45c9765a0ae42f5256d05c56072d886f4cf07",
+  "installed_readme_claimed_method_paths": 449,
+  "fixture_tables": 10,
+  "fixture_rows": 456,
+  "request_rows": 432,
+  "preflight_rows": 24,
+  "unique_concrete_method_paths": 436,
+  "counts_by_family": {
+    "Identity/access": 55,
+    "Server/admin": 26,
+    "Protocol/discovery": 4,
+    "Definitions": 116,
+    "Catalog": 71,
+    "VCS": 35,
+    "Agent pools": 14,
+    "Queue": 12,
+    "Agents": 14,
+    "Files/logs": 20,
+    "Builds/results": 49,
+    "Provider/cloud": 10,
+    "Audit": 2,
+    "Deployments": 9,
+    "Tests/triage": 19
+  },
+  "implemented_teamcity_facade_routes": 0,
+  "limitations": [
+    "Synthetic fixtures, not live reference results or executed tests.",
+    "Published npm metadata has no gitHead; matching source/package version is not installed-binary provenance proof. Runtime file hash is recorded separately.",
+    "Concrete example paths are not normalized API templates; do not compare this count to the README route claim.",
+    "Inline test handlers, all client variants and full server OpenAPI remain separate reconciliation inputs.",
+    "Fixture-default media/status requires harness inspection before a protocol contract is frozen."
+  ],
+  "input_hashes": [
+    {
+      "path": "integrations/teamcity/tests/admin-cases.ts",
+      "sha256": "d3f38d4cd035b5690d94515d90155e8416eec861dbe6e2e7531f349357caf82e"
+    },
+    {
+      "path": "integrations/teamcity/tests/advanced-authoring-cases.ts",
+      "sha256": "22abbb49503678a8d81b5363bd9696fd2643c6fa830f8e14ce20c304a94943cd"
+    },
+    {
+      "path": "integrations/teamcity/tests/authoring-cases.ts",
+      "sha256": "d9c8ad4b8fb088d4cf1c306249cb002f265d27d2f4100b2c0145e992d7d1fc95"
+    },
+    {
+      "path": "integrations/teamcity/tests/bulk-configuration-cases.ts",
+      "sha256": "695e3ee233074296b17d2e20cb9a29c8fef1fcac4f3ee5f6c8646c390e02abce"
+    },
+    {
+      "path": "integrations/teamcity/tests/configuration-cases.ts",
+      "sha256": "02009b99941afd4b51babb8990328c80b6d29d7e7f600560e607fccc93b96139"
+    },
+    {
+      "path": "integrations/teamcity/tests/files-cases.ts",
+      "sha256": "ec4f083eae9ded674c980881cd6e5fbfa875e9bef5bfe05432eea8fb20068619"
+    },
+    {
+      "path": "integrations/teamcity/tests/infrastructure-cases.ts",
+      "sha256": "b66243d4ac120e89c8f5374a32bdf92d3090b7f6762da7c2399f82a0ca660238"
+    },
+    {
+      "path": "integrations/teamcity/tests/operator-cases.ts",
+      "sha256": "94eda92318500c8338c7287a4c4e24024eba28714e2e462eb43c710ab31237d7"
+    },
+    {
+      "path": "integrations/teamcity/tests/system-cases.ts",
+      "sha256": "9f0d218193bef5e77ad2d2d4074d089bee1bd0a50ecbb401ca5f6a7c53ee972c"
+    },
+    {
+      "path": "integrations/teamcity/tests/triage-cases.ts",
+      "sha256": "c7e6c0a9254416f9c6130354d366b9779c8bd9485881411db29911d2918c30cc"
+    }
+  ]
+}

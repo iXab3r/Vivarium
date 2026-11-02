@@ -279,7 +279,7 @@ public sealed class AgentConfigurationReconciliationMonitorTests
         spec:
           enabled: {enabled.ToString().ToLowerInvariant()}
 
-        """;
+        """.ReplaceLineEndings("\n");
 
     private static Task CommitExternalAsync(string repositoryPath, string message) =>
         RunGitAsync(

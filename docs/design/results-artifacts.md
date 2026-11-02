@@ -10,6 +10,12 @@ This document is the focused design for centralized TeamCity-style build/test re
 If implementation requires a contradictory choice, the architecture decision must be updated in the
 same change before code lands.
 
+D32's [behavioral parity contract](teamcity-parity.md#9-tests-and-individual-test-history) makes
+individual test history, durations, details/attachments, first/new/fixed failures, triage and retained
+imported timelines required migration surfaces. JUnit for the current nextest/Node/Vitest/Playwright
+producers is required alongside .NET/TRX. The existing TRX-only implementation does not close those
+gates. PostgreSQL is the new business-persistence target; SQLite passages describe current foundations.
+
 The goal is a durable chain of evidence:
 
 ```text
@@ -151,7 +157,7 @@ permission to read it.
 
 A finalization attempt first waits for the Logs Expert's store to durably seal contiguous ranges
 through every declared watermark. The returned immutable log-seal identity is then an input to one
-serialized SQLite transaction, which must:
+PostgreSQL transaction, which must preserve the same durable result boundary:
 
 1. establish that no different terminal result has already won;
 2. persist the verified log-seal identity, watermarks, and log references;
@@ -521,10 +527,12 @@ versioned resources from day one:
 | `GET /api/v1/builds/{buildId}/matrix` | For a composite/matrix `Build`, paged/sectioned stable-test × scenario projection with iteration summaries and child-build links. |
 | `GET /api/v1/builds/{buildId}/log` | Logs Expert-owned stream/read model used by semantic links. |
 
-Requirements common to these resources:
+Requirements common to these native `/api/v1` resources follow below. Compatible `/app/rest`
+resources share the domain evidence and authorization but retain their reference IDs, media,
+pagination/errors and completion behavior; do not impose these native envelopes or headers on them.
 
 - browser UI and external clients consume the same REST application service; the UI does not read
-  SQLite or internal singleton state directly;
+  business storage or internal singleton state directly;
 - project/build authorization is checked before lookup details can reveal resource existence;
 - stable opaque ids, additive schemas, consistent problem details, cursor pagination, sparse field or
   expansion support, and resumable/event resources where live data warrants them;
@@ -559,7 +567,7 @@ states for a TeamCity-shaped experience:
   cancellation states, and child-build drill-down.
 - Composite: child status/provenance without flattening child evidence.
 
-The API, not React components, owns status rollup and identity. The UI Expert owns Workbench parts,
+The API, not TypeScript components, owns status rollup and identity. The UI Expert owns Workbench parts,
 routes, commands, accessibility, virtualized tables, colors, icons, and responsive behavior. Result
 states must always have textual labels; color alone is insufficient.
 
@@ -826,7 +834,7 @@ model additively.
 4. What are the first-release artifact/report/log quotas and inherited retention defaults?
 5. Does sensitive-artifact classification require per-entry ACLs, or is a separate project-level
    permission sufficient initially?
-6. Which fields are frozen in the public v1 REST representation before the React UI begins consuming
+6. Which fields are frozen in the public v1 REST representation before the TypeScript UI begins consuming
    it?
 7. How long are raw reports retained after normalized occurrences, and may metadata survive deliberate
    artifact expiration?

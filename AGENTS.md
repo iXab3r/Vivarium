@@ -1,10 +1,12 @@
 # Vivarium Project Notes
 
-Vivarium is an OSS TeamCity-style test farm plus AgentExplorer fleet manager. One cross-platform agent runs
+Vivarium is an OSS TeamCity-style CI build server and test farm plus AgentExplorer fleet manager. One cross-platform agent runs
 jobs and safe remote operations on user-provided physical machines first and on snapshot-managed VMs
 later, producing centralized test × scenario results across Windows, Linux, and macOS.
 
-> **Docs map:** this file (AGENTS.md) holds the *rules*; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+> **Docs map:** this file (AGENTS.md) holds the *rules*;
+> [`docs/acceptance/`](docs/acceptance/README.md) holds expected business behavior and lifecycle AC;
+> [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 > holds the *shape* (all adopted decisions, numbered D1…); [`docs/design/`](docs/design/README.md)
 > holds focused designs; [`docs/roles/`](docs/roles/README.md) routes expert context;
 > [`docs/ROADMAP.md`](docs/ROADMAP.md) holds
@@ -19,6 +21,13 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
+The immediate product priority is replacing the owner's TeamCity infrastructure without functional
+loss, including individual test history, Agent requirements/compatibility, durable logs and operator
+workflows. [Architecture D32](docs/ARCHITECTURE.md#d32-teamcity-behavioral-parity-is-the-immediate-build-product-contract)
+and [the behavioral parity contract](docs/design/teamcity-parity.md) adopt C# definitions, in-process
+Chiral nodes and PostgreSQL as the new target. This migration is not implemented; the current
+SQLite/YAML foundation described below remains real implementation evidence.
+
 Phase 1 in progress; the Phase 0 pinned-TLS session loop is complete. Persistent TeamCity-style agent
 registrations and status axes, heartbeats, separately managed reported/custom parameters,
 restart-safe build ownership and cancellation, durable FIFO scheduling with queue-wait deadlines,
@@ -29,7 +38,7 @@ payload archives are also implemented. The transport-independent management kern
 ordered checksummed SQLite migration ledger, fail-closed schema validation, a minimal append-only audit
 journal, shared actor/correlation context, and one authorization evaluator beneath the
 ControlPlane, panel, and blob boundaries. The current Blazor panel is transitional: the accepted target
-is a React panel built on the vendored EyeAuras Workbench and the public REST management API. The
+  follows Depot's TypeScript/Vite panel on pinned EyeAuras Workbench and the public REST management API (D35). The
 read-only REST foundation now publishes system, Agent, audit, build, and queue resources plus a
 deterministic OpenAPI document. AgentHub now negotiates an additive v1 capability contract, persists
 durable credential/connection generations, and publishes bounded typed static host facts and
@@ -87,10 +96,10 @@ platform evidence remain release-quality gates.
 
 - All committed content — docs, code, comments, commit messages — is in **English**.
 - Target stack: **.NET 10 / C#** for controller, agent, bootstrap, CLI; protocol in **proto3**
-  (`Vivarium.Contracts`). React + EyeAuras Workbench for the panel, built to static assets and served
-  by the controller. SQLite + a blob directory for operational storage — no external service
-  dependencies.
-- Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned React sources,
+  (`Vivarium.Contracts`). TypeScript/Vite + EyeAuras Workbench for the panel (D35), built to static assets and served
+  by the controller. The new D32 target uses one initial Host with in-process EyeAuras.Chiral nodes,
+  PostgreSQL business storage and object/blob bytes. SQLite is the current transitional persistence.
+- Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned TypeScript sources,
   `tests/Vivarium.Tests`, `docs/`, plus `images/` for image recipes (later).
 - Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
 - The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
@@ -119,7 +128,7 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   leases, fencing, and recovery. **AgentExplorer Expert** owns independent fleet observation and remote
   operation semantics.
 - **Vivarium REST Expert** reviews every public management resource or mutation. **UI Expert** reviews
-  every web UI change and the React/EyeAuras Workbench integration.
+  every web UI change and the TypeScript/EyeAuras Workbench integration.
 - **Git/Versioning Expert** reviews every desired setting/property change. **User Roles** and
   **Admin/SuperUser** experts own authorization and first-run administration; **Security Expert** reviews
   trust-boundary changes.
@@ -129,21 +138,87 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   document graph current.
 - Adopt **Reconciliation Lead** for broad migrations/audits and **Test Steward** for test or verification
   changes. State the lead and co-held roles before acting.
+- Adopt [Story Delivery Lead](docs/roles/story-delivery-lead.md) to connect actor goals, surface
+  scenarios and API evidence to useful increments; follow the existing [delivery practice](docs/design/api-ledger-delivery.md#actor-goal-stories-and-traceability).
 
 ## Configuration and management contracts
 
-- Git is the source of truth for mutable **desired configuration** from its first implementation.
-  Projects, build configurations, fleet policy, agent custom properties, RBAC policy, and non-secret
-  server settings become effective only from a validated Git revision. REST, UI, and CLI writes use one
-  Git mutation/reconciliation service; they never patch a hidden SQLite authority.
+- Git is the source of truth for versioned **desired configuration**: projects/build definitions,
+  fleet policy and agent desired properties use one Git validation/mutation/reconciliation path.
+  D34 explicitly replaces Git identity/RBAC authority with PostgreSQL application data: users,
+  groups, editable TeamCity roles/permissions and scoped grants use common authorized/audited services.
+  D35 uses Chiral's managed settings/restart lifecycle for private Host/DB/OIDC/storage configuration;
+  do not create a second settings authority. Other structured business/runtime data lives in PostgreSQL;
+  Storage owns large bytes with PostgreSQL references. Current SQLite/Git-RBAC remains transitional.
+- D34 adopts Depot's stock Identity/OpenIddict OIDC, normal cookie and installation-user lifecycle.
+  TeamCity role/permission IDs, editability, scopes, groups and inheritance must match 1:1; do not
+  retain the superseded immutable role floor or reinterpret TeamCity grants as narrower fleet grants.
+- D35 shares Depot's UI technologies/integration, not a mandatory layout redesign. Preserve useful
+  current Vivarium/TeamCity navigation, pages and workflows while porting to TypeScript/Workbench.
+- D36 makes REST resource/identity/state/mutation/protocol decomposition a P0 structural gate.
+  R0 must provide a real local Host+Agent and first unchanged-CLI smoke path; R5 is cumulative
+  conformance. Do not defer compatibility model decisions until after domain implementation.
+- D37 requires a TeamCity semantic superset for builds/agents throughout development. Every affected
+  change/milestone names its business AC, TCM model invariants and wire cases, preserves the base
+  behavior and proves relevant extension neutrality. Do not wait until R5 to check model drift.
+- Highest-level AC live in `docs/acceptance/**/*.feature` in business language, independent of internal
+  architecture. Business Acceptance owns intent; Testing Architect selects minimal evidence/oracles;
+  Test Steward owns bindings/execution. Use the D37 hierarchy/pyramid; parsed/unbound features are
+  not GREEN, Gherkin does not force E2E, and no new test framework is implied.
+- D38 makes executable, reference-backed REST conformance and a genuine RED baseline the first P0
+  execution slice before structural replacement. Prefer WireMock.Net replay on the existing NUnit/
+  Test SDK stack; mock GREEN does not prove Vivarium behavior. Hundreds/thousands of real variants
+  are expected as coverage expands. Preserve implemented GREEN cases, execute/report remaining raw
+  RED explicitly, and distinguish missing reference/product prerequisites from harness/setup errors.
+  No guessed oracle, skipped placeholder, automatic RED allowance or product-derived expectation.
+  Deterministic fixtures run production logic with controlled time and bounded external actors;
+  WireMock replays HTTP rather than implementing a second model. P0.REST.2 proves the smallest
+  composition, isolation/timer control and maintenance/runtime cost before bulk case expansion.
+- D39 requires task blocks (REST contract → implementation → REST acceptance → milestone closure)
+  and a mechanically checked API ledger/status at each milestone. GitHub owns live task state;
+  ledger/results own compatibility evidence. Unknown denominators are unknown, not percentages.
+  Follow [API-ledger delivery](docs/design/api-ledger-delivery.md): focused TDD during work, batch
+  required checks at coherent checkpoints, formal independent aggregate correctness/simplicity and
+  explicit Security/Adversarial review at milestone end. Fix all milestone findings/debts there;
+  no carryover, no next-milestone implementation before closure, no per-task review/full-suite tax.
+- D40 makes coherent subsystems the implementation units. Maintain the full REST ledger with one
+  primary subsystem/variant owner and related-owner links; attach REST-contract/acceptance subtasks
+  to same-milestone subsystem implementation tasks. Track subsystem lifecycle/integration and API
+  completeness separately, with milestone/global rollups. See [subsystems](docs/design/subsystems.md).
+  REST discovery/TDD still comes early; do not implement route by route or multiply state authorities.
+- D41 replaces the transitional YAML/native payload submission entry with real C#/Git Project/BuildType
+  runs for the fresh US-013 installation. Preserve execution/matrix/cancel/log/artifact capabilities,
+  AgentHub and Bootstrap; retire old code only with verified replacement. Legacy public alias/DTO
+  preservation is not a target requirement.
+- D42 adopts free OSS capacity without license-imposed limits and explicitly unsupported commercial
+  TeamCity key operations. Keep that owner-approved exception visible in source allocation and negative
+  acceptance; unsupported is not positive conformance. Other compatibility obligations remain.
+- D43 isolates compilation and execution of project C# inside Linux/Docker, without network, Host
+  data or credentials and with resource/time/output bounds. The coordinator owns pinned compiler/
+  dependency inputs and validates untrusted output under current authority; no same-user Host fallback.
+  Existing trusted-source studies are not isolation or production-evaluator acceptance.
+- D44 selects managed typed C# declarations/edits with untouched user computations and one effective
+  Git owner per Project/field. Disabled synchronization uses managed-local Git, not PG desired state;
+  an ancestor source cannot seize an independently owned child. Reference modes/completion and
+  XML/Kotlin obligations remain; the source studies are not full SDK or product acceptance.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.
-- `/api/v1` REST is the canonical public management surface for both TeamCity and AgentExplorer. The React
+- `/api/v1` REST is the canonical public management surface for both TeamCity and AgentExplorer. The TypeScript
   UI and CLI consume it. AgentHub remains reverse-streaming gRPC, blob bytes remain on the authenticated
   HTTP data plane, and the existing gRPC ControlPlane is a transitional compatibility adapter only.
-- Every state-changing request carries actor, correlation/idempotency identity, target, outcome, and,
-  when configuration-derived, the Git revision. Logs and audit records must be bounded and redacted.
+  D33 additionally requires a TeamCity-compatible `/app/rest` facade for existing clients. Both HTTP
+  contracts use the same application services, authorization, appropriate Git/PG/Chiral authority and audit; compatibility
+  never grants a separate state authority or permission bypass.
+- For the adopted TeamCity model, operation handling comes from the reference TeamCity contract:
+  defaults, validation, states, permissions, side effects, replacement/merge, retry, cancellation and
+  completion behavior are not independent Vivarium policy choices. Native and compatible surfaces
+  share that processing. Unknown reference variants remain verification gaps; internal technology
+  choices, framework defaults or generic hardening do not justify a different observable result.
+- Every state-changing request has actor, internal correlation/operation identity, target, outcome,
+  and, when configuration-derived, the Git revision. Idempotency/preconditions follow the frozen
+  operation contract or explicit native opt-in workflow; do not require new compatible-client headers
+  or deduplicate intentional unkeyed runs. Logs and audit records must be bounded and redacted.
 
 ## Core implementation rules
 
