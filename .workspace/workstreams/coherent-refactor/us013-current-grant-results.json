@@ -1,0 +1,1893 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-02T02:47:28.845292+00:00",
+  "scope": "Three frozen current-grant reference cases, exact raw-target replay and refreshed cumulative partial baseline. Not product access/OIDC acceptance or P0 closure.",
+  "candidate": {
+    "git_base": "88f9ce043aa6e0a64a2bb54ed616ff764ee88cb5",
+    "state": "Executed working sources; exact-commit transfer is separate.",
+    "production_tree": "9cd8e1f5835a4306c23024e94c95d061e62d278d",
+    "source_inputs": [
+      {
+        "path": ".workspace/workstreams/coherent-refactor/agent-message-occurrences.tsv",
+        "sha256": "2ce8818c581e7160bb196ebd85e993dd4236515b04f95c2d211aace43141e1ab"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/api-blocks.tsv",
+        "sha256": "48e6d52cdb9ad27eef0b44074c175a708116ecc1c3d43d2414a05d483eea76b3"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/api-ledger.tsv",
+        "sha256": "21f5c3e169ac3cc01e4f332e03989c973cc4fb22e1fe953518c4a94f354a5cc7"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/cli-source-relations.tsv",
+        "sha256": "725e3f51a1561cde04d32d68620811a519e67041476d9451ce1e5e4587f1097c"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/installed-http-occurrences.tsv",
+        "sha256": "5f47f76f6b2e72b6cfe082dc6ffdbf728ad95d8db8beae1269c54058eef61b8a"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/inventory-rest.mjs",
+        "sha256": "90347cb2da09ae470fffd86e5bdf631cae0100b5997499ec64774703b1e39fcd"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/native-http-occurrences.tsv",
+        "sha256": "5099d4928aa859ca1480c686a295630eff5d1c6593ae55e1ce064e3121f3dfed"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/rest-first-cohort-cases.tsv",
+        "sha256": "d32964fb7418b1e0ff1fcb15b9c14890be6738f1da54abb75a79cbcb411258c4"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/rest-fixture-inventory.tsv",
+        "sha256": "5d55385b819b43290a841832f5ec8f9e23d21d438b85ac8fac9e4eacf52be43e"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/rest-local-mutation-cases.tsv",
+        "sha256": "a13e0327f49c420ca964c1acae6c4f581618597cec416ab61fdc22513bba909d"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/source-disposition.py",
+        "sha256": "96846bdef212e810e901f379b986a05e2cc0ed98f1bea7c74fb233945e63ef33"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/source-disposition.tsv",
+        "sha256": "b83531e21017de674f04d1e2eca4f2d5d949cbd35b8582523e75f38b5096508b"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/source-inventory.tsv",
+        "sha256": "a60c9976cb5805f8f7012f32c248f8fecb58bd815ae6cbc62ee52d5900a8e748"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/source-relations.tsv",
+        "sha256": "2d2b58036cbd4cf05f1cdeed8ff46548d088f3682e76ceeba8b131b1b181aa71"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/source-union-checkpoint.json",
+        "sha256": "1901c7d52de40ea1c896ab0e3ecf30bcaa4d98820a941d2fe38ca4b21a144f2a"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/stories.tsv",
+        "sha256": "7ff6e2d9e822519db52a27a5ae1816912ed4aaf0361c7769d4105065ca78985e"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/story-dependencies.tsv",
+        "sha256": "73d63b2370c7449281d5ae11d915fa8ac82499bfc05c4d01a7acdb55f756538b"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/story-gaps.tsv",
+        "sha256": "d4ef808788cce63e8715b88ab5a070d50a26d2d425dfa08255108312f9d9d821"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/story-implementation-links.tsv",
+        "sha256": "7078904930beeb68e15e61df4fd88db3f8b435ea7be8b8ffdf0fc353c96c0c80"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/story-links.tsv",
+        "sha256": "ea029d964b69674c239670a9918c03671fe86d307716446bc25abb3d4a921a65"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/story-scenarios.tsv",
+        "sha256": "0fa124232a95fbf0968a9750575558def21e971758ff0c2ab869410875a52e2c"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/subsystem-contributions.tsv",
+        "sha256": "a250f852e32cbf2df7101baca7785d2b779cdc8eacc25e259f48285c14abdc16"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/subsystem-slices.tsv",
+        "sha256": "a52c9de862ada2ebbc6fb28fdc7787e96b149e20f6d6ec62b9a628ad142fbd37"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/subsystems.tsv",
+        "sha256": "eae574cadf0ed05231041dd34ad129ca174e580b2fef52f7251e5be7b2e2f2a3"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/task-packet-bodies.tsv",
+        "sha256": "0ad8f59fcd59b0005ce08acbe11c7d72c3c84cda267d31c458dfb00cb0e9a9b4"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/teamcity-official-rest-operations.tsv",
+        "sha256": "9dd82d6feaaca4d4193db255df799f872dac4adab427ef51534be221ea257582"
+      },
+      {
+        "path": ".workspace/workstreams/coherent-refactor/verify-source-union.py",
+        "sha256": "71211caab41160789639c7e3914243d76554e4c6e4422ef1ae1ce25bed0184eb"
+      },
+      {
+        "path": "Directory.Build.props",
+        "sha256": "7f19a87890a4d93125d6a7f1bb3112027da17ab84d326e1bd43b52bb6ffa0d17"
+      },
+      {
+        "path": "Vivarium.slnx",
+        "sha256": "cf53109196dc66724df7c2d2620959d4af9a2322f26436f026b61c6423c7e597"
+      },
+      {
+        "path": "build/BuildContext.cs",
+        "sha256": "3c81a1968401ea2fb71eed020b06de072ae131dee5c35e027cebbf76cb0ee4c2"
+      },
+      {
+        "path": "build/BuildProcess.cs",
+        "sha256": "cb0991e18e8a320ca7fa865d0539f8f184e79877184e900ecb1ea7ab7115cc63"
+      },
+      {
+        "path": "build/BuildTasks.cs",
+        "sha256": "54b55242b5010dd8256c2e6c9bb28127de6826ddccf029fd1c251ccd54c6e0ad"
+      },
+      {
+        "path": "build/CompileTasks.cs",
+        "sha256": "6526b0a294f876f114c981d57c8d7cc877b409d6b86cd6af6e51fe8dbc8e035f"
+      },
+      {
+        "path": "build/DockerTasks.cs",
+        "sha256": "3549a44bc0aa8d7e70340ddd83474bcde415a096f97c05de77a0afc57cdb762d"
+      },
+      {
+        "path": "build/GitHubReleaseTasks.cs",
+        "sha256": "f45e05b81618fbb515ccdf72c261b68fda861b6729a2cf808e4e122cc496d7f3"
+      },
+      {
+        "path": "build/PayloadTasks.cs",
+        "sha256": "be350a546c4536d79d505c017baf77a1a04607e199ee6c59ad5a1f0b44a3a71a"
+      },
+      {
+        "path": "build/Program.cs",
+        "sha256": "3705fa5d4d1f28ac03ad731412e1dc693685f991f1bafc917be9d0cfd3bacb32"
+      },
+      {
+        "path": "build/ReleaseTasks.cs",
+        "sha256": "9c1d490bd136f30e18d9a054c798dfd8addc9427c11a09a65271b070a7af947f"
+      },
+      {
+        "path": "build/Vivarium.Build.csproj",
+        "sha256": "55f64a5b24dea356aab83aa164116bae27d01d10afd477ecf4761560b7970f43"
+      },
+      {
+        "path": "build/assets/bootstrap.json.sample",
+        "sha256": "42f6106eea6be6159c6052db82945fa65e409cd7eec55b60c1e769061ca70b2c"
+      },
+      {
+        "path": "build/docker/viv-server.Dockerfile",
+        "sha256": "2aaeeca2ec88e286f5bc06dffd4274570c9e17d52da2b0e29be79730059c2271"
+      },
+      {
+        "path": "global.json",
+        "sha256": "e43ef3bfdcacfa29ee23e2fd88d58f81df93490168702ba9b74f5216f25d4ccc"
+      },
+      {
+        "path": "src/Vivarium.Agent/ActiveBuildJournal.cs",
+        "sha256": "351debc1c4768d23e672ddf20e979cd06fab20eed76e6397407df031999cf6dc"
+      },
+      {
+        "path": "src/Vivarium.Agent/AgentOptions.cs",
+        "sha256": "c558d7701c1e89fe34e0115aab4828daddb041534141771f66e61c002349ebbc"
+      },
+      {
+        "path": "src/Vivarium.Agent/AgentRunner.cs",
+        "sha256": "94a4da0c3655a0b25039ec96619c590ead6d865319a5555a28e69dbe8cdb5f73"
+      },
+      {
+        "path": "src/Vivarium.Agent/BlobClient.cs",
+        "sha256": "3eafaa81e91d73b8d8dfbcea865eb1721701310222e88086fec382e99395147c"
+      },
+      {
+        "path": "src/Vivarium.Agent/BuildExecutor.cs",
+        "sha256": "5914839337316abc49703d5d04bed52496f4939be54f7683692d8e2f0a33fd8a"
+      },
+      {
+        "path": "src/Vivarium.Agent/BuildStopController.cs",
+        "sha256": "d494520290fe16b824fa795b71b66fc896d9a949780ba34a45822619334b5a67"
+      },
+      {
+        "path": "src/Vivarium.Agent/DurableFile.cs",
+        "sha256": "710d2d57c10ac8e751d60d6f8d8d2b350a12d580d83862f74f947c494d59bb90"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/LinuxPlatformFactsCollector.cs",
+        "sha256": "40e93b712c721f21de13e387130dd5a76e22e5649b70b0cc520e37d089045f1e"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/MacOsPlatformFactsCollector.cs",
+        "sha256": "163014badc772b8e8f5ad52227cc52c6456bde6de1e5b7ed79ea8296d3ecf30d"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/PlatformFactContracts.cs",
+        "sha256": "d46dee1b503303c52d6f9ea75ba8ac50d50ffa7c9ee8dc0d6ca912bb1a2d1464"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/PlatformFactSource.cs",
+        "sha256": "ebc618975842a1e3c961739e799c11b4ca2e74d3b04ee7855deeda14c52c59b4"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/PlatformFactsCollector.cs",
+        "sha256": "c959dc9ae67ddf48f8a22416d0460ebfa964e296e60ba0a4f0c9be0ce3bee21e"
+      },
+      {
+        "path": "src/Vivarium.Agent/Facts/WindowsPlatformFactsCollector.cs",
+        "sha256": "1ac2ab625a2fbf36e4bf2d95fe0ac2be483df5bfef060807ecdbbf6ddf646068"
+      },
+      {
+        "path": "src/Vivarium.Agent/PayloadArchiveExtractor.cs",
+        "sha256": "cf1c06a67d48bca5b8373c0b0d9ced1f2af6b0e40cd594493526510a0836f911"
+      },
+      {
+        "path": "src/Vivarium.Agent/PinnedTls.cs",
+        "sha256": "5594995332fc3b2283b5131b39fd510359bec86c6a4a85b7226ffbb5d7f80a30"
+      },
+      {
+        "path": "src/Vivarium.Agent/PrivateStorage.cs",
+        "sha256": "4903cda18aa909e197cdeb0a4384f1346b2ad41e2650adc9580c10ceedc37798"
+      },
+      {
+        "path": "src/Vivarium.Agent/Program.cs",
+        "sha256": "49f7406ecd7f5f19121a79916c37fdd9b7b28c3407e0c39289706670ad0682bb"
+      },
+      {
+        "path": "src/Vivarium.Agent/Properties/AssemblyInfo.cs",
+        "sha256": "3458f375b90a500ed4d15c10e24855f6a1e08374b1ada05aacb453f626737e9f"
+      },
+      {
+        "path": "src/Vivarium.Agent/SessionWriter.cs",
+        "sha256": "a59396f931f878316aad64f8eb03b234987aa76631b1e3cc4f9375c69f4f73ba"
+      },
+      {
+        "path": "src/Vivarium.Agent/Vivarium.Agent.csproj",
+        "sha256": "a6c0744a4257a675bc3fe5d5a0b20587edad8300f1e9ec799c7f2ea8a2f953d9"
+      },
+      {
+        "path": "src/Vivarium.Bootstrap/Program.cs",
+        "sha256": "ed6d0e9358bdd94ccc9724c7316d1c32d3018dffe982f074ef9c6657f9548aa8"
+      },
+      {
+        "path": "src/Vivarium.Bootstrap/Vivarium.Bootstrap.csproj",
+        "sha256": "2bb569eef75b715aa6f2eebbdc67e88b63a58e9031bddeda766e14f1f2d85558"
+      },
+      {
+        "path": "src/Vivarium.Cli/BuildRequestMapper.cs",
+        "sha256": "92d61fec8e6e2b4fae9a8e8163b2a2c4e17acf92f5eca5dc3657aac92fedcacf"
+      },
+      {
+        "path": "src/Vivarium.Cli/CliArguments.cs",
+        "sha256": "dd14e8a99b1ed5c108e07ae6c64c8a39bdb88231e21a2af66c55f711711f2dd0"
+      },
+      {
+        "path": "src/Vivarium.Cli/CliConsole.cs",
+        "sha256": "6ad7730d738af330c61a88cc1c87a8112e1830111256dfcdcbfa57ce188eb7c4"
+      },
+      {
+        "path": "src/Vivarium.Cli/ClientConfiguration.cs",
+        "sha256": "3af29f131b9aabf3f4b0e159438bb5da09fb0c06f0d186a8e73e2baa5b36798b"
+      },
+      {
+        "path": "src/Vivarium.Cli/Configuration/VivariumDefinitionParser.cs",
+        "sha256": "b871fcfa9b8485aba34e96383a56a3f34a2524058f999b46d18cac81c24a5659"
+      },
+      {
+        "path": "src/Vivarium.Cli/Configuration/VivariumRunDefinition.cs",
+        "sha256": "da984d22fdfff4836ac34094cda4afb7d67b6fea140d44d70536b8a85861ab8f"
+      },
+      {
+        "path": "src/Vivarium.Cli/ControlPlaneEndpoint.cs",
+        "sha256": "49775a8ce2599bf132f792897b76e67a8074d431259ce2fd41dd70e29c916db7"
+      },
+      {
+        "path": "src/Vivarium.Cli/PayloadArchive.cs",
+        "sha256": "34472a54c1e5c21f9e33b94546108862e3c0ba7b323704951eae036f9c312739"
+      },
+      {
+        "path": "src/Vivarium.Cli/PinnedTls.cs",
+        "sha256": "329180371bbc174a5882ab09bd3eae79ff57dabfc561d8e8dfd4e76a58ed3bd3"
+      },
+      {
+        "path": "src/Vivarium.Cli/Program.cs",
+        "sha256": "d2edd2f464b59997c12456bbb01a31d052e859b94a44d72e3867f6992ffb77cc"
+      },
+      {
+        "path": "src/Vivarium.Cli/Properties/AssemblyInfo.cs",
+        "sha256": "49eca87b9e9b6c27696df577b89092c971b806a277b0b971bd6355bbc85501a5"
+      },
+      {
+        "path": "src/Vivarium.Cli/Rest/RestBuildRequestMapper.cs",
+        "sha256": "70988770e79eb3840f8c8b5f1d5bd3e8cfb01d34a3e83d11997dafb21b9024a9"
+      },
+      {
+        "path": "src/Vivarium.Cli/Rest/VivariumRestApiClient.cs",
+        "sha256": "7305ea3ab9adcc33d667ef8a16c31ed7ed194d435a58c47ceb6dba3dbc7fb421"
+      },
+      {
+        "path": "src/Vivarium.Cli/Rest/VivariumRestModels.cs",
+        "sha256": "19a987fe8f5c907ce42620dbb0fe3a377ac7bb36c5a98dde7accf02f05743d3c"
+      },
+      {
+        "path": "src/Vivarium.Cli/TemporaryPayloadArchives.cs",
+        "sha256": "626882ef9bdd8af46e9716fed725bbb45fc75924606feee305f2b0cb57643c61"
+      },
+      {
+        "path": "src/Vivarium.Cli/Vivarium.Cli.csproj",
+        "sha256": "b973c123f77588155f3b4e030866b3ba3faf75c50db173ea28028dfc13e63bf1"
+      },
+      {
+        "path": "src/Vivarium.Cli/VivariumCliApplication.cs",
+        "sha256": "fa3e601dd8657f450de858d0a583af8e23263521a2cace7dbfe1f20928d1e511"
+      },
+      {
+        "path": "src/Vivarium.Contracts/Vivarium.Contracts.csproj",
+        "sha256": "ef8a30ec97268cb1d0ef561588ecbc9d4d0e1629adfb173a7fa5cb492cf992bf"
+      },
+      {
+        "path": "src/Vivarium.Contracts/VivariumProductVersion.cs",
+        "sha256": "919fde8eeb27c0c47fed0ce8fddfeb0688fd0a0405f0883ace0bcc580674cfe2"
+      },
+      {
+        "path": "src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto",
+        "sha256": "5d8625ce25f13cff503d37143cc625f36467988bcfb4be69e1510399d19b6da5"
+      },
+      {
+        "path": "src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto",
+        "sha256": "1ab724972d1ca86da34929db9f8c7e02e21084a395ec074f83ac347a27d0571e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Administration/AdministrationBootstrapContracts.cs",
+        "sha256": "93f795f5e4e88a04247f8a1fdf5902ff75e6e4f9fb4e96e79bc882110e7669f3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Administration/AdministrationBootstrapService.cs",
+        "sha256": "c80146e5e91848642bc46d3440baff9e47f3f8744ff86530c9cdf651b9731404"
+      },
+      {
+        "path": "src/Vivarium.Controller/AgentHubService.cs",
+        "sha256": "e1e06bab3fde3f60a95c220751fdd94e998c3e4c491c3bb3f4c59d7dd23c3f5b"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentAdministration.cs",
+        "sha256": "39f1b223dfa4920cbe2ed2b96208276313ec777176efb745a4701cb407ad2496"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentDesiredConfigurationActivationSink.cs",
+        "sha256": "a99b6b9c19136a5c7758d0dd3f72bd060377570bea8b78ed56b6e39a6d981239"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentHeartbeatMonitor.cs",
+        "sha256": "ecf3a7c14c97a2a0b86b9c6860ae39c2ba66b058dc2d5cdc98f9b654b4f35622"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentLifecycleCoordinator.cs",
+        "sha256": "40f41a96ea5d3ac2e343f68c41660c9dab8b75972ff6f0e3b767326bfc7ce5a4"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentOperationalStore.cs",
+        "sha256": "6ece807167ee1d5a53d4ab79c0f648b48045e6bc3be921d9e84fc6f92620709e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentParameterMaps.cs",
+        "sha256": "c5728cbbafc1024593eb6361814f459ae17b20a3436ae1b9f14375537627fd21"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentRegistry.cs",
+        "sha256": "e8b3a5ffa2aa9afa091294beb39459833a898c7c7c558cbc942afbaad775ae23"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentRestartService.cs",
+        "sha256": "1375d4a6c26b4fee99006d5c0441e25b8e050f7b1bb528865b686ce5686e5e77"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentRestartStore.cs",
+        "sha256": "b9aa036379b23d60d459a8958d0a064a9f525f15330df9ba83cb5515212c73c3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/AgentStore.cs",
+        "sha256": "cea9e443d5a2d0dbadbe98627477dcab228a2e459402cc47464bf8145fe5e54b"
+      },
+      {
+        "path": "src/Vivarium.Controller/Agents/Compatibility/AgentProtocolCompatibility.cs",
+        "sha256": "5ed5bea280673dad76cef5c428f86adabc947f6bfc03a216cf862d27706dffdf"
+      },
+      {
+        "path": "src/Vivarium.Controller/Auditing/AuditEventStore.cs",
+        "sha256": "77c5cd0a19e4a265a2d29f5b4a226da69a5dec310a6afcbc0afa84ba211976e6"
+      },
+      {
+        "path": "src/Vivarium.Controller/Blobs/Access/BlobAccessContracts.cs",
+        "sha256": "8ad99ecc97cdd408f97c8d342c5cf49cf1309d2f82f34b2ef694cf98bc60ba22"
+      },
+      {
+        "path": "src/Vivarium.Controller/Blobs/Access/BlobAccessService.cs",
+        "sha256": "40e40cc3584ddd2c66d871d972a3c107abdf1319e7326af305d0cf5e65fd54d3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Blobs/Access/BlobAccessStore.cs",
+        "sha256": "4985168a527545396acd638f6f84a386ad1cbcec57ae4ea12ed6db4ede138735"
+      },
+      {
+        "path": "src/Vivarium.Controller/Blobs/BlobStore.cs",
+        "sha256": "bda7c1ca697224ba49b447f7b49f7ff912258458eeb897fda00dd6114033e39f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildAdmission.cs",
+        "sha256": "b2f02795a7baf522f818b444fa071e8669355ca1cad7086fd674e26ce4356dff"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildQueueItem.cs",
+        "sha256": "13ead4fa97fdfc948414c0315b9c08e035403009561b9612df8074e12458dcc5"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildQueueService.cs",
+        "sha256": "27054ed838a01ca0b115321503ac4e6eb60193b891ad8b7f5691da5240de66e8"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildQueueStore.cs",
+        "sha256": "2c111fd1758016149f114ec1cacffd534883059ca8f5905d41f8f0d865641365"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildStore.cs",
+        "sha256": "be4d75105c4d6790e22cc5cdc567ae884a6896a603bc2a97643b1dd865bcba9e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Builds/BuildTracker.cs",
+        "sha256": "24e66462312dc8ca3923662c15ae354303da96838ec60dc1d3acccfc7bd67a7d"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/App.razor",
+        "sha256": "e8b3af3bff65946b4c6b8d7ad2d2f2d35767f8571ce1cceba381b5aa30be078a"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Layout/MainLayout.razor",
+        "sha256": "cad2247c81a8cd78b29c327c4bb1da9eded6ef57934dfea6896f78d1a766ad12"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/Agents.razor",
+        "sha256": "97bac9100116efe12d478ef5c4ace873ad2149350d8aed6b50c5b924d9c39d4d"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/BuildDetails.razor",
+        "sha256": "1df9cb5a7764021ee66d43edc0cf9d3c2b65fbc4ada749d91ef525b0be1b4221"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/BuildDetails.razor.css",
+        "sha256": "ad0feca1eca1949205789853a5ff097e053cec666f0683ec3618ab9ade113828"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/Builds.razor",
+        "sha256": "7603e484f218eb88aaf29644cf831679ccbc36da8eed4635e053a8534f586c96"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/Builds.razor.css",
+        "sha256": "ed1e936c0dfead0784b1c2dfd84dfb220d3a857616288be79c1b9a26811d4639"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Pages/Home.razor",
+        "sha256": "24eacdcf258a1298da23a006501522e1e867c1ba4cdc96f33adb7fc2d19f389f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/PanelLogin.cs",
+        "sha256": "f6ef71b88a907d5142219b3073e5f38b8ba458d495077732e5fac885af240fb2"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/PanelManagementContext.cs",
+        "sha256": "5c535cd074efd1ff3038bafd2440352cc8d24ff0c817f407799acee622ee5e63"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/Routes.razor",
+        "sha256": "907ceb083cd3ca06576e565dfbd19f9c5ce2a99edc571b7031430a60674eec84"
+      },
+      {
+        "path": "src/Vivarium.Controller/Components/_Imports.razor",
+        "sha256": "57d0f04555861f489bbebabaaa6a1ac443956cb70ed406c3b94f210d24455fc7"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Agents/AgentConfigurationReconciliationMonitor.cs",
+        "sha256": "35a72fdbd6bc551cc8e28fe7cbf123fc815bdf9d8ddecf765f67a650fde7eb65"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationContracts.cs",
+        "sha256": "2da7da25a02094ced25925db2ae3299461efc297ba88f81979eef02148135db6"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationService.cs",
+        "sha256": "d01b13d41b69b97abdfcbd00fe6a6cdd107aba0327011739af3987170eecf2bf"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationServiceCollectionExtensions.cs",
+        "sha256": "ccd5bf8c9d04b79bdd25bad95c8c44232b639faec904d654896edca65cbcc73c"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/ConfigurationRepositoryContracts.cs",
+        "sha256": "0f9da76e2bfa0823e0d46fed273c0712fb9a0bd0231d997d7b5aa9f23f33aa5e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/ConfigurationTreeValidator.cs",
+        "sha256": "d7f519e750e10bae03fc41517a98c710ab9a70749b745340a279c1f3589ee339"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/GitCommandRunner.cs",
+        "sha256": "c05ceb8a056bff9b176bb74d50227b163c4eb1813f037a751cc6af1cea005ba5"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Git/ManagedGitRepository.cs",
+        "sha256": "3d6abb0accb37bef8321e3e5d1073820a9c673332a2db9c488d106959fce6769"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Reconciliation/AgentDesiredConfigurationProjection.cs",
+        "sha256": "5cbecaefccc0c0b6536b0acc7b6aa1b681a935a3faaacd79558462c5d4908d1b"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Reconciliation/AuthorizationPolicyProjection.cs",
+        "sha256": "92213578c1f36a69ae47a614d1452dbb2c18db927d352ab5296f57c504f7627b"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationOperationStore.cs",
+        "sha256": "6f118c39924eb343596f97da4c029c359384e6680da5635e9f20a9c77865ccf3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationReconciler.cs",
+        "sha256": "55be59418062ace11abe4635acd0d570204bdee5beed788e15144ece97b32059"
+      },
+      {
+        "path": "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationReconciliationContracts.cs",
+        "sha256": "3f9ee490afdd815a3c3337b2042878fd2a2997f91d8dd328af84e609f403ff0b"
+      },
+      {
+        "path": "src/Vivarium.Controller/ControllerOptions.cs",
+        "sha256": "ebc5d9973a2dbb3ac8c1f4e56764b841fcfbf66b311f262587bdcfd707766e8c"
+      },
+      {
+        "path": "src/Vivarium.Controller/Deployment/AgentPackageContracts.cs",
+        "sha256": "8391d7674aa2d7a41e4219dd20c52a97572781257d80647e6f225d62b5283da3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Deployment/AgentPackageStore.cs",
+        "sha256": "dc64a2db8946afb10002922e71768f2b2b66b8e49049e9359d3566d17bec10f2"
+      },
+      {
+        "path": "src/Vivarium.Controller/Deployment/AgentUpgradeContracts.cs",
+        "sha256": "d78dd08a06d827a08213512f19563464267462032b469a048bd3f350794e7904"
+      },
+      {
+        "path": "src/Vivarium.Controller/Deployment/AgentUpgradeService.cs",
+        "sha256": "8ee80de3838068c3952bc17f1b4bcff6180fc63c3c0292fc47f90e364ae7a372"
+      },
+      {
+        "path": "src/Vivarium.Controller/Deployment/AgentUpgradeStore.cs",
+        "sha256": "dc254c4ccfeb3af0cb2973686a4ca8a58c052561d320115950340e3e303d332d"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/ControlPlaneAuthorizer.cs",
+        "sha256": "362a6827b2e84f4b9a4750fe7018f529321cf9bf9905aa4eb02a2380dae76b5e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/ControlPlaneService.cs",
+        "sha256": "9044408c4332d826e0491c96e00a22494c9e8ad57ac66904a9c66861189b7226"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/DatabaseChangeNotifier.cs",
+        "sha256": "0261244d1cc0fe708c8d99cf70120cd899c181380c10e97086ae6ea4dde61d23"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/MatrixBuildCancellationService.cs",
+        "sha256": "ce0d42cc85809babc952c29130c214d94118a8d882dbad5c7504e293f2a6ba46"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/MatrixBuildStore.cs",
+        "sha256": "9d5d044e3144ac4947911141795ed7853ab10eee3755242b441b84612181789b"
+      },
+      {
+        "path": "src/Vivarium.Controller/Management/MatrixBuildSubmissionService.cs",
+        "sha256": "e29bb4eeedbadd972d67a46a2eba7bbd25634d6d8e63ea981022b7e65cc49eea"
+      },
+      {
+        "path": "src/Vivarium.Controller/Persistence/DatabaseMigrator.cs",
+        "sha256": "9823bf4e25081d2ea76b34bac30818072fec05d5d2173c03f4bdc3307235febd"
+      },
+      {
+        "path": "src/Vivarium.Controller/Persistence/VivariumDatabase.cs",
+        "sha256": "7dfa9840bf7146f59939918b488e92bd175b0967d5ec2f733928bb64f4ed513e"
+      },
+      {
+        "path": "src/Vivarium.Controller/Program.cs",
+        "sha256": "0755ae6a1e048c02fde9b7fe1503c93141d71371430124bc59adb0d6cbd7f6d8"
+      },
+      {
+        "path": "src/Vivarium.Controller/Properties/launchSettings.json",
+        "sha256": "d25dd29e3151e207c4b268286290102c86320ec676106a5cdab86f0a047f8f52"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Administration/AdministrationSetupEndpoints.cs",
+        "sha256": "b8a8127331eb5ca94549a4505788336e7ea09509997578c88187e5dc09ca0ca0"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Administration/AdministrationSetupModels.cs",
+        "sha256": "a5671fd1066f158790e93f5e23665f64caa967c0e0d12913c4a0529af536a4e7"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/AgentRestEndpoints.cs",
+        "sha256": "643862593aaf67b5ce60d519027b6d97e1058b4a1037dea1509995bf856bd713"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/AgentRestModels.cs",
+        "sha256": "aa2e9118428e5eb408f92bc82982d4a4fd12ce6d2f41753688c8e54f74e54d6c"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/AgentRestProjection.cs",
+        "sha256": "f72cfa2ff7db8ca910c45184668470d0aff4a2414964987e6fc1bfa676aa0da8"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/AgentRestartEndpoints.cs",
+        "sha256": "1bc68c88ade4e7bd134c21139af89a77c673a9aa6d769422b00ba62a1f35f630"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/Configuration/AgentConfigurationEtags.cs",
+        "sha256": "e4349ca3ec1bb2cb8286eee1d8a6ab08d9fa0f67062e1e7a94dc305fe809a680"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/Configuration/AgentDesiredConfigurationEndpoints.cs",
+        "sha256": "a3d651edcba81e0c4281a12e2f0eba3e1b3df49f2f3bf0801f62762f096a0ba9"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Agents/Configuration/AgentDesiredConfigurationRestModels.cs",
+        "sha256": "64ccc5494c1ce17cec6dd4cec50e2e711c5a75fa18f48d3fd3e41b583c133f40"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Audit/AuditRestEndpoints.cs",
+        "sha256": "671ef0ee8f332d2adf63e95586302aff93621d10c753aa6c5fadf594c2c25d37"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Audit/AuditRestModels.cs",
+        "sha256": "0d322a6c599326fc7ea908211c17636fb30edb3fc972b917c41026cf0042fc6f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Audit/AuditRestProjection.cs",
+        "sha256": "4f3f5aa3984a5a4d3441c7a43916a32a9db998fab8139a03133ebdbb59b78265"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Blobs/BlobAccessEndpoints.cs",
+        "sha256": "436eda6727c0edc5ba7ec39025b7a410c9c3bd4bb08d07cf864c4f827c9130d2"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Blobs/BlobAccessRestModels.cs",
+        "sha256": "181fe942b9d4cee5416d0995a17d8551b000ebeb721667a8d36c02f23c29efb5"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/BuildEndpoints.cs",
+        "sha256": "5c296900f2b392ab817292f6777ffd1509eac5836d9e4f0d2e91b23366cd9242"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/BuildRestModels.cs",
+        "sha256": "18f2416c30e740fcf9c221e9bc5d6f4234a5c41ba36c568be743de3590a529e5"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/BuildRestProjection.cs",
+        "sha256": "2034970735fadac29ae05620d9f157a049a79e3e19f729218149a1454d41a4c0"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationEndpoints.cs",
+        "sha256": "2fed86b08b095d17cfb029c38d1a3a2cc9cd9a692729e4032390c1e8db8211f3"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationModels.cs",
+        "sha256": "0e4a527c290f0fc40a8e6df1c4ebe2a9c3cf73963af29c98c3e81ed2af5fc157"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationService.cs",
+        "sha256": "f4ebc5e237a115f2c63f74098f6d33f7f0dd181111718f0cb7c3d116e06911f9"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestAuthentication.cs",
+        "sha256": "196d89f74bfa6e3ba68d64e660e1709e6d6d4f90827f35459ab120d8761dc186"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestCorrelationMiddleware.cs",
+        "sha256": "aa13aaa8cf2c5df67825d73b22238c9512ea6183ea4254611f98d74f2d05ac55"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestCursorCodec.cs",
+        "sha256": "0b9c513d89432ef28df2421dd02cfcf779c47d873df916d4c1277390bbfd2651"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestEtags.cs",
+        "sha256": "ea0b2d89b75b36b7666f0f3ccb621612b98dacbad6e8f255456ce2d97f42a607"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestJson.cs",
+        "sha256": "d021e1a3e66e931e01070002c75377c21bf79a0ebb1d53b0f99c1242cb549a95"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestPagination.cs",
+        "sha256": "a2fab81b34586728eafd9174b87b9e32d0df7b7ad2d1a89aa8e17431cfb85afb"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestProblemDetails.cs",
+        "sha256": "0e236140fe948dca4b5760abbffa941b0a49a5b1964650a370066ff49909abb5"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/RestProblems.cs",
+        "sha256": "a04b09d841a277362be8779e3d529f7dcb44d8233fa5c7fff1bffede9daf5644"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Common/VivariumRestApiExtensions.cs",
+        "sha256": "61f36d579e5dcb150579541307d3ca63a75634663400815ca9e63249817c2435"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Deployment/AgentDeploymentEndpoints.cs",
+        "sha256": "45934d359ab8ee89e438f37f7681dbf14ad96d264828ef10ec7afd6e452dcaed"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Deployment/AgentDeploymentModels.cs",
+        "sha256": "938b017383c1e557918c61f247637d28febd30873c8767f8a163507ca20b316a"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Events/BuildEventEndpoints.cs",
+        "sha256": "f0d9ff280c7ba959fe0d629237c646326cb769a742b03eff5c5a80641b2bd605"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Events/BuildEventModels.cs",
+        "sha256": "8360d5e0bb371042d97e08eab0aab82e9c93d499b1413ec711f34c251b1b76c8"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/Events/BuildEventStore.cs",
+        "sha256": "9dc81dea900daf996e580f84130d3bd4e6e3bd384c9e22acd8184d4b8ffbfcf0"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/OpenApi/VivariumOpenApiExtensions.cs",
+        "sha256": "7238a57bf2a1ef31d480e0a8138d4accd115d566d7b5501b4a9fd986a2aebb3c"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/System/SystemEndpoints.cs",
+        "sha256": "159293a6c0262dd7a7255739d1a7b4b44706257c32be5e22e8ac26c02b13b375"
+      },
+      {
+        "path": "src/Vivarium.Controller/Rest/System/SystemResource.cs",
+        "sha256": "714b4d4f4fe2ecebd6991c6ba895b262ceafa8aa7a3282bb0c1e2c09814df547"
+      },
+      {
+        "path": "src/Vivarium.Controller/Results/Trx/TrxProjectionContracts.cs",
+        "sha256": "751fa56dd1aa66caa039e9514f1ed7a29f22643d0382186bfac9470bbbde6b8f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Results/Trx/TrxProjectionPersistence.cs",
+        "sha256": "5d295407b231bcb5b37b29fc179761dbfb12269ff580fda3b6bef1a70362f1aa"
+      },
+      {
+        "path": "src/Vivarium.Controller/Results/Trx/TrxProjectionService.cs",
+        "sha256": "1a405c25592cec74a1946339749ca82e5f89d1c9086c39de7c36836eb88d2678"
+      },
+      {
+        "path": "src/Vivarium.Controller/Results/Trx/TrxResultAdapter.cs",
+        "sha256": "ddd0c57a2c8e79562aa7a5cc8892b933e2c7f6db087017acc73afc9d24860314"
+      },
+      {
+        "path": "src/Vivarium.Controller/Scheduling/AgentCompatibilityMatcher.cs",
+        "sha256": "b7d23ecc366a935f6734a1983800caef840918c67c02da3ff585ce86adf4b5e4"
+      },
+      {
+        "path": "src/Vivarium.Controller/Scheduling/BuildQueueTimeoutMonitor.cs",
+        "sha256": "875d1a259f3c345c0caa73a0c6df51801114e1491b3e6dc116554e2a1c1a210f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Scheduling/BuildScheduler.cs",
+        "sha256": "d58db4ddf4d6e462b8ea7bdacbc58620923adef70b8fe853b7892c5e9bc14c8f"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/AuthorizationPolicy.cs",
+        "sha256": "465636a3cda86d535cfd05e317708ed49049cd69f90fb3db4d2c8ba05b3f36d9"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/ControllerCertificate.cs",
+        "sha256": "df0fd901911feb09e766a3999052772e11af71e9f7b024a534e47ada4898fdb8"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/ManagementAuthorization.cs",
+        "sha256": "120f8d3b88f4f82fd1d379df721ce00f95fd25ca5055356bc70a95601af2c843"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/PrivateStorage.cs",
+        "sha256": "dd996162cbdcf4c433f0259d5e576cdfa5891b04d806e4866aa1bebfd6a6a867"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/TokenStore.cs",
+        "sha256": "f7c20e0e154935fa4f25690dcf12030e85036883c4ed8257b0c97f8ff4677b1c"
+      },
+      {
+        "path": "src/Vivarium.Controller/Security/UserCredentialService.cs",
+        "sha256": "8e0dd1554cacf5b454e0fa6ea27e29ace0845c64fe11591cb5210d3d9a481b03"
+      },
+      {
+        "path": "src/Vivarium.Controller/Vivarium.Controller.csproj",
+        "sha256": "014a58721869707ba62aa90a41909ddc5afea473b1d7de199e03a0a454b07cfb"
+      },
+      {
+        "path": "src/Vivarium.Controller/VivariumControllerHost.cs",
+        "sha256": "5df647e73e94603bd90d4eb194b547b1845b3c85726268e3c2fd8b791ba1ca65"
+      },
+      {
+        "path": "src/Vivarium.Controller/appsettings.Development.json",
+        "sha256": "73f95f9e0ceb205fc1c4dc50c07697fcfa29d7087868c2aef1d504cb38c771ec"
+      },
+      {
+        "path": "src/Vivarium.Controller/appsettings.json",
+        "sha256": "200332b434757a0054a3d356c91cde01f2c48712be8aa2bcb0f3e973619f06e3"
+      },
+      {
+        "path": "src/Vivarium.Controller/wwwroot/app.css",
+        "sha256": "179ccb84c41dd788b48639418f87331d0a06b4e08adb97a08fcd728bfc424aa2"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/ComputedSourceTests.cs",
+        "sha256": "e8759969423410c725bd89d05756a20a681442ab17e755cc8439547225fb9d6d"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/ContextSourceTests.cs",
+        "sha256": "0e950c2929831047b665f5c8f4530c3f8f443310b37d735f29888a5795017da5"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/OwnedPostgres.cs",
+        "sha256": "e482091983d005187316e158287c2b1887a26156f4b49ace7a2586350b46a922"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/Program.cs",
+        "sha256": "c68f7a7d8e118249c14a5254ff3675f659770d272b6559febcdd25a0baad28cf"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/ProofProcess.cs",
+        "sha256": "8f36bb4ef4856c2460b7781551881d9a2091ba9e4cd59767c3aca53ab7bc0b2f"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/RecipeSourceTests.cs",
+        "sha256": "ae672016232716f7b54cf362a29eb48f3b7e8fc379239485bdc363ccd2dd3bb2"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/RevisionSetPhysicalTests.cs",
+        "sha256": "62f3db7d1215ff5215fba4a04261d752cd846f3a0859ff8fffbf577974975b41"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/RevisionSetStudy.cs",
+        "sha256": "adb386bfb5a4ffc1cb89a2be4001caea383ed87cc6da0917fb3f2328a17956fb"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/SourceCompiler.cs",
+        "sha256": "82f66c9f4ddc94e697d3251e07cf4c5d166d24df59739554a8a3f9813b82aee7"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/Vivarium.DefinitionProof.csproj",
+        "sha256": "bad0bf74d20cad84532eafd11f4e96f5467c122c6b980d0098fac9f6490e2054"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/RawTeamCityTests.cs",
+        "sha256": "30ce26f269e2e9b0ba0cda52cdd5bac26be9250896d2d3ee209d62ca6d05df36"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj",
+        "sha256": "d314b3d31e37b711e3a7398551590600ec3b3dfd8ae38e70e44a7ec37e672082"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AdministrationBootstrapTests.cs",
+        "sha256": "9e9d124df1b24f437b682d9f9d34447ac5a9af46a81b85b5c9dce67bc3968121"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentBlobClientTests.cs",
+        "sha256": "89095dd6efffcf8c0abd5e01ff9aaf09ec68feb533374980630ad2a403a281ad"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentConfigurationReconciliationMonitorTests.cs",
+        "sha256": "55999e6d4f8496da98f6784fb2880052e814a7fd69ba8dbfd90017241f8f8fc7"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentCustomParameterTests.cs",
+        "sha256": "8d69586dc7e1930e9a81a9296d6e40ce96add25c1740b985ba5faf1699f4c331"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentDeploymentTests.cs",
+        "sha256": "354ee41dbf4814164f22d67475af1ef7c4c4af8958e6ea0941a1c701ff51241b"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentDesiredConfigurationTests.cs",
+        "sha256": "6c8fbef45abcf53dccf760a006178a8edc109672545adebcea1a71abb9bc94fb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentFactCollectorTests.cs",
+        "sha256": "0eb0eb5bd1d3567aecaf8073dfb01fa888dd09a1e2500632dd553b85706cfa54"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentFactRestApiTests.cs",
+        "sha256": "def45953e0734b1cfba69be998c5ad11fd621a64e16e383d5302aa8616f26ac2"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentLifecycleTests.cs",
+        "sha256": "90d94eb26d5a4833e0136e18313d9daebc9ad6917c562402ddb89e911ffa0f47"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentProtocolCompatibilityTests.cs",
+        "sha256": "afce25d426aee6fcc832cd474e823e08c8ec238221aadffbfc44dddf05674b6e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentResponsivenessTests.cs",
+        "sha256": "4e0fb1663a05f5da2f0e5f157b0e2ef9820d5fe7eb7e418a1e2f5a294dfd885c"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AgentRestApiTests.cs",
+        "sha256": "9627c6e0363bbf68e71f6b7bb3273f76dc9faebec7f95aea6ee771abfbd1ba99"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ApplicationAuthorizationTests.cs",
+        "sha256": "ca6b570661692aba8103945a0fa3e4aab0c4a6508efda0fc1be42b5936027841"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AuditBoundaryTests.cs",
+        "sha256": "33987ebc2321388cbefdb6dbffc7d50dc548cbb5bfbf5e4113acc8f34c677f90"
+      },
+      {
+        "path": "tests/Vivarium.Tests/AuthorizationPolicyTests.cs",
+        "sha256": "72f8cdd4831bf7ca27caa572c9b8fb65c952a2ba6f3250d9a3705a59cc38f29d"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BlobAccessRestApiTests.cs",
+        "sha256": "ba0b795f336804dea5534d32206a51a38cbcef6537df625caeab6b6f7f7263b1"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BlobAccessServiceTests.cs",
+        "sha256": "7cac274cff83fa74f593f7aec9291e8063df8036b9eea5653dfbe6aeb8ee74dc"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildEventStreamTests.cs",
+        "sha256": "a892d58a953fe209ddf714fb10ff83945f12c83aadfb88e4c2dc5905eca81a40"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildExecutorTests.cs",
+        "sha256": "ab661b7038f2d4fc67bddae4e097450726c65175020ce5c21b65f1034299e97c"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildLeaseTests.cs",
+        "sha256": "844be4524e663332f6da097708408d36e9c7da763b2298e0f95fd526dff9345b"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildMutationRestApiTests.cs",
+        "sha256": "e835d7065bd0d4fe9d2ece864c0cf3d48b00ce260d2ccfc6816823f230c07bef"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildQueueStoreTests.cs",
+        "sha256": "3416ca644ed7880cd06133bd1d62b8f98560a45064b95c6cbd8611f3b86a72a6"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildQueueTimeoutTests.cs",
+        "sha256": "bc76cbdbaff920cfea0f233b4beeef2fe6fa9a9139bb12809d2197b7806d6312"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildRestApiTests.cs",
+        "sha256": "750c9a3f7db853a5423c7582dcdf77e765034a0063e64b91b4f67a6deb5f2021"
+      },
+      {
+        "path": "tests/Vivarium.Tests/BuildSchedulerTests.cs",
+        "sha256": "d9cfa09aa95a9236a8ea5467956288f950d596614c5cc8a3d1025b77ae225ce5"
+      },
+      {
+        "path": "tests/Vivarium.Tests/CliRestClientTests.cs",
+        "sha256": "9c244fad954f666d8acc32eb167fc8c6f73c47fddebfab6214f1d52bae21b3d8"
+      },
+      {
+        "path": "tests/Vivarium.Tests/CliTests.cs",
+        "sha256": "952da39f1d0228e6db0cf4c7b3aea3535dcfb4bd44d22485e47be2f4afe35fb1"
+      },
+      {
+        "path": "tests/Vivarium.Tests/CompatibilityMatcherTests.cs",
+        "sha256": "0055c9c6302b0feed97ae7bbb37614a2580fc54b9236b9bb3299a86f64d29d1e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ConfigurationReconciliationTests.cs",
+        "sha256": "c141afe979967504af8f0b43cae3abcf95432ce1c8bea6933eebf1e196ddf494"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ControlPlaneTests.cs",
+        "sha256": "7227292c24e3baaf5f69077b33713ef522072133278d065d8f5f3e431817fa58"
+      },
+      {
+        "path": "tests/Vivarium.Tests/DatabaseMigrationTests.cs",
+        "sha256": "f50e52ff3a67d001a06f96a679a56180a6691f55f37e8ebac512c5b4fcda704a"
+      },
+      {
+        "path": "tests/Vivarium.Tests/FencingTests.cs",
+        "sha256": "f8c82fc1f84adbaa752d1d52b632db7e7710f739421819c15148ff3816c17dac"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ManagedGitRepositoryTests.cs",
+        "sha256": "416889c489207667e92677c54124699a402208ef77f238659ec61de1900162a4"
+      },
+      {
+        "path": "tests/Vivarium.Tests/ManagementKernelTests.cs",
+        "sha256": "6673ae9eed91288fb827df449295defccff191233d3c062b9425c828deea14ca"
+      },
+      {
+        "path": "tests/Vivarium.Tests/PanelTests.cs",
+        "sha256": "b3fb528b9f14928dfabe5533b6adc17022ce951b7d66541385791c1756415c1e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/PayloadArchiveTests.cs",
+        "sha256": "9770751be64ea6b494217995f864fe459403bcbd9d11ebd463c1426e7d2fc2a8"
+      },
+      {
+        "path": "tests/Vivarium.Tests/PrincipalIdempotencyTests.cs",
+        "sha256": "3aa1b3affd5203cdcf2e0c85643395f54ed16b97234d4667a0d79f8dd591556b"
+      },
+      {
+        "path": "tests/Vivarium.Tests/RestInfrastructureTests.cs",
+        "sha256": "c9ad5c432aba0f86222cf3de9c37a90a380dfaecd04b2f92c90a016fc52dccb3"
+      },
+      {
+        "path": "tests/Vivarium.Tests/SecretStorageTests.cs",
+        "sha256": "3d713fc7d484320177cbcc5a9ac2fa874ca6029327afa3421cbcdda1a1cc4390"
+      },
+      {
+        "path": "tests/Vivarium.Tests/SessionLoopTests.cs",
+        "sha256": "d14401680962eb0912388d580a8541399d2501770dc3c594ad3dcef5f62fd9bc"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ApiLedgerTests.cs",
+        "sha256": "f8a60755b8e5366bb0551ff3417cc49d51713f6d05bce0ea36b6f1982a740b60"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/CurrentController.cs",
+        "sha256": "e2bce580faf588e4eced7b246fb034ad9fdb931d2246c02a986684154fb88628"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/CurrentGrantObservationTests.cs",
+        "sha256": "51c811f2598eb063a3ed941915c03239dba5d4b0a019e2a437c59abd6480d35d"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProductionCompositionTests.cs",
+        "sha256": "fa307cd0db074281279570e15d288095f69fd9f0e20c7976182ac0911639a50f"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProductionSubmissionCompositionTests.cs",
+        "sha256": "60bd20142ba8c4a7239f8fbc8f0d782861ed2c30058881ab1a8134f82f69c193"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ProjectCreationContract.cs",
+        "sha256": "b81f1386ba2690d95a9330752dc33516f311ad4906a4b402bc76cd99a9731cbe"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationCases.cs",
+        "sha256": "77688f8181e7a932ba183c19dc544cead26bc07b88af3fdc79a9dac138115238"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RecordedMutationReplayTests.cs",
+        "sha256": "6b4e8da74f4bef457532ab670330536f3539fd2d4a4b7b5a5aecbbb7f7a7889d"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/api-version.json",
+        "sha256": "40eb42235522216140b4d6ffca53a805f4c476a2a7f6c549323945386ebbe891"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/current-grant-observations.json",
+        "sha256": "277dadf72cbc079b973d2835cf6a53affc54d2d61c83aaac7572f30e86ebe08e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/local-mutations.json",
+        "sha256": "28610c0a014d3c7c206506275f25c4e1057fa7201f8b10e5cacdd05056a0bceb"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/project-create-schema-excerpt.json",
+        "sha256": "dcd840b3049b03ee53884edc4ddfea0ed8e822eef7547243cc1328005d41a63a"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/root-project.json",
+        "sha256": "0079aa0a8009ad1db3855af989e0ecbdf2752410ecd934cef5b425bae7c3630e"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/versioned-mode-observations.json",
+        "sha256": "985c88b7ac6c525ce77c03bad95e914a1cbf87bfc23acdef8b3ecdd97de71a9a"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ReplayControlTests.cs",
+        "sha256": "80af763c492d1ae949fb2ecb310a70ed9d58b12c873cf5ab2168c751551adaaa"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/RestResponseAssert.cs",
+        "sha256": "9c8de06393aebacbb261afa002fad9debd22c1154cbb438fbc8e27c002f7a94d"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/TeamCityCases.cs",
+        "sha256": "22fc2a6bc0b06ecac505836defb05538ddc25ef465be5bf494b8142cb6ff8e19"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/VersionedSettingsObservationTests.cs",
+        "sha256": "b004cf8d4d21e74b9f44172a7fa9285a7711d5aef4220dd0ffa5b5582558c009"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TrxProjectionPersistenceTests.cs",
+        "sha256": "6e1093491974d183110614c0ad029746ce271bcf258a1b7a9943b10c0f7ffb4d"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TrxResultProjectionTests.cs",
+        "sha256": "6ef00ce6cb2115316140622d9909d36a1e6e49f91b9066b3b19e49dd60cc0db5"
+      },
+      {
+        "path": "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+        "sha256": "58fa2afaa2c20982b2738257cdf585e0653eefac47943fa7c1c7979780890f50"
+      },
+      {
+        "path": "tests/Vivarium.Tests/VivariumDefinitionParserTests.cs",
+        "sha256": "590d00351888bb59f56958e0a9835101a17a6707ec4817f73affda85d3e829a6"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Ledger.cs",
+        "sha256": "818cd98b35f7fa376608f638b265789e79c6282829a326e1664f743464ea1a2d"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Program.cs",
+        "sha256": "d225295beb4a461a685c0ecfbc1206cd99c9583031510bc1177bf05d316c0b5c"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/StorySourceLinks.cs",
+        "sha256": "a3386c33444cffd242e5d746a2179ade42794cf28648816a227b525af0198bd1"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Vivarium.ApiLedger.csproj",
+        "sha256": "c978813609c077b4b2e19e6e48f925f5c51d7eea7c46cd63195690a672774a41"
+      },
+      {
+        "path": "tools/definition-proof/Control.g.cs",
+        "sha256": "1afd38b644f55f4a0e040508d62b6c835a08e9f72c3e35d3b70ee15dd2426a26"
+      },
+      {
+        "path": "tools/definition-proof/ControlReader.cs",
+        "sha256": "eb59a60f03b7e681f9f6a53e48b5a562ec79a167b4f82f349c05abf2df595267"
+      },
+      {
+        "path": "tools/definition-proof/Evaluator.csproj",
+        "sha256": "3bd55d8df85a261e50c8756aa708397b91169405b4cf28a7c0e594555e6f6663"
+      },
+      {
+        "path": "tools/definition-proof/Model.cs",
+        "sha256": "61ea5c9093b5848db70e10fbae779caa47d6a993400649a2ee86bc4ffe0d6b8d"
+      },
+      {
+        "path": "tools/definition-proof/Program.cs",
+        "sha256": "91091e0b7b1fdac3bc616f36cc7c3e95c6dc11d08b7979dfa0c0a0b2c691d026"
+      },
+      {
+        "path": "tools/definition-proof/Settings.g.cs",
+        "sha256": "85443dece6059c64590c9d01ffbd228354879b3dbbcb03f61d6119af66323cfa"
+      },
+      {
+        "path": "tools/definition-proof/T3Recipe.cs",
+        "sha256": "3ba421cfb84a4e74d4560eadd4e739224c8d83783eb9fae906738bc9b93f6406"
+      },
+      {
+        "path": "tools/definition-proof/UserCode.cs",
+        "sha256": "c553b06b531ece0e68e469062cda3936000fc6da25a951a428da4bf8294cabc6"
+      },
+      {
+        "path": "tools/definition-proof/probe.py",
+        "sha256": "48c72bdc49a0d2d2d32cfecf5a944a72eefd3e49f9971003b146d0081cb922c7"
+      },
+      {
+        "path": "tools/definition-proof/reference/t3personal.settings.kts",
+        "sha256": "6d7ab6a1dbbdf2a465e4c26f2adcab305f9160b4a1c8ec0286037f5cb0921b7f"
+      },
+      {
+        "path": "tools/definition-proof/render.py",
+        "sha256": "05acdc9530f2061ed1fd744d0e9dabb1ae6886eb7969547375849a5f8a0562a6"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-current-grant-capture.patch",
+        "sha256": "937064246f15be83796de046f3ef7cacef21c3f3d144201897644a228f04d75f"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-lab-fixture-capture.patch",
+        "sha256": "9f855e9b2baf6d6eac71b4173463dfda5f48ec52c2d2d135de6364ea65098d84"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-reference-capture.patch",
+        "sha256": "0ac38fa6a925472874870b8cc55844861438bcf3aec025279c9a03a22883b6c4"
+      },
+      {
+        "path": "tools/teamcity-reference/cli-t3-inputs-capture.patch",
+        "sha256": "a1694f178b6823937cf85c497fc8ac76df6de3c16fad4b114d22a461268b60ad"
+      }
+    ],
+    "source_fingerprint_sha256": "dbb4bb2fde5ea6a39a80a49f207fe6ae6719c499b1a2c67a8fb198a828f9a972",
+    "assemblies": [
+      {
+        "path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+        "sha256": "f3625a9bb4f917dd65136a747ec212622b850c0e10cbace4c032c5d76dc7d4a9"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll",
+        "sha256": "14f4142a1b0f401d094cbdccc3a85858ec49ff6a4b25363ca4aa97565457adba"
+      },
+      {
+        "path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+        "sha256": "d583bee5fb78f24d047649cf15d5339a030778130ffad0313b047ddefd2dd497"
+      },
+      {
+        "path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+        "sha256": "f6e949eb937d7f72ca0218d3a3897fe50cf0041373679551b2ed60ccd016db77"
+      },
+      {
+        "path": "tests/Vivarium.DefinitionProof/bin/Debug/net10.0/Vivarium.DefinitionProof.dll",
+        "sha256": "0aaee42035c4bca351b31ef397cbb2cdd5b82bf79dde70cc1530c8661d733507"
+      }
+    ]
+  },
+  "reference": {
+    "profile": "vivarium-teamcity-lab-202613",
+    "server": "2026.1.3 build 222742",
+    "capture": "tests/Vivarium.Tests/TeamCity/Reference/local-mutations.json",
+    "capture_sha256": "28610c0a014d3c7c206506275f25c4e1057fa7201f8b10e5cacdd05056a0bceb",
+    "api": "2026.1",
+    "target": "http://127.0.0.1:18111",
+    "tool": "@eyeauras/teamcity-cli 0.5.2 plus bounded source patches at b158fe03eab3c31982a21b36c278f690f6b541d9",
+    "retained_capture_from": {
+      "path": ".workspace/workstreams/coherent-refactor/rest-ledger-results.json",
+      "sha256": "debf7fd8b7ce07ff72e49a54a9320897d505619b1e1d91186f468a852d0eb1a7"
+    }
+  },
+  "environment": {
+    "sdk": "10.0.303",
+    "os": "Windows x64",
+    "product_boundary": "Unchanged legacy production Kestrel/Git/SQLite; no replacement Host claim"
+  },
+  "results": {
+    "root_build": {
+      "command": "dotnet build -m:1 --nologo",
+      "artifact": "artifacts/us013-access-20261102/root-build.log",
+      "sha256": "f6333186d1090446607a739068ff81a59486dfce36b238ea1f0bc64f3199faa4",
+      "exit_code": 0
+    },
+    "ordinary_baseline": {
+      "artifact": "artifacts/us013-access-20261102/results/grant-root.trx",
+      "sha256": "7fe5f44c1fc09d6710894a5e633248b6b3cea58e3670dcfd592f0ec486e62c4e",
+      "command": "dotnet test -m:1 --no-build --logger trx;LogFileName=grant-root.trx --results-directory artifacts/us013-access-20261102/results",
+      "exit_code": 0,
+      "counters": {
+        "total": 550,
+        "executed": 538,
+        "passed": 538,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 538,
+        "NotExecuted": 12
+      },
+      "times": {
+        "creation": "2026-11-02T03:40:20.3474420+01:00",
+        "queuing": "2026-11-02T03:40:20.3474424+01:00",
+        "start": "2026-11-02T03:40:17.0463441+01:00",
+        "finish": "2026-11-02T03:46:58.6169904+01:00"
+      },
+      "failures": []
+    },
+    "controls": {
+      "artifact": "artifacts/us013-access-20261102/results/grant-final-controls.trx",
+      "sha256": "8d15856a105a0364a3de5c87633e7200c6c47428774f1707b99c8711f4c1333a",
+      "command": "dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj -m:1 --no-build --filter FullyQualifiedName~Vivarium.Tests.TeamCity --logger trx;LogFileName=grant-final-controls.trx --results-directory artifacts/us013-access-20261102/results",
+      "exit_code": 0,
+      "counters": {
+        "total": 195,
+        "executed": 195,
+        "passed": 195,
+        "failed": 0,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Passed": 195
+      },
+      "times": {
+        "creation": "2026-11-02T03:47:00.1075505+01:00",
+        "queuing": "2026-11-02T03:47:00.1075511+01:00",
+        "start": "2026-11-02T03:46:59.4197611+01:00",
+        "finish": "2026-11-02T03:47:17.1691922+01:00"
+      },
+      "failures": []
+    },
+    "raw": {
+      "artifact": "artifacts/us013-access-20261102/results/grant-raw.trx",
+      "sha256": "797fa99bc844c0151eae04cd3ce9aeb6e4e3cc02f148333a6582bedf55f2bbdd",
+      "command": "dotnet test tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj --no-build --logger trx;LogFileName=grant-raw.trx --results-directory artifacts/us013-access-20261102/results",
+      "exit_code": 1,
+      "counters": {
+        "total": 5,
+        "executed": 5,
+        "passed": 0,
+        "failed": 5,
+        "error": 0,
+        "timeout": 0,
+        "aborted": 0,
+        "inconclusive": 0,
+        "passedButRunAborted": 0,
+        "notRunnable": 0,
+        "notExecuted": 0,
+        "disconnected": 0,
+        "warning": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "pending": 0
+      },
+      "result_row_outcomes": {
+        "Failed": 5
+      },
+      "times": {
+        "creation": "2026-11-02T03:47:20.9106595+01:00",
+        "queuing": "2026-11-02T03:47:20.9106598+01:00",
+        "start": "2026-11-02T03:47:17.7838198+01:00",
+        "finish": "2026-11-02T03:47:20.9156263+01:00"
+      },
+      "failures": [
+        {
+          "name": "TCREST-PROJECT-CREATE-READBACK-JSON-001",
+          "message": "  installed addProject contract: explicit project creation\r\nAssert.That(created.StatusCode, Is.EqualTo(HttpStatusCode.OK))\r\n  Expected: OK\r\n  But was:  NotFound\r\n",
+          "classification": "http-response-mismatch",
+          "stage": "response-assertion",
+          "expected_status": 200,
+          "actual_status": 404
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-SERVER-API-VERSION-TEXT-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n",
+          "classification": "http-response-mismatch",
+          "stage": "response-assertion",
+          "expected_status": 200,
+          "actual_status": 404
+        },
+        {
+          "name": "Current_product_matches_ready_local_reference_workflow(TCREST-PROJECT-MALFORMED-ID-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 500, actual 404\"\r\n",
+          "classification": "http-response-mismatch",
+          "stage": "response-assertion",
+          "expected_status": 500,
+          "actual_status": 404
+        },
+        {
+          "name": "Current_product_matches_ready_local_reference_workflow(TCREST-PROJECT-CREATE-READBACK-002)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n",
+          "classification": "http-response-mismatch",
+          "stage": "response-assertion",
+          "expected_status": 200,
+          "actual_status": 404
+        },
+        {
+          "name": "Current_product_matches_frozen_reference_read(TCREST-PROJECT-ROOT-FIELDS-JSON-001)",
+          "message": "  Assert.That(await DifferenceAsync(actual, expected), Is.Null)\r\n  Expected: null\r\n  But was:  \"HTTP status: expected 200, actual 404\"\r\n",
+          "classification": "http-response-mismatch",
+          "stage": "response-assertion",
+          "expected_status": 200,
+          "actual_status": 404
+        }
+      ]
+    }
+  },
+  "retained_assemblies": [
+    {
+      "recorded_path": "tests/Vivarium.Tests/bin/Debug/net10.0/Vivarium.Tests.dll",
+      "artifact": "artifacts/us013-access-20261102/assemblies/Vivarium.Tests.dll",
+      "sha256": "f3625a9bb4f917dd65136a747ec212622b850c0e10cbace4c032c5d76dc7d4a9"
+    },
+    {
+      "recorded_path": "tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll",
+      "artifact": "artifacts/us013-access-20261102/assemblies/Vivarium.ApiLedger.dll",
+      "sha256": "14f4142a1b0f401d094cbdccc3a85858ec49ff6a4b25363ca4aa97565457adba"
+    },
+    {
+      "recorded_path": "src/Vivarium.Controller/bin/Debug/net10.0/Vivarium.Controller.dll",
+      "artifact": "artifacts/us013-access-20261102/assemblies/Vivarium.Controller.dll",
+      "sha256": "d583bee5fb78f24d047649cf15d5339a030778130ffad0313b047ddefd2dd497"
+    },
+    {
+      "recorded_path": "tests/Vivarium.TeamCity.Conformance/bin/Debug/net10.0/Vivarium.TeamCity.Conformance.dll",
+      "artifact": "artifacts/us013-access-20261102/assemblies/Vivarium.TeamCity.Conformance.dll",
+      "sha256": "f6e949eb937d7f72ca0218d3a3897fe50cf0041373679551b2ed60ccd016db77"
+    },
+    {
+      "recorded_path": "tests/Vivarium.DefinitionProof/bin/Debug/net10.0/Vivarium.DefinitionProof.dll",
+      "artifact": "artifacts/us013-access-20261102/assemblies/Vivarium.DefinitionProof.dll",
+      "sha256": "0aaee42035c4bca351b31ef397cbb2cdd5b82bf79dde70cc1530c8661d733507"
+    }
+  ],
+  "accounting": {
+    "source_inputs": [
+      {
+        "path": "tools/Vivarium.ApiLedger/Ledger.cs",
+        "sha256": "818cd98b35f7fa376608f638b265789e79c6282829a326e1664f743464ea1a2d"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/StorySourceLinks.cs",
+        "sha256": "a3386c33444cffd242e5d746a2179ade42794cf28648816a227b525af0198bd1"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Program.cs",
+        "sha256": "d225295beb4a461a685c0ecfbc1206cd99c9583031510bc1177bf05d316c0b5c"
+      },
+      {
+        "path": "tools/Vivarium.ApiLedger/Vivarium.ApiLedger.csproj",
+        "sha256": "c978813609c077b4b2e19e6e48f925f5c51d7eea7c46cd63195690a672774a41"
+      },
+      {
+        "path": "tests/Vivarium.Tests/TeamCity/ApiLedgerTests.cs",
+        "sha256": "f8a60755b8e5366bb0551ff3417cc49d51713f6d05bce0ea36b6f1982a740b60"
+      },
+      {
+        "path": "Vivarium.slnx",
+        "sha256": "cf53109196dc66724df7c2d2620959d4af9a2322f26436f026b61c6423c7e597"
+      },
+      {
+        "path": "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+        "sha256": "58fa2afaa2c20982b2738257cdf585e0653eefac47943fa7c1c7979780890f50"
+      }
+    ],
+    "assembly": {
+      "path": "tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll",
+      "sha256": "14f4142a1b0f401d094cbdccc3a85858ec49ff6a4b25363ca4aa97565457adba"
+    }
+  },
+  "source_joins": {
+    "actor_goal_stories": 25,
+    "surface_scenario_candidates": 160,
+    "story_dependency_references": 52,
+    "schema_source_occurrences": 449,
+    "cli_fixture_source_occurrences": 456,
+    "native_http_source_occurrences": 40,
+    "agent_envelope_source_occurrences": 20,
+    "known_story_source_gaps": 78,
+    "distinct_scenario_linked_cases": 18,
+    "story_source_join_state": "REFERENTIAL_LINKS_VALID; FROZEN_VARIANTS_AND_EFFECTS_NOT_PROVED",
+    "required_input_paths": [
+      ".workspace/workstreams/coherent-refactor/agent-message-occurrences.tsv",
+      ".workspace/workstreams/coherent-refactor/api-blocks.tsv",
+      ".workspace/workstreams/coherent-refactor/api-ledger.tsv",
+      ".workspace/workstreams/coherent-refactor/cli-source-relations.tsv",
+      ".workspace/workstreams/coherent-refactor/installed-http-occurrences.tsv",
+      ".workspace/workstreams/coherent-refactor/native-http-occurrences.tsv",
+      ".workspace/workstreams/coherent-refactor/rest-first-cohort-cases.tsv",
+      ".workspace/workstreams/coherent-refactor/rest-fixture-inventory.tsv",
+      ".workspace/workstreams/coherent-refactor/rest-local-mutation-cases.tsv",
+      ".workspace/workstreams/coherent-refactor/source-relations.tsv",
+      ".workspace/workstreams/coherent-refactor/stories.tsv",
+      ".workspace/workstreams/coherent-refactor/story-dependencies.tsv",
+      ".workspace/workstreams/coherent-refactor/story-gaps.tsv",
+      ".workspace/workstreams/coherent-refactor/story-implementation-links.tsv",
+      ".workspace/workstreams/coherent-refactor/story-links.tsv",
+      ".workspace/workstreams/coherent-refactor/story-scenarios.tsv",
+      ".workspace/workstreams/coherent-refactor/subsystem-contributions.tsv",
+      ".workspace/workstreams/coherent-refactor/subsystem-slices.tsv",
+      ".workspace/workstreams/coherent-refactor/subsystems.tsv",
+      ".workspace/workstreams/coherent-refactor/teamcity-official-rest-operations.tsv",
+      "Directory.Build.props",
+      "Vivarium.slnx",
+      "build/BuildContext.cs",
+      "build/BuildProcess.cs",
+      "build/BuildTasks.cs",
+      "build/CompileTasks.cs",
+      "build/DockerTasks.cs",
+      "build/GitHubReleaseTasks.cs",
+      "build/PayloadTasks.cs",
+      "build/Program.cs",
+      "build/ReleaseTasks.cs",
+      "build/Vivarium.Build.csproj",
+      "build/assets/bootstrap.json.sample",
+      "build/docker/viv-server.Dockerfile",
+      "global.json",
+      "src/Vivarium.Agent/ActiveBuildJournal.cs",
+      "src/Vivarium.Agent/AgentOptions.cs",
+      "src/Vivarium.Agent/AgentRunner.cs",
+      "src/Vivarium.Agent/BlobClient.cs",
+      "src/Vivarium.Agent/BuildExecutor.cs",
+      "src/Vivarium.Agent/BuildStopController.cs",
+      "src/Vivarium.Agent/DurableFile.cs",
+      "src/Vivarium.Agent/Facts/LinuxPlatformFactsCollector.cs",
+      "src/Vivarium.Agent/Facts/MacOsPlatformFactsCollector.cs",
+      "src/Vivarium.Agent/Facts/PlatformFactContracts.cs",
+      "src/Vivarium.Agent/Facts/PlatformFactSource.cs",
+      "src/Vivarium.Agent/Facts/PlatformFactsCollector.cs",
+      "src/Vivarium.Agent/Facts/WindowsPlatformFactsCollector.cs",
+      "src/Vivarium.Agent/PayloadArchiveExtractor.cs",
+      "src/Vivarium.Agent/PinnedTls.cs",
+      "src/Vivarium.Agent/PrivateStorage.cs",
+      "src/Vivarium.Agent/Program.cs",
+      "src/Vivarium.Agent/Properties/AssemblyInfo.cs",
+      "src/Vivarium.Agent/SessionWriter.cs",
+      "src/Vivarium.Agent/Vivarium.Agent.csproj",
+      "src/Vivarium.Bootstrap/Program.cs",
+      "src/Vivarium.Bootstrap/Vivarium.Bootstrap.csproj",
+      "src/Vivarium.Cli/BuildRequestMapper.cs",
+      "src/Vivarium.Cli/CliArguments.cs",
+      "src/Vivarium.Cli/CliConsole.cs",
+      "src/Vivarium.Cli/ClientConfiguration.cs",
+      "src/Vivarium.Cli/Configuration/VivariumDefinitionParser.cs",
+      "src/Vivarium.Cli/Configuration/VivariumRunDefinition.cs",
+      "src/Vivarium.Cli/ControlPlaneEndpoint.cs",
+      "src/Vivarium.Cli/PayloadArchive.cs",
+      "src/Vivarium.Cli/PinnedTls.cs",
+      "src/Vivarium.Cli/Program.cs",
+      "src/Vivarium.Cli/Properties/AssemblyInfo.cs",
+      "src/Vivarium.Cli/Rest/RestBuildRequestMapper.cs",
+      "src/Vivarium.Cli/Rest/VivariumRestApiClient.cs",
+      "src/Vivarium.Cli/Rest/VivariumRestModels.cs",
+      "src/Vivarium.Cli/TemporaryPayloadArchives.cs",
+      "src/Vivarium.Cli/Vivarium.Cli.csproj",
+      "src/Vivarium.Cli/VivariumCliApplication.cs",
+      "src/Vivarium.Contracts/Vivarium.Contracts.csproj",
+      "src/Vivarium.Contracts/VivariumProductVersion.cs",
+      "src/Vivarium.Contracts/protos/vivarium/v1/agent_hub.proto",
+      "src/Vivarium.Contracts/protos/vivarium/v1/control_plane.proto",
+      "src/Vivarium.Controller/Administration/AdministrationBootstrapContracts.cs",
+      "src/Vivarium.Controller/Administration/AdministrationBootstrapService.cs",
+      "src/Vivarium.Controller/AgentHubService.cs",
+      "src/Vivarium.Controller/Agents/AgentAdministration.cs",
+      "src/Vivarium.Controller/Agents/AgentDesiredConfigurationActivationSink.cs",
+      "src/Vivarium.Controller/Agents/AgentHeartbeatMonitor.cs",
+      "src/Vivarium.Controller/Agents/AgentLifecycleCoordinator.cs",
+      "src/Vivarium.Controller/Agents/AgentOperationalStore.cs",
+      "src/Vivarium.Controller/Agents/AgentParameterMaps.cs",
+      "src/Vivarium.Controller/Agents/AgentRegistry.cs",
+      "src/Vivarium.Controller/Agents/AgentRestartService.cs",
+      "src/Vivarium.Controller/Agents/AgentRestartStore.cs",
+      "src/Vivarium.Controller/Agents/AgentStore.cs",
+      "src/Vivarium.Controller/Agents/Compatibility/AgentProtocolCompatibility.cs",
+      "src/Vivarium.Controller/Auditing/AuditEventStore.cs",
+      "src/Vivarium.Controller/Blobs/Access/BlobAccessContracts.cs",
+      "src/Vivarium.Controller/Blobs/Access/BlobAccessService.cs",
+      "src/Vivarium.Controller/Blobs/Access/BlobAccessStore.cs",
+      "src/Vivarium.Controller/Blobs/BlobStore.cs",
+      "src/Vivarium.Controller/Builds/BuildAdmission.cs",
+      "src/Vivarium.Controller/Builds/BuildQueueItem.cs",
+      "src/Vivarium.Controller/Builds/BuildQueueService.cs",
+      "src/Vivarium.Controller/Builds/BuildQueueStore.cs",
+      "src/Vivarium.Controller/Builds/BuildStore.cs",
+      "src/Vivarium.Controller/Builds/BuildTracker.cs",
+      "src/Vivarium.Controller/Components/App.razor",
+      "src/Vivarium.Controller/Components/Layout/MainLayout.razor",
+      "src/Vivarium.Controller/Components/Pages/Agents.razor",
+      "src/Vivarium.Controller/Components/Pages/BuildDetails.razor",
+      "src/Vivarium.Controller/Components/Pages/BuildDetails.razor.css",
+      "src/Vivarium.Controller/Components/Pages/Builds.razor",
+      "src/Vivarium.Controller/Components/Pages/Builds.razor.css",
+      "src/Vivarium.Controller/Components/Pages/Home.razor",
+      "src/Vivarium.Controller/Components/PanelLogin.cs",
+      "src/Vivarium.Controller/Components/PanelManagementContext.cs",
+      "src/Vivarium.Controller/Components/Routes.razor",
+      "src/Vivarium.Controller/Components/_Imports.razor",
+      "src/Vivarium.Controller/Configuration/Agents/AgentConfigurationReconciliationMonitor.cs",
+      "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationContracts.cs",
+      "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationService.cs",
+      "src/Vivarium.Controller/Configuration/Agents/AgentDesiredConfigurationServiceCollectionExtensions.cs",
+      "src/Vivarium.Controller/Configuration/Git/ConfigurationRepositoryContracts.cs",
+      "src/Vivarium.Controller/Configuration/Git/ConfigurationTreeValidator.cs",
+      "src/Vivarium.Controller/Configuration/Git/GitCommandRunner.cs",
+      "src/Vivarium.Controller/Configuration/Git/ManagedGitRepository.cs",
+      "src/Vivarium.Controller/Configuration/Reconciliation/AgentDesiredConfigurationProjection.cs",
+      "src/Vivarium.Controller/Configuration/Reconciliation/AuthorizationPolicyProjection.cs",
+      "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationOperationStore.cs",
+      "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationReconciler.cs",
+      "src/Vivarium.Controller/Configuration/Reconciliation/ConfigurationReconciliationContracts.cs",
+      "src/Vivarium.Controller/ControllerOptions.cs",
+      "src/Vivarium.Controller/Deployment/AgentPackageContracts.cs",
+      "src/Vivarium.Controller/Deployment/AgentPackageStore.cs",
+      "src/Vivarium.Controller/Deployment/AgentUpgradeContracts.cs",
+      "src/Vivarium.Controller/Deployment/AgentUpgradeService.cs",
+      "src/Vivarium.Controller/Deployment/AgentUpgradeStore.cs",
+      "src/Vivarium.Controller/Management/ControlPlaneAuthorizer.cs",
+      "src/Vivarium.Controller/Management/ControlPlaneService.cs",
+      "src/Vivarium.Controller/Management/DatabaseChangeNotifier.cs",
+      "src/Vivarium.Controller/Management/MatrixBuildCancellationService.cs",
+      "src/Vivarium.Controller/Management/MatrixBuildStore.cs",
+      "src/Vivarium.Controller/Management/MatrixBuildSubmissionService.cs",
+      "src/Vivarium.Controller/Persistence/DatabaseMigrator.cs",
+      "src/Vivarium.Controller/Persistence/VivariumDatabase.cs",
+      "src/Vivarium.Controller/Program.cs",
+      "src/Vivarium.Controller/Properties/launchSettings.json",
+      "src/Vivarium.Controller/Rest/Administration/AdministrationSetupEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Administration/AdministrationSetupModels.cs",
+      "src/Vivarium.Controller/Rest/Agents/AgentRestEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Agents/AgentRestModels.cs",
+      "src/Vivarium.Controller/Rest/Agents/AgentRestProjection.cs",
+      "src/Vivarium.Controller/Rest/Agents/AgentRestartEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Agents/Configuration/AgentConfigurationEtags.cs",
+      "src/Vivarium.Controller/Rest/Agents/Configuration/AgentDesiredConfigurationEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Agents/Configuration/AgentDesiredConfigurationRestModels.cs",
+      "src/Vivarium.Controller/Rest/Audit/AuditRestEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Audit/AuditRestModels.cs",
+      "src/Vivarium.Controller/Rest/Audit/AuditRestProjection.cs",
+      "src/Vivarium.Controller/Rest/Blobs/BlobAccessEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Blobs/BlobAccessRestModels.cs",
+      "src/Vivarium.Controller/Rest/Builds/BuildEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Builds/BuildRestModels.cs",
+      "src/Vivarium.Controller/Rest/Builds/BuildRestProjection.cs",
+      "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationModels.cs",
+      "src/Vivarium.Controller/Rest/Builds/Mutations/BuildMutationService.cs",
+      "src/Vivarium.Controller/Rest/Common/RestAuthentication.cs",
+      "src/Vivarium.Controller/Rest/Common/RestCorrelationMiddleware.cs",
+      "src/Vivarium.Controller/Rest/Common/RestCursorCodec.cs",
+      "src/Vivarium.Controller/Rest/Common/RestEtags.cs",
+      "src/Vivarium.Controller/Rest/Common/RestJson.cs",
+      "src/Vivarium.Controller/Rest/Common/RestPagination.cs",
+      "src/Vivarium.Controller/Rest/Common/RestProblemDetails.cs",
+      "src/Vivarium.Controller/Rest/Common/RestProblems.cs",
+      "src/Vivarium.Controller/Rest/Common/VivariumRestApiExtensions.cs",
+      "src/Vivarium.Controller/Rest/Deployment/AgentDeploymentEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Deployment/AgentDeploymentModels.cs",
+      "src/Vivarium.Controller/Rest/Events/BuildEventEndpoints.cs",
+      "src/Vivarium.Controller/Rest/Events/BuildEventModels.cs",
+      "src/Vivarium.Controller/Rest/Events/BuildEventStore.cs",
+      "src/Vivarium.Controller/Rest/OpenApi/VivariumOpenApiExtensions.cs",
+      "src/Vivarium.Controller/Rest/System/SystemEndpoints.cs",
+      "src/Vivarium.Controller/Rest/System/SystemResource.cs",
+      "src/Vivarium.Controller/Results/Trx/TrxProjectionContracts.cs",
+      "src/Vivarium.Controller/Results/Trx/TrxProjectionPersistence.cs",
+      "src/Vivarium.Controller/Results/Trx/TrxProjectionService.cs",
+      "src/Vivarium.Controller/Results/Trx/TrxResultAdapter.cs",
+      "src/Vivarium.Controller/Scheduling/AgentCompatibilityMatcher.cs",
+      "src/Vivarium.Controller/Scheduling/BuildQueueTimeoutMonitor.cs",
+      "src/Vivarium.Controller/Scheduling/BuildScheduler.cs",
+      "src/Vivarium.Controller/Security/AuthorizationPolicy.cs",
+      "src/Vivarium.Controller/Security/ControllerCertificate.cs",
+      "src/Vivarium.Controller/Security/ManagementAuthorization.cs",
+      "src/Vivarium.Controller/Security/PrivateStorage.cs",
+      "src/Vivarium.Controller/Security/TokenStore.cs",
+      "src/Vivarium.Controller/Security/UserCredentialService.cs",
+      "src/Vivarium.Controller/Vivarium.Controller.csproj",
+      "src/Vivarium.Controller/VivariumControllerHost.cs",
+      "src/Vivarium.Controller/appsettings.Development.json",
+      "src/Vivarium.Controller/appsettings.json",
+      "src/Vivarium.Controller/wwwroot/app.css",
+      "tests/Vivarium.DefinitionProof/ComputedSourceTests.cs",
+      "tests/Vivarium.DefinitionProof/ContextSourceTests.cs",
+      "tests/Vivarium.DefinitionProof/OwnedPostgres.cs",
+      "tests/Vivarium.DefinitionProof/Program.cs",
+      "tests/Vivarium.DefinitionProof/ProofProcess.cs",
+      "tests/Vivarium.DefinitionProof/RecipeSourceTests.cs",
+      "tests/Vivarium.DefinitionProof/RevisionSetPhysicalTests.cs",
+      "tests/Vivarium.DefinitionProof/RevisionSetStudy.cs",
+      "tests/Vivarium.DefinitionProof/SourceCompiler.cs",
+      "tests/Vivarium.DefinitionProof/Vivarium.DefinitionProof.csproj",
+      "tests/Vivarium.TeamCity.Conformance/RawTeamCityTests.cs",
+      "tests/Vivarium.TeamCity.Conformance/Vivarium.TeamCity.Conformance.csproj",
+      "tests/Vivarium.Tests/AdministrationBootstrapTests.cs",
+      "tests/Vivarium.Tests/AgentBlobClientTests.cs",
+      "tests/Vivarium.Tests/AgentConfigurationReconciliationMonitorTests.cs",
+      "tests/Vivarium.Tests/AgentCustomParameterTests.cs",
+      "tests/Vivarium.Tests/AgentDeploymentTests.cs",
+      "tests/Vivarium.Tests/AgentDesiredConfigurationTests.cs",
+      "tests/Vivarium.Tests/AgentFactCollectorTests.cs",
+      "tests/Vivarium.Tests/AgentFactRestApiTests.cs",
+      "tests/Vivarium.Tests/AgentLifecycleTests.cs",
+      "tests/Vivarium.Tests/AgentProtocolCompatibilityTests.cs",
+      "tests/Vivarium.Tests/AgentResponsivenessTests.cs",
+      "tests/Vivarium.Tests/AgentRestApiTests.cs",
+      "tests/Vivarium.Tests/ApplicationAuthorizationTests.cs",
+      "tests/Vivarium.Tests/AuditBoundaryTests.cs",
+      "tests/Vivarium.Tests/AuthorizationPolicyTests.cs",
+      "tests/Vivarium.Tests/BlobAccessRestApiTests.cs",
+      "tests/Vivarium.Tests/BlobAccessServiceTests.cs",
+      "tests/Vivarium.Tests/BuildEventStreamTests.cs",
+      "tests/Vivarium.Tests/BuildExecutorTests.cs",
+      "tests/Vivarium.Tests/BuildLeaseTests.cs",
+      "tests/Vivarium.Tests/BuildMutationRestApiTests.cs",
+      "tests/Vivarium.Tests/BuildQueueStoreTests.cs",
+      "tests/Vivarium.Tests/BuildQueueTimeoutTests.cs",
+      "tests/Vivarium.Tests/BuildRestApiTests.cs",
+      "tests/Vivarium.Tests/BuildSchedulerTests.cs",
+      "tests/Vivarium.Tests/CliRestClientTests.cs",
+      "tests/Vivarium.Tests/CliTests.cs",
+      "tests/Vivarium.Tests/CompatibilityMatcherTests.cs",
+      "tests/Vivarium.Tests/ConfigurationReconciliationTests.cs",
+      "tests/Vivarium.Tests/ControlPlaneTests.cs",
+      "tests/Vivarium.Tests/DatabaseMigrationTests.cs",
+      "tests/Vivarium.Tests/FencingTests.cs",
+      "tests/Vivarium.Tests/ManagedGitRepositoryTests.cs",
+      "tests/Vivarium.Tests/ManagementKernelTests.cs",
+      "tests/Vivarium.Tests/PanelTests.cs",
+      "tests/Vivarium.Tests/PayloadArchiveTests.cs",
+      "tests/Vivarium.Tests/PrincipalIdempotencyTests.cs",
+      "tests/Vivarium.Tests/RestInfrastructureTests.cs",
+      "tests/Vivarium.Tests/SecretStorageTests.cs",
+      "tests/Vivarium.Tests/SessionLoopTests.cs",
+      "tests/Vivarium.Tests/TeamCity/ApiLedgerTests.cs",
+      "tests/Vivarium.Tests/TeamCity/CurrentController.cs",
+      "tests/Vivarium.Tests/TeamCity/ProductionCompositionTests.cs",
+      "tests/Vivarium.Tests/TeamCity/ProductionSubmissionCompositionTests.cs",
+      "tests/Vivarium.Tests/TeamCity/ProjectCreationContract.cs",
+      "tests/Vivarium.Tests/TeamCity/RecordedMutationCases.cs",
+      "tests/Vivarium.Tests/TeamCity/RecordedMutationReplayTests.cs",
+      "tests/Vivarium.Tests/TeamCity/Reference/api-version.json",
+      "tests/Vivarium.Tests/TeamCity/Reference/local-mutations.json",
+      "tests/Vivarium.Tests/TeamCity/Reference/project-create-schema-excerpt.json",
+      "tests/Vivarium.Tests/TeamCity/Reference/root-project.json",
+      "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+      "tests/Vivarium.Tests/TeamCity/Reference/versioned-mode-observations.json",
+      "tests/Vivarium.Tests/TeamCity/ReplayControlTests.cs",
+      "tests/Vivarium.Tests/TeamCity/RestResponseAssert.cs",
+      "tests/Vivarium.Tests/TeamCity/TeamCityCases.cs",
+      "tests/Vivarium.Tests/TeamCity/VersionedSettingsObservationTests.cs",
+      "tests/Vivarium.Tests/TrxProjectionPersistenceTests.cs",
+      "tests/Vivarium.Tests/TrxResultProjectionTests.cs",
+      "tests/Vivarium.Tests/Vivarium.Tests.csproj",
+      "tests/Vivarium.Tests/VivariumDefinitionParserTests.cs",
+      "tools/Vivarium.ApiLedger/Ledger.cs",
+      "tools/Vivarium.ApiLedger/Program.cs",
+      "tools/Vivarium.ApiLedger/StorySourceLinks.cs",
+      "tools/Vivarium.ApiLedger/Vivarium.ApiLedger.csproj",
+      "tools/definition-proof/Control.g.cs",
+      "tools/definition-proof/ControlReader.cs",
+      "tools/definition-proof/Evaluator.csproj",
+      "tools/definition-proof/Model.cs",
+      "tools/definition-proof/Program.cs",
+      "tools/definition-proof/Settings.g.cs",
+      "tools/definition-proof/T3Recipe.cs",
+      "tools/definition-proof/UserCode.cs",
+      "tools/definition-proof/probe.py",
+      "tools/definition-proof/reference/t3personal.settings.kts",
+      "tools/definition-proof/render.py",
+      "tools/teamcity-reference/cli-lab-fixture-capture.patch",
+      "tools/teamcity-reference/cli-reference-capture.patch",
+      "tools/teamcity-reference/cli-t3-inputs-capture.patch"
+    ]
+  },
+  "source_proof_reuse": {
+    "from_receipt": {
+      "path": ".workspace/workstreams/coherent-refactor/us013-context-results.json",
+      "sha256": "037bb8e012720fa6193a766d6e1524be9589bfa3062e02387c2f848e720d0713"
+    },
+    "eleven_source_physical_cases": "Not rerun; prior literal artifacts and all four proof input rosters verified unchanged.",
+    "proofs": {
+      "computed_source_proof": {
+        "receipt": {
+          "path": "artifacts/us013-computed/source-run-74ee928a116140e0935cbe35b5b9ecb2/receipt.json",
+          "sha256": "e5e66c46b80ac90e4293eabd376fd90dc49ecb2cb48bca2d36774785826d422e"
+        },
+        "input_hashes_verified_unchanged": true
+      },
+      "recipe_source_proof": {
+        "receipt": {
+          "path": "artifacts/us013-recipe/source-run-7f2f9bfe8c0944b8b23541becb4b6d14/receipt.json",
+          "sha256": "591aacf94baf4e9efe1cb6ea05602664b8a01747a17fbe3616d5ccd7fa803c26"
+        },
+        "input_hashes_verified_unchanged": true
+      },
+      "physical_recovery_proof": {
+        "receipt": {
+          "path": "artifacts/us013-p0/physical-run-aa5b14ff707c42d3a15728c820564f26/receipt.json",
+          "sha256": "874f3ae686575a09e38046b67c1997b3505f80ebf2d45d8e4e6d59c6f5ff131e"
+        },
+        "input_hashes_verified_unchanged": true
+      },
+      "context_source_proof": {
+        "receipt": {
+          "path": "artifacts/us013-context/source-run-a3d3bb5f82da4f1a91b1162df856953f/receipt.json",
+          "sha256": "01737957800cd0819f27a5023f542366b98c3b1357aac02fa612d260f8d3e2fb"
+        },
+        "input_hashes_verified_unchanged": true
+      }
+    }
+  },
+  "current_grant_reference": {
+    "corpus": {
+      "path": "tests/Vivarium.Tests/TeamCity/Reference/current-grant-observations.json",
+      "sha256": "277dadf72cbc079b973d2835cf6a53affc54d2d61c83aaac7572f30e86ebe08e"
+    },
+    "capture": {
+      "path": "artifacts/us013-access-20261102/run-b26e5b1bbe8a4bb1b908139412c72c5d/receipt.json",
+      "sha256": "49135742d101a8df5885d2ec144c007359f082a7697a7c1187e3186dafcf5d45"
+    },
+    "gates": {
+      "path": "artifacts/us013-access-20261102/run-b26e5b1bbe8a4bb1b908139412c72c5d/gate-receipt.json",
+      "sha256": "ede9dc47d52afc3c4c349563f10a491e525096ec7f04477482d94d73c303f796"
+    },
+    "capture_patch": {
+      "path": "tools/teamcity-reference/cli-current-grant-capture.patch",
+      "sha256": "937064246f15be83796de046f3ef7cacef21c3f3d144201897644a228f04d75f"
+    },
+    "cases": 3,
+    "literal_exchanges": 15,
+    "original_scoped_pat_reused": true,
+    "credential_setup_entity_export": "OMITTED_PRIVATE_CREDENTIAL_SETUP",
+    "owned_cleanup_verified": true
+  },
+  "local_validation": {
+    "path": "artifacts/us013-access-20261102/local-validation.json",
+    "sha256": "402242f74e4352c7bd2a0173bdc2dc85ab21e3417325a9ddf14fb6f9e23c7823"
+  },
+  "source_byte_verification": {
+    "path": "artifacts/us013-access-20261102/source-byte-verification.json",
+    "sha256": "e66a1af32cceef19c376a20e5015c8d53d72f660acae6db9025369d54c327161"
+  },
+  "input_provenance": {
+    "snapshot": {
+      "path": "artifacts/us013-access-20261102/check-inputs.json",
+      "sha256": "4881bdd397035e5099515350a74d21d135bbc128a95cb2e99ec04b23177b006e"
+    },
+    "inputs": 300,
+    "all_stable": true
+  },
+  "previous_checkpoint": {
+    "path": ".workspace/workstreams/coherent-refactor/us013-context-results.json",
+    "sha256": "037bb8e012720fa6193a766d6e1524be9589bfa3062e02387c2f848e720d0713"
+  },
+  "status": "PARTIAL_BASELINE_P0_OPEN",
+  "diagnostics": {
+    "initial_aggregate": {
+      "path": "artifacts/us013-access-20261102/results/grant-all-controls.trx",
+      "sha256": "4672846d52717c7b2e62f54dbf11458227fc6ac3a4d68c0d5b4269caa4b270a9"
+    },
+    "initial_replay": {
+      "path": "artifacts/us013-access-20261102/results/current-grant-controls.trx",
+      "sha256": "2ef740db5f82e06a6a107f74f8e95879ece66e19b9dd205ad49dbf010f6bc406"
+    },
+    "encoded_target_diagnostic": {
+      "path": "artifacts/us013-access-20261102/results/encoded-target-diagnostic.trx",
+      "sha256": "4c31df655c7d235a72f223c7d34f09da60f1d7979c2400b72eb31ac5239d3e49"
+    },
+    "interpretation": "Initial exact-URL replay lost encoded colon; raw transport target preserves it. First aggregate had 194 pass/one owned-directory sharing violation after Host disposal. Bounded retry only Windows sharing/lock errors, permanent failure still propagates. Failed artifacts retained; not product RED."
+  },
+  "limits": [
+    "Original fifteen case identities/oracles and historical receipts are unchanged. Added three selected reference cases are product-prerequisite-blocked. Cumulative eighteen known cases: five actual HTTP RED, thirteen blocked, zero GREEN; global denominator unknown.",
+    "The ordinary scoped TeamCity PAT capture does not establish Depot OIDC, every permission variant, cookie/Basic compatibility or Agent access.",
+    "Strict replay matches finite literal exchanges, not a second permission model or evidence that Vivarium implements current grants.",
+    "Source allocation, shared native/compatible identity, due C#/Git/mode/completion contracts and independent aggregate/Security, zero-debt and main-delivery gates remain open. No R0/PILOT implementation, T3 build/publication or whole-story acceptance."
+  ],
+  "task_sync": {
+    "readback": {
+      "path": "artifacts/us013-access-20261102/tracker-readback.json",
+      "sha256": "245cb991b3a4a8b8548e55de6846cb942be33f7a74c99f62614f1f8a4329be49"
+    },
+    "created": 0,
+    "closed": 0,
+    "active_execution_comment": "https://github.com/iXab3r/Vivarium/issues/110#issuecomment-6567252085",
+    "prior_story_body_and_discussion_preserved": true
+  },
+  "capture_cli_tests": {
+    "command": "npm run test:compiled",
+    "artifact": "artifacts/us013-access-20261102/cli-tests-final.log",
+    "sha256": "1e1b0ac8f1938ff748c5d12f153f5b10b5180bddce500a1309c1d809b469a586",
+    "passed": 664,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "Owned capture copy, not installed/acceptance CLI or product GREEN."
+  }
+}

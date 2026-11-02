@@ -1,4 +1,6 @@
 using System.Net;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -152,12 +154,22 @@ public sealed class RecordedMutationReplayTests
             StartAdminInterface = false,
             AllowPartialMapping = false,
             MaxRequestLogCount = Math.Max(30, testCase.Exchanges.Count + 1),
+            PreWireMockMiddlewareInit = app => ((IApplicationBuilder)app).Use(async (context, next) =>
+            {
+                // WireMock 2.15 rebuilds a URL from ASP.NET's decoded path, losing %3A spelling.
+                // Keep the transport target for exact matching; always overwrite caller input.
+                context.Request.Headers["X-Vivarium-Replay-Raw-Target"] =
+                    context.Features.Get<IHttpRequestFeature>()?.RawTarget
+                    ?? throw new InvalidOperationException("Replay transport did not expose its raw request target.");
+                await next();
+            }),
         });
         for (var index = 0; index < testCase.Exchanges.Count; index++)
         {
             var exchange = testCase.Exchanges[index];
             var request = Request.Create()
-                .WithUrl(new ExactMatcher(server.Url + exchange.PathAndQuery))
+                .WithHeader("Host", new ExactMatcher(new Uri(server.Url!).Authority))
+                .WithHeader("X-Vivarium-Replay-Raw-Target", new ExactMatcher(exchange.PathAndQuery))
                 .UsingMethod(exchange.Method)
                 .WithHeader("Accept", new ExactMatcher(exchange.Headers["accept"]))
                 .WithHeader("Authorization", new ExactMatcher("Bearer fixture-" + exchange.Actor));

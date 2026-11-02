@@ -84,6 +84,21 @@ internal sealed class CurrentController : IAsyncDisposable
                 File.SetAttributes(path, File.GetAttributes(path) & ~FileAttributes.ReadOnly);
             }
         }
-        Directory.Delete(root, recursive: true);
+        // Windows can briefly retain a directory handle after the owned Host has stopped.
+        // Retry only sharing/lock violations; permanent leaks still fail cleanup.
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                Directory.Delete(root, recursive: true);
+                break;
+            }
+            catch (IOException exception) when (OperatingSystem.IsWindows() &&
+                (exception.HResult & 0xffff) is 32 or 33 && attempt < 10)
+            {
+                TestContext.Out.WriteLine($"Owned fixture cleanup sharing violation, retry {attempt + 1}: {exception.Message}");
+                Thread.Sleep(50);
+            }
+        }
     }
 }

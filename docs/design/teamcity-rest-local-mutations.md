@@ -4,6 +4,22 @@
 > Lead: Test Steward; co-held TeamCity, Vivarium REST, User Roles and Testing Architect
 > Tasks: [#33](https://github.com/iXab3r/Vivarium/issues/33), [#35](https://github.com/iXab3r/Vivarium/issues/35), [#42](https://github.com/iXab3r/Vivarium/issues/42)
 
+The later [current-grant cohort](../../tests/Vivarium.Tests/TeamCity/Reference/current-grant-observations.json)
+adds three separately identified cases to the live [contract task #111](https://github.com/iXab3r/Vivarium/issues/111).
+One ordinary user's unchanged scoped PAT receives 403 before a direct project grant, 200 after
+the grant, and 403 after revocation. Readbacks retain the accepted value; a protected second
+project has denied ordinary-user and successful administrator controls. Credential setup entities
+are excluded, while all fifteen policy exchanges retain literal request/response bytes and hashes.
+These cases remain product-prerequisite-blocked pending real compatible objects, credentials and
+current-role services. They do not establish target OIDC behavior or global permission coverage.
+The acquisition patch is [retained separately](../../tools/teamcity-reference/cli-current-grant-capture.patch).
+
+Replay matches the transport's original request target and Host. WireMock.Net 2.15 rebuilds its URL
+from a decoded ASP.NET path, so matching that URL would lose the captured `%3A` in role scopes.
+The transport middleware overwrites the internal raw-target header before matching; an encoded-path
+control also rejects a caller's attempt to spoof it. This changes no reference bytes or product route.
+Counts and execution results in the original checkpoint below remain historical; GitHub holds live status.
+
 This bounded D38 increment asks whether automation can create a project and build configuration,
 change their descriptions, and observe the actual stored values; rejected changes must leave the
 objects unchanged. Permission cases additionally require a known restricted actor and a successful
