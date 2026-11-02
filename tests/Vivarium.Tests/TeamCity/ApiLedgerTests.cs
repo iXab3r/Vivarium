@@ -58,6 +58,8 @@ public sealed class ApiLedgerTests
                 ["source_overrides"] = new JsonArray(), ["linked_reruns"] = new JsonArray() },
         };
         CreateStorySourceLinks();
+        CreateCliSourceAllocation();
+        CreateSupplementalSourceAllocation();
         RebindMetadataInputs();
     }
 
@@ -99,6 +101,109 @@ public sealed class ApiLedgerTests
 
     [TearDown]
     public void Remove_isolated_files() => Directory.Delete(root, recursive: true);
+
+    private void CreateCliSourceAllocation()
+    {
+        var revision = new string('b', 40); var hash = new string('a', 64);
+        const string source = "integrations/teamcity/src/client.ts";
+        Write(Ledger.Workstream + "source-union-checkpoint.json", new JsonObject
+        {
+            ["cli_source_revision"] = revision,
+            ["cli_implementation_files"] = new JsonArray(new JsonObject { ["path"] = source, ["sha256"] = hash }),
+        }.ToJsonString());
+        Table("cli-client-methods.tsv", "method_id\tsource\tsource_revision\tsource_sha256\tmethod\tdeclaration_sha256",
+            $"CLI-METHOD:currentUser\t{source}\t{revision}\t{hash}\tcurrentUser\t{hash}");
+        Table("cli-client-calls.tsv", "site_id\tsource\tsource_revision\tsource_sha256\towner_method\tcalled_method",
+            $"CLI-CALL:1:1\t{source}\t{revision}\t{hash}\tcurrentUser\tcurrentUser");
+        Table("cli-path-fragments.tsv", "fragment_id\tsource\tsource_revision\tsource_sha256",
+            $"CLI-PATH:{source}:1:1\t{source}\t{revision}\t{hash}");
+        Table("cli-method-allocation.tsv", "method_id\tprimary_source_subsystem\trelated_source_subsystems\tfull_owner_slice\tfull_implementation_issue\tfull_contract_issue\tfull_acceptance_issue\tcandidate_entry_slices\trationale\tremaining_variant_owner_basis\tstate",
+            "CLI-METHOD:currentUser\tSS-PROTO\t\tSS-PROTO@P0\t12\t33\t42\tSS-PROTO@P0\tSynthetic source responsibility\tapi-ledger.tsv\tALLOCATED_SOURCE_ONLY_NOT_DISPATCH_OR_ACCEPTANCE");
+        Table("cli-file-allocation.tsv", "source\tsource_revision\tsource_sha256\tprimary_source_subsystem\trelated_source_subsystems\tfull_owner_slice\tfull_implementation_issue\tfull_contract_issue\tfull_acceptance_issue\trationale\tstate",
+            $"{source}\t{revision}\t{hash}\tSS-PROTO\t\tSS-PROTO@P0\t12\t33\t42\tSynthetic source responsibility\tALLOCATED_SOURCE_ONLY_NOT_DISPATCH_OR_ACCEPTANCE");
+    }
+
+    [TestCase("missing-method")]
+    [TestCase("unknown-owner")]
+    [TestCase("wrong-task")]
+    [TestCase("unknown-entry")]
+    [TestCase("orphan-call")]
+    [TestCase("wrong-source-hash")]
+    [TestCase("missing-file")]
+    [TestCase("false-acceptance")]
+    public void Known_CLI_sources_cannot_lose_ownership_or_become_dispatch_acceptance(string corruption)
+    {
+        switch (corruption)
+        {
+            case "missing-method": ReplaceTable("cli-method-allocation.tsv", "CLI-METHOD:currentUser", "CLI-METHOD:missing"); break;
+            case "unknown-owner": ReplaceTable("cli-method-allocation.tsv", "\tSS-PROTO\t", "\tSS-MISSING\t"); break;
+            case "wrong-task": ReplaceTable("cli-method-allocation.tsv", "\t33\t", "\t999\t"); break;
+            case "unknown-entry": ReplaceTable("cli-method-allocation.tsv", "\tSS-PROTO@P0\tSynthetic", "\tSS-MISSING@R0\tSynthetic"); break;
+            case "orphan-call": ReplaceTable("cli-client-calls.tsv", "\tcurrentUser\tcurrentUser", "\tcurrentUser\tmissing"); break;
+            case "wrong-source-hash": ReplaceTable("cli-path-fragments.tsv", new string('a', 64), new string('c', 64)); break;
+            case "missing-file": ReplaceTable("cli-file-allocation.tsv", "src/client.ts", "src/missing.ts"); break;
+            case "false-acceptance": ReplaceTable("cli-method-allocation.tsv", "ALLOCATED_SOURCE_ONLY_NOT_DISPATCH_OR_ACCEPTANCE", "GREEN_SERVER_DISPATCH"); break;
+        }
+        RebindMetadataInputs(); // A correct current hash must not hide an invalid allocation.
+        var report = Read();
+        Assert.That(report.Errors, Is.Not.Empty);
+        Assert.That(report.ProductGreenCases, Is.Zero);
+    }
+
+    private static readonly string[] SupplementalFixtureInputs =
+        ["producer-source.json", "selected-cli-source.json", "selected-core-blobs.json", "src/Fixture.cs", "tests/FixtureTests.cs"];
+
+    private void CreateSupplementalSourceAllocation()
+    {
+        var revision = new string('b', 40); var hash = new string('a', 64);
+        Write("producer-source.json", new JsonObject { ["files"] = new JsonArray(new JsonObject
+            { ["repository"] = "sample", ["revision"] = revision, ["path"] = "build.cs", ["sha256"] = hash }) }.ToJsonString());
+        Write("selected-cli-source.json", new JsonObject { ["selectedSourceRevision"] = revision,
+            ["coreChangedSources"] = new JsonArray("packages/core/src/example.ts") }.ToJsonString());
+        Write("selected-core-blobs.json", new JsonObject { ["revision"] = revision, ["files"] = new JsonArray(new JsonObject
+            { ["path"] = "packages/core/src/example.ts", ["sha256"] = hash }) }.ToJsonString());
+        JsonObject Reference(string path) => new() { ["path"] = path, ["sha256"] = Hash(path) };
+        Write(Ledger.Workstream + "supplemental-source-inputs.json", new JsonObject
+        {
+            ["producer_source"] = Reference("producer-source.json"),
+            ["selected_source_delta"] = Reference("selected-cli-source.json"),
+            ["selected_core_blobs"] = Reference("selected-core-blobs.json"),
+        }.ToJsonString());
+        Write(Ledger.Workstream + "r0-client-selection.json", new JsonObject { ["independent_verification"] = new JsonObject
+            { ["source_difference_assessment"] = Reference("selected-cli-source.json") } }.ToJsonString());
+        const string header = "source_kind\tsource_id\trepository\tsource_revision\tsource_path\tsource_sha256\tprimary_source_subsystem\trelated_source_subsystems\tfull_owner_slice\tfull_implementation_issue\tfull_contract_issue\tfull_acceptance_issue\tearliest_integration_slice\tearly_implementation_issue\tearly_contract_issue\tearly_acceptance_issue\trationale\tstate";
+        var suffix = "\tSS-PROTO\t\tSS-PROTO@P0\t12\t33\t42\tSS-PROTO@P0\t12\t33\t42\tSynthetic source allocation\tALLOCATED_SOURCE_ONLY_NOT_DISPATCH_OR_ACCEPTANCE";
+        Table("supplemental-source-allocation.tsv", header,
+            $"producer-consumer\tsample@{revision}:build.cs\tsample\t{revision}\tbuild.cs\t{hash}" + suffix,
+            $"selected-core-change\tiXab3r/EyeAuras.CliFactory@{revision}:packages/core/src/example.ts\tiXab3r/EyeAuras.CliFactory\t{revision}\tpackages/core/src/example.ts\t{hash}" + suffix);
+        Write("src/Fixture.cs", "Synthetic preserved source"); Write("tests/FixtureTests.cs", "Synthetic baseline anchor; not execution proof");
+        Table("source-inventory.tsv", "path\tbucket", "src/Fixture.cs\tproduction");
+        Table("source-disposition.tsv", "path\tsha256\tsubsystem_id\treplacement_task\tbaseline_test_files\tproof_state",
+            $"src/Fixture.cs\t{Hash("src/Fixture.cs")}\tSS-PROTO\t12\ttests/FixtureTests.cs\tSOURCE_DISPOSITION_ONLY_NOT_REPLACEMENT_ACCEPTANCE");
+    }
+
+    [TestCase("missing-producer")]
+    [TestCase("missing-core")]
+    [TestCase("changed-reference")]
+    [TestCase("missing-preservation")]
+    [TestCase("missing-baseline")]
+    [TestCase("false-acceptance")]
+    public void Known_external_and_preserved_sources_cannot_be_dropped_or_counted_as_acceptance(string corruption)
+    {
+        switch (corruption)
+        {
+            case "missing-producer": ReplaceTable("supplemental-source-allocation.tsv", "sample@", "missing@"); break;
+            case "missing-core": ReplaceTable("supplemental-source-allocation.tsv", "packages/core/src/example.ts", "packages/core/src/missing.ts"); break;
+            case "changed-reference": ReplaceTable("supplemental-source-allocation.tsv", new string('a', 64), new string('c', 64)); break;
+            case "missing-preservation": ReplaceTable("source-disposition.tsv", "src/Fixture.cs", "src/missing.cs"); break;
+            case "missing-baseline": File.Delete(Path.Combine(root, "tests/FixtureTests.cs")); break;
+            case "false-acceptance": ReplaceTable("supplemental-source-allocation.tsv", "ALLOCATED_SOURCE_ONLY_NOT_DISPATCH_OR_ACCEPTANCE", "GREEN"); break;
+        }
+        RebindMetadataInputs();
+        var report = Read();
+        Assert.That(report.Errors, Is.Not.Empty);
+        Assert.That(report.ProductGreenCases, Is.Zero);
+    }
 
     [TestCase("missing-disposition")]
     [TestCase("wrong-owner")]
@@ -597,9 +702,13 @@ public sealed class ApiLedgerTests
     private void RebindMetadataInputs()
     {
         var inputs = receipt["candidate"]!["source_inputs"]!.AsArray();
-        foreach (var input in inputs.Where(input => input!["path"]!.GetValue<string>().StartsWith(Ledger.Workstream, StringComparison.Ordinal)).ToArray())
+        foreach (var input in inputs.Where(input => input!["path"]!.GetValue<string>().StartsWith(Ledger.Workstream, StringComparison.Ordinal) ||
+            SupplementalFixtureInputs.Contains(input["path"]!.GetValue<string>())).ToArray())
             inputs.Remove(input);
-        foreach (var path in Directory.GetFiles(Path.Combine(root, Ledger.Workstream), "*.tsv").Order(StringComparer.Ordinal))
+        foreach (var path in Directory.GetFiles(Path.Combine(root, Ledger.Workstream), "*.tsv")
+            .Concat(new[] { "source-union-checkpoint.json", "supplemental-source-inputs.json", "r0-client-selection.json" }
+                .Select(path => Path.Combine(root, Ledger.Workstream + path)))
+            .Concat(SupplementalFixtureInputs.Select(path => Path.Combine(root, path)).Where(File.Exists)).Order(StringComparer.Ordinal))
         {
             var relative = Path.GetRelativePath(root, path).Replace('\\', '/');
             inputs.Add(new JsonObject { ["path"] = relative, ["sha256"] = Hash(relative) });

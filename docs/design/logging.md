@@ -288,12 +288,22 @@ audit row per deletion. Legal/compliance retention is a future policy, not impli
 
 ### Terminal watermarks and the release barrier
 
-Every terminal build or AgentExplorer operation result carries immutable final watermarks for all logical
+Every producer-reported terminal build or AgentExplorer operation result carries immutable final watermarks for all logical
 output streams. A watermark entry identifies workload, step or operation scope, stdout/stderr stream,
 `final_sequence_exclusive`, and total produced bytes. `0` closes an empty stream. All sequence values
 below the exclusive watermark must resolve to either a durably persisted output chunk or a durably
 persisted gap record. The first accepted terminal result freezes these watermarks; a retry must match,
 and a conflicting retry is a fenced protocol error rather than a new history.
+
+An unreachable/crashed producer is different: the controller cannot manufacture its final watermark,
+exit code or exact lost byte count. After the bounded output-finalization deadline it records the
+known persisted/gapped prefix and an explicit unknown terminal tail, preserving that the end was
+not observed. Native output represents that gap with a null exclusive sequence end and
+`producer-lost`, then seals `complete_with_gaps`. This closes only the output barrier; process-stop,
+lease fencing, workload reconciliation and health quarantine still control machine reuse. A late
+message cannot rewrite the sealed history into an apparently complete log. A never-dispatched
+cancelled workload can instead be proven empty; do not apply that conclusion to an uncertain
+assignment/start or an unreachable process.
 
 Terminal-result acknowledgement and output acknowledgement are independent contracts. Persisting and
 acknowledging a result does not acknowledge output. The agent retains each unacknowledged output range

@@ -639,7 +639,8 @@ archive rendering, general AgentExplorer output and the compatible TeamCity log 
 their full owners; they are not prerequisites for the selected native read/resume journey.
 
 `GET /api/v1/builds/{buildId}/output?cursor=...&limit=...` returns `application/json` with the normal
-`items`/`page` collection envelope. The default limit is 50, maximum 200. Additional top-level `output`
+`items`/`page` collection envelope. The default limit is 50; a supplied limit must be an integer from
+1 through 200, otherwise 400 `invalid_query`. Additional top-level `output`
 metadata contains `state` (`open`, `sealing`, `complete`, `complete-with-gaps`) and `resumeCursor`.
 `page.nextCursor` continues available rows; at the current end it is null. `output.resumeCursor`
 denotes the position after the last returned row (or the unchanged starting position for an empty
@@ -647,12 +648,17 @@ page). Poll with that cursor to receive later rows without replaying or skipping
 Queued and genuinely empty Builds return an empty page, not an invented output row. A finished Build
 may still have `sealing` output; terminal result acceptance is not output completion.
 
-Each item has an opaque stable `id`, `kind` (`data` or `gap`), immutable Build/step scope, `stepIndex`,
-`stream` (`stdout` or `stderr`), source sequence range, and controller `receivedAt`. Source observation
-time is optional and never establishes cross-source order. Sequence endpoints are nonnegative decimal
-strings, with an exclusive end, so JSON clients cannot round uint64 values. Data items cover exactly
-one source sequence and expose `content: { href, length, sha256 }`. A gap has no content link and names
-the missing range and bounded machine-readable reason. Publication order is durable and append-only;
+Each item has an opaque stable `id`, `kind` (`data` or `gap`), immutable `buildId`/`stepIndex` scope,
+`stream` (`stdout` or `stderr`), `sourceSequenceStart`, `sourceSequenceEndExclusive` and controller
+`receivedAt` (RFC3339 UTC). Optional `observedAt` is the producer observation time and never establishes
+cross-source order. Sequence endpoints are nonnegative decimal strings, with an exclusive end, so
+JSON clients cannot round uint64 values. Data items cover exactly one source sequence and expose
+`content: { href, length, sha256 }`, with length an integer byte count and SHA256 lowercase hex. A gap
+omits `content` and has `reason`: `delivery-deadline`, `quota-exceeded`, `spool-overflow`,
+`storage-failure`, `producer-lost` or `retention`. Data items omit `reason`. Only an unknown terminal
+tail may have `sourceSequenceEndExclusive: null` and `reason: producer-lost`: this explicitly says
+that the final producer watermark/amount of missing output was not observed, not that zero bytes
+were lost. Known retained ranges stay exact. Publication order is durable and append-only;
 within one source stream it preserves sequence order. Delayed input cannot rebase already published
 positions; bounded pending ranges resolve to bytes or explicit gaps. Different streams do not acquire
 a fabricated total source-clock order.
@@ -664,18 +670,23 @@ authority. Both metadata and every content read authenticate and evaluate curren
 `view_project`, including inherited permissions and current account/credential eligibility. They do
 not require `view_file_content` or `view_build_runtime_data` in addition to project visibility.
 An invisible or absent Build/entry returns 404; a missing/invalid/expired/revoked credential returns
-401 under the common authentication contract. Links, cursors, old success responses and possession
-of a content hash do not preserve access after rights withdrawal. Current user-disable handling
-follows the common identity service; it must deny before output bytes are read.
+401 under the common authentication contract, including a currently disabled account. Links, cursors, old success responses and possession
+of a content hash do not preserve access after rights withdrawal. Eligibility/authentication denial
+runs before output bytes are read; output does not introduce an independent account policy.
 
 Cursors follow section 4's integrity/principal/filter/snapshot binding. They record retained durable
 positions, survive an ordinary Host restart and do not snapshot permissions. Malformed/tampered or
-cross-resource cursors return 400; a formerly valid cursor outside retained history returns
-410 `cursor_expired` with a recovery link. A fresh read reports retained output and its completeness,
+cross-resource cursors return 400 `invalid_cursor`; a formerly valid cursor outside retained history
+returns 410 `cursor_expired` with a `recovery` extension containing the current authorized relative
+output-resource link. A fresh read reports retained output and its completeness,
 never substitutes missing output with an empty complete log. Byte reads of known expired content
 likewise report 410 after current access checks. Unknown/hidden identities remain 404. Full retention
 policy stays with SS-LOG/BLOB; R0 must prove expiry behavior with controlled time rather than waiting
 or changing the machine clock.
+Retention changes the availability view/epoch, never the original producer evidence. A fresh view
+contains explicit `retention` gaps for purged ranges and reports retained completeness; it does not
+relabel an empty retained tail as a complete original log. Cursors identify the retained view they
+can resume. Retention markers are availability metadata, not late producer bytes rewriting a sealed log.
 
 The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
 registered-secret masking before transport/persistence, per-stream sequence identity, independent
@@ -683,6 +694,12 @@ output acknowledgement and the terminal watermark barrier. Persist content befor
 PG reference; acknowledge only persisted ranges or durable gaps. Replayed identical chunks do not
 duplicate output; conflicting same-sequence content is a protocol failure. A sink/quota/deadline
 failure must produce explicit gap evidence, never false completeness or unbounded capacity retention.
+If the producer disappears without a final watermark, the controller may seal a durable unknown-tail
+gap at the bounded finalization deadline and report `complete-with-gaps`. It must retain that origin,
+never invent a producer watermark, exit code or known byte total, and reject data that would rewrite
+a sealed log. Workload/process reconciliation and quarantine still gate Agent reuse independently;
+sealing missing output is not proof that an unreachable process stopped. Registered exact-value
+masking uses the native marker `[REDACTED]`; lengths and hashes describe the post-mask persisted bytes.
 Agent API/SDK owns the additive capability/protocol extension: current sequence-free `LogChunk`
 cannot satisfy this contract. Preserve existing AgentHub/Bootstrap compatibility; do not assign a
 new output-required workload to an Agent that lacks the negotiated capability.

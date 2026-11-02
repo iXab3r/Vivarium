@@ -53,6 +53,25 @@ schema-backed administrator token DELETE are qualified acquisition steps, not un
 | `TCREST-R0-SCOPED-RUNNING-CANCEL-001` | The same actor selects `env.MODE=long`, observes running before cancel and separately reads retained finished/UNKNOWN. Request acceptance is not substituted for terminal completion. | IAM/AGT/RUN/EXEC |
 | `TCREST-R0-REVOKED-CREDENTIAL-BUILD-BYTES-DENIED-001` | Scoped PAT self-revoke gets 403; authorized administrator DELETE gets 204. The unchanged revoked credential then gets 401 text for existing Build/bytes; administrator still downloads the exact file. | IAM/RUN/BLOB |
 
+### Credential preparation versus compatible wire assertions
+
+The full five-exchange revocation case above remains one indivisible TCREST case, including both
+TeamCity token DELETE requests. It remains product-prerequisite-blocked until the compatible PAT
+wire owner (#119/#120/#121, R1) can execute that whole case with the recorded actor restrictions.
+Neither native My keys revocation nor a subset of its exchanges can make that TCREST case GREEN.
+
+For the R0 credential effect, use the ordinary framework-issued key and revoke it through its normal
+My keys lifecycle. Its subsequent Build and artifact reads are checked against exchanges 2 and 3
+(zero-based) of that case: both are 401 text/plain with the exact retained authentication error.
+Exchange 4 is the independent administrator's 200/exact-byte positive control. This is an explicitly
+selected R0 effect with native credential preparation, not the complete TeamCity token workflow.
+The earlier PAT self-DELETE 403 and administrator DELETE 204 are not native My keys assertions.
+Current account/grant checks, expiry and disable have their separate ordinary-credential obligations
+below; matching this one denial does not establish credential-system equivalence. Keep the full
+134-exchange replay and its source entities unchanged, and report selected-effect evidence separately
+from full-case wire conformance. The other six selected cases contain R0 actions rather than PAT
+issuance/revocation wire; their administrative controls remain part of their required effects.
+
 Build/Agent/user IDs in these literal transcripts are independent reference identities, not product
 seed values or a new ID allocator. Product bindings remain prerequisite-blocked until the actual
 catalogue, scoped principal, process/artifact and revocation services can reproduce those effects.
@@ -105,7 +124,7 @@ native readbacks and actual product execution remain due before this manifest is
 | Catalog P/C | Stable Project P and BuildType C/LocalSmoke activated through the final Git-owned representation proved by #34, with accepted/active revisions and independent expected effective settings. This is a source-free smoke, not full R2 authoring or source checkout. |
 | Protected Q/D | Unrelated Project Q and equivalent owned smoke configuration D; retain a real protected artifact from its successful Build. Positive authorized download and R's allowed P download discriminate permission denial from absent bytes. |
 | Agent E | Real separate native Agent, owned persistent directory, normal enrollment/trusted TLS; independent connected/authorized/enabled/activity facts. Prepare pending, authorized-but-ineligible, ready, busy and disconnected states plus restarted same identity. |
-| Workload | Prepared real native fixture executable with recognizable output and exact smoke.txt bytes, success/nonzero/long modes and fingerprints. Freeze the actual supported parameter selection; do not invent a command/parameter name now. |
+| Workload | Prepared real native fixture executable with recognizable output and exact `owned-r0-smoke\n` bytes in smoke.txt. Absence of env.MODE selects success; normal admission properties `env.MODE=fail` selects exit 7 and `env.MODE=long` selects a bounded fixture-owned wait for running cancel. Record executable/source fingerprints before execution. |
 
 #14 integrates these thin SS-IAM/CFG/AGT/RUN/EXEC/LOG/BLOB contributions; #15 prepares owned inputs,
 #37 proves admission/credential readiness, #38 exercises the client, #40 binds canonical AC and
@@ -133,8 +152,8 @@ a JSON body exists. Freeze download media/headers from the actual chosen client 
 | Failure / nonzero mode | Same normal enqueue/poll commands with the frozen fixture-mode input | Actual nonzero process exit, durable terminal FAILURE/detail and unchanged CLI nonzero exit. No fabricated failed HTTP response or empty successful artifact substitutes for execution. | EXEC/RUN → #38 |
 | Queued cancel / work prevented from starting | POST `/buildQueue/id:N?fields=<buildFields>`, body `{"readdIntoQueue":false}` plus optional string comment | Reference-defined cancel response/terminal projection, no later process start, consistent queue/history/native readback. Establish effects rather than assume request acceptance means cancellation completed. | RUN → #38 |
 | Running cancel / long process confirmed started | POST `/builds/id:N?fields=<buildFields>`, same cancel body | Durable intent/delivery, actual Agent stop, reference-defined terminal result and capacity release. Establish raced finish/stop outcome independently; never force successful cancellation of already-completed work. | RUN/EXEC/AGT → #38 |
-| Artifact / known completed Build N | GET `/builds/id:N/artifacts?resolveParameters=false&logBuildUsage=false&locator=<fileLocator>&fields=count,file(name,size,modificationTime)`; GET `/builds/id:N/artifacts/files/smoke.txt?resolveParameters=false&logBuildUsage=false` | Selected unchanged `files artifacts list/download` commands, observed metadata/media/status and exact retained bytes/hash. This client uses `/files/`, not an assumed `/content/` route. R can download P's allowed bytes; denied Q download/control yields no protected content/effect. | BLOB → #38/#44 |
-| Retained output / same Build | Separate native bounded durable output resource, still to select/freeze; `/api/v1/events` carries lifecycle transitions only | Recognizable actual stdout retained and readable after restart with current permission checks. Current `BuildEventData` contains no stdout and `BuildTracker.GetLog` is memory-only. Neither proves this obligation; full log search remains R4. | LOG → #38/#44 |
+| Artifact / known completed Build N | GET `/builds/id:N/artifacts?resolveParameters=false&logBuildUsage=false&locator=<fileLocator>&fields=count,file(name,size,modificationTime)`; GET `/builds/id:N/artifacts/files/smoke.txt?resolveParameters=false&logBuildUsage=false` | Selected unchanged `builds artifacts list N` / `builds artifacts download N smoke.txt --output <unique-name>` commands, observed metadata/media/status and exact retained bytes/hash. `--output` is a new filename under the isolated profile's downloads directory, not an arbitrary path. This client uses `/files/`, not an assumed `/content/` route. R can download P's allowed bytes; denied Q download/control yields no protected content/effect. | BLOB → #38/#44 |
+| Retained output / same Build | GET `/api/v1/builds/{buildId}/output` and its content links, specified below; `/api/v1/events` carries lifecycle transitions only | Recognizable actual stdout retained and readable after restart with current permission checks. Current `BuildEventData` contains no stdout and `BuildTracker.GetLog` is memory-only. Neither proves this obligation; full log search remains R4. | LOG → #38/#44 |
 | Recovery / owned work and completed bytes | Repeat the same ordinary read/poll/download around controlled Host restart and Agent disconnect/reconnect | Stable identities, truthful occupied/terminal state, immutable actually resolved input/Agent provenance, no duplicate execution/result acceptance, retained output/bytes and owned cleanup. | #14 R0.3 with #15/#38/#44 |
 
 Installed Build.id is int64; the unchanged CLI additionally requires a positive safe integer.
@@ -174,7 +193,7 @@ comes from our public specification, not a guessed TeamCity raw-output renderer.
 | `NATIVE-R0-OUTPUT-LIVE-RESUME-001` | A real owned process writes literal `owned-log-stdout\n` to stdout and `owned-log-stderr\n` to stderr, waits on a bounded fixture-owned gate, then writes `owned-log-tail\n` to stdout and exits 0. While it is still running, ordinary P `view_project` reads output metadata/content. Per-stream concatenation is exactly the independently prepared bytes; do not assume one process write equals one chunk. Read to the current head, release the gate, resume with `output.resumeCursor`, observe the tail once, and reach `complete` only after the frozen final watermarks are resolved. Validate every length/hash against downloaded bytes. |
 | `NATIVE-R0-OUTPUT-CURRENT-ACCESS-001` | Reuse the real P/Q output and previously issued P links/cursors. With no Q grant, both Q metadata/content return404 and contain no Q bytes; authorized Q and ordinary P controls stay positive. Withdraw P `view_project` through the authorized service: the unchanged credential and old links/cursor lose P reads. Regrant restores current allowed reads; revoke/expire the credential and disable the account through their common services, proving denial before content access. No direct role-row mutation or administrator substitution is access evidence. |
 | `NATIVE-R0-OUTPUT-RESTART-REPLAY-001` | Persist a prefix and cursor, then restart the actual Host against the same PG/Storage/key state while its owned Agent retains the workload. Resume the same cursor and replay a previously acknowledged source sequence: no lost retained bytes, duplicate entries or rewritten positions; terminal output and exact final bytes survive a second cold read. Kill/retry at the content/reference/ack handoffs using production logic; an unindexed orphan is not readable output. |
-| `NATIVE-R0-OUTPUT-EXPLICIT-GAP-001` | With controlled time and bounded sink/transport limits, leave a known sequence range unresolved below actual terminal watermarks. Before resolution output is `sealing`; at the bounded finalization deadline persist the exact gap, return `complete-with-gaps`, acknowledge only resolved ranges and release capacity. Never invent missing bytes or change original exit evidence into a successful complete log. Check quota overflow and duplicate/conflicting-sequence handling through the actual ingestion service. |
+| `NATIVE-R0-OUTPUT-EXPLICIT-GAP-001` | With controlled time and bounded sink/transport limits, leave a known sequence range unresolved below actual terminal watermarks. Before resolution output is `sealing`; at the bounded finalization deadline persist the exact gap and return `complete-with-gaps`. Separately lose the producer before its final watermark: persist an explicit unknown terminal tail (`sourceSequenceEndExclusive: null`, `reason: producer-lost`) rather than inventing an end, byte count or exit. Sealing resolves only the output barrier; process-stop/lease/quarantine still govern capacity reuse. Reject changes to sealed producer history. Check quota overflow and duplicate/conflicting-sequence handling through actual ingestion logic. |
 | `NATIVE-R0-OUTPUT-REDACTION-001` | Register one owned synthetic secret before the process starts. Emit that exact value in each stream and across a supported read boundary; raw persisted bytes, metadata, downloads, diagnostic/audit sinks and replay contain no value. Check the documented mask and unchanged surrounding markers. This is exact registered-value evidence, not a promise for unknown encodings or arbitrary transformations. |
 | `NATIVE-R0-OUTPUT-CURSOR-EXPIRY-001` | Tampered/cross-Build cursors return400. A retained valid cursor survives Host restart. Advance controlled production time/retention to expire a formerly valid position:410 `cursor_expired` and a usable current-authorized recovery link, never an empty complete replacement. Known expired content likewise returns410 after access checks; absent/hidden Build/entry remains404. |
 | `NATIVE-R0-OUTPUT-EMPTY-AND-BOUNDS-001` | An actually empty process and a queued Build return empty pages with truthful output state. Exercise default50/max200 metadata paging, maximum64KiB data items and concurrent stdout/stderr; no inline/base64 content, unbounded tail reader or source-clock reordering. A data link for another Build/entry conveys no access. |
@@ -182,8 +201,11 @@ comes from our public specification, not a guessed TeamCity raw-output renderer.
 The fixture gate is test-owned and bounded; no product pause/debug endpoint is introduced. Expected
 stdout/stderr are prepared before execution. Hashing these independent bytes is an oracle; copying
 a product response into expected output is not. Native error envelopes follow the common REST
-contract. Framework user-disable/expiry details remain with the shared IAM contract and must be
-frozen there before exposure, rather than inventing an output-only identity policy.
+contract. Current disabled/expired/revoked accounts or credentials deny with401 through common IAM;
+hidden Project/Build reads are404. Output has no separate identity policy. `PROJECT_VIEWER` is the
+reference-backed log-only role: the read-only installed role observation confirms its sole direct
+permission is `view_project`; the independent log PAT fixture proves that permission suffices.
+The native mask is `[REDACTED]`, with hashes/lengths computed from persisted post-mask bytes.
 
 Current AgentHub `LogChunk` has no source sequence, output acknowledgement or terminal watermarks.
 The R0 contribution therefore requires a reviewed additive negotiated Agent capability, preserving
@@ -192,6 +214,27 @@ These seven planned effects have no executable product binding yet and do not cl
 P0, any source gap or the full SS-LOG owner.
 
 ## Credential lifecycle and denial controls due in R0
+
+R0 uses the stock Guid-keyed Identity account, with one durable positive int64 TeamCity user facet
+on that same PG account for compatible `currentUser`/user lookups. Its framework JWT subject remains
+the normal local account key; a numeric facade ID is not a new identity or credential authority.
+Use current account/grant lookup after resolving either representation. The pinned schema and Depot
+source, not a universal string-ID convention, determine these types. In particular, `/app/rest`
+authentication failures must enter the API challenge projection; Depot's `/api`/`/r` cookie redirect
+classification alone would incorrectly send an unchanged client to a login page.
+
+Prepare the restricted fixture through the authorized/audited common IAM service, with a named
+P-scoped role whose permission IDs match the independently recorded six restrictions:
+`view_project`, `run_build`, `view_file_content`, `view_build_runtime_data`,
+`customize_build_parameters`, `cancel_build`. Read and explicitly neutralize any broad All Users
+grant **in the owned fresh Vivarium fixture** before its no-grant/P/Q checks; never assume a new
+account is restricted merely because it has no direct assignment. Do not change the reference
+lab's inherited group grant or reinterpret its scoped PAT as proof of native JWT restriction.
+Native My keys remains the framework credential; do not add a parallel PAT permission engine to
+make this fixture work. Minimal data-driven role definition, the implicit All Users group/grants
+and this setup command are due R0 IAM contributions; full role/group API/UI lifecycle remains R1.
+The setup must use real authorized services, never direct role-row seeds. This fixes the fixture's
+effective permissions without inventing a product-default All Users assignment.
 
 Keep one framework issuance/validation/current-grant authority. Prove one-time secure disclosure
 and metadata-only later listing; installation issue/redemption denial; no-grant denial then authorized
@@ -227,6 +270,11 @@ AC-ART-01/03; affected TCM-01/02/03/04/05/06/07/08/10. #40 freezes exact obligat
 Source-free smoke does not accept all AC-BLD-01; minimal IAM does not accept complete R1 lifecycle.
 
 ## Sources and evidence limits
+
+The [identity source facts](r0-identity-source-facts.json) bind exact pinned Depot source hashes,
+installed user/Agent/Build numeric schema types and the four read-only installed role exchanges.
+They identify required R0 integration work and the exact restricted/view-only fixture; they are not
+product authentication, role-lifecycle or wire conformance. The reference All Users grant is unchanged.
 
 Independently read at Depot `20238384013326cddb3296963a6d101a0970efc0`:
 

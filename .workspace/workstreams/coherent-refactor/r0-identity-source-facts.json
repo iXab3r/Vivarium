@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "kind": "PINNED_SOURCE_FACTS_AND_REQUIRED_R0_INTEGRATION_NOT_PRODUCT_ACCEPTANCE",
+  "borrowed_source_inputs": [
+    {
+      "repository": "iXab3r/EyeAuras.Depot",
+      "revision": "20238384013326cddb3296963a6d101a0970efc0",
+      "path": "src/EyeAuras.Depot.Data/Identity/DepotUser.cs",
+      "sha256": "95a6307acd8d43770a8cbfe9064604e96fe3821dcfc5e1089bba6c8b198f77a3",
+      "bytes": 323
+    },
+    {
+      "repository": "iXab3r/EyeAuras.Depot",
+      "revision": "20238384013326cddb3296963a6d101a0970efc0",
+      "path": "src/EyeAuras.Depot.Host/Identity/DepotIdentityRegistration.cs",
+      "sha256": "09efe16ce08f45c01933652909cdeb8f14fe172fae8d3b6cc90c0a0d36b6f740",
+      "bytes": 7425
+    }
+  ],
+  "installed_schema": {
+    "path": "artifacts/p0-rest-first/reference/captured/schema.body",
+    "sha256": "22e37bbaf8bdb48f5f67eade2cd3fe206a193eb8eb4de10178909386444104dc",
+    "properties": {
+      "user": {
+        "type": "integer",
+        "format": "int64",
+        "example": 1,
+        "xml": {
+          "attribute": true
+        },
+        "description": "The unique user account ID."
+      },
+      "agent": {
+        "type": "integer",
+        "format": "int32",
+        "example": 771,
+        "xml": {
+          "attribute": true
+        },
+        "description": "An integer value that is the unique agent identificator."
+      },
+      "build": {
+        "type": "integer",
+        "format": "int64",
+        "example": 8134,
+        "xml": {
+          "attribute": true
+        },
+        "description": "The automatically generated unique ID of the build."
+      }
+    }
+  },
+  "installed_role_read": {
+    "path": "artifacts/us013-output-source-20261102/role-source-read.json",
+    "sha256": "d9cb73d99bf8b73e81f5209fbe1e1891266545caa137fcc6493332b1cc3297bc",
+    "reads": 4,
+    "mutations": 0,
+    "viewer_direct_permissions": [
+      "view_project"
+    ],
+    "developer_direct_permissions": [
+      "assign_investigation",
+      "cancel_build",
+      "clean_build_configuration_sources",
+      "comment_build",
+      "customize_build_parameters",
+      "customize_build_revisions",
+      "label_build",
+      "patch_build_sources",
+      "pause_activate_build_configuration",
+      "pin_unpin_build",
+      "reorder_build_queue",
+      "run_build",
+      "tag_build",
+      "view_agent_clouds",
+      "view_agent_details_for_project",
+      "view_agent_usage_statistics",
+      "view_all_users",
+      "view_build_configuration_settings",
+      "view_build_runtime_data",
+      "view_file_content"
+    ],
+    "developer_included_roles": [
+      "PROJECT_VIEWER"
+    ],
+    "unchanged_all_users": [
+      {
+        "roleId": "PROJECT_DEVELOPER",
+        "scope": "g"
+      }
+    ]
+  },
+  "required_r0_contracts": [
+    {
+      "id": "R0-IDENTITY-USER-FACET",
+      "primary_owner": "SS-IAM",
+      "integration_tasks": [
+        113,
+        114,
+        115
+      ],
+      "full_owner": 119,
+      "contract": "Keep normal Guid-keyed Identity authentication. Allocate a durable int64 TeamCity user facet on the same PG account; resolve both projections to current eligibility/grants. No GUID serialization into compatible user.id, hash/truncation, second user/token authority or server-side JS-safe-integer limit.",
+      "product_binding": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "R0-IDENTITY-API-CHALLENGE",
+      "primary_owner": "SS-IAM",
+      "related": [
+        "SS-PROTO",
+        "SS-HOST"
+      ],
+      "integration_tasks": [
+        113,
+        114,
+        115
+      ],
+      "full_owner": 119,
+      "contract": "Extend stock API challenge classification to /app/rest. Preserve framework browser login/OIDC behavior; compatible API requests must not become login-page redirects. Exact native/compatible failure representations retain their protocol owners.",
+      "product_binding": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "R0-RESTRICTED-ROLE-FIXTURE",
+      "primary_owner": "SS-IAM",
+      "integration_tasks": [
+        113,
+        114,
+        115
+      ],
+      "full_owner": 119,
+      "permissions": [
+        "view_project",
+        "run_build",
+        "view_file_content",
+        "view_build_runtime_data",
+        "customize_build_parameters",
+        "cancel_build"
+      ],
+      "log_only_role": "PROJECT_VIEWER",
+      "contract": "Authorized/audited common IAM services prepare owned fixture grants and neutralize any broad All Users grant there. Reference lab group grant is unchanged. Native My keys remains framework issuance; no per-key shadow authorization engine. No product-default group-role policy is inferred.",
+      "product_binding": "NOT_IMPLEMENTED"
+    }
+  ],
+  "limits": [
+    "Read-only role acquisition uses isolated published TeamCityClient0.5.6, not a whole unchanged-CLI workflow or Vivarium acceptance.",
+    "The first read-only request was rejected by an overly narrow acquisition allowlist before reaching the role endpoint; corrected to the actual pinned id: path. No reference mutation or product RED.",
+    "Framework source and installed schema determine a representation/integration requirement, not a functioning new Host or auth model. No new product case, GREEN, milestone closure or normalized denominator."
+  ]
+}

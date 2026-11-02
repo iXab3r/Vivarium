@@ -32,6 +32,15 @@ public sealed class Report
     public int CliFixtureSourceOccurrences { get; set; }
     public int CliTestSourceFiles { get; set; }
     public int CliInlineHandlerSourceOccurrences { get; set; }
+    public int CliImplementationFileAllocationRows { get; set; }
+    public int CliMethodAllocationRows { get; set; }
+    public int CliCallSiteAllocationRows { get; set; }
+    public int CliPathFragmentAllocationRows { get; set; }
+    public int CliPotentialEarlyMethods { get; set; }
+    public int ProducerConsumerSourceAllocationRows { get; set; }
+    public int SelectedCoreSourceAllocationRows { get; set; }
+    public int ProductionSourceDispositionRows { get; set; }
+    public string KnownSourceAllocationState { get; set; } = "UNVERIFIED";
     public int NativeHttpSourceOccurrences { get; set; }
     public int AgentEnvelopeSourceOccurrences { get; set; }
     public int KnownStorySourceGaps { get; set; }
@@ -158,6 +167,9 @@ public static partial class Ledger
         }
 
         ValidateStorySources(root, byApi, byCase, byOwner, bySlice, metadataInputs, report);
+        ValidateCliSourceAllocation(root, byOwner, bySlice, metadataInputs, report);
+        ValidateSupplementalSourceAllocation(root, byOwner, bySlice, metadataInputs, report);
+        report.KnownSourceAllocationState = "KNOWN_SOURCE_RESPONSIBILITY_ALLOCATED_NOT_VARIANT_OR_ACCEPTANCE";
 
         var evidence = Json(root, assessmentPath);
         Require(S(evidence, "candidate_id") == candidate, "Unknown candidate: explicit evidence decision required.");

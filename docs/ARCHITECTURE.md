@@ -1189,6 +1189,11 @@ zero-debt/main delivery; no per-card formal review or placeholder/effect-free GR
 See [REST domain contract](design/teamcity-rest-domain.md), the workstream REST breakdown and local
 lab gates. Current legacy session tests/manual process entry points are prior evidence, not proof
 that the new PG/Chiral local environment has already been delivered.
+The R0 identity integration preserves the stock Guid-keyed account while allocating its compatible
+int64 user facet in the same PG authority; numeric lookup is not another user/token store or JWT
+subject. Adapt the framework API challenge classification to `/app/rest` so compatible requests do
+not become login-page redirects. These source-backed representation/protocol inputs and the
+explicit restricted-role fixture are recorded in the R0 contract; they are not implementation proof.
 
 ### D37. Business acceptance and continuous TeamCity superset conformance govern every milestone
 

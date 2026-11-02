@@ -71,6 +71,22 @@ Project/configuration external IDs, numeric internal IDs, mutable build numbers 
 are distinct. Native and imported origins require collision-free persisted mappings and valid local
 hrefs, with compatible JSON representation per resource. Never apply a universal stringify-all rule.
 
+D34's pinned Depot account is `IdentityUser<Guid>`; preserve that framework authentication key and
+issuer/opaque-subject link. The installed TeamCity schema declares `user.id` as JSON int64, while
+`agent.id` is int32 and `build.id` is int64. The ordinary account therefore needs an installation-local
+numeric TeamCity user facet allocated durably with the same PG account, unique and never recycled.
+Native account identity and compatible numeric lookup resolve to that one account and its current
+eligibility/grants. The facet is not another user store, credential authority or JWT subject; never
+serialize the GUID into compatible `user.id`, hash/truncate it into a number, or impose a client's
+JS-safe-integer limit as the server's int64 domain. Imports retain separately qualified source origin.
+
+Preserve stock authentication while adapting protocol classification: Depot's cookie redirect hook
+recognizes `/api` and `/r`; the compatible `/app/rest` boundary must also return the frozen API
+authentication/permission response instead of redirecting a client to an HTML login page. Normal
+account/login/OIDC browser pages retain their framework behavior. Both API projections still call
+one authentication/current-authorization stack; only their response representations differ. This is
+a required R0 integration contract, not implemented identity/facade acceptance.
+
 Queue/running/finished state is separate from SUCCESS/FAILURE/other outcome and cancellation/failure
 details; the installed lifecycle enum also declares deleted and unknown. Literal absent/null/status
 behavior and optimized/reused old-ID resolution remain observation gaps, not a universal numeric-ID
