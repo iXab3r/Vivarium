@@ -224,6 +224,15 @@ Exact mode/error/completion cases, current grants, collisions, accepted-but-unap
 handoffs and real recovery remain P0 work. Kotlin/XML-specific public operations still need explicit
 language/source mappings and due ownership; reporting fictitious Kotlin success is not a C# mapping.
 
+The separate CLI format blocker is now resolved by the published, locally installed **0.5.6** fix in
+CliFactory [#79](https://github.com/iXab3r/EyeAuras.CliFactory/issues/79). The
+[selected R0 consumer](r0-client-selection.json) independently verifies both unchanged-string writes,
+remote errors, Update denial, ordinary JSON and JSON-RPC against the installed package. This allows
+the C# format to reach a server; it does not prove that server's source compilation or activation.
+No XML/Kotlin compatibility exception is accepted. Keep other language/mode/ownership/completion
+variants accountable and the original 0.5.2 reference observations immutable. CliFactory's ongoing
+[#80 audit](https://github.com/iXab3r/EyeAuras.CliFactory/issues/80) is not a blanket story dependency.
+
 The [child-owner reference corpus](../../../tests/Vivarium.Tests/TeamCity/Reference/child-owner-observations.json)
 now supplies seven groups / 297 exchanges and exact source revisions. Under an editing-disabled
 ancestor, an inherited child edit returns 500/ReadOnlyEntityException; explicitly disabling child

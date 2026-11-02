@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "R0_SELECTED_PUBLISHED_CLIENT_NOT_PRODUCT_ACCEPTANCE",
+  "selected_package": {
+    "name": "@eyeauras/teamcity-cli",
+    "version": "0.5.6",
+    "source_revision": "c0159333508e8cbd417107cf60d2bb2efee882af",
+    "shasum": "1b63d215ac15e2b55ac5308aabc2f9db6fae7ebb",
+    "integrity": "sha512-6BhqCfqfgncLPw5F7uZFXE4mesCUfLKmqIV3IfbdbUnGjZBS3WBKLieZL37X799GkVa70aczjhgSksYIuAtWfg==",
+    "archive_sha256": "7dfd8df5d3a5ac31dd7a389b7499551ef2512373bde2c9ac5d574b8dde863122"
+  },
+  "delivery": {
+    "issue": "https://github.com/iXab3r/EyeAuras.CliFactory/issues/79",
+    "pull_request": "https://github.com/iXab3r/EyeAuras.CliFactory/pull/81",
+    "release": "https://github.com/iXab3r/EyeAuras.CliFactory/releases/tag/v0.5.6",
+    "merged_source_revision": "c0159333508e8cbd417107cf60d2bb2efee882af",
+    "issue_closed": true
+  },
+  "independent_verification": {
+    "release_registry_installed_bytes": {
+      "path": "artifacts/us013-cli056-20261102/release-identity-receipt.json",
+      "sha256": "c3728a31f3c6620bdd5b63172d7d96e93b7c14345f40f04f68e90f9e6ca858ce"
+    },
+    "installed_command_composition": {
+      "path": "artifacts/us013-cli056-20261102/installed-composition-receipt.json",
+      "sha256": "817ad6a86a8175174f88cc9d10d67b3d0d9f930471820db184ecbf98721c6a01"
+    },
+    "source_difference_assessment": {
+      "path": "artifacts/us013-cli056-20261102/source-selection-assessment.json",
+      "sha256": "78e42b8d050b41d138b17969a662282b8f314e3322435a9ec1a4e144d0295830"
+    },
+    "forwarded_string_write_cases": 12,
+    "remote_error_cases": 2,
+    "invalid_type_rejections": 4,
+    "update_denials_before_fetch": 2,
+    "ordinary_json_read": true,
+    "json_rpc_write": true,
+    "http_boundary_calls": 16,
+    "real_service_requests": 0,
+    "cleanup_verified": true,
+    "teamcity_source_files": 32,
+    "unchanged_teamcity_source_files": 29,
+    "core_runtime_changed": true
+  },
+  "scope": {
+    "selected_for": "Future unchanged published-CLI R0 entry and CSharp Versioned Settings preparation; verify active installed version at use.",
+    "resolved": "Local xml/kotlin-only format rejection in both writing paths. No new XML/Kotlin compatibility exception.",
+    "not_accepted": "Reference-server CSharp execution, Vivarium settings activation/permissions/modes, whole-client conformance, exact complete R0 journey, P0/R0/PILOT or whole-story acceptance.",
+    "historical_reference_client": "0.5.2 at b158fe03eab3c31982a21b36c278f690f6b541d9. Original source census, acquisition copy, observations, oracles and execution receipts remain immutable. The selected 0.5.6 entry is separately qualified, not relabelled historical execution.",
+    "follow_up": "CliFactory #80 remains its independent ongoing broader audit, not a blanket US-013 predecessor."
+  }
+}

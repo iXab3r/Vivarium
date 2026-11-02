@@ -9,6 +9,31 @@ former #42 supplies P0 freeze input and former #44 supplies R0 acceptance input.
 [contributions](subsystem-contributions.tsv) retain their primary/full owners and empty case IDs
 until independently established cases exist. This Markdown is planning data, not a fixture DSL.
 
+## Selected published client
+
+The R0 entry now selects published **TeamCity CLI 0.5.6**, source
+`c0159333508e8cbd417107cf60d2bb2efee882af`, as recorded in the
+[client selection and verification](r0-client-selection.json). CliFactory
+[#79](https://github.com/iXab3r/EyeAuras.CliFactory/issues/79) is merged/released/installed. Independent
+verification matches all three installed packages to their registry archives and release manifest.
+Both format-writing paths forward `csharp` and future strings unchanged; current Update denial,
+ordinary JSON and JSON-RPC retain their tested narrow behavior. The HTTP boundary is controlled:
+this does not prove server-side C# execution or any replacement Host behavior.
+
+All 32 TeamCity implementation source paths are compared with the earlier pin: 29 are byte-identical;
+the other three change the version, format help and format validator. In particular, `client.ts`,
+`build-flow.ts` and `file-models.ts` remain identical. Core changed separately, so source equality is
+not a claim of whole-runtime equivalence; the installed consumer probes and upstream release checks
+have their own boundaries. Recheck the chosen installed version at execution, especially while
+CliFactory [#80](https://github.com/iXab3r/EyeAuras.CliFactory/issues/80) continues its broader audit.
+
+The old **0.5.2 / b158fe03…** pin still owns the original reference acquisition, source tables and
+historical executions. Keep those bytes and receipts unchanged. The source-established requests
+below retain that provenance; future product evidence must name the separately selected 0.5.6
+consumer. No XML/Kotlin compatibility waiver is adopted. The local format-value blocker is resolved;
+the remaining manifest/model/current-principal/effect/freeze gates remain open. The wider #80 audit
+does not block this selected entry.
+
 ## Freeze inputs and required outputs
 
 #32 supplies verified identity/state/provenance traces; #33/#35 acquire independent reference
@@ -138,7 +163,8 @@ Independently read at Depot `20238384013326cddb3296963a6d101a0970efc0`:
   [WorkbenchAccessSteps](https://github.com/iXab3r/EyeAuras.Depot/blob/20238384013326cddb3296963a6d101a0970efc0/tests/EyeAuras.Depot.AcceptanceTests/WorkbenchAccessSteps.cs)
   and [ManagementRoles](https://github.com/iXab3r/EyeAuras.Depot/blob/20238384013326cddb3296963a6d101a0970efc0/src/EyeAuras.Depot.Host/Access/ManagementRoles.cs): ordinary token before grant, private installation login, Access UI grant, same pre-grant JWT gaining current Admin rights. Vivarium uses TeamCity SYSTEM_ADMIN/current project rights instead.
 
-Pinned CliFactory source `b158fe03eab3c31982a21b36c278f690f6b541d9`, integration version 0.5.2:
+Historical reference-acquisition CliFactory source `b158fe03eab3c31982a21b36c278f690f6b541d9`,
+integration version 0.5.2 (the selected future entry is qualified separately above):
 [client.ts](https://github.com/iXab3r/EyeAuras.CliFactory/blob/b158fe03eab3c31982a21b36c278f690f6b541d9/integrations/teamcity/src/client.ts)
 (`userFields`/`serverFields`/`projectFields`/`jobFields`/`agentFields`/`buildFields`, currentUser,
 runJob/getBuild/cancel/listFiles/downloadFile),
