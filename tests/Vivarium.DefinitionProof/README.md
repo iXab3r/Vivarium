@@ -43,7 +43,8 @@ the study is not a compatible facade or a replacement persistence implementation
 real Agent execution, imported identities, optimized queue replacement, SSE or artifact mapping.
 
 Under D41, that public legacy alias adapter is historical feasibility evidence, not a replacement
-requirement. `CatalogIdentityPhysicalTests` instead compiles real committed C# into Project and
+requirement. `CatalogIdentityPhysicalTests` instead compiles and evaluates real committed C# inside
+the D43 isolated Linux/Docker boundary, then consumes the actual returned plan as Project and
 BuildType catalogue identities and immutable selected definitions in an owned PostgreSQL database.
 It rejects missing owners/definitions and definition rewrites, allocates concurrent Build identities,
 retains old selected input after a real Git edit and PostgreSQL restart, and separately maps an opaque

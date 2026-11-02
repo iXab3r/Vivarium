@@ -197,6 +197,10 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   data or credentials and with resource/time/output bounds. The coordinator owns pinned compiler/
   dependency inputs and validates untrusted output under current authority; no same-user Host fallback.
   Existing trusted-source studies are not isolation or production-evaluator acceptance.
+- D44 selects managed typed C# declarations/edits with untouched user computations and one effective
+  Git owner per Project/field. Disabled synchronization uses managed-local Git, not PG desired state;
+  an ancestor source cannot seize an independently owned child. Reference modes/completion and
+  XML/Kotlin obligations remain; the source studies are not full SDK or product acceptance.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

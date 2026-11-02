@@ -1387,6 +1387,48 @@ before affected exposure. Existing trusted-source experiments remain historical 
 not proof of this isolation. P0 proves the boundary; production integration remains behind the P0
 gate. This decision does not waive permitted TeamCity edits, language mappings or other D36 gates.
 
+### D44. One selected Git owner and typed C# edits, independent of synchronization mode
+
+The C# representation uses managed typed declarations and, for user-computed definitions, managed
+typed edit declarations applied after the untouched user computation. Both are committed C# in the
+selected settings repository and evaluated through D43. Read declared edits from their compiled
+declaration before a subsequent mutation; do not reconstruct ownership/overrides from effective
+values, rewrite arbitrary C# syntax or keep editable JSON/database overrides. An edit category is
+exposed only when the shared typed model/editor can preserve its reference behavior, including
+removal/reset, collection identity/order, inheritance and current permissions. This is one source
+mechanism, not permission to reject compatible edits to manually authored definitions.
+
+Control Git owns Project identity/hierarchy, explicit settings bindings, trust/credential references
+and synchronization policy. Product Git owns only the settings scope delegated by that binding.
+Resolve each Project's effective source owner from the nearest explicit synchronization selection:
+inherited settings follow that selection; explicitly disabled synchronization uses that Project's
+managed-local control-Git C#; enabled/bound settings use the selected settings repository/revision.
+Disabled synchronization does not move desired settings into PostgreSQL. Ordinary parameter/template
+inheritance remains a separate model. A parent's source declaring a locally owned child cannot seize
+that child or overwrite its settings. There is exactly one accepted owner for each desired field.
+When explicitly disabling synchronization, materialize the current validated local declarations and
+stable identities as managed-local C#, preserving declaration-versus-inheritance distinctions. An
+unselected product computation is not silently rerun during later local edits. Switching back to
+inherited/bound source uses the frozen import/overwrite operation, not an implicit merge of two owners.
+
+Initialize an unbound Project/BuildType before an optional product binding. Control-selected paths
+and repository identities locate the managed declarations and user files; validate reserved paths,
+scope and collisions before selecting source. Prepare and validate a destination, then durably
+activate the accepted binding/revision set; a prepared copy is not a second active owner. Git CAS,
+PG activation and last-known-good recovery retain their separate boundaries. Two-way mutation,
+one-way/read-only or initializing rejection, context-dependent editability and current/default/VCS
+Build-settings selection follow the frozen TeamCity operation, not a new universal mode policy.
+Configuration-updated acknowledgement need not imply a new source import when the operation does not
+perform one. Selected historical Build plans are never reevaluated into new history.
+
+P0's real source/child-owner/computed/T3-recipe and Git/PG recovery studies establish bounded
+feasibility; D43 proves the isolation boundary separately and the catalogue composition consumes
+its actual isolated output. They do not accept the public SDK, full field schemas, concurrent
+activation, HTTP mode/completion or authorization implementation. R0 consumes an unbound Git-owned
+smoke and PILOT uses C#/Git preparation; full editable/language-specific variants remain allocated
+to their owners before exposure. XML/Kotlin compatibility is not waived. This decision resolves the
+shared source-authority/edit mechanism; exact unproved variants remain visible verification gaps.
+
 ## 5. Protocol sketch
 
 ```proto

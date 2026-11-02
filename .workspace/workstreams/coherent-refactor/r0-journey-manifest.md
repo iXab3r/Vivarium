@@ -149,6 +149,48 @@ Probe all three conditions and distinguish source `revisions` from `versionedSet
 requested settings mode. Freeze actually resolved execution inputs at their reference-defined boundary,
 not an invented enqueue snapshot. Full branch/VCS authoring remains #34/#47/#48 proof/acceptance work.
 
+## Selected native output contract and planned effect cases
+
+The R0 output contribution now has a concrete
+[native resource contract](../../../docs/design/rest-api.md#71-selected-r0-durable-build-output)
+and [independent access observations](us013-log-access-results.json). The reference root
+`GET /downloadBuildLog.html?buildId=N&plain=true` returns actual live and finished output with only
+P `view_project` in the PAT restrictions. The same P credential gets a hiding 404 for a real Q log;
+its post-revocation read gets 401 while administrator byte controls remain readable. Q's HTML error
+entity is omitted, so this does not freeze that full wire response. `/httpAuth` rejects the observed
+Bearer form with 401 and is not substituted for the successful root variant. No log-download CLI
+command exists in the selected client. These are access observations, not new TCREST cases.
+
+The following **planned, unbound, not GREEN** native variants belong to #114/#115 within #113,
+with SS-LOG primary and IAM/RUN/EXEC/BLOB/Agent API collaborators. They specify the useful LocalSmoke
+output result, not separate implementation cards or completion of the full R4 logging subsystem.
+Use actual production logic at the smallest sufficient boundary; share the owned real Agent/Build
+fixture rather than repeating a full deployment for every denial. At least the live process and
+Host restart journeys cross the real Agent/Host/PG/Storage boundary. The exact native representation
+comes from our public specification, not a guessed TeamCity raw-output renderer.
+
+| Planned variant | Independent seed and expected effect |
+|---|---|
+| `NATIVE-R0-OUTPUT-LIVE-RESUME-001` | A real owned process writes literal `owned-log-stdout\n` to stdout and `owned-log-stderr\n` to stderr, waits on a bounded fixture-owned gate, then writes `owned-log-tail\n` to stdout and exits 0. While it is still running, ordinary P `view_project` reads output metadata/content. Per-stream concatenation is exactly the independently prepared bytes; do not assume one process write equals one chunk. Read to the current head, release the gate, resume with `output.resumeCursor`, observe the tail once, and reach `complete` only after the frozen final watermarks are resolved. Validate every length/hash against downloaded bytes. |
+| `NATIVE-R0-OUTPUT-CURRENT-ACCESS-001` | Reuse the real P/Q output and previously issued P links/cursors. With no Q grant, both Q metadata/content return404 and contain no Q bytes; authorized Q and ordinary P controls stay positive. Withdraw P `view_project` through the authorized service: the unchanged credential and old links/cursor lose P reads. Regrant restores current allowed reads; revoke/expire the credential and disable the account through their common services, proving denial before content access. No direct role-row mutation or administrator substitution is access evidence. |
+| `NATIVE-R0-OUTPUT-RESTART-REPLAY-001` | Persist a prefix and cursor, then restart the actual Host against the same PG/Storage/key state while its owned Agent retains the workload. Resume the same cursor and replay a previously acknowledged source sequence: no lost retained bytes, duplicate entries or rewritten positions; terminal output and exact final bytes survive a second cold read. Kill/retry at the content/reference/ack handoffs using production logic; an unindexed orphan is not readable output. |
+| `NATIVE-R0-OUTPUT-EXPLICIT-GAP-001` | With controlled time and bounded sink/transport limits, leave a known sequence range unresolved below actual terminal watermarks. Before resolution output is `sealing`; at the bounded finalization deadline persist the exact gap, return `complete-with-gaps`, acknowledge only resolved ranges and release capacity. Never invent missing bytes or change original exit evidence into a successful complete log. Check quota overflow and duplicate/conflicting-sequence handling through the actual ingestion service. |
+| `NATIVE-R0-OUTPUT-REDACTION-001` | Register one owned synthetic secret before the process starts. Emit that exact value in each stream and across a supported read boundary; raw persisted bytes, metadata, downloads, diagnostic/audit sinks and replay contain no value. Check the documented mask and unchanged surrounding markers. This is exact registered-value evidence, not a promise for unknown encodings or arbitrary transformations. |
+| `NATIVE-R0-OUTPUT-CURSOR-EXPIRY-001` | Tampered/cross-Build cursors return400. A retained valid cursor survives Host restart. Advance controlled production time/retention to expire a formerly valid position:410 `cursor_expired` and a usable current-authorized recovery link, never an empty complete replacement. Known expired content likewise returns410 after access checks; absent/hidden Build/entry remains404. |
+| `NATIVE-R0-OUTPUT-EMPTY-AND-BOUNDS-001` | An actually empty process and a queued Build return empty pages with truthful output state. Exercise default50/max200 metadata paging, maximum64KiB data items and concurrent stdout/stderr; no inline/base64 content, unbounded tail reader or source-clock reordering. A data link for another Build/entry conveys no access. |
+
+The fixture gate is test-owned and bounded; no product pause/debug endpoint is introduced. Expected
+stdout/stderr are prepared before execution. Hashing these independent bytes is an oracle; copying
+a product response into expected output is not. Native error envelopes follow the common REST
+contract. Framework user-disable/expiry details remain with the shared IAM contract and must be
+frozen there before exposure, rather than inventing an output-only identity policy.
+
+Current AgentHub `LogChunk` has no source sequence, output acknowledgement or terminal watermarks.
+The R0 contribution therefore requires a reviewed additive negotiated Agent capability, preserving
+Bootstrap and existing session fences. Current memory-only BuildTracker/SSE is insufficient.
+These seven planned effects have no executable product binding yet and do not close the manifest,
+P0, any source gap or the full SS-LOG owner.
+
 ## Credential lifecycle and denial controls due in R0
 
 Keep one framework issuance/validation/current-grant authority. Prove one-time secure disclosure

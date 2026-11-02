@@ -41,14 +41,34 @@ Adding a remote alone does not change authority. Remote authority, branch and di
 are explicit operator choices stored with the Chiral-owned resource settings needed to locate Git.
 
 The settings tree reserves `.vivarium/repository.yaml`, project declarations, agent declarations,
-fleet policies and provider/image declarations. C# definition paths and their editable representation
-are finalized by the early [REST/domain contract](teamcity-rest-domain.md). Existing YAML parsing is
-legacy support; arbitrary C# cannot be represented as editable forms by wishful round-tripping.
+fleet policies and provider/image declarations. D44 selects managed typed C# declarations and typed
+edit declarations after untouched user computations; compiled declarations supply edit readback.
+The control owner selects explicit validated source paths/bindings and owns the managed-local
+unbound namespace. Arbitrary AST rewriting and editable database/JSON overrides are not source
+authorities. The exact public SDK/file schema for each exposed field remains with the early
+[REST/domain contract](teamcity-rest-domain.md). Existing YAML parsing is legacy support; arbitrary
+C# cannot be represented as editable forms by wishful round-tripping.
 No target `.vivarium/rbac` tree is defined. Non-secret versioned policy is distinct from resource
 connections and their private settings. Final per-kind schemas remain a P0 implementation input.
-A Project can be declared before it has a product/settings binding. #34 must prove the blank-install
-Project → unbound BuildType → authorized binding sequence and independently expected control/product
-diffs; exact unbound C# placement, file schema and SDK API stay unresolved until that proof.
+A Project can be declared before it has a product/settings binding. The real source/catalogue
+studies prove bounded unbound C# ownership and destination preparation/binding; product activation
+and authorized blank-install Project → unbound BuildType → binding remain separate implementation
+gates. Their independently expected control/product diffs, public file schema and field SDK are not
+accepted merely by source compilation.
+
+D44 keeps synchronization policy separate from Git authority. An inherited Project follows the
+nearest explicit source selection; explicitly disabled synchronization uses its own managed-local
+control-Git C#. A bound Project uses the selected settings repository and revision. Parent source
+presence cannot overwrite a child that independently selected a local owner. Parameter/template
+inheritance is independent of this source-owner selection. Preparing another repository is not
+activation or a second accepted owner. One-way, initialization/context restrictions and Build-settings
+selection retain the frozen reference operation's handling; no generic read-only or success rule is
+inferred from the source mechanism.
+An explicit disable materializes the validated local declarations and stable identities into real
+managed-local C#, retaining inherited relationships rather than flattening effective values. Later
+local edits do not invoke an unselected product computation. Re-enabling/inheriting uses the selected
+reference import/overwrite behavior. Desired accepted binding and currently applied/last-known-good
+revision sets remain distinct during a failed or pending transition; that is not two writable owners.
 
 ## Mutation and activation
 

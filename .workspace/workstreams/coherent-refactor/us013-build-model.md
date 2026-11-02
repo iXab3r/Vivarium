@@ -1,8 +1,9 @@
 # US-013 worked Build identity and input model
 
 P0 working contract for #32/#111, based on the [executed reference proof](us013-p0-execution.md).
-Observed facts below are independently captured. The proposed internal representation remains a P0
-structural candidate, not an implemented schema, public SDK or milestone acceptance. Resolve its
+Observed facts below are independently captured. D41/D43/D44 adopt catalogue ownership, isolation
+and the shared source/edit mechanism; exact schemas and public SDK remain P0/owner inputs rather
+than implemented product or milestone acceptance. Resolve the remaining
 remaining checks and final independent review before R0 implementation.
 
 ## Reference traces
@@ -207,10 +208,21 @@ state with its reference behavior, not an empty successful plan.
 
 ## C#/Git authority and completion
 
-The [source experiment](../../../tools/definition-proof/README.md) separates control metadata/binding,
-product managed declarations and named user computations. The reference demonstrates generated,
-initializing, manual/computed and editing-disabled contexts. Required supported edits must survive
-those distinctions without arbitrary C# AST rewriting or a hidden DB/JSON override.
+D44 adopts the mechanism established by the
+[source experiment](../../../tools/definition-proof/README.md): control metadata/binding, product
+managed declarations and untouched named user computations, with typed C# edit declarations after
+computed definitions. Subsequent mutations read the actual compiled declarations, preserving prior
+removals/overrides rather than reconstructing intent from effective values. No arbitrary C# AST
+rewriting or hidden DB/JSON override is an authority. Full field SDK/editor support remains due
+before exposing each edit category; the bounded scalar/parameter/step study does not accept all fields.
+
+Source selection follows the closest explicit synchronization policy: inherited shares that source;
+an explicitly disabled Project selects its managed-local control-Git C#; an enabled binding selects
+its declared settings repository/revision. Desired settings stay in Git even while synchronization
+is disabled. Parent source presence cannot replace a child's independently selected owner. Ordinary
+project/template inheritance remains separate. R0 uses a real unbound Git-owned smoke; PILOT prepares
+the three configurations through C#/Git. Broader mode/language/API editing remains with SS-CFG/VCS
+before exposure, not a blanket prerequisite to implementing those selected integration contributions.
 
 Project creation must precede an optional product binding. Prepare a destination without making it
 an active second owner; switch the accepted control binding and retain exact active/last-known-good
@@ -219,9 +231,11 @@ source compile or remote Git push alone is not an applied configuration. Interna
 restart recovery must preserve the reference's caller-visible success/readback fence; they do not
 require new headers or blanket 202 responses from compatible clients.
 
-The source experiment proves typed edits and deterministic reevaluation, not that activation saga.
-Exact mode/error/completion cases, current grants, collisions, accepted-but-unapplied/interrupted
-handoffs and real recovery remain P0 work. Kotlin/XML-specific public operations still need explicit
+The source experiments prove bounded typed edits and cold reevaluation of fixed fixtures; arbitrary
+C# need not be deterministic (D43). Separate Git/PG worker-crash studies prove bounded recovery,
+not a production activation saga. Freeze the selected early completion/current-authority/collision
+and failed-handoff contract in P0; broader exact mode/error/edit cases remain due to their owners
+before exposure. Kotlin/XML-specific public operations still need explicit
 language/source mappings and due ownership; reporting fictitious Kotlin success is not a C# mapping.
 
 The separate CLI format blocker is now resolved by the published, locally installed **0.5.6** fix in
@@ -295,23 +309,27 @@ only in memory. Neither proves retained output after restart. The earlier propos
 route for output was incorrect and is withdrawn before contract freeze.
 
 SS-LOG's early R0 contribution must instead deliver real bounded durable output bytes and an
-authorized native read/resume resource under the same Build identity. Freeze its literal resource,
-cursor/gap/error/current-access cases before P0 closure; actual storage/Agent receipt/restart/readback
+authorized native read/resume resource under the same Build identity. The selected
+[REST resource](../../../docs/design/rest-api.md#71-selected-r0-durable-build-output) and seven
+[planned native effect variants](r0-journey-manifest.md#selected-native-output-contract-and-planned-effect-cases)
+now specify metadata/content reads, cursor/gap/error/current-access behavior. These remain unbound;
+complete their common IAM/protocol details and P0 freeze before exposure. Actual storage/Agent receipt/restart/readback
 remain R0 implementation/acceptance work. Port the actual bounded-output assertions and preserve
 D31's control-path priority; byte provenance and durable gaps cannot be replaced by status events.
 The unchanged TeamCity CLI's inspected byte methods use REST file/source/archive/icon resources;
 they do not supply an ordinary Build-log download command. Do not invent one to prove the CLI
 journey. Native output and compatible artifact download must inspect the same actual Build.
 Range/archive/source/server-file/avatar and non-REST clients remain separately accountable under
-their full owners. This correction does not freeze the missing output contract or declare it GREEN.
+their full owners. Neither these specifications nor the independent installed log-access observations
+declare native output GREEN or close the complete R0 manifest.
 
 Supporting business intent: AC-BLD-01/02/03/04/05/07/09/13, AC-CFG-01/02/03/04/05/06,
 AC-AG-02/06, AC-ART-01/03 and affected access/identity AC. TCM-01/02/03/04/05/07/08/10 and their
 exact wire variants are joined per due case, not all declared GREEN by this document.
 
-Before P0 closure: adopt the real catalogue Project/BuildType/Build ownership proved by the bounded
-D41 study, retain Agent/workload fences and matrix capability obligations, complete the
-real representation/activation/recovery boundary, freeze exact R0 actor/request/effect/byte cases,
+Before P0 closure: verify the adopted catalogue Project/BuildType/Build and D44 source ownership
+against their bounded studies, retain Agent/workload fences and matrix capability obligations,
+complete the selected representation/activation/recovery contract, freeze exact R0 actor/request/effect/byte cases,
 classify remaining alias/requeue/deleted/permission/race/settings-mode variants by earliest due
 integration, and finish the existing source/ledger/control/debt/review/main gates. Unknown shared or
 R0 impact cannot be marked later merely because the happy path is now observed.

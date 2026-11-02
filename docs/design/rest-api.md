@@ -630,6 +630,75 @@ range/cursor reads, and a resumable tail. Large completed logs belong in the blo
 retain or replay unlimited stdout. Audit events use their own collection and permission because they
 may reveal sensitive operational metadata.
 
+### 7.1. Selected R0 durable Build output
+
+**Specified target, not implemented or accepted.** R0's real LocalSmoke execution needs a separate
+output resource; the existing Build SSE contains lifecycle projections, not stdout/stderr. This
+bounded contribution belongs to SS-LOG with SS-RUN/EXEC/BLOB/IAM under #113/#114/#115. Search,
+archive rendering, general AgentExplorer output and the compatible TeamCity log renderer remain with
+their full owners; they are not prerequisites for the selected native read/resume journey.
+
+`GET /api/v1/builds/{buildId}/output?cursor=...&limit=...` returns `application/json` with the normal
+`items`/`page` collection envelope. The default limit is 50, maximum 200. Additional top-level `output`
+metadata contains `state` (`open`, `sealing`, `complete`, `complete-with-gaps`) and `resumeCursor`.
+`page.nextCursor` continues available rows; at the current end it is null. `output.resumeCursor`
+denotes the position after the last returned row (or the unchanged starting position for an empty
+page). Poll with that cursor to receive later rows without replaying or skipping earlier output.
+Queued and genuinely empty Builds return an empty page, not an invented output row. A finished Build
+may still have `sealing` output; terminal result acceptance is not output completion.
+
+Each item has an opaque stable `id`, `kind` (`data` or `gap`), immutable Build/step scope, `stepIndex`,
+`stream` (`stdout` or `stderr`), source sequence range, and controller `receivedAt`. Source observation
+time is optional and never establishes cross-source order. Sequence endpoints are nonnegative decimal
+strings, with an exclusive end, so JSON clients cannot round uint64 values. Data items cover exactly
+one source sequence and expose `content: { href, length, sha256 }`. A gap has no content link and names
+the missing range and bounded machine-readable reason. Publication order is durable and append-only;
+within one source stream it preserves sequence order. Delayed input cannot rebase already published
+positions; bounded pending ranges resolve to bytes or explicit gaps. Different streams do not acquire
+a fabricated total source-clock order.
+
+`GET /api/v1/builds/{buildId}/output/{entryId}/content` returns the exact persisted, already-redacted
+bytes as `application/octet-stream`, with matching length and SHA-256 metadata. A data item is at most
+64 KiB; collections contain metadata, never inline/base64 output. The relative link conveys no
+authority. Both metadata and every content read authenticate and evaluate current Build/Project
+`view_project`, including inherited permissions and current account/credential eligibility. They do
+not require `view_file_content` or `view_build_runtime_data` in addition to project visibility.
+An invisible or absent Build/entry returns 404; a missing/invalid/expired/revoked credential returns
+401 under the common authentication contract. Links, cursors, old success responses and possession
+of a content hash do not preserve access after rights withdrawal. Current user-disable handling
+follows the common identity service; it must deny before output bytes are read.
+
+Cursors follow section 4's integrity/principal/filter/snapshot binding. They record retained durable
+positions, survive an ordinary Host restart and do not snapshot permissions. Malformed/tampered or
+cross-resource cursors return 400; a formerly valid cursor outside retained history returns
+410 `cursor_expired` with a recovery link. A fresh read reports retained output and its completeness,
+never substitutes missing output with an empty complete log. Byte reads of known expired content
+likewise report 410 after current access checks. Unknown/hidden identities remain 404. Full retention
+policy stays with SS-LOG/BLOB; R0 must prove expiry behavior with controlled time rather than waiting
+or changing the machine clock.
+
+The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
+registered-secret masking before transport/persistence, per-stream sequence identity, independent
+output acknowledgement and the terminal watermark barrier. Persist content before publishing its
+PG reference; acknowledge only persisted ranges or durable gaps. Replayed identical chunks do not
+duplicate output; conflicting same-sequence content is a protocol failure. A sink/quota/deadline
+failure must produce explicit gap evidence, never false completeness or unbounded capacity retention.
+Agent API/SDK owns the additive capability/protocol extension: current sequence-free `LogChunk`
+cannot satisfy this contract. Preserve existing AgentHub/Bootstrap compatibility; do not assign a
+new output-required workload to an Agent that lacks the negotiated capability.
+
+The independent [installed log-access observations](../../.workspace/workstreams/coherent-refactor/us013-log-access-results.json)
+show that a P-restricted PAT with `view_project` alone can read actual running and finished logs;
+the protected Q log is hidden with 404, and the unchanged revoked PAT gets 401 while administrator
+controls still read real output. These establish narrow access facts, not native rendering, cursor,
+durability or OIDC acceptance. The root TeamCity download route accepts Bearer in this capture while
+its `/httpAuth` variant rejects that form with 401. The HTML 404 entity is intentionally omitted and
+cannot be used as a full literal wire fixture. The selected CLI exposes no log-download command.
+
+Before R0 exposure, bind the native read/resume, current-principal, restart/replay, explicit-gap,
+redaction and expiry variants in the R0 manifest to actual services/Agent/PG/Storage. Planned cases
+are not GREEN. HTTP replay of formatted TeamCity log text cannot substitute for these native effects.
+
 WebSockets are reserved for future genuinely bidirectional interactive features, such as a terminal.
 They are not required for inventory, build watch, queue, or ordinary command output. SignalR may be
 an internal UI convenience only if it does not become a private management contract or diverge from

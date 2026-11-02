@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Npgsql;
 
@@ -16,8 +17,8 @@ public sealed class CatalogIdentityPhysicalTests
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Vivarium.slnx"))) directory = directory.Parent;
         var root = directory?.FullName ?? throw new InvalidOperationException("Repository root not found.");
         var run = Path.Combine(root, "artifacts/us013-catalogue-identity-20261102", "physical-run-" + Guid.NewGuid().ToString("N"));
-        var control = Path.Combine(run, "control"); var product = Path.Combine(run, "unused-product");
-        Directory.CreateDirectory(control); Directory.CreateDirectory(product);
+        var control = Path.Combine(run, "control");
+        Directory.CreateDirectory(control);
         await SourceCompiler.GitAsync(control, "init", "-b", "main");
         await SourceCompiler.GitAsync(control, "config", "core.autocrlf", "false");
         await SourceCompiler.GitAsync(control, "config", "user.name", "Vivarium P0 proof");
@@ -40,8 +41,38 @@ public sealed class CatalogIdentityPhysicalTests
             .Append(Path.Combine(root, "global.json")).Append(Path.Combine(root, "Directory.Build.props"))
             .ToDictionary(path => Path.GetRelativePath(root, path), Hash);
         var originalCommit = await Commit("unbound catalogue source");
-        var compiler = new SourceCompiler(new(root, control, product, Path.Combine(run, "evaluation")));
-        var original = await compiler.CompileAsync(originalCommit, originalCommit);
+        var compilerRuns = new List<object>();
+        async Task<CompiledRevisionPair> CompileAsync(string commit)
+        {
+            // This fixture has one explicitly unbound owner. Read exact committed bytes;
+            // never compile or evaluate its C# in a Host child before the container.
+            var sources = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var name in new[] { "Model.cs", "Program.cs" })
+                sources[name] = await File.ReadAllTextAsync(Path.Combine(source, name));
+            foreach (var (path, name) in new[]
+            {
+                ("Control.g.cs", "Control.g.cs"),
+                (".vivarium/unbound/T3Personal/Settings.g.cs", "Settings.g.cs"),
+                (".vivarium/unbound/T3Personal/UserCode.cs", "UserCode.cs"),
+            })
+            {
+                var committed = await ProofProcess.RunAsync("git", ["-C", control, "show", commit + ":" + path]);
+                sources[name] = new UTF8Encoding(false, true).GetString(committed.Output);
+            }
+            var compiler = new IsolatedCompilerStudy();
+            var evaluated = await compiler.EvaluateAsync(sources);
+            Assert.Multiple(() =>
+            {
+                Assert.That(evaluated.ExitCode, Is.Zero, evaluated.Error);
+                Assert.That(evaluated.DeadlineExceeded || evaluated.OutputExceeded || evaluated.OomKilled, Is.False);
+            });
+            var hash = IsolatedCompilerStudy.Hash(evaluated.Output);
+            await File.WriteAllTextAsync(Path.Combine(run, commit + ".container.json"), evaluated.Container.GetRawText());
+            compilerRuns.Add(new { commit, container = compiler.Name, planHash = hash,
+                image = IsolatedCompilerStudy.Image, sdk = IsolatedCompilerStudy.Sdk, removed = true });
+            return new(commit, "control-proof", commit, hash, evaluated.Output);
+        }
+        var original = await CompileAsync(originalCommit);
         using var plan = JsonDocument.Parse(original.Plan);
         var configurations = plan.RootElement.GetProperty("configurations").EnumerateArray().ToArray();
         Assert.That(plan.RootElement.GetProperty("project").GetProperty("id").GetString(), Is.EqualTo("T3Personal"));
@@ -124,7 +155,7 @@ public sealed class CatalogIdentityPhysicalTests
             Assert.That(changedSource, Is.Not.EqualTo(originalSource));
             await File.WriteAllTextAsync(settings, changedSource);
             var changedCommit = await Commit("edit real configuration name");
-            var changed = await compiler.CompileAsync(changedCommit, changedCommit);
+            var changed = await CompileAsync(changedCommit);
             Assert.That(changed.PlanHash, Is.Not.EqualTo(original.PlanHash));
             foreach (var id in ids)
             {
@@ -152,9 +183,9 @@ public sealed class CatalogIdentityPhysicalTests
             foreach (var input in inputs) Assert.That(Hash(Path.Combine(root, input.Key)), Is.EqualTo(input.Value), input.Key);
             await File.WriteAllTextAsync(Path.Combine(run, "receipt.json"), JsonSerializer.Serialize(new
             {
-                result = passed ? "PASS" : "FAIL", inputs, observations,
+                result = passed ? "PASS" : "FAIL", inputs, observations, compilerRuns,
                 source = new { original.ControlCommit, original.SettingsRepository, original.SettingsCommit, original.PlanHash },
-                limits = "Real Git/CSharp/PG structural study only. No product Host/catalogue activation, authorization, source-timing/concurrent-activation, matrix execution, public adapter or Agent protocol behavior is proved."
+                limits = "Real committed Git -> D43 isolated Linux CSharp compilation/evaluation -> PG catalogue/immutable Build-input structural study only. No product Host/catalogue activation, authorization, source-timing/concurrent-activation, matrix execution, public adapter or Agent protocol behavior is proved."
             }, new JsonSerializerOptions { WriteIndented = true }));
             TestContext.Out.WriteLine("Catalogue identity receipt: " + Path.Combine(run, "receipt.json"));
         }
