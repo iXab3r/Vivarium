@@ -20,11 +20,12 @@ public sealed class CurrentAccessPhysicalTests
         var configuration = new ConfigurationBuilder().Build();
         await using var reader = Open();
         await PostgresSchema.MigrateAsync(reader);
+        // Replace only the owned arrangement's initial administrator definition. Migration
+        // data is not the oracle for these independent permission/effect expectations.
+        await reader.RolePermissions.Where(permission => permission.RoleId == "SYSTEM_ADMIN").ExecuteDeleteAsync();
         reader.Users.Add(new VivariumUser { Id = userId, UserName = "owned-current-user" });
-        reader.Roles.AddRange(new TeamCityRole { Id = "SYSTEM_ADMIN", Name = "System administrator" },
-            new TeamCityRole { Id = "RUNNER", Name = "Runner" },
+        reader.Roles.AddRange(new TeamCityRole { Id = "RUNNER", Name = "Runner" },
             new TeamCityRole { Id = "VIEWER", Name = "Viewer" });
-        reader.Groups.Add(new TeamCityGroup { Key = TeamCityGroup.AllUsersKey, Name = "All Users" });
         reader.RolePermissions.AddRange(new RolePermission { RoleId = "SYSTEM_ADMIN", PermissionId = "manage_roles" },
             new RolePermission { RoleId = "RUNNER", PermissionId = "run_build" },
             new RolePermission { RoleId = "VIEWER", PermissionId = "view_project" });

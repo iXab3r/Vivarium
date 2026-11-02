@@ -1,7 +1,7 @@
 # TeamCity/Vivarium UI on the shared Workbench stack
 
 > Status: **Accepted — D35, 2026-10-31**
-> Implementation: **Current panel is Blazor; replacement not implemented**
+> Implementation: **Legacy panel remains; fresh Host Workbench Access delivery is in progress**
 > Maintainers: UI, REST, Identity, TeamCity, AgentExplorer, Test Steward
 > Related: [Architecture](../ARCHITECTURE.md) D24/D25/D32–D35
 
@@ -21,6 +21,13 @@ The ASP.NET Host packages frontend dist into wwwroot. UI/WorkbenchShell.cs inser
 account presentation and antiforgery token, then serves the actual shell. Identity Razor pages keep
 stock credential handlers and share product styling/navigation. Vite/Node are development/build
 tools, not services required in production.
+
+The fresh Vivarium entry now builds `src/Vivarium.Controller/Workbench` with the same pinned
+TypeScript/Vite/Workbench versions and a package lock. Its same-origin `/access` shell injects only
+current account presentation, capability hints and stock CSRF data. The current real page handles
+paged users, role assignments and account enablement through common PostgreSQL services. CI pages,
+Nodes and complete Access editing remain due; the legacy panel is not retired by this first view.
+Monaco is retained as Workbench 0.2.6's required peer, not a newly exposed configuration editor.
 
 Reference paths are in [the Depot study](../../.workspace/workstreams/coherent-refactor/depot-study.md).
 Follow source and current server-backed scenarios where older Depot prose still describes mocks.

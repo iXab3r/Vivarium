@@ -12,7 +12,7 @@ public sealed class HostFixture
     public required AutomationProcess Process { get; init; }
 
     public static async Task<HostFixture> StartAsync(AutomationScope scope, PostgresFixture postgres,
-        RunTls tls, IssuerFixture issuer, string origin)
+        RunTls tls, IssuerFixture issuer, string origin, bool installationAccess = false)
     {
         var run = await AutomationRun.ConnectAsync(scope.CancellationToken);
         var host = Environment.GetEnvironmentVariable("VIVARIUM_HOST_PATH")
@@ -24,7 +24,7 @@ public sealed class HostFixture
         Command Command(string command) => Cli.Wrap("dotnet").WithArguments([host, command, "--settings-directory", nodes])
             .WithWorkingDirectory(scope.WorkingDirectory).WithEnvironmentVariables(tls.Environment);
         var identity = await IdentityFixtureSettings.CreateAsync(scope, issuer);
-        // Installation access is unnecessary for this ordinary-login scenario.
+        identity["SuperuserEnabled"] = installationAccess;
         await PrivateCommand.ExecuteAsync(run, Command("init"), JsonSerializer.Serialize(new Dictionary<string, object>
         {
             ["vivarium-host"] = new { PublicOrigin = origin, ListenUrl = origin, StorageListenUrl = storageOrigin,
@@ -49,5 +49,14 @@ public sealed class HostFixture
             catch (HttpRequestException) { return 0; }
         }, status => status == 200, "owned Host readiness", TimeSpan.FromSeconds(45), scope.CancellationToken);
         return new() { Origin = origin, Process = process };
+    }
+
+    public async Task<string> InstallationPasswordAsync(CancellationToken token)
+    {
+        var log = (await Process.ReadDiagnosticsAsync(token)).StandardOutput;
+        var match = System.Text.RegularExpressions.Regex.Match(log,
+            "Installation superuser login: superuser; password: ([^\\r\\n]+)");
+        return match.Success ? match.Groups[1].Value.Trim()
+            : throw new InvalidOperationException("Intended private installation disclosure is absent.");
     }
 }

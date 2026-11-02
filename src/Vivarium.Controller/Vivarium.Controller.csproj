@@ -8,6 +8,7 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <PublishTrimmed>false</PublishTrimmed>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Workbench/node_modules/**;Workbench/dist/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,11 +35,28 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Hosting/Schemas/*.json" />
+    <EmbeddedResource Include="Identity/Defaults/*.json" />
     <Content Update="wwwroot/identity.css" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Vivarium.Contracts\Vivarium.Contracts.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <WorkbenchInputs Include="Workbench/src/**;Workbench/package.json;Workbench/package-lock.json;Workbench/tsconfig.json;Workbench/vite.config.ts;Workbench/index.html" />
+  </ItemGroup>
+  <Target Name="BuildWorkbench" Inputs="@(WorkbenchInputs)" Outputs="$(MSBuildProjectDirectory)/Workbench/dist/index.html"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(BuildWorkbench)' != 'false'">
+    <Exec Command="npm ci --no-audit --fund=false" WorkingDirectory="$(MSBuildProjectDirectory)/Workbench" />
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/Workbench" />
+  </Target>
+  <Target Name="IncludeWorkbench" BeforeTargets="AssignTargetPaths" DependsOnTargets="BuildWorkbench">
+    <ItemGroup>
+      <_WorkbenchAssets Include="Workbench/dist/**" />
+      <Content Include="@(_WorkbenchAssets)" Link="wwwroot/workbench/%(_WorkbenchAssets.RecursiveDir)%(_WorkbenchAssets.Filename)%(_WorkbenchAssets.Extension)"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 
 </Project>

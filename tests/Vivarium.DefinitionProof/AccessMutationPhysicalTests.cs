@@ -28,6 +28,7 @@ public sealed class AccessMutationPhysicalTests
         await using (var database = Open())
         {
             await PostgresSchema.MigrateAsync(database);
+            var initialRoleCount = await database.Roles.CountAsync();
             database.Users.AddRange(new VivariumUser { Id = VivariumIdentityConstants.SuperuserId, UserName = "superuser" },
                 new VivariumUser { Id = adminId, UserName = "owned-admin" },
                 new VivariumUser { Id = targetId, UserName = "owned-target" });
@@ -36,7 +37,7 @@ public sealed class AccessMutationPhysicalTests
             var service = new TeamCityAccessService(database, access, new PostgresAuditStore(database), TimeProvider.System);
             Assert.That(await service.SetRoleAsync(Actor(adminId), "SYSTEM_ADMIN", "System administrator", ["manage_roles", "change_user"]),
                 Is.EqualTo(AccessMutationResult.Denied));
-            Assert.That(await database.Roles.CountAsync(), Is.Zero);
+            Assert.That(await database.Roles.CountAsync(), Is.EqualTo(initialRoleCount));
             Assert.That(await service.SetRoleAsync(installation, "SYSTEM_ADMIN", "System administrator", ["manage_roles", "change_user"]),
                 Is.EqualTo(AccessMutationResult.Applied));
             Assert.That(await service.SetGlobalUserRoleAsync(installation, adminId, "SYSTEM_ADMIN", true),

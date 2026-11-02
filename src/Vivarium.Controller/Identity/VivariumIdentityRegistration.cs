@@ -24,6 +24,7 @@ public static class VivariumIdentityRegistration
         services.AddScoped<CurrentAccess>();
         services.AddScoped<RuntimeIdentity>();
         services.AddScoped<TeamCityAccessService>();
+        services.AddScoped<AccessQueries>();
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;

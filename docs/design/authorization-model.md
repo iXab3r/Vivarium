@@ -25,7 +25,7 @@ evaluator and audit boundary already exist. General role/group CRUD, full projec
 the D34 Identity/OIDC model do not. Preserve boundary/invariant tests while replacing these mechanisms;
 do not describe the accepted target as working functionality.
 
-The fresh R0 Host now composes stock `IdentityCore`, Identity authentication cookies and
+The fresh R0 Host composes stock `IdentityCore`, Identity authentication cookies and
 OpenIddict over PostgreSQL. Its scoped TeamCity roles, permission and included-role relations,
 direct grants and All Users contributions are separate application tables; unused framework
 global-role tables are removed only when empty. Current access rereads eligibility and role data,
@@ -43,6 +43,19 @@ Native My keys issuance wraps framework entry creation/metadata and audit in one
 before disclosure. Stock authorization-code consumption remains before that transaction, including
 on a later failed issuance. Revocation shares its mutation/audit transaction. OpenIddict entity
 caching is disabled so rollback cannot leave a committed-looking credential status in that cache.
+
+Initial migration data supplies the five standard TeamCity role definitions captured from 2026.1.3,
+including permission IDs and role inclusions, plus the All Users group without assignments. It does
+not import the owner's custom roles or infer a default group grant. This is a one-time schema-data
+migration: restart never restores removed permissions or recreates a deleted role. The original
+embedded migration data remains immutable; future reference changes need a new migration.
+
+The fresh Workbench Access view uses native paged user/role/grant reads and current global user-role
+and eligibility mutations. Role-definition reads follow the observed global `view_user_profile` or
+`change_user` alternatives; `manage_roles` alone is not a read grant. Own assignment reads remain
+available to the eligible subject. Full compatible wire, nested groups and project delegation retain
+their due owners. Native My keys has a passing focused real-issuer/browser lifecycle case; this does
+not accept the complete IAM family or US-013.
 
 ## TeamCity parity contract
 

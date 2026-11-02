@@ -1,0 +1,47 @@
+using System.Text.Json;
+using Microsoft.AspNetCore.Antiforgery;
+
+namespace Vivarium.Controller.Identity;
+
+/// <summary>Same-origin Workbench entry, with presentation/CSRF bootstrap and server-side authority.</summary>
+internal static class WorkbenchShell
+{
+    public static void MapWorkbench(this WebApplication app)
+    {
+        app.MapGet("/", RenderAsync);
+        app.MapGet("/access", RenderAsync);
+        app.MapGet("/access/users/{userId:guid}", RenderAsync);
+    }
+
+    private static async Task<IResult> RenderAsync(HttpContext http, RuntimeIdentity identity,
+        CurrentAccess access, RuntimeRequestContext requestContext, AccessQueries reads,
+        IAntiforgery antiforgery, IWebHostEnvironment environment)
+    {
+        http.Response.Headers.CacheControl = "no-store";
+        var user = await identity.CurrentAsync(http);
+        if (user is null && http.Request.Headers.ContainsKey("Authorization"))
+            return Rest.Common.RestProblems.AuthenticationRequired(http);
+        var read = false; var grant = false; var change = false;
+        if (user is not null)
+        {
+            var actor = requestContext.ForUser(user.Id, "identity-cookie", "workbench");
+            read = await reads.CanReadProfilesAsync(actor, http.RequestAborted);
+            change = await access.AllowsAsync(user.Id, "change_user", cancellationToken: http.RequestAborted);
+            grant = change || await access.AllowsAsync(user.Id, "manage_roles", cancellationToken: http.RequestAborted);
+        }
+        var session = JsonSerializer.Serialize(new
+        {
+            user = user is null ? null : new
+            {
+                user.Id, displayName = user.DisplayName ?? user.UserName ?? "Account",
+                isInstallation = user.Id == VivariumIdentityConstants.SuperuserId
+            },
+            canReadProfiles = read, canGrantRoles = grant, canChangeUsers = change,
+            requestVerificationToken = user is null ? "" : antiforgery.GetAndStoreTokens(http).RequestToken
+        }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        // The stock JSON encoder escapes '<' in untrusted account presentation.
+        var html = await File.ReadAllTextAsync(Path.Combine(environment.WebRootPath, "workbench/index.html"), http.RequestAborted);
+        return Results.Content(html.Replace("</head>", "<script id=\"vivarium-session\" type=\"application/json\">"
+            + session + "</script></head>", StringComparison.Ordinal), "text/html; charset=utf-8");
+    }
+}

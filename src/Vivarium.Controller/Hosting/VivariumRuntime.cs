@@ -66,6 +66,8 @@ public static class VivariumRuntime
         app.UseRateLimiter();
         app.MapVivariumIdentity();
         RuntimeIdentity.Map(app);
+        app.MapAccess();
+        app.MapWorkbench();
         app.MapVivariumTokens();
         app.MapGet("/health/live", () => Results.Text("Healthy"));
         app.MapGet("/health/ready", async (VivariumDbContext database, CancellationToken cancellationToken) =>

@@ -1,0 +1,201 @@
+{
+  "reference": "TeamCity 2026.1.3 owner capture; definitions only, no assignments",
+  "roles": [
+    {
+      "id": "SYSTEM_ADMIN",
+      "name": "System administrator",
+      "permissions": [
+        "run_build",
+        "cancel_build",
+        "cancel_any_personal_build",
+        "pin_unpin_build",
+        "tag_build",
+        "pause_activate_build_configuration",
+        "comment_build",
+        "clean_build_configuration_sources",
+        "assign_investigation",
+        "view_project",
+        "view_build_configuration_settings",
+        "view_file_content",
+        "edit_vcs_modification",
+        "edit_project",
+        "change_cleanup_rules",
+        "backup",
+        "customize_build_parameters",
+        "customize_build_revisions",
+        "create_sub_project",
+        "delete_sub_project",
+        "create_delete_vcs_root",
+        "reorder_build_queue",
+        "change_user_roles_in_project",
+        "label_build",
+        "archive_project",
+        "manage_build_problems",
+        "view_build_runtime_data",
+        "create_user",
+        "delete_user",
+        "change_user",
+        "change_user_notifications",
+        "manage_server_licenses",
+        "change_server_settings",
+        "change_agent_run_configuration_policy",
+        "clean_agent_sources",
+        "enable_disable_agent",
+        "authorize_agent",
+        "view_agent_details",
+        "configure_server_data_cleanup",
+        "change_own_profile",
+        "view_agent_usage_statistics",
+        "remove_agent",
+        "create_usergroup",
+        "delete_usergroup",
+        "change_usergroup",
+        "assign_users_add_subgroups",
+        "manage_roles",
+        "administer_agent",
+        "view_audit_log",
+        "view_agent_clouds",
+        "manage_agent_clouds",
+        "start_stop_cloud_agent",
+        "view_server_errors",
+        "view_usage_statistics",
+        "manage_agent_pools",
+        "view_user_profile",
+        "manage_agent_pools_for_project",
+        "manage_build_problem_instances",
+        "remove_build",
+        "import_projects",
+        "edit_versioned_settings",
+        "enable_disable_agent_for_project",
+        "change_agent_run_configuration_policy_for_project",
+        "administer_agent_for_project",
+        "remove_agent_for_project",
+        "authorize_agent_for_project",
+        "view_all_users",
+        "manage_server_installation",
+        "edit_enforced_settings",
+        "view_agent_details_for_project",
+        "view_server_settings",
+        "change_user_notifications_in_project",
+        "manage_authentication_settings",
+        "manage_custom_ssl_certificates",
+        "patch_build_sources",
+        "connect_to_agent",
+        "change_vcs_username_in_project",
+        "change_https_settings",
+        "manage_experimental_features"
+      ],
+      "includedRoles": []
+    },
+    {
+      "id": "PROJECT_ADMIN",
+      "name": "Project administrator",
+      "permissions": [
+        "cancel_any_personal_build",
+        "edit_vcs_modification",
+        "edit_project",
+        "change_cleanup_rules",
+        "create_sub_project",
+        "delete_sub_project",
+        "create_delete_vcs_root",
+        "change_user_roles_in_project",
+        "archive_project",
+        "manage_build_problems",
+        "view_agent_usage_statistics",
+        "view_audit_log",
+        "manage_agent_clouds",
+        "start_stop_cloud_agent",
+        "view_user_profile",
+        "manage_agent_pools_for_project",
+        "manage_build_problem_instances",
+        "remove_build",
+        "enable_disable_agent_for_project",
+        "change_agent_run_configuration_policy_for_project",
+        "administer_agent_for_project",
+        "remove_agent_for_project",
+        "authorize_agent_for_project",
+        "connect_to_agent"
+      ],
+      "includedRoles": [
+        "PROJECT_DEVELOPER"
+      ]
+    },
+    {
+      "id": "PROJECT_DEVELOPER",
+      "name": "Project developer",
+      "permissions": [
+        "run_build",
+        "cancel_build",
+        "pin_unpin_build",
+        "tag_build",
+        "pause_activate_build_configuration",
+        "comment_build",
+        "clean_build_configuration_sources",
+        "assign_investigation",
+        "view_build_configuration_settings",
+        "view_file_content",
+        "customize_build_parameters",
+        "customize_build_revisions",
+        "reorder_build_queue",
+        "label_build",
+        "view_build_runtime_data",
+        "view_agent_usage_statistics",
+        "view_agent_clouds",
+        "view_all_users",
+        "view_agent_details_for_project",
+        "patch_build_sources"
+      ],
+      "includedRoles": [
+        "PROJECT_VIEWER"
+      ]
+    },
+    {
+      "id": "PROJECT_VIEWER",
+      "name": "Project viewer",
+      "permissions": [
+        "view_project"
+      ],
+      "includedRoles": []
+    },
+    {
+      "id": "AGENT_MANAGER",
+      "name": "Agent manager",
+      "permissions": [
+        "change_agent_run_configuration_policy",
+        "enable_disable_agent",
+        "view_agent_details",
+        "view_agent_usage_statistics",
+        "remove_agent",
+        "administer_agent",
+        "view_agent_clouds",
+        "manage_agent_clouds",
+        "start_stop_cloud_agent",
+        "view_server_errors",
+        "manage_agent_pools"
+      ],
+      "includedRoles": []
+    }
+  ],
+  "source_files": [
+    {
+      "path": "artifacts\\depot-refactor-study\\teamcity-role-SYSTEM_ADMIN.json",
+      "sha256": "267ae84b1f6f9c1ec0a3dea598fbe1ccb45cf23422e4afda5914eff0d6f565bf"
+    },
+    {
+      "path": "artifacts\\depot-refactor-study\\teamcity-role-PROJECT_ADMIN.json",
+      "sha256": "d8b741e1f6dbf86b73d54a3369ed67e1b9de477fbea7d34ddd98593856de45b6"
+    },
+    {
+      "path": "artifacts\\depot-refactor-study\\teamcity-role-PROJECT_DEVELOPER.json",
+      "sha256": "e75d868586f21edba931bb3528e38d9f641b8b5fe377d98e1e9cb3f11e9d8cd8"
+    },
+    {
+      "path": "artifacts\\depot-refactor-study\\teamcity-role-PROJECT_VIEWER.json",
+      "sha256": "aea0ca5bfba23f2ef701920650a5c4e459fde9dbddae7338f8355064e21531fc"
+    },
+    {
+      "path": "artifacts\\depot-refactor-study\\teamcity-role-AGENT_MANAGER.json",
+      "sha256": "a7b304d578daf852b887227db1b2f35409228778d8bfd759354a9060bfbde074"
+    }
+  ]
+}

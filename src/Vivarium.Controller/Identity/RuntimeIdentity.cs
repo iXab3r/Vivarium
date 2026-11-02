@@ -17,13 +17,19 @@ public sealed class RuntimeIdentity(CurrentAccess access)
         var bearer = http.Request.Headers.ContainsKey("Authorization");
         var ticket = await http.AuthenticateAsync(bearer
             ? OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme : IdentityConstants.ApplicationScheme);
-        if (!ticket.Succeeded || ticket.Principal is null) return null;
+        http.User = new ClaimsPrincipal(new ClaimsIdentity());
+        if (!ticket.Succeeded || ticket.Principal is null)
+        {
+            return null;
+        }
         var subject = bearer ? ticket.Principal.GetClaim(OpenIddictConstants.Claims.Subject)
             : ticket.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(subject, out var userId)
             || bearer && !ticket.Principal.HasScope(VivariumTokenProfile.Scope)) return null;
         if (bearer && userId == VivariumIdentityConstants.SuperuserId) return null;
-        return await access.FindEligibleAsync(userId, http.RequestAborted);
+        var user = await access.FindEligibleAsync(userId, http.RequestAborted);
+        http.User = user is null ? new ClaimsPrincipal(new ClaimsIdentity()) : ticket.Principal;
+        return user;
     }
 
     internal static void Map(WebApplication app) =>

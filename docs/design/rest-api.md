@@ -275,6 +275,29 @@ without falling back to a cookie. Missing, invalid, expired, revoked or disabled
 credentials receive the existing native `authentication_required` Problem Details/401;
 responses are no-store. No role claims or new user/token authority are introduced.
 
+### 4.2.2 Fresh Access projection
+
+The fresh Host's native Access surface shares current PostgreSQL application services:
+
+- `GET /api/v1/users` and `GET /api/v1/roles` return `{items,total,offset,limit}` with default
+  offset 0/limit 50, maximum limit 200. Users expose Guid `id`, int64 `teamCityId`, nullable
+  `userName`/`displayName`, `isEnabled` and `isInstallation`. Roles expose `id`, `name`, direct
+  `permissions` and `includedRoles`. Global profile-read or user-management permission is required.
+- `GET /api/v1/users/{userId}` returns the same user projection or 404 under that read check.
+- `GET /api/v1/users/{userId}/roles` pages direct `{roleId,scope}` assignments; an eligible user
+  may read their own assignments. Other-user reads require the profile check. Optional `scope`
+  and up to 200 repeated `roleId` filters narrow the current collection without granting access.
+- `PUT`/`DELETE /api/v1/users/{userId}/roles/{roleId}/g` grants/withdraws the global assignment
+  through the common `change_user`/`manage_roles` operation; success and no-change return 204.
+- `PUT /api/v1/users/{userId}/enabled` takes exactly `{enabled:boolean}` and requires current
+  `change_user`. It applies only to ordinary accounts; Chiral remains the technical account's
+  enablement authority. Success/no-change returns 204.
+
+These mutations authorize the selected current framework identity, validate normal CSRF for a cookie
+caller and commit application mutation/audit together. Bearer callers do not borrow a cookie's rights.
+Missing targets return 404, denied mutations 403, malformed shape/CSRF 400 and non-JSON enablement
+input 415. These native projections do not claim completed TeamCity role/user wire conformance.
+
 ### 4.3 Errors
 
 Errors follow RFC 9457 Problem Details and add stable machine-readable Vivarium fields:

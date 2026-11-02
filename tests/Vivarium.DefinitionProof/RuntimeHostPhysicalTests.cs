@@ -145,12 +145,30 @@ public sealed class RuntimeHostPhysicalTests
                     using var account = JsonDocument.Parse(await current.Content.ReadAsStringAsync());
                     Assert.That(account.RootElement.GetProperty("teamCityId").GetInt64(), Is.Positive);
                 }
+                using (var roles = await http.GetAsync("/api/v1/roles"))
+                {
+                    Assert.That(roles.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    using var definitions = JsonDocument.Parse(await roles.Content.ReadAsStringAsync());
+                    Assert.That(definitions.RootElement.GetProperty("items").EnumerateArray()
+                        .Select(role => role.GetProperty("id").GetString()), Is.EquivalentTo(new[]
+                            { "SYSTEM_ADMIN", "PROJECT_ADMIN", "PROJECT_DEVELOPER", "PROJECT_VIEWER", "AGENT_MANAGER" }));
+                }
+                var installationRoles = "/api/v1/users/53a74e90-6a7c-4965-a530-8d498c4e523e/roles/SYSTEM_ADMIN/g";
+                using (var noCsrf = await http.PutAsync(installationRoles, content: null))
+                    Assert.That(noCsrf.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+                        "A cookie cannot mutate access without normal request verification.");
                 using (var explicitCredential = new HttpRequestMessage(HttpMethod.Get, "/api/v1/users/current"))
                 {
                     explicitCredential.Headers.Authorization = new("Bearer", "owned-invalid");
                     using var mixed = await http.SendAsync(explicitCredential);
                     Assert.That(mixed.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized),
                         "An invalid explicit credential cannot inherit the installation cookie.");
+                }
+                using (var explicitCredential = new HttpRequestMessage(HttpMethod.Put, installationRoles))
+                {
+                    explicitCredential.Headers.Authorization = new("Bearer", "owned-invalid");
+                    using var denied = await http.SendAsync(explicitCredential);
+                    Assert.That(denied.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
                 }
                 await using (var state = new VivariumDbContext(new DbContextOptionsBuilder<VivariumDbContext>()
                     .UseNpgsql(postgres.ConnectionString).Options))
