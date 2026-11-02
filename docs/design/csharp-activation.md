@@ -5,6 +5,39 @@ Owners: SS-CFG with Git/Versioning, Persistence, IAM, Security and Agent API; ea
 #113/#114/#115 and #116/#117/#118, full authoring #122/#123/#124. D43/D44 govern this contract.
 This freezes the early source/activation obligations, not the complete later language/field SDK.
 
+The fresh Host implementation is in progress under R0, not accepted. Its native installation-wide
+activation action is `POST /api/v1/configuration-changes/reconcile`: it journals the authenticated
+operator and the already accepted control head, returns `202` with a status location, and lets the
+Host coordinator perform the evaluation/apply work. It does not edit Git, advance refs or acknowledge
+a compatible settings mutation. Current global `edit_project` and `create_sub_project` permissions
+are required for this whole-installation action, including replay/activation. Losing those rights
+cannot turn the pending managed operation into an external import. Individual compatible authoring
+operations and externally delegated automatic imports remain with their own contracts.
+
+Private repository locations are optional `DefinitionSources` in the existing Host Chiral node,
+with an explicit control repository ID/path and local settings repository ID/path/trust-reference
+registry. Desired declarations remain in Git. The fresh repository manifest retains
+`apiVersion: vivarium.io/v1alpha1`, `kind: Repository` and `id`, with `spec.schemaVersion: "2"` and
+one `documentKinds` entry (`Project` for control, `Settings` for a bound source). This selects the
+server-owned definition contract v1 and pinned evaluator; it is separate from the legacy schema-1
+Agent/User/RoleBinding manifest. Local binding uses the configured trust reference and an empty
+credential reference; remote acquisition/credentials are not implemented by this local adapter.
+The initial operational bounds are 16 Projects, 4096 reserved-tree files, 4 MiB reserved-tree bytes,
+256 KiB per source input and 1 MiB materialized catalogue; these are resource bounds, not licensed
+capacity. No acceptance of a full public SDK or complete native/compatible resource family follows.
+Each evaluator also has a trusted 30-second PID-1 timeout inside its private PID namespace, so
+coordinator loss cannot leave author code running indefinitely. Recovery reconciles only journalled
+invocation identities, rejects interrupted evaluation and retains active/LKG; already materialized
+evaluations retain their original compiler/contract identity and are not executed again.
+The journal pins each selected settings member before evaluating its code. Restart cannot silently
+resolve that member to a newer head or recompute a completed phase with changed compiler inputs.
+The activation transaction also projects stable positive PostgreSQL Project/BuildType keys and
+their exact owner relations. Per-BuildType definitions are immutable, foreign-key-backed members
+of the materialized revision; rename updates the current index without replacing identity or old
+definitions. Removal from active use retains identity/history. The selected R0/PILOT path does not
+silently convert a retained configuration to a template or move it between Projects; those operations
+retain their separately due reference contracts.
+
 ## Selected source boundary
 
 R0 starts with a managed-local control repository on its configured authoritative ref. Its Project

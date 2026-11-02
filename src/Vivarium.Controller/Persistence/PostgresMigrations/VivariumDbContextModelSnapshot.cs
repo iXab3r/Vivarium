@@ -381,6 +381,327 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogActive", b =>
+                {
+                    b.Property<string>("RepositoryId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<Guid>("LastKnownGoodRevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RevisionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RepositoryId");
+
+                    b.HasIndex("LastKnownGoodRevisionId");
+
+                    b.HasIndex("RevisionId");
+
+                    b.ToTable("ActiveCatalogs");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogBuildDefinition", b =>
+                {
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("RevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PlanHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlanJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SettingsCommit")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SettingsPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SettingsRepositoryId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildTypeId", "RevisionId");
+
+                    b.HasIndex("RevisionId");
+
+                    b.HasIndex("BuildTypeId", "ProjectId");
+
+                    b.ToTable("CatalogBuildDefinitions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CatalogBuildDefinitions_Hash", "\"PlanHash\" ~ '^[0-9a-f]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogBuildType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid?>("ActiveRevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTemplate")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActiveRevisionId");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("CatalogBuildTypes", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CatalogBuildTypes_Id", "\"Id\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BaseRevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CandidateCommit")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CorrelationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CredentialKind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FailureCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MaterializedJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RepositoryId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("RequestId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SelectedRevisionsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RepositoryId", "CreatedAt");
+
+                    b.ToTable("CatalogChanges", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CatalogChanges_Origin", "\"Origin\" = 'MANAGED'");
+
+                            t.HasCheckConstraint("CK_CatalogChanges_State", "\"State\" IN ('PENDING','EVALUATED','APPLIED','REJECTED','CONFLICT')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogEvaluation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChangeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CleanupConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FailureCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("InputHashesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OutputHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Phase")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProjectId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangeId");
+
+                    b.ToTable("CatalogEvaluations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CatalogEvaluations_State", "\"State\" IN ('RUNNING','SUCCEEDED','FAILED','INTERRUPTED')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogProjectIdentity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid?>("ActiveRevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RepositoryId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActiveRevisionId");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("CatalogProjects", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CatalogProjects_Id", "\"Id\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogRevision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ActivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ChangeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CompilerImage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompilerSdk")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContractHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ControlCommit")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DefinitionHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DefinitionJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("RepositoryId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangeId")
+                        .IsUnique();
+
+                    b.ToTable("CatalogRevisions");
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Identity.GroupRoleGrant", b =>
                 {
                     b.Property<string>("GroupKey")
@@ -617,6 +938,82 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogActive", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("LastKnownGoodRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("RevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogBuildDefinition", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("RevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogBuildType", null)
+                        .WithMany()
+                        .HasForeignKey("BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogBuildType", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("ActiveRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogProjectIdentity", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogEvaluation", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogChange", null)
+                        .WithMany()
+                        .HasForeignKey("ChangeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogProjectIdentity", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("ActiveRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogProjectIdentity", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogRevision", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogChange", null)
+                        .WithMany()
+                        .HasForeignKey("ChangeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vivarium.Controller.Identity.GroupRoleGrant", b =>

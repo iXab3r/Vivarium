@@ -1,5 +1,20 @@
 using System.Text.Json;
 using Vivarium.DefinitionProof;
+using Vivarium.Controller.Catalog;
+
+if (args is ["--production-evaluator-worker", var invocation])
+{
+    var sources = ProductionEvaluatorPhysicalTests.Sources("File.WriteAllText(\"/work/author-ready\", \"ready\"); UserCode.Attack();");
+    sources["UserCode.cs"] = """
+        using System.Runtime.InteropServices;
+        public static class UserCode {
+            [DllImport("libc", EntryPoint = "kill")] private static extern int Kill(int pid, int signal);
+            public static void Attack() { Kill(1, 19); Thread.Sleep(Timeout.Infinite); }
+        }
+        """;
+    var result = await new IsolatedDefinitionEvaluator(Guid.Parse(invocation)).EvaluateAsync(sources);
+    return result.ExitCode;
+}
 
 if (args is ["--isolated-worker", var sourcePath, var containerName])
 {

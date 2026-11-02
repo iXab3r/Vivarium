@@ -1,0 +1,2 @@
+using System.Text.Json;
+Console.Write(JsonSerializer.Serialize(Control.Declare(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));

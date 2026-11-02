@@ -33,7 +33,12 @@ public sealed class RuntimeHostPhysicalTests
         if (!target.StartsWith(parent, StringComparison.OrdinalIgnoreCase)
             || !Regex.IsMatch(Path.GetFileName(target), "^runtime-[a-f0-9]{32}$"))
             throw new InvalidDataException("Owned private fixture cleanup target differs.");
-        if (Directory.Exists(target)) Directory.Delete(target, recursive: true);
+        if (Directory.Exists(target))
+        {
+            foreach (var file in Directory.EnumerateFiles(target, "*", SearchOption.AllDirectories))
+                File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
+            Directory.Delete(target, recursive: true);
+        }
         ownedRoot = null;
     }
 
@@ -46,6 +51,36 @@ public sealed class RuntimeHostPhysicalTests
             "artifacts/r0-host/runtime-" + Guid.NewGuid().ToString("N")));
         ownedRoot = root;
         Directory.CreateDirectory(root);
+        var definitions = Path.Combine(root, "definitions");
+        Directory.CreateDirectory(definitions);
+        await SourceCompiler.GitAsync(definitions, "init", "-b", "main");
+        await SourceCompiler.GitAsync(definitions, "config", "core.autocrlf", "false");
+        await SourceCompiler.GitAsync(definitions, "config", "user.name", "Owned Host fixture");
+        await SourceCompiler.GitAsync(definitions, "config", "user.email", "fixture@example.invalid");
+        var source = ProductionEvaluatorPhysicalTests.Sources();
+        var files = new Dictionary<string, string>
+        {
+            [".vivarium/repository.yaml"] = """
+                apiVersion: vivarium.io/v1alpha1
+                kind: Repository
+                id: host-fixture
+                spec:
+                  schemaVersion: "2"
+                  documentKinds:
+                    - Project
+                """,
+            [".vivarium/projects/P/Control.g.cs"] = source["Control.g.cs"],
+            [".vivarium/unbound/P/Settings.g.cs"] = source["Settings.g.cs"],
+            [".vivarium/unbound/P/UserCode.cs"] = source["UserCode.cs"],
+        };
+        foreach (var (path, text) in files)
+        {
+            var target = Path.Combine(definitions, path);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            await File.WriteAllTextAsync(target, text);
+        }
+        await SourceCompiler.GitAsync(definitions, "add", "--all");
+        await SourceCompiler.GitAsync(definitions, "commit", "-m", "fixture: Host Git catalogue");
         var directory = Path.Combine(root, "nodes");
         var publicPort = Port();
         var storagePort = Port();
@@ -85,6 +120,8 @@ public sealed class RuntimeHostPhysicalTests
                     {
                         ["PublicOrigin"] = origin, ["ListenUrl"] = origin,
                         ["StorageListenUrl"] = storageOrigin, ["CertificatePath"] = certificate.Path,
+                        ["DefinitionSources"] = JsonSerializer.SerializeToNode(new
+                        { RepositoryId = "host-fixture", Path = definitions, SettingsRepositories = Array.Empty<object>() }),
                     },
                     ["vivarium-database"] = new() { ["ConnectionString"] = postgres.ConnectionString },
                     ["vivarium-identity"] = identity,
@@ -148,11 +185,35 @@ public sealed class RuntimeHostPhysicalTests
                 using (var roles = await http.GetAsync("/api/v1/roles"))
                 {
                     Assert.That(roles.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-                    using var definitions = JsonDocument.Parse(await roles.Content.ReadAsStringAsync());
-                    Assert.That(definitions.RootElement.GetProperty("items").EnumerateArray()
+                    using var roleDefinitions = JsonDocument.Parse(await roles.Content.ReadAsStringAsync());
+                    Assert.That(roleDefinitions.RootElement.GetProperty("items").EnumerateArray()
                         .Select(role => role.GetProperty("id").GetString()), Is.EquivalentTo(new[]
                             { "SYSTEM_ADMIN", "PROJECT_ADMIN", "PROJECT_DEVELOPER", "PROJECT_VIEWER", "AGENT_MANAGER" }));
                 }
+                Assert.That((await http.GetAsync("/api/v1/projects")).StatusCode, Is.EqualTo(HttpStatusCode.ServiceUnavailable));
+                var shell = await http.GetStringAsync("/access");
+                var bootstrap = Regex.Match(shell, "<script id=\"vivarium-session\" type=\"application/json\">(.*?)</script>", RegexOptions.Singleline);
+                using var session = JsonDocument.Parse(bootstrap.Groups[1].Value);
+                using var reconcile = new HttpRequestMessage(HttpMethod.Post, "/api/v1/configuration-changes/reconcile");
+                reconcile.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                using var accepted = await http.SendAsync(reconcile);
+                Assert.That(accepted.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+                var location = accepted.Headers.Location!;
+                var until = DateTimeOffset.UtcNow.AddSeconds(60);
+                var applied = false;
+                while (DateTimeOffset.UtcNow < until)
+                {
+                    using var progress = await http.GetAsync(location);
+                    Assert.That(progress.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    using var change = JsonDocument.Parse(await progress.Content.ReadAsStringAsync());
+                    var state = change.RootElement.GetProperty("state").GetString();
+                    if (state == "applied") { applied = true; break; }
+                    Assert.That(state, Is.EqualTo("pending").Or.EqualTo("evaluated"));
+                    await Task.Delay(100);
+                }
+                Assert.That(applied, Is.True);
+                using var catalog = JsonDocument.Parse(await http.GetStringAsync("/api/v1/projects/P/build-configurations"));
+                Assert.That(catalog.RootElement.GetProperty("items")[0].GetProperty("id").GetString(), Is.EqualTo("P_LocalSmoke"));
                 var installationRoles = "/api/v1/users/53a74e90-6a7c-4965-a530-8d498c4e523e/roles/SYSTEM_ADMIN/g";
                 using (var noCsrf = await http.PutAsync(installationRoles, content: null))
                     Assert.That(noCsrf.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
@@ -231,6 +292,7 @@ public sealed class RuntimeHostPhysicalTests
                 Assert.That(restartedCapture.Password is not null && restartedCapture.Password != oldPassword, Is.True);
                 Assert.That((await LoginAsync(http, oldPassword)).StatusCode, Is.EqualTo(HttpStatusCode.OK), "Old password must fail normal login.");
                 Assert.That((await LoginAsync(http, restartedCapture.Password!)).StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+                Assert.That((await http.GetAsync("/api/v1/build-configurations/P_LocalSmoke")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
                 var objects = app.Services.GetRequiredService<IObjectStorage>();
                 var download = await objects.DownloadAsync(new GetDownloadUrl("owned-r0/object", "owned.bin"));
                 using var retained = await http.GetAsync(download.Url);

@@ -16,32 +16,45 @@ public sealed class CurrentAccess(VivariumDbContext database, IConfiguration con
 
     public async Task<bool> AllowsAsync(Guid userId, string permissionId,
         IReadOnlyList<string>? projectAndAncestors = null, CancellationToken cancellationToken = default)
+        => await AllowsAllAsync(userId, [permissionId], projectAndAncestors, cancellationToken);
+
+    public async Task<bool> AllowsAllAsync(Guid userId, IReadOnlyList<string> permissionIds,
+        IReadOnlyList<string>? projectAndAncestors = null, CancellationToken cancellationToken = default)
     {
-        var user = await FindEligibleAsync(userId, cancellationToken);
-        if (user is null) return false;
-        if (user.Id == VivariumIdentityConstants.SuperuserId)
-            return true;
         // Project identities and ancestry come from the owning active catalogue projection.
         // A transport must never accept a caller-supplied ancestry list as authority.
         var scopes = new HashSet<string>(StringComparer.Ordinal) { "g" };
         if (projectAndAncestors is not null)
             foreach (var project in projectAndAncestors) scopes.Add("p:" + project);
-        var userGrants = await database.UserRoleGrants.AsNoTracking().Where(grant => grant.UserId == userId)
-            .Select(grant => new { grant.RoleId, grant.Scope }).ToArrayAsync(cancellationToken);
-        var allUsersGrants = await database.GroupRoleGrants.AsNoTracking()
-            .Where(grant => grant.GroupKey == TeamCityGroup.AllUsersKey)
-            .Select(grant => new { grant.RoleId, grant.Scope }).ToArrayAsync(cancellationToken);
-        var roles = userGrants.Concat(allUsersGrants).Where(grant => scopes.Contains(grant.Scope))
-            .Select(grant => grant.RoleId).ToHashSet(StringComparer.Ordinal);
-        var pending = new Queue<string>(roles);
-        while (pending.TryDequeue(out var role))
-        {
-            var included = await database.IncludedRoles.AsNoTracking().Where(edge => edge.RoleId == role)
-                .Select(edge => edge.IncludedRoleId).ToArrayAsync(cancellationToken);
-            foreach (var id in included)
-                if (roles.Add(id)) pending.Enqueue(id);
-        }
-        return await database.RolePermissions.AsNoTracking()
-            .AnyAsync(permission => roles.Contains(permission.RoleId) && permission.PermissionId == permissionId, cancellationToken);
+        var scopeValues = scopes.ToArray();
+        var permissionValues = permissionIds.ToArray();
+        var installationId = VivariumIdentityConstants.SuperuserId;
+        var installationEnabled = configuration.GetValue<bool>("Vivarium:Identity:SuperuserEnabled");
+        // One PostgreSQL statement snapshot covers eligibility, grants, transitive inclusions and
+        // permissions. Separate queries must not combine an old enabled account with a newer grant.
+        return await database.Database.SqlQuery<bool>($"""
+            WITH RECURSIVE effective_roles("RoleId") AS (
+                SELECT "RoleId" FROM "UserRoleGrants"
+                    WHERE "UserId" = {userId} AND "Scope" = ANY({scopeValues})
+                UNION
+                SELECT "RoleId" FROM "GroupRoleGrants"
+                    WHERE "GroupKey" = {TeamCityGroup.AllUsersKey} AND "Scope" = ANY({scopeValues})
+                UNION
+                SELECT edge."IncludedRoleId" FROM "IncludedRoles" edge
+                    JOIN effective_roles inherited ON inherited."RoleId" = edge."RoleId"
+            )
+            SELECT EXISTS (
+                SELECT 1 FROM "AspNetUsers" account
+                WHERE account."Id" = {userId} AND account."IsEnabled"
+                    AND (account."Id" <> {installationId} OR {installationEnabled})
+                    AND (account."Id" = {installationId} OR NOT EXISTS (
+                        SELECT 1 FROM unnest({permissionValues}) requested("PermissionId") WHERE NOT EXISTS (
+                            SELECT 1 FROM "RolePermissions" permission JOIN effective_roles role
+                                ON role."RoleId" = permission."RoleId"
+                            WHERE permission."PermissionId" = requested."PermissionId"
+                        )
+                    ))
+            ) AS "Value"
+            """).SingleAsync(cancellationToken);
     }
 }

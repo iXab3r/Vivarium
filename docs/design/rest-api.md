@@ -575,6 +575,22 @@ bounded, and sanitized; commit signing policy belongs to the Git/Versioning Expe
 
 ### 5.3 Apply and conflict semantics
 
+R0's native installation-wide activation action is
+`POST /api/v1/configuration-changes/reconcile` with no body. It records the current operator and
+already accepted Git head, then returns `202`, `Location` and a pending change. The asynchronous
+coordinator uses the [selected C#/Git activation contract](csharp-activation.md); it does not mutate
+Git or substitute this action for batch/compatible authoring. `GET /configuration-changes/{id}`
+exposes pending/evaluated/applied/rejected/conflict and applied revision only after the PG commit.
+Both actions require current global `edit_project` and `create_sub_project`; browser mutation uses
+normal CSRF and explicit bearer credentials never fall back to a cookie. This initial whole-installation
+workflow is distinct from later scoped authoring and delegated external imports.
+
+The fresh native catalogue reads expose Project/configuration identity, name, parent/Project and
+active revision metadata. They filter using current `view_project` and active catalogue ancestry;
+invisible item reads are opaque `404`. An installation with no accepted active catalogue returns
+`503 catalogue_unavailable`, not a successful empty smoke catalogue. This initial projection does
+not declare the complete settings resource family implemented.
+
 1. Resolve and validate the caller's `baseConfigurationRevision`/`If-Match`.
 2. Materialize the proposed change without editing the active projection.
 3. Validate schema and cross-resource invariants using the same application services that reconcile

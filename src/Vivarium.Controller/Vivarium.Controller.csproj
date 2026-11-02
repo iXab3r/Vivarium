@@ -36,6 +36,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Hosting/Schemas/*.json" />
     <EmbeddedResource Include="Identity/Defaults/*.json" />
+    <EmbeddedResource Include="Catalog/DefinitionModel.cs" LogicalName="Vivarium.Controller.Catalog.DefinitionModel.cs" WithCulture="false" />
+    <EmbeddedResource Include="Catalog/Evaluator/Program.cs.txt" LogicalName="Vivarium.Controller.Catalog.Evaluator.Program.cs.txt" WithCulture="false" />
+    <EmbeddedResource Include="Catalog/Evaluator/ControlReader.cs.txt" LogicalName="Vivarium.Controller.Catalog.Evaluator.ControlReader.cs.txt" WithCulture="false" />
     <Content Update="wwwroot/identity.css" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 

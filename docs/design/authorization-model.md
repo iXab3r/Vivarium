@@ -28,15 +28,18 @@ do not describe the accepted target as working functionality.
 The fresh R0 Host composes stock `IdentityCore`, Identity authentication cookies and
 OpenIddict over PostgreSQL. Its scoped TeamCity roles, permission and included-role relations,
 direct grants and All Users contributions are separate application tables; unused framework
-global-role tables are removed only when empty. Current access rereads eligibility and role data,
+global-role tables are removed only when empty. One PostgreSQL statement snapshot reads eligibility,
+direct/All Users grants and transitive included-role permissions, avoiding a mixture of old eligibility
+and newer grants. Current catalogue metadata and scope checks use one repeatable-read snapshot;
+the short activation commit fences concurrent eligibility/grant writes. Current access rereads this data,
 without an immutable SYSTEM_ADMIN floor. This is component-level implementation, not completed
 authorized role management, nested-group support, REST conformance or story acceptance.
 
 The common R0 service can edit direct role permissions, grant/withdraw global user roles and
 enable/disable ordinary accounts with current checks and the same PostgreSQL audit transaction.
 Its model tests include delegation, immediate loss of removed administrator permissions and a
-failed audit that rolls back a grant. These are service effects; normal Access UI entry and project
-delegation remain due. The native current-account read resolves one framework credential and
+failed audit that rolls back a grant. The Access UI has selected real browser evidence; project
+delegation remains due. The native current-account read resolves one framework credential and
 rereads eligibility, without falling back from an explicit bearer to a browser cookie.
 
 Native My keys issuance wraps framework entry creation/metadata and audit in one EF transaction

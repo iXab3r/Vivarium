@@ -70,14 +70,35 @@ Host stopped. Runtime DB credentials may have narrower permissions than maintena
 startup refuses missing/unready nodes, pending/unknown/checksum-drifted schema and unusable Identity
 keys before opening listeners. Object HTTP stays on a distinct loopback listener. The installation
 password is disclosed only in the intended private startup log after its framework hash commits.
-These commands currently establish infrastructure and account pages. Catalogue/Agent/build and
-Workbench integration remain under R0 delivery; this is not a completed local-run or US-013 claim.
+These commands establish infrastructure, ordinary account/My keys pages and Workbench Access.
+The fresh C#/Git catalogue path is in progress: optional Host `DefinitionSources` locates the
+control repository and explicit local settings-source registry. Prepare schema-2 C# declarations
+using the [selected activation contract](design/csharp-activation.md), provision its pinned Linux
+SDK image, then submit the native authenticated reconcile action and observe its status location.
+The Host must have Docker daemon access; project code receives neither that access nor Host mounts,
+network, settings or credentials. An unavailable evaluator cannot fall back to Host execution.
+Catalogue metadata is read under current project visibility, while Agent/build/chain integration
+remains due. This is not a completed local-run or US-013 claim.
+
+The Controller build includes the locked TypeScript/Vite Workbench assets. Root `dotnet build`
+runs `npm ci` and `npm run build` when frontend inputs change, so Node/npm are build prerequisites.
+An externally prepared frontend may use `-p:BuildWorkbench=false`; its `Workbench/dist` must already
+exist and is still copied into the Host output/publish tree. This is how the owned Linux browser
+contour separates its pinned Node build stage from .NET compilation.
+
+Selected real Host/Git/Docker/PostgreSQL checks are explicit in `tests/Vivarium.DefinitionProof`:
+`ProductionEvaluatorPhysicalTests`, `ProductionCatalogPhysicalTests`, `RuntimeHostPhysicalTests`,
+and the existing Host/Identity/access groups. The closed ordinary Identity and Workbench Access
+browser contour is prepared with `python tools/identity/prepare.py`, then executed with
+`python tools/identity/run.py <printed-context-path>`. Its summaries require clean owned processes
+and container removal; it is not the D43 author-code evaluator or complete R0/story acceptance.
 
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
 ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
 invoked `tests/Vivarium.TeamCity.Conformance` project; its raw five-case product-ready run remains nonzero while
 the compatible routes are missing. No delivered TeamCity GREEN selection exists yet, and broader
-P0 composition/accounting/acceptance gates remain open. The [local mutation cohort](design/teamcity-rest-local-mutations.md)
+P0 foundation was delivered in PR #164; R0 product binding and cumulative conformance remain open.
+The [local mutation cohort](design/teamcity-rest-local-mutations.md)
 separately records twelve observed/replay-bound workflows and ten product-prerequisite-blocked variants.
 
 D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first

@@ -6,7 +6,24 @@
     "ListenUrl": { "type": "string", "format": "uri", "minLength": 1 },
     "StorageListenUrl": { "type": "string", "format": "uri", "minLength": 1 },
     "CertificatePath": { "type": ["string", "null"] },
-    "CertificatePassword": { "type": ["string", "null"], "writeOnly": true }
+    "CertificatePassword": { "type": ["string", "null"], "writeOnly": true },
+    "DefinitionSources": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "RepositoryId": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "Path": { "type": "string", "minLength": 1 },
+        "SettingsRepositories": { "type": "array", "maxItems": 16, "items": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "Id": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "Path": { "type": "string", "minLength": 1 },
+            "TrustReference": { "type": "string", "minLength": 1 }
+          },
+          "required": ["Id", "Path", "TrustReference"]
+        } }
+      },
+      "required": ["RepositoryId", "Path", "SettingsRepositories"]
+    }
   },
   "required": ["PublicOrigin", "ListenUrl", "StorageListenUrl"]
 }

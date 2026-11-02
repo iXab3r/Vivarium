@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Identity;
 using Vivarium.Controller.Auditing;
+using Vivarium.Controller.Catalog;
 
 namespace Vivarium.Controller.Persistence;
 
@@ -17,10 +18,73 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<UserRoleGrant> UserRoleGrants => Set<UserRoleGrant>();
     public DbSet<TeamCityGroup> Groups => Set<TeamCityGroup>();
     public DbSet<GroupRoleGrant> GroupRoleGrants => Set<GroupRoleGrant>();
+    public DbSet<CatalogChange> CatalogChanges => Set<CatalogChange>();
+    public DbSet<CatalogEvaluation> CatalogEvaluations => Set<CatalogEvaluation>();
+    public DbSet<CatalogRevision> CatalogRevisions => Set<CatalogRevision>();
+    public DbSet<CatalogActive> ActiveCatalogs => Set<CatalogActive>();
+    public DbSet<CatalogProjectIdentity> CatalogProjects => Set<CatalogProjectIdentity>();
+    public DbSet<CatalogBuildType> CatalogBuildTypes => Set<CatalogBuildType>();
+    public DbSet<CatalogBuildDefinition> CatalogBuildDefinitions => Set<CatalogBuildDefinition>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        var change = modelBuilder.Entity<CatalogChange>();
+        change.HasKey(entry => entry.Id);
+        change.Property(entry => entry.MaterializedJson).HasColumnType("jsonb");
+        change.Property(entry => entry.SelectedRevisionsJson).HasColumnType("jsonb");
+        change.Property(entry => entry.RepositoryId).UseCollation("C");
+        change.HasIndex(entry => new { entry.RepositoryId, entry.CreatedAt });
+        change.ToTable("CatalogChanges", table =>
+        {
+            table.HasCheckConstraint("CK_CatalogChanges_State", "\"State\" IN ('PENDING','EVALUATED','APPLIED','REJECTED','CONFLICT')");
+            table.HasCheckConstraint("CK_CatalogChanges_Origin", "\"Origin\" = 'MANAGED'");
+        });
+        var evaluation = modelBuilder.Entity<CatalogEvaluation>();
+        evaluation.HasKey(entry => entry.Id);
+        evaluation.Property(entry => entry.InputHashesJson).HasColumnType("jsonb");
+        evaluation.Property(entry => entry.OutputJson).HasColumnType("jsonb");
+        evaluation.HasIndex(entry => entry.ChangeId);
+        evaluation.HasOne<CatalogChange>().WithMany().HasForeignKey(entry => entry.ChangeId).OnDelete(DeleteBehavior.Restrict);
+        evaluation.ToTable("CatalogEvaluations", table =>
+            table.HasCheckConstraint("CK_CatalogEvaluations_State", "\"State\" IN ('RUNNING','SUCCEEDED','FAILED','INTERRUPTED')"));
+        var revision = modelBuilder.Entity<CatalogRevision>();
+        revision.HasKey(entry => entry.Id);
+        revision.Property(entry => entry.RepositoryId).UseCollation("C");
+        revision.Property(entry => entry.DefinitionJson).HasColumnType("jsonb");
+        revision.HasIndex(entry => entry.ChangeId).IsUnique();
+        revision.HasOne<CatalogChange>().WithMany().HasForeignKey(entry => entry.ChangeId).OnDelete(DeleteBehavior.Restrict);
+        var active = modelBuilder.Entity<CatalogActive>();
+        active.HasKey(entry => entry.RepositoryId);
+        active.Property(entry => entry.RepositoryId).UseCollation("C");
+        active.HasOne<CatalogRevision>().WithMany().HasForeignKey(entry => entry.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        active.HasOne<CatalogRevision>().WithMany().HasForeignKey(entry => entry.LastKnownGoodRevisionId).OnDelete(DeleteBehavior.Restrict);
+        var project = modelBuilder.Entity<CatalogProjectIdentity>();
+        project.HasKey(entry => entry.Id);
+        project.Property(entry => entry.Id).UseIdentityAlwaysColumn();
+        project.Property(entry => entry.ExternalId).UseCollation("C");
+        project.Property(entry => entry.RepositoryId).UseCollation("C");
+        project.HasIndex(entry => entry.ExternalId).IsUnique();
+        project.HasOne<CatalogProjectIdentity>().WithMany().HasForeignKey(entry => entry.ParentId).OnDelete(DeleteBehavior.Restrict);
+        project.HasOne<CatalogRevision>().WithMany().HasForeignKey(entry => entry.ActiveRevisionId).OnDelete(DeleteBehavior.Restrict);
+        project.ToTable("CatalogProjects", table => table.HasCheckConstraint("CK_CatalogProjects_Id", "\"Id\" > 0"));
+        var buildType = modelBuilder.Entity<CatalogBuildType>();
+        buildType.HasKey(entry => entry.Id);
+        buildType.Property(entry => entry.Id).UseIdentityAlwaysColumn();
+        buildType.Property(entry => entry.ExternalId).UseCollation("C");
+        buildType.HasIndex(entry => entry.ExternalId).IsUnique();
+        buildType.HasAlternateKey(entry => new { entry.Id, entry.ProjectId });
+        buildType.HasOne<CatalogProjectIdentity>().WithMany().HasForeignKey(entry => entry.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        buildType.HasOne<CatalogRevision>().WithMany().HasForeignKey(entry => entry.ActiveRevisionId).OnDelete(DeleteBehavior.Restrict);
+        buildType.ToTable("CatalogBuildTypes", table => table.HasCheckConstraint("CK_CatalogBuildTypes_Id", "\"Id\" > 0"));
+        var definition = modelBuilder.Entity<CatalogBuildDefinition>();
+        definition.HasKey(entry => new { entry.BuildTypeId, entry.RevisionId });
+        definition.Property(entry => entry.PlanJson).HasColumnType("jsonb");
+        definition.HasOne<CatalogBuildType>().WithMany().HasForeignKey(entry => new { entry.BuildTypeId, entry.ProjectId })
+            .HasPrincipalKey(entry => new { entry.Id, entry.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        definition.HasOne<CatalogRevision>().WithMany().HasForeignKey(entry => entry.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        definition.ToTable("CatalogBuildDefinitions", table => table.HasCheckConstraint("CK_CatalogBuildDefinitions_Hash",
+            "\"PlanHash\" ~ '^[0-9a-f]{64}$'"));
         modelBuilder.UseOpenIddict();
         var account = modelBuilder.Entity<VivariumUser>();
         account.Property(user => user.DisplayName).HasMaxLength(256);
