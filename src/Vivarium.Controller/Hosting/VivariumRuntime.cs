@@ -6,6 +6,7 @@ using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Tokens;
 using Vivarium.Controller.Catalog;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Builds.Runtime;
 
 namespace Vivarium.Controller.Hosting;
 
@@ -39,6 +40,13 @@ public static class VivariumRuntime
         builder.Services.AddSingleton<AgentLifecycleCoordinator>();
         builder.Services.AddSingleton(provider => new AgentRegistry(timeProvider: provider.GetRequiredService<TimeProvider>()));
         builder.Services.AddSingleton<RuntimeAgentSessions>();
+        builder.Services.AddSingleton<RuntimeBuildService>();
+        builder.Services.AddSingleton<RuntimeBuildBytes>();
+        builder.Services.AddSingleton<RuntimeStepCompiler>();
+        builder.Services.AddSingleton<RuntimeBuildCoordinator>();
+        builder.Services.AddSingleton<RuntimeBuildOutputStore>();
+        builder.Services.AddHostedService<RuntimeBuildWorker>();
+        builder.Services.AddSingleton<Vivarium.Controller.Rest.Common.RestCursorCodec>();
         builder.WebHost.ConfigureKestrel(options =>
             options.Configure(builder.Configuration.GetSection("Kestrel"), reloadOnChange: false));
         builder.Services.DeferVivariumIdentityPreload();
@@ -80,6 +88,10 @@ public static class VivariumRuntime
         app.MapAccess();
         app.MapCatalog();
         app.MapRuntimeAgents();
+        app.MapRuntimeBuilds();
+        app.MapRuntimeBuildOutput();
+        app.MapRuntimeBuildArtifacts();
+        app.MapRuntimeAgentBytes();
         app.MapGrpcService<RuntimeAgentHub>();
         app.MapWorkbench();
         app.MapVivariumTokens();

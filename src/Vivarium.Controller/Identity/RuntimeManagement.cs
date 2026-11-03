@@ -36,6 +36,7 @@ internal static class RuntimeManagement
         }
         catch (JsonException) { return InvalidInput(http); }
         catch (BadHttpRequestException) { return InvalidInput(http); }
+        catch (RestApiException error) { return RestProblems.Create(http, error); }
     }
 
     internal static IResult InvalidInput(HttpContext http) => RestProblems.Create(http, 400,

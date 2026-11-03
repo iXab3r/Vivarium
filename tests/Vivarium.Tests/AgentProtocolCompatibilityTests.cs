@@ -87,7 +87,40 @@ public sealed class AgentProtocolCompatibilityTests
             AssertField(ControllerMsg.Descriptor, 7, "upgrade_health_accepted");
             AssertField(ControllerMsg.Descriptor, 8, "upgrade_commit_accepted");
             AssertField(ControllerMsg.Descriptor, 9, "upgrade_commit_recorded");
+            AssertField(AgentMsg.Descriptor, 13, "build_output");
+            AssertField(ControllerMsg.Descriptor, 10, "build_output_acknowledged");
+            AssertField(BuildAssignment.Descriptor, 7, "output_contract_major");
+            AssertField(BuildAssignment.Descriptor, 8, "output_secrets");
+            AssertField(BuildAssignment.Descriptor, 9, "artifact_publication_contract_major");
+            AssertField(BuildResult.Descriptor, 7, "output_watermarks");
+            AssertField(BuildResult.Descriptor, 8, "output_producer_lost");
         });
+    }
+
+    [Test]
+    public void Durable_output_requires_explicit_controller_support_and_the_exact_capability_major()
+    {
+        var hello = CurrentHello("output-agent", "output-session", "unused");
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = "teamcity.build-output.v1", ContractMajor = 1 });
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello).SupportsDurableBuildOutput, Is.False,
+            "The legacy controller must not negotiate output messages that its adapter does not process.");
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true).SupportsDurableBuildOutput, Is.True);
+        hello.Capabilities[^1].ContractMajor = 2;
+        Assert.Throws<AgentProtocolException>(() => AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true));
+        hello.Capabilities[^1].CapabilityId = "teamcity.build-output.v2";
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true).SupportsDurableBuildOutput, Is.False);
+    }
+
+    [Test]
+    public void Literal_publisher_is_separately_gated_and_cannot_be_enabled_by_an_unknown_major()
+    {
+        var hello = CurrentHello("publisher-agent", "publisher-session", "unused");
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = AgentProtocolCompatibility.ArtifactPublisherCapabilityId, ContractMajor = 1 });
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true).SupportsLiteralArtifactPublisher, Is.False);
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello, enableLiteralArtifactPublisher: true).SupportsLiteralArtifactPublisher, Is.True);
+        hello.Capabilities[^1].CapabilityId = "teamcity.artifact-publisher.literal.v2";
+        hello.Capabilities[^1].ContractMajor = 2;
+        Assert.That(AgentProtocolCompatibility.Negotiate(hello, enableLiteralArtifactPublisher: true).SupportsLiteralArtifactPublisher, Is.False);
     }
 
     [Test]

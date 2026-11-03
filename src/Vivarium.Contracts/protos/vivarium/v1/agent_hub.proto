@@ -23,6 +23,7 @@ message AgentMsg {
     UpgradeFinalizationConfirmed upgrade_finalization_confirmed = 10; // server-recorded marker persisted locally (D30)
     BuildStopAcknowledged build_stop_acknowledged = 11; // exact fenced graceful/force intent entered Agent control loop (D31)
     AgentRestartAcknowledged agent_restart_acknowledged = 12; // restart intent accepted before Agent exits (D31)
+    BuildOutput build_output = 13; // capability-gated durable, independently acknowledged output
   }
 }
 
@@ -37,6 +38,7 @@ message ControllerMsg {
     UpgradeHealthAccepted upgrade_health_accepted = 7; // controller reconciled the candidate; persist health before confirming (D30)
     UpgradeCommitAccepted upgrade_commit_accepted = 8; // controller durably entered commit-pending (D30)
     UpgradeCommitRecorded upgrade_commit_recorded = 9; // controller durably recorded the committed marker (D30)
+    BuildOutputAcknowledged build_output_acknowledged = 10;
   }
 }
 
@@ -183,6 +185,9 @@ message BuildAssignment {
   repeated string collect = 4;         // artifact globs relative to workdir
   OnFail on_fail = 5;
   map<string, string> parameters = 6;  // resolved scenario params -> env VIVARIUM_PARAM_* (D18)
+  uint32 output_contract_major = 7; // 1 requires negotiated teamcity.build-output.v1
+  repeated bytes output_secrets = 8; // ephemeral exact-value masks; never desired Git data or ordinary logs
+  uint32 artifact_publication_contract_major = 9; // 1: negotiated teamcity.artifact-publisher.literal.v1
 }
 
 message AssignmentAccepted {
@@ -291,6 +296,38 @@ message LogChunk {
   bytes data = 4;
 }
 
+// Chunk sequence identity belongs to one Build/step/stream and survives session replacement.
+// Data covers one sequence; a gap covers omitted sequences. Byte offsets make split gaps exact.
+message BuildOutput {
+  string build_id = 1;
+  string session_id = 2;
+  int32 step_index = 3;
+  LogStream stream = 4;
+  uint64 source_sequence_start = 5;
+  uint64 source_sequence_end_exclusive = 6;
+  bytes data = 7;
+  string gap_reason = 8;
+  uint64 produced_bytes = 9; // post-mask bytes in this range, equal to source_byte_end_exclusive - source_byte_start
+  uint64 source_byte_start = 10;
+  uint64 source_byte_end_exclusive = 11;
+}
+
+message BuildOutputAcknowledged {
+  string build_id = 1;
+  string session_id = 2;
+  int32 step_index = 3;
+  LogStream stream = 4;
+  uint64 sequence_exclusive = 5; // contiguous durable prefix, independent of terminal-result ACK
+  uint64 produced_bytes = 6; // post-mask byte offset at that prefix
+}
+
+message BuildOutputWatermark {
+  int32 step_index = 1;
+  LogStream stream = 2;
+  uint64 final_sequence_exclusive = 3;
+  uint64 produced_bytes = 4; // post-mask, including explicitly gapped bytes
+}
+
 message StepResult {
   int32 step_index = 1;
   int32 exit_code = 2;
@@ -311,6 +348,8 @@ message BuildResult {
   repeated Artifact artifacts = 4;
   BuildOutcome outcome = 5;
   string status_text = 6;
+  repeated BuildOutputWatermark output_watermarks = 7;
+  bool output_producer_lost = 8; // no final watermark can be asserted (crash or incomplete pipe drain)
 }
 
 message BuildResultAccepted {

@@ -269,8 +269,12 @@ the explicit releasing/finalization split is target work.
    among its authorized pools/trust classes and has all required capacity.
 4. The scheduler/provider selects an actual Agent. In one serialized transaction the coordinator:
    - verifies the queue deadline is strictly in the future;
-   - rechecks current authorization without expanding the admitted target scope; a revocation blocks
-     dispatch and records both admitted and current policy revisions;
+   - rechecks the current target/pool policy without expanding the admitted target scope. It does
+     not require the submitting user's `run_build` grant again: with per-project authorization
+     enabled, pinned TeamCity 2026.1.3 continues an accepted queued Build after that grant is withdrawn,
+     while denying a new run from the same ordinary account. Admission is a durable authorized
+     action, not a credential to replay at dispatch. New actions and reads use current rights
+     ([literal reference receipt](../../tests/Vivarium.Tests/TeamCity/Reference/queued-authority-observations.json));
    - verifies the Agent and optional ProviderInstance are still eligible;
    - allocates the Agent lease and next fence;
    - starts the selected execution-target snapshot with credential/session and Agent/provider capabilities,

@@ -266,6 +266,8 @@ public sealed class RestInfrastructureTests
         time.Advance(RestCursorCodec.Lifetime + TimeSpan.FromMilliseconds(1));
         var expiryError = Assert.Throws<RestApiException>(() => codec.Decode(
             cursor, principal, "agents", "filter-a", "-createdAt,id"));
+        var expiredWrongPrincipal = Assert.Throws<RestApiException>(() => codec.Decode(
+            cursor, ManagementPrincipal.LegacySubmit, "agents", "filter-a", "-createdAt,id"));
 
         Assert.Multiple(() =>
         {
@@ -275,6 +277,8 @@ public sealed class RestInfrastructureTests
             Assert.That(scopeError!.Code, Is.EqualTo("cursor_context_mismatch"));
             Assert.That(expiryError!.Status, Is.EqualTo(410));
             Assert.That(expiryError.Code, Is.EqualTo("cursor_expired"));
+            Assert.That(expiredWrongPrincipal!.Code, Is.EqualTo("cursor_context_mismatch"),
+                "A different principal never obtains an expiry/recovery response for another principal's cursor.");
         });
     }
 

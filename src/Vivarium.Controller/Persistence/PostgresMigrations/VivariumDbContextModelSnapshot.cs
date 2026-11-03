@@ -434,7 +434,14 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("TeamCityId"));
 
+                    b.Property<long>("WorkloadFence")
+                        .HasColumnType("bigint");
+
                     b.HasKey("AgentId");
+
+                    b.HasIndex("AuthTokenHash")
+                        .IsUnique()
+                        .HasFilter("\"AuthTokenHash\" IS NOT NULL");
 
                     b.HasIndex("TeamCityId")
                         .IsUnique();
@@ -450,6 +457,8 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                             t.HasCheckConstraint("CK_AgentRegistrations_HeartbeatSequence", "\"LastHeartbeatSequence\" BETWEEN 0 AND 18446744073709551615");
 
                             t.HasCheckConstraint("CK_AgentRegistrations_TeamCityId", "\"TeamCityId\" > 0");
+
+                            t.HasCheckConstraint("CK_AgentRegistrations_WorkloadFence", "\"WorkloadFence\" >= 0");
                         });
                 });
 
@@ -535,6 +544,488 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                             t.HasCheckConstraint("CK_AuditEvents_Details", "length(\"DetailsJson\"::text) <= 4096");
 
                             t.HasCheckConstraint("CK_AuditEvents_Outcome", "\"Outcome\" IN ('SUCCEEDED', 'DENIED', 'FAILED', 'NO_CHANGE')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeArtifactUpload", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Sha256")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ObjectKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildId", "Sha256");
+
+                    b.ToTable("RuntimeArtifactUploads", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeArtifactUploads_Content", "\"Size\" >= 0 AND \"Sha256\" ~ '^[a-f0-9]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuild", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("CancelOperationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CancelReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("CancelRequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CorrelationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Counter")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CredentialKind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("FailedToStart")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("FinishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("QueueDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("QueuedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("StatusText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("StopAcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("StopDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("StopMode")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildTypeId", "Counter")
+                        .IsUnique();
+
+                    b.HasIndex("BuildTypeId", "ProjectId");
+
+                    b.HasIndex("State", "QueuedAt", "Id");
+
+                    b.ToTable("RuntimeBuilds", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuilds_Id", "\"Id\" > 0 AND \"Counter\" > 0");
+
+                            t.HasCheckConstraint("CK_RuntimeBuilds_State", "\"State\" IN ('QUEUED','RUNNING','RELEASING','FINISHED')");
+
+                            t.HasCheckConstraint("CK_RuntimeBuilds_Status", "\"Status\" IN ('UNKNOWN','SUCCESS','FAILURE')");
+
+                            t.HasCheckConstraint("CK_RuntimeBuilds_Stop", "\"StopMode\" IS NULL OR \"StopMode\" IN ('GRACEFUL','FORCE')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildArtifact", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildId", "Ordinal");
+
+                    b.HasIndex("BuildId", "Path")
+                        .IsUnique();
+
+                    b.HasIndex("BuildId", "Sha256");
+
+                    b.ToTable("RuntimeBuildArtifacts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildArtifacts_Content", "\"Ordinal\" >= 0 AND \"Size\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", b =>
+                {
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("NextValue")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildTypeId");
+
+                    b.ToTable("RuntimeBuildCounters", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildCounters_Positive", "\"NextValue\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildExecution", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("AcknowledgementDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AgentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("AssignedConnectionGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AssignedSessionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Assignment")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<long>("CredentialGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CurrentConnectionGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CurrentSessionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("ExecutionDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("LeaseFence")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("OutputDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Phase")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("PreparationDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PreparedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("ReconnectDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("ReleasedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SelectionSnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TargetSnapshotJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("TerminalReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WorkloadId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildId");
+
+                    b.HasIndex("AgentId")
+                        .IsUnique()
+                        .HasFilter("\"ReleasedAt\" IS NULL");
+
+                    b.HasIndex("WorkloadId")
+                        .IsUnique();
+
+                    b.ToTable("RuntimeBuildExecutions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildExecutions_Fences", "\"LeaseFence\" > 0 AND \"CredentialGeneration\" > 0 AND \"AssignedConnectionGeneration\" > 0 AND \"CurrentConnectionGeneration\" > 0");
+
+                            t.HasCheckConstraint("CK_RuntimeBuildExecutions_Phase", "\"Phase\" IN ('PREPARING','DISPATCHING','ACCEPTED','TERMINAL','RELEASED')");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AdmissionJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CollectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OverridesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("RevisionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("BuildId");
+
+                    b.HasIndex("BuildTypeId", "RevisionId");
+
+                    b.HasIndex("BuildId", "BuildTypeId", "ProjectId")
+                        .IsUnique();
+
+                    b.ToTable("RuntimeBuildInputs", (string)null);
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("NextPosition")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildId");
+
+                    b.ToTable("RuntimeBuildOutputs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildOutputs_State", "\"State\" IN ('OPEN','SEALING','COMPLETE','COMPLETE_WITH_GAPS') AND \"NextPosition\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildPayload", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Sha256")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ObjectKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildId", "Sha256");
+
+                    b.ToTable("RuntimeBuildPayloads", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildPayloads_Content", "\"Size\" >= 0 AND \"Sha256\" ~ '^[a-f0-9]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("OriginalOutcome")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SemanticHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildId");
+
+                    b.ToTable("RuntimeBuildResults", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildResults_Hash", "\"SemanticHash\" ~ '^[a-f0-9]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputRange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("ByteEnd")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("ByteStart")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal?>("End")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ObjectKey")
+                        .HasColumnType("text");
+
+                    b.Property<long?>("Position")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ReceiptOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("ReceiptOrder"));
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Sha256")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Start")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("StepIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Stream")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildId", "Position")
+                        .IsUnique()
+                        .HasFilter("\"Position\" IS NOT NULL");
+
+                    b.HasIndex("BuildId", "StepIndex", "Stream", "Start")
+                        .IsUnique();
+
+                    b.ToTable("RuntimeOutputRanges", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeOutputRanges_Content", "(\"Kind\" IN ('HEAD','TAIL') AND \"End\" IS NOT NULL AND \"ByteEnd\" IS NOT NULL AND \"End\" = \"Start\" + 1 AND \"ByteEnd\" - \"ByteStart\" BETWEEN 1 AND 65536 AND \"Sha256\" IS NOT NULL AND \"Sha256\" ~ '^[a-f0-9]{64}$' AND \"ObjectKey\" IS NOT NULL AND \"Reason\" IS NULL) OR (\"Kind\" = 'GAP' AND \"Sha256\" IS NULL AND \"ObjectKey\" IS NULL AND \"Reason\" IS NOT NULL AND \"Reason\" IN ('delivery-deadline','quota-exceeded','spool-overflow','storage-failure','producer-lost','retention'))");
+
+                            t.HasCheckConstraint("CK_RuntimeOutputRanges_Kind", "\"Kind\" IN ('HEAD','TAIL','GAP')");
+
+                            t.HasCheckConstraint("CK_RuntimeOutputRanges_Sequence", "\"Start\" BETWEEN 0 AND 18446744073709551615 AND \"ByteStart\" BETWEEN 0 AND 18446744073709551615 AND ((\"End\" IS NOT NULL AND \"ByteEnd\" IS NOT NULL AND \"End\" > \"Start\" AND \"End\" <= 18446744073709551615 AND \"ByteEnd\" > \"ByteStart\" AND \"ByteEnd\" <= 18446744073709551615) OR (\"End\" IS NULL AND \"ByteEnd\" IS NULL AND \"Kind\" = 'GAP' AND \"Reason\" = 'producer-lost'))");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputStream", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("StepIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Stream")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("CommittedBytes")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("CommittedSequence")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal?>("FinalBytes")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal?>("FinalSequence")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<bool>("TailStarted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("BuildId", "StepIndex", "Stream");
+
+                    b.ToTable("RuntimeOutputStreams", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeOutputStreams_Final", "(\"FinalSequence\" IS NULL AND \"FinalBytes\" IS NULL) OR (\"FinalSequence\" IS NOT NULL AND \"FinalBytes\" IS NOT NULL AND \"FinalSequence\" BETWEEN 0 AND 18446744073709551615 AND \"FinalBytes\" BETWEEN 0 AND 18446744073709551615)");
+
+                            t.HasCheckConstraint("CK_RuntimeOutputStreams_Prefix", "\"CommittedSequence\" BETWEEN 0 AND 18446744073709551615 AND \"CommittedBytes\" BETWEEN 0 AND 18446744073709551615");
+
+                            t.HasCheckConstraint("CK_RuntimeOutputStreams_Scope", "\"StepIndex\" >= 0 AND \"Stream\" IN (0,1)");
                         });
                 });
 
@@ -1103,6 +1594,119 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .WithMany()
                         .HasForeignKey("ClaimedAgentId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeArtifactUpload", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuild", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogBuildType", null)
+                        .WithMany()
+                        .HasForeignKey("BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildArtifact", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeArtifactUpload", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId", "Sha256")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogBuildType", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", "BuildTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildExecution", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Agents.AgentRegistration", null)
+                        .WithMany()
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildExecution", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogBuildDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("BuildTypeId", "RevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", "BuildId", "BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Vivarium.Controller.Builds.Runtime.RuntimeBuild", "Id", "BuildTypeId", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildPayload", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputRange", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeOutputStream", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId", "StepIndex", "Stream")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputStream", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogActive", b =>

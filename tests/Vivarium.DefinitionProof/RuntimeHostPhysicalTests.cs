@@ -71,7 +71,9 @@ public sealed class RuntimeHostPhysicalTests
                     - Project
                 """,
             [".vivarium/projects/P/Control.g.cs"] = source["Control.g.cs"],
-            [".vivarium/unbound/P/Settings.g.cs"] = source["Settings.g.cs"],
+            [".vivarium/unbound/P/Settings.g.cs"] = source["Settings.g.cs"].Replace("echo from CSharp Git",
+                "echo from CSharp Git\\necho owned-smoke-artifact>proof.txt\\n" + (OperatingSystem.IsWindows()
+                    ? "echo ##teamcity[publishArtifacts 'proof.txt']" : "echo \\\"##teamcity[publishArtifacts 'proof.txt']\\\""), StringComparison.Ordinal),
             [".vivarium/unbound/P/UserCode.cs"] = source["UserCode.cs"],
         };
         foreach (var (path, text) in files)
@@ -152,6 +154,8 @@ public sealed class RuntimeHostPhysicalTests
         };
         using var http = new HttpClient(handler) { BaseAddress = new Uri(origin), Timeout = TimeSpan.FromSeconds(15) };
         string oldPassword;
+        long? executedBuild = null;
+        string? outputResumeCursor = null;
         var capture = new PrivateStartupLog();
         await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(capture)))
         {
@@ -268,6 +272,60 @@ public sealed class RuntimeHostPhysicalTests
                         && value.GetProperty("ready").GetBoolean());
                     Assert.That(ready.GetProperty("teamCityId").GetInt32(), Is.EqualTo(proven.GetProperty("teamCityId").GetInt32()));
                     Assert.That(ready.GetProperty("appliedConfigurationRevision").GetString(), Does.StartWith("host-fixture@"));
+                    using var submit = new HttpRequestMessage(HttpMethod.Post, "/api/v1/builds");
+                    submit.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                    submit.Content = new StringContent("{\"configurationId\":\"P_LocalSmoke\"}", System.Text.Encoding.UTF8, "application/json");
+                    using var queued = await http.SendAsync(submit);
+                    Assert.That(queued.StatusCode, Is.EqualTo(HttpStatusCode.Accepted),
+                        "The fresh entry must run an actual Git-owned BuildType rather than a submitted payload.");
+                    using var admitted = JsonDocument.Parse(await queued.Content.ReadAsStringAsync());
+                    executedBuild = admitted.RootElement.GetProperty("id").GetInt64();
+                    Assert.That(executedBuild, Is.Positive);
+                    var finished = await WaitBuildAsync(http, executedBuild.Value);
+                    Assert.That(finished.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
+                    Assert.That(finished.GetProperty("configurationId").GetString(), Is.EqualTo("P_LocalSmoke"));
+                    using var output = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/output"));
+                    outputResumeCursor = output.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString();
+                    Assert.That(output.RootElement.GetProperty("output").GetProperty("state").GetString(), Is.EqualTo("complete"),
+                        output.RootElement.GetRawText());
+                    var stdout = new List<byte>();
+                    foreach (var entry in output.RootElement.GetProperty("items").EnumerateArray())
+                    {
+                        Assert.That(entry.GetProperty("kind").GetString(), Is.EqualTo("data"));
+                        if (entry.GetProperty("stream").GetString() != "stdout") continue;
+                        var content = entry.GetProperty("content");
+                        var persisted = await http.GetByteArrayAsync(content.GetProperty("href").GetString());
+                        Assert.That(persisted.Length, Is.EqualTo(content.GetProperty("length").GetInt32()));
+                        Assert.That(Convert.ToHexStringLower(SHA256.HashData(persisted)), Is.EqualTo(content.GetProperty("sha256").GetString()));
+                        stdout.AddRange(persisted);
+                    }
+                    Assert.That(System.Text.Encoding.UTF8.GetString(stdout.ToArray()), Does.Contain("from CSharp Git"));
+                    using var artifacts = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/artifacts"));
+                    var artifact = artifacts.RootElement.GetProperty("items").EnumerateArray().Single();
+                    Assert.That(artifact.GetProperty("path").GetString(), Is.EqualTo("proof.txt"));
+                    var artifactBytes = await http.GetByteArrayAsync(artifact.GetProperty("href").GetString());
+                    Assert.That(System.Text.Encoding.UTF8.GetString(artifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
+                    Assert.That(Convert.ToHexStringLower(SHA256.HashData(artifactBytes)), Is.EqualTo(artifact.GetProperty("sha256").GetString()));
+                    await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId && value.GetProperty("ready").GetBoolean());
+                    using var resumed = await http.GetAsync($"/api/v1/builds/{executedBuild}/output?cursor="
+                        + Uri.EscapeDataString(output.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString()!));
+                    Assert.That(resumed.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    using var end = JsonDocument.Parse(await resumed.Content.ReadAsStringAsync());
+                    Assert.That(end.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
+                    using var repeatRequest = new HttpRequestMessage(HttpMethod.Post, "/api/v1/builds");
+                    repeatRequest.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                    repeatRequest.Content = new StringContent("{\"configurationId\":\"P_LocalSmoke\"}", System.Text.Encoding.UTF8, "application/json");
+                    using var repeatedResponse = await http.SendAsync(repeatRequest);
+                    Assert.That(repeatedResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+                    using var repeated = JsonDocument.Parse(await repeatedResponse.Content.ReadAsStringAsync());
+                    var next = await WaitBuildAsync(http, repeated.RootElement.GetProperty("id").GetInt64());
+                    Assert.That(next.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
+                    Assert.That(next.GetProperty("number").GetString(), Is.EqualTo("2"));
+                    Assert.That(next.GetProperty("agentId").GetString(), Is.EqualTo(agentId));
+                    using var wrongBuildCursor = await http.GetAsync($"/api/v1/builds/{next.GetProperty("id").GetInt64()}/output?cursor="
+                        + Uri.EscapeDataString(outputResumeCursor!));
+                    Assert.That(wrongBuildCursor.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+                    await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId && value.GetProperty("ready").GetBoolean());
                 }
                 finally
                 {
@@ -355,6 +413,24 @@ public sealed class RuntimeHostPhysicalTests
                 Assert.That((await LoginAsync(http, oldPassword)).StatusCode, Is.EqualTo(HttpStatusCode.OK), "Old password must fail normal login.");
                 Assert.That((await LoginAsync(http, restartedCapture.Password!)).StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                 Assert.That((await http.GetAsync("/api/v1/build-configurations/P_LocalSmoke")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(executedBuild, Is.Not.Null);
+                using var retainedBuild = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}"));
+                using var retainedOutput = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/output"));
+                using var coldResume = await http.GetAsync($"/api/v1/builds/{executedBuild}/output?cursor=" + Uri.EscapeDataString(outputResumeCursor!));
+                Assert.That(coldResume.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                using var coldEnd = JsonDocument.Parse(await coldResume.Content.ReadAsStringAsync());
+                Assert.That(coldEnd.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
+                var retainedStdout = new List<byte>();
+                foreach (var entry in retainedOutput.RootElement.GetProperty("items").EnumerateArray())
+                    if (entry.GetProperty("kind").GetString() == "data" && entry.GetProperty("stream").GetString() == "stdout")
+                        retainedStdout.AddRange(await http.GetByteArrayAsync(entry.GetProperty("content").GetProperty("href").GetString()));
+                Assert.That(System.Text.Encoding.UTF8.GetString(retainedStdout.ToArray()), Does.Contain("from CSharp Git"));
+                using var retainedArtifacts = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/artifacts"));
+                var retainedArtifact = retainedArtifacts.RootElement.GetProperty("items").EnumerateArray().Single();
+                var retainedArtifactBytes = await http.GetByteArrayAsync(retainedArtifact.GetProperty("href").GetString());
+                Assert.That(System.Text.Encoding.UTF8.GetString(retainedArtifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
+                Assert.That(retainedBuild.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
+                Assert.That(retainedBuild.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
                 using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
                 var oldAgent = priorAgents.RootElement.GetProperty("items")[0];
                 var oldAgentId = oldAgent.GetProperty("id").GetString();
@@ -470,6 +546,20 @@ public sealed class RuntimeHostPhysicalTests
             await Task.Delay(100);
         }
         throw new AssertionException("The owned Git policy did not activate.");
+    }
+
+    private static async Task<JsonElement> WaitBuildAsync(HttpClient http, long id)
+    {
+        var until = DateTimeOffset.UtcNow.AddSeconds(45);
+        while (DateTimeOffset.UtcNow < until)
+        {
+            using var response = await http.GetAsync($"/api/v1/builds/{id}");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var build = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            if (build.RootElement.GetProperty("state").GetString() == "finished") return build.RootElement.Clone();
+            await Task.Delay(100);
+        }
+        throw new AssertionException("The owned catalogue Build did not finish.");
     }
 
     private sealed class PrivateStartupLog : ILoggerProvider, ILogger

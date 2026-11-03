@@ -95,6 +95,12 @@ public sealed class AgentCredentials(IDbContextFactory<VivariumDbContext> databa
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
             return null;
         }
+        if (current?.CurrentWorkloadId is not null)
+        {
+            Audit(database, actor, "agent.reenroll", "agent", hello.AgentId, AuditOutcome.Denied, "active_workload_owns_identity");
+            await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+            return null;
+        }
         var replaced = current is not null;
         if (current is null)
         {

@@ -72,17 +72,6 @@ public sealed class RestCursorCodec
             throw InvalidCursor();
         }
 
-        var age = timeProvider.GetUtcNow() -
-            DateTimeOffset.FromUnixTimeMilliseconds(payload.IssuedUnixMilliseconds);
-        if (age < TimeSpan.Zero || age > Lifetime)
-        {
-            throw new RestApiException(
-                StatusCodes.Status410Gone,
-                "cursor_expired",
-                "The pagination cursor has expired",
-                "Restart the collection request without a cursor.");
-        }
-
         if (!string.Equals(payload.Principal, PrincipalIdentity(principal), StringComparison.Ordinal) ||
             !string.Equals(payload.Resource, resource, StringComparison.Ordinal) ||
             !string.Equals(payload.QueryFingerprint, queryFingerprint, StringComparison.Ordinal) ||
@@ -93,6 +82,17 @@ public sealed class RestCursorCodec
                 "cursor_context_mismatch",
                 "The pagination cursor does not match this request",
                 "Use the cursor with the same authenticated principal, resource, filters, and sort order.");
+        }
+
+        var age = timeProvider.GetUtcNow() -
+            DateTimeOffset.FromUnixTimeMilliseconds(payload.IssuedUnixMilliseconds);
+        if (age < TimeSpan.Zero || age > Lifetime)
+        {
+            throw new RestApiException(
+                StatusCodes.Status410Gone,
+                "cursor_expired",
+                "The pagination cursor has expired",
+                "Restart the collection request without a cursor.");
         }
 
         return payload.Position;

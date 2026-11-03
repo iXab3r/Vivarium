@@ -24,7 +24,10 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 The fresh D34/D35 Host is being delivered under US-013/R0. Explicit local `init`, `nodes`, `migrate`
 and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
-HTTP. Real Host/PG/storage restart and installation-login evidence exists. Ordinary OIDC/current
+HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real Windows Agent with
+independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
+and retained bytes/cursors after a Host restart have selected integration evidence; R0 scoped-actor,
+cancel/fault, compatibility and final review gates remain open. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.
 

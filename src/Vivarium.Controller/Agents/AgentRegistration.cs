@@ -22,6 +22,7 @@ public sealed class AgentRegistration
     public bool SessionAuthenticated { get; set; }
     public string? ProcessInstanceId { get; set; }
     public string? CurrentWorkloadId { get; set; }
+    public long WorkloadFence { get; set; }
     public decimal LastHeartbeatSequence { get; set; }
     public DateTimeOffset? LastHeartbeatAt { get; set; }
     public bool Reconciled { get; set; }

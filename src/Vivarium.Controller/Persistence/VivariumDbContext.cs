@@ -5,6 +5,7 @@ using Vivarium.Controller.Identity;
 using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Catalog;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Builds.Runtime;
 
 namespace Vivarium.Controller.Persistence;
 
@@ -28,15 +29,28 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<CatalogBuildDefinition> CatalogBuildDefinitions => Set<CatalogBuildDefinition>();
     public DbSet<AgentRegistration> AgentRegistrations => Set<AgentRegistration>();
     public DbSet<AgentEnrollment> AgentEnrollments => Set<AgentEnrollment>();
+    public DbSet<RuntimeBuild> RuntimeBuilds => Set<RuntimeBuild>();
+    public DbSet<RuntimeBuildInput> RuntimeBuildInputs => Set<RuntimeBuildInput>();
+    public DbSet<RuntimeBuildCounter> RuntimeBuildCounters => Set<RuntimeBuildCounter>();
+    public DbSet<RuntimeBuildExecution> RuntimeBuildExecutions => Set<RuntimeBuildExecution>();
+    public DbSet<RuntimeBuildResult> RuntimeBuildResults => Set<RuntimeBuildResult>();
+    public DbSet<RuntimeBuildPayload> RuntimeBuildPayloads => Set<RuntimeBuildPayload>();
+    public DbSet<RuntimeArtifactUpload> RuntimeArtifactUploads => Set<RuntimeArtifactUpload>();
+    public DbSet<RuntimeBuildArtifact> RuntimeBuildArtifacts => Set<RuntimeBuildArtifact>();
+    public DbSet<RuntimeBuildOutput> RuntimeBuildOutputs => Set<RuntimeBuildOutput>();
+    public DbSet<RuntimeOutputStream> RuntimeOutputStreams => Set<RuntimeOutputStream>();
+    public DbSet<RuntimeOutputRange> RuntimeOutputRanges => Set<RuntimeOutputRange>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        RuntimeBuildModel.Configure(modelBuilder);
         var agent = modelBuilder.Entity<AgentRegistration>();
         agent.HasKey(entry => entry.AgentId);
         agent.Property(entry => entry.AgentId).UseCollation("C");
         agent.Property(entry => entry.TeamCityId).UseIdentityAlwaysColumn();
         agent.HasIndex(entry => entry.TeamCityId).IsUnique();
+        agent.HasIndex(entry => entry.AuthTokenHash).IsUnique().HasFilter("\"AuthTokenHash\" IS NOT NULL");
         agent.Property(entry => entry.LastHeartbeatSequence).HasColumnType("numeric(20,0)");
         agent.Property(entry => entry.CustomParametersJson).HasColumnType("jsonb");
         agent.Property(entry => entry.ReportedParametersJson).HasColumnType("jsonb");
@@ -50,6 +64,7 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
             table.HasCheckConstraint("CK_AgentRegistrations_HeartbeatSequence", "\"LastHeartbeatSequence\" BETWEEN 0 AND 18446744073709551615");
             table.HasCheckConstraint("CK_AgentRegistrations_Health", "\"Health\" IN ('UNKNOWN','HEALTHY','UNHEALTHY')");
             table.HasCheckConstraint("CK_AgentRegistrations_EnabledProjection", "NOT \"DesiredEnabled\" OR \"DesiredRevision\" IS NOT NULL");
+            table.HasCheckConstraint("CK_AgentRegistrations_WorkloadFence", "\"WorkloadFence\" >= 0");
         });
         var enrollment = modelBuilder.Entity<AgentEnrollment>();
         enrollment.HasKey(entry => entry.Id);

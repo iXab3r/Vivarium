@@ -5,6 +5,7 @@ using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents.Compatibility;
 using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Security;
+using Vivarium.Controller.Builds.Runtime;
 
 namespace Vivarium.Controller.Agents;
 
@@ -21,7 +22,8 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
     internal async Task<RuntimeAgentConnection?> ConnectAsync(Hello hello, CancellationToken token)
     {
         AgentSessionIdentity.Validate(hello);
-        var protocol = AgentProtocolCompatibility.Negotiate(hello); // Reject before any enrollment side effect.
+        var protocol = AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true,
+            enableLiteralArtifactPublisher: true); // Reject before any enrollment side effect.
         await using var lease = await lifecycle.AcquireAsync(hello.AgentId, token);
         var credential = await credentials.AdmitAsync(hello, token);
         if (credential is null) return null;
@@ -52,9 +54,23 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
         row.StaticObservationJson = observation is null ? null : JsonSerializer.Serialize(observation, Json);
         if (hello.WorkloadRecoveryOutcome == WorkloadRecoveryOutcome.Failed)
         { row.Quarantined = true; row.HealthReason = "workload_recovery_failed"; }
-        // A peer assertion alone never creates or transfers a Build. The run coordinator will
-        // reconcile known immutable assignment ownership before admitting a busy session.
-        if (hello.RunningBuildId.Length > 0 || row.CurrentWorkloadId is not null)
+        // Rebind delivery only for the already persisted owner. Immutable assigned provenance stays
+        // unchanged; a Hello can neither invent a lease nor move one to another Agent.
+        var owned = row.CurrentWorkloadId is null ? null : await database.RuntimeBuildExecutions
+            .SingleOrDefaultAsync(e => e.WorkloadId == row.CurrentWorkloadId && e.AgentId == row.AgentId, token);
+        var known = credential.BearerProven && owned is not null && owned.ReleasedAt is null
+            && owned.LeaseFence == row.WorkloadFence && owned.CredentialGeneration == row.CredentialGeneration
+            && (owned.ReconnectDeadline is null || owned.ReconnectDeadline > time.GetUtcNow());
+        var matches = known && (hello.RunningBuildId == owned!.WorkloadId
+            || hello.RunningBuildId.Length == 0 && (owned!.AcceptedAt is null || owned.TerminalReceivedAt is not null));
+        if (matches)
+        {
+            owned!.CurrentSessionId = row.CurrentSessionId; owned.CurrentConnectionGeneration = row.ConnectionGeneration;
+            owned.ReconnectDeadline = null;
+            if (hello.RunningBuildId.Length == 0) await ReleaseIfCompleteAsync(database, row, owned, token);
+        }
+        else if (known && hello.RunningBuildId.Length == 0 && await ReleaseIfCompleteAsync(database, row, owned!, token)) { }
+        else if (hello.RunningBuildId.Length > 0 || row.CurrentWorkloadId is not null)
         { row.Quarantined = true; row.HealthReason = "unreconciled_workload"; }
         row.Reconciled = credential.BearerProven && !row.Quarantined && protocol.SupportsBuildRunner;
         row.Health = row.Quarantined ? "UNHEALTHY" : row.Reconciled ? "HEALTHY" : "UNKNOWN";
@@ -68,7 +84,7 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
             registry.ApplyStoredOperationalState(handle, new(row.Health switch
             { "HEALTHY" => AgentOperationalHealth.Healthy, "UNHEALTHY" => AgentOperationalHealth.Unhealthy, _ => AgentOperationalHealth.Unknown },
                 row.Quarantined, row.HealthReason, time.GetUtcNow()));
-            if (row.Reconciled) registry.Reconcile(handle, null);
+            if (row.Reconciled) registry.Reconcile(handle, row.CurrentWorkloadId);
             var connection = new RuntimeAgentConnection(handle, credential, protocol, lifetime);
             connections[hello.AgentId] = connection;
             return connection;
@@ -85,7 +101,17 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
         var row = await database.AgentRegistrations.SingleAsync(a => a.AgentId == connection.Handle.AgentId, token);
         if (!Current(row, connection)) return false;
         var regressed = heartbeat.Sequence != 0 && (decimal)heartbeat.Sequence <= row.LastHeartbeatSequence;
+        var execution = row.CurrentWorkloadId is null ? null : await database.RuntimeBuildExecutions
+            .SingleOrDefaultAsync(e => e.WorkloadId == row.CurrentWorkloadId && e.AgentId == row.AgentId, token);
         var mismatch = !string.Equals(row.CurrentWorkloadId ?? "", heartbeat.RunningBuildId, StringComparison.Ordinal);
+        if (!regressed && mismatch && heartbeat.RunningBuildId.Length == 0 && execution is not null
+            && RuntimeBuildCoordinator.Owner(row, execution, connection))
+        {
+            // Empty heartbeats before acceptance are not proof that a durable assignment vanished.
+            if (execution.AcceptedAt is null && execution.TerminalReceivedAt is null) mismatch = false;
+            else if (execution.TerminalReceivedAt is not null)
+            { await ReleaseIfCompleteAsync(database, row, execution, token); mismatch = false; }
+        }
         if (regressed || mismatch)
         {
             row.Quarantined = true; row.Health = "UNHEALTHY";
@@ -99,6 +125,7 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
             registry.Heartbeat(connection.Handle, heartbeat);
         }
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+        if (!regressed && !mismatch) registry.Reconcile(connection.Handle, row.CurrentWorkloadId);
         return true;
     }
 
@@ -126,6 +153,35 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
     internal bool Connected(string agentId, string? sessionId, long generation) => connections.TryGetValue(agentId, out var connection)
         && connection.Handle.SessionId == sessionId && connection.Handle.ConnectionGeneration == generation && registry.IsCurrent(connection.Handle);
 
+    internal bool TryGetCurrent(string agentId, out RuntimeAgentConnection? connection)
+    {
+        if (connections.TryGetValue(agentId, out var value) && registry.IsCurrent(value.Handle))
+        { connection = value; return true; }
+        connection = null; return false;
+    }
+
+    internal async Task ExpireSilentAsync(CancellationToken token)
+    {
+        foreach (var connection in connections.Values)
+        {
+            if (!registry.IsCurrent(connection.Handle)) continue;
+            await using var database = await databases.CreateDbContextAsync(token);
+            await using var transaction = await database.Database.BeginTransactionAsync(token);
+            await AgentCredentials.LockAgentAsync(database, connection.Handle.AgentId, token);
+            var row = await database.AgentRegistrations.SingleAsync(a => a.AgentId == connection.Handle.AgentId, token);
+            if (!Current(row, connection) || row.LastHeartbeatAt is null || row.LastHeartbeatAt.Value.AddSeconds(15) > time.GetUtcNow()) continue;
+            row.Reconciled = false;
+            if (row.CurrentWorkloadId is not null)
+            {
+                var execution = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == row.CurrentWorkloadId, token);
+                if (execution is { ReleasedAt: null }) execution.ReconnectDeadline ??= row.LastHeartbeatAt.Value.AddSeconds(45);
+            }
+            await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+            try { await connection.Lifetime.CancelAsync(); }
+            catch (ObjectDisposedException) { } // The exact stream finished while its expiry committed.
+        }
+    }
+
     internal async Task DisconnectAsync(RuntimeAgentConnection connection)
     {
         var loss = registry.Disconnect(connection.Handle);
@@ -136,8 +192,27 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
         await using var transaction = await database.Database.BeginTransactionAsync();
         await AgentCredentials.LockAgentAsync(database, connection.Handle.AgentId, CancellationToken.None);
         var row = await database.AgentRegistrations.SingleAsync(a => a.AgentId == connection.Handle.AgentId);
-        if (Current(row, connection)) { row.Reconciled = false; await database.SaveChangesAsync(); }
+        if (Current(row, connection))
+        {
+            row.Reconciled = false;
+            if (row.CurrentWorkloadId is not null)
+            {
+                var execution = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == row.CurrentWorkloadId);
+                if (execution is { ReleasedAt: null }) execution.ReconnectDeadline ??= time.GetUtcNow().AddSeconds(30);
+            }
+            await database.SaveChangesAsync();
+        }
         await transaction.CommitAsync();
+    }
+
+    private async Task<bool> ReleaseIfCompleteAsync(VivariumDbContext database, AgentRegistration row,
+        RuntimeBuildExecution execution, CancellationToken token)
+    {
+        if (execution.TerminalReceivedAt is null || execution.ReleasedAt is not null) return false;
+        var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == execution.BuildId, token);
+        if (output.State is not ("COMPLETE" or "COMPLETE_WITH_GAPS")) return false;
+        execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow(); row.CurrentWorkloadId = null;
+        return true;
     }
 
     private static bool Current(AgentRegistration row, RuntimeAgentConnection connection) => row.DeletedAt is null

@@ -2,11 +2,13 @@ using Grpc.Core;
 using Vivarium.Contracts;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Agents.Compatibility;
+using Vivarium.Controller.Builds.Runtime;
 
 namespace Vivarium.Controller.Agents;
 
 /// <summary>Private AgentHub adapter for the fresh PG services; Bootstrap and field tags are unchanged.</summary>
-internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, TimeProvider time) : AgentHub.AgentHubBase
+internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, RuntimeBuildCoordinator builds,
+    RuntimeBuildOutputStore output, TimeProvider time) : AgentHub.AgentHubBase
 {
     public override async Task Session(IAsyncStreamReader<AgentMsg> requestStream,
         IServerStreamWriter<ControllerMsg> responseStream, ServerCallContext context)
@@ -52,6 +54,17 @@ internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, TimeProvide
                 {
                     if (!await sessions.HeartbeatAsync(connection, message.Heartbeat, lifetime.Token))
                         throw new RpcException(new Status(StatusCode.Aborted, "The Agent session was superseded."));
+                }
+                else if (message.MsgCase == AgentMsg.MsgOneofCase.BuildOutput)
+                {
+                    try { output.Enqueue(connection, message.BuildOutput); }
+                    catch (InvalidDataException) { throw new RpcException(new Status(StatusCode.InvalidArgument, "Output range is invalid.")); }
+                }
+                else if (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result
+                    or AgentMsg.MsgOneofCase.BuildStopAcknowledged or AgentMsg.MsgOneofCase.Status)
+                {
+                    try { await builds.ReceiveAsync(connection, message, lifetime.Token); }
+                    catch (InvalidDataException) { throw new RpcException(new Status(StatusCode.FailedPrecondition, "Workload ownership/evidence differs.")); }
                 }
                 else throw new RpcException(new Status(StatusCode.FailedPrecondition, "No owning workload accepts this message."));
             }

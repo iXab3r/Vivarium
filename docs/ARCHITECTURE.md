@@ -433,6 +433,16 @@ collection), and retention is explicit: blobs referenced by retained builds are 
 
 ### D14. The work model is TeamCity's, names included
 
+D32/D37 refine the legacy YAML queue policies below for the fresh C#/Git catalogue path: admission,
+waiting limits and defaults follow the pinned TeamCity operation contract, rather than inheriting
+the legacy fail-fast selector or 30-minute queue default. An authorized accepted run remains an
+accepted action if its author's `run_build` grant is later withdrawn. The scheduler still enforces
+current target policy and Agent eligibility; new actions and reads require current rights. The
+[scoped queued-authority observation](../tests/Vivarium.Tests/TeamCity/Reference/queued-authority-observations.json)
+proves the distinction with per-project authorization enabled, a denied new run and an independently
+verified artifact from the original accepted Build. It does not generalize to PAT revocation,
+account disablement or pool-policy changes.
+
 `Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
 matrix expands into a **matrix build** whose cells are ordinary builds, aggregated composite-style.

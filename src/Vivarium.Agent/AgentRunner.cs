@@ -21,6 +21,8 @@ public sealed class AgentRunner
     private const uint MinimumProtocolVersion = (uint)AgentProtocolVersion.V1;
     private const uint CurrentProtocolVersion = (uint)AgentProtocolVersion.V1;
     private const string BuildRunnerCapabilityId = "teamcity.build-runner.v1";
+    private const string BuildOutputCapabilityId = "teamcity.build-output.v1";
+    private const string ArtifactPublisherCapabilityId = "teamcity.artifact-publisher.literal.v1";
     private const string BootstrapSupervisorCapabilityId = "vivarium.bootstrap-supervisor.v1";
     private static readonly System.Text.Json.JsonSerializerOptions UpgradeJsonOptions =
         new(System.Text.Json.JsonSerializerDefaults.Web)
@@ -44,6 +46,9 @@ public sealed class AgentRunner
     private volatile SessionWriter? currentWriter;
     private volatile string currentSessionId = string.Empty;
     private BuildResult? pendingResult;
+    private BuildOutputSpool? outputSpool;
+    private volatile bool durableOutputNegotiated;
+    private volatile bool literalPublisherNegotiated;
     private ActiveBuild? activeBuild;
     private PlatformFactSnapshot? platformFacts;
     private ulong credentialGeneration;
@@ -134,6 +139,17 @@ public sealed class AgentRunner
         {
             runningBuildId = interruptedBuild.BuildId;
         }
+
+        outputSpool = BuildOutputSpool.Restore(options.DataDir, pendingResult?.BuildId ?? interruptedBuild?.BuildId);
+        if (pendingResult is not null && outputSpool is not null)
+        {
+            if (pendingResult.OutputProducerLost != outputSpool.ProducerLost
+                || !pendingResult.OutputProducerLost && !pendingResult.OutputWatermarks.SequenceEqual(outputSpool.Seal()))
+                throw new InvalidDataException("Pending result differs from its frozen output evidence.");
+            ReleasePendingIfReady();
+        }
+        else if (pendingResult is not null && (pendingResult.OutputWatermarks.Count > 0 || pendingResult.OutputProducerLost))
+            throw new InvalidDataException("Pending result has lost its output receipt.");
 
         blobs = new BlobClient(options.ControllerUrl, options.CertFingerprintSha256) { BearerToken = authToken };
         platformFactsCollector = options.PlatformFactsCollector ?? PlatformFactsCollector.CreateDefault();
@@ -257,18 +273,24 @@ public sealed class AgentRunner
         var writerPump = Task.Run(
             () => writer.RunAsync(sessionCts.Token), CancellationToken.None);
         Task heartbeats = Task.CompletedTask;
+        Task output = Task.CompletedTask;
+        durableOutputNegotiated = false;
+        literalPublisherNegotiated = false;
         try
         {
             await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
             currentSessionId = sessionId;
             currentWriter = writer;
             heartbeats = HeartbeatLoopAsync(writer, sessionCts.Token);
+            output = OutputLoopAsync(writer, sessionCts.Token);
 
             await foreach (var msg in call.ResponseStream.ReadAllAsync(ct))
             {
                 switch (msg.MsgCase)
                 {
                     case ControllerMsg.MsgOneofCase.Welcome:
+                        durableOutputNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == BuildOutputCapabilityId && c.ContractMajor == 1);
+                        literalPublisherNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == ArtifactPublisherCapabilityId && c.ContractMajor == 1);
                         ClockSkew = DateTimeOffset.FromUnixTimeMilliseconds(msg.Welcome.ServerTimeUnixMs) - DateTimeOffset.UtcNow;
                         if (msg.Welcome.SelectedProtocolVersion != 0 &&
                             msg.Welcome.SelectedProtocolVersion is < MinimumProtocolVersion or > CurrentProtocolVersion)
@@ -319,6 +341,10 @@ public sealed class AgentRunner
                         AcceptResult(msg.ResultAccepted);
                         break;
 
+                    case ControllerMsg.MsgOneofCase.BuildOutputAcknowledged:
+                        AcceptOutput(msg.BuildOutputAcknowledged);
+                        break;
+
                     case ControllerMsg.MsgOneofCase.UpgradeHealthAccepted:
                         await ConfirmUpgradeHealthAsync(
                             msg.UpgradeHealthAccepted, writer, sessionId, ct);
@@ -366,6 +392,8 @@ public sealed class AgentRunner
             catch (OperationCanceledException)
             {
             }
+            try { await output; }
+            catch (OperationCanceledException) when (sessionCts.IsCancellationRequested) { }
         }
     }
 
@@ -375,6 +403,11 @@ public sealed class AgentRunner
     /// </summary>
     private async Task SendRoutedAsync(AgentMsg msg, CancellationToken ct)
     {
+        if (msg.MsgCase == AgentMsg.MsgOneofCase.Log && outputSpool is { } spool)
+        {
+            spool.Append(msg.Log.StepIndex, msg.Log.Stream, msg.Log.Data.Span);
+            return; // The independent retry pump sends only persisted, already-masked ranges.
+        }
         var writer = currentWriter;
         if (writer == null)
         {
@@ -410,6 +443,12 @@ public sealed class AgentRunner
                     $"build '{pendingResult.BuildId}' is still awaiting result acknowledgement");
             }
 
+            if (outputSpool is { } spool)
+            {
+                if (result.OutputProducerLost) spool.MarkProducerLost();
+                else if (result.OutputWatermarks.Count == 0) result.OutputWatermarks.Add(spool.Seal());
+            }
+
             var tempPath = PendingResultPath + ".tmp";
             using (var file = new FileStream(
                        tempPath, FileMode.Create, FileAccess.Write, FileShare.None,
@@ -435,9 +474,37 @@ public sealed class AgentRunner
                 return;
             }
 
-            File.Delete(PendingResultPath);
-            pendingResult = null;
-            runningBuildId = null;
+            outputSpool?.MarkResultAccepted();
+            ReleasePendingIfReady();
+        }
+    }
+
+    private void AcceptOutput(BuildOutputAcknowledged acknowledged)
+    {
+        lock (pendingLock)
+        {
+            if (acknowledged.SessionId != currentSessionId || acknowledged.BuildId != runningBuildId || outputSpool is null) return;
+            outputSpool.Acknowledge(acknowledged.StepIndex, acknowledged.Stream, acknowledged.SequenceExclusive, acknowledged.ProducedBytes);
+            ReleasePendingIfReady();
+        }
+    }
+
+    private void ReleasePendingIfReady()
+    {
+        if (pendingResult is null || outputSpool is not null && !outputSpool.CanRelease) return;
+        File.Delete(PendingResultPath);
+        outputSpool?.DeleteCompleted();
+        outputSpool = null; pendingResult = null; runningBuildId = null;
+    }
+
+    private async Task OutputLoopAsync(SessionWriter writer, CancellationToken token)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
+        while (await timer.WaitForNextTickAsync(token))
+        {
+            if (!durableOutputNegotiated || !ReferenceEquals(writer, currentWriter) || outputSpool is not { } spool) continue;
+            foreach (var frame in spool.Snapshot(currentSessionId))
+                await writer.SendAsync(new AgentMsg { BuildOutput = frame }, token);
         }
     }
 
@@ -510,6 +577,7 @@ public sealed class AgentRunner
                 BuildId = record.BuildId,
                 Outcome = BuildOutcome.InfrastructureFailed,
                 StatusText = "Agent restarted while the Build owned a workload process",
+                OutputProducerLost = outputSpool is not null,
             });
             activeBuildJournal.Complete(record.BuildId);
             workloadRecoveryOutcome = WorkloadRecoveryOutcome.Succeeded;
@@ -601,6 +669,10 @@ public sealed class AgentRunner
 
     private async Task AcceptBuildAsync(BuildAssignment assignment)
     {
+        if (assignment.OutputContractMajor > 1 || assignment.OutputContractMajor == 1 && !durableOutputNegotiated)
+            throw new InvalidDataException("The required Build output contract was not negotiated.");
+        if (assignment.ArtifactPublicationContractMajor > 1 || assignment.ArtifactPublicationContractMajor == 1 && !literalPublisherNegotiated)
+            throw new InvalidDataException("The required artifact publisher was not negotiated.");
         ActiveBuild? build = null;
         var accepted = false;
         lock (activeBuildLock)
@@ -610,7 +682,7 @@ public sealed class AgentRunner
                 // The controller deliberately resends an unacknowledged assignment after a stream
                 // or controller restart. Re-acknowledge the same ownership without starting twice;
                 // a different concurrent assignment is rejected by withholding acknowledgement.
-                accepted = activeBuild.Assignment.BuildId == assignment.BuildId;
+                accepted = activeBuild.Assignment.Equals(assignment);
             }
             else
             {
@@ -624,6 +696,9 @@ public sealed class AgentRunner
                     }
                     else
                     {
+                        if (assignment.OutputContractMajor == 1)
+                            outputSpool = BuildOutputSpool.Create(options.DataDir, assignment.BuildId, assignment.Steps.Count,
+                                assignment.OutputSecrets);
                         build = new ActiveBuild(
                             assignment.Clone(),
                             new BuildStopController());
@@ -720,13 +795,14 @@ public sealed class AgentRunner
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[agent] build {assignment.BuildId} failed: {ex}");
+            var safeError = assignment.OutputContractMajor == 1 ? ex.GetType().Name : ex.ToString();
+            Console.Error.WriteLine($"[agent] build {assignment.BuildId} failed: {safeError}");
             result = new BuildResult
             {
                 BuildId = assignment.BuildId,
                 SessionId = currentSessionId,
                 Outcome = BuildOutcome.InfrastructureFailed,
-                StatusText = ex.Message,
+                StatusText = assignment.OutputContractMajor == 1 ? "Build execution failed" : ex.Message,
             };
         }
 
@@ -812,6 +888,8 @@ public sealed class AgentRunner
             CapabilityId = BuildRunnerCapabilityId,
             ContractMajor = 1,
         });
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildOutputCapabilityId, ContractMajor = 1 });
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactPublisherCapabilityId, ContractMajor = 1 });
         if (options.BootstrapLeasePath is not null && options.BootstrapLeaseId is not null)
         {
             hello.Capabilities.Add(new CapabilitySupport

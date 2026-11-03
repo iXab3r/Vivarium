@@ -70,8 +70,9 @@ internal static class RuntimeAgentEndpoints
             authorized = row.Authorized, enabled = row.DesiredEnabled, connected, row.Reconciled,
             row.Health, row.Quarantined, row.HealthReason, row.CredentialGeneration, row.ConnectionGeneration,
             row.LastSeenAt, row.LastHeartbeatAt, appliedConfigurationRevision = row.DesiredRevision,
+            activity = row.CurrentWorkloadId is null ? "idle" : "building",
             ready = connected && row.SessionAuthenticated && row.Authorized && row.DesiredEnabled && row.DesiredRevision is not null
-                && row.Reconciled && row.Health == "HEALTHY" && !row.Quarantined && !row.MaintenanceDrain,
+                && row.Reconciled && row.Health == "HEALTHY" && !row.Quarantined && !row.MaintenanceDrain && row.CurrentWorkloadId is null,
         };
     }
     private static Task<bool> CanReadAsync(ManagementRequestContext actor, CurrentAccess access, CancellationToken token) =>
