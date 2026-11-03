@@ -8,7 +8,7 @@ namespace Vivarium.Controller.Agents;
 
 /// <summary>Private AgentHub adapter for the fresh PG services; Bootstrap and field tags are unchanged.</summary>
 internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, RuntimeBuildCoordinator builds,
-    RuntimeBuildOutputStore output, TimeProvider time) : AgentHub.AgentHubBase
+    RuntimeBuildOutputStore output, TimeProvider time, IHostApplicationLifetime application) : AgentHub.AgentHubBase
 {
     public override async Task Session(IAsyncStreamReader<AgentMsg> requestStream,
         IServerStreamWriter<ControllerMsg> responseStream, ServerCallContext context)
@@ -21,6 +21,9 @@ internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, RuntimeBuil
         catch (ArgumentException) { throw new RpcException(new Status(StatusCode.InvalidArgument, "Agent session identity is invalid.")); }
         if (connection is null) throw new RpcException(new Status(StatusCode.PermissionDenied, "Valid Agent or enrollment proof is required."));
         using var lifetime = connection.Lifetime;
+        // Do not wait for the HTTP/2 graceful-shutdown timeout while an Agent keeps its reverse
+        // stream open. Disconnect records the durable reconnect intent before Host services stop.
+        using var stopping = application.ApplicationStopping.Register(() => lifetime.Cancel());
         var writer = Task.CompletedTask;
         try
         {

@@ -121,6 +121,22 @@ its own labelled volume and unprivileged UID, and is removed before the later Wi
 preservation, and rejection of hook/filter execution. These are supporting integration checks;
 the R0 ledger still requires explicit complete-case bindings and milestone review.
 
+`R0AcceptanceCases` runs independent selected journeys against the actual fresh Host, PostgreSQL,
+private Storage and owned Windows Agent. One migrated/bootstrap database and one genuinely activated
+C#/Git database serve as templates; every case receives its own database, Git checkout, private keys,
+object directory and ordinary credentials. Only one case Host is live at a time. Runtime connections
+use a bounded PostgreSQL pool; teardown clears only that case's pool before cloning/dropping its
+database. Reusing the administrative unpooled connection for every runtime query can exhaust Windows
+ephemeral ports and is a fixture failure, not REST conformance evidence.
+
+Run this group explicitly with `dotnet test tests/Vivarium.DefinitionProof --filter
+FullyQualifiedName~R0AcceptanceCases`. Its bounded process gates, selective production clocks and
+transport/Storage faults exercise current access, live/resumed output, redaction, gaps, expiry,
+Host restart, C#/Git rejection and source handoff. The separate Identity browser contour proves real
+OIDC entry and a pre-grant My keys bearer observing current grant/withdrawal/disable effects.
+These standard NUnit/TRX results require explicit case and input-provenance bindings; passing the
+group alone does not close the selected reference cohort, R0 or US-013.
+
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
 ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
 invoked `tests/Vivarium.TeamCity.Conformance` project; its legacy-controller raw five-case product-ready

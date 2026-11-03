@@ -7,7 +7,7 @@ using Vivarium.Acceptance.Fixtures;
 
 namespace Vivarium.Acceptance;
 
-/// <summary>AC-SU-07 with the ordinary account's unchanged cookie and current authority effects.</summary>
+/// <summary>AC-SU-07 and R0 current grants with the ordinary account's unchanged cookie and My keys bearer.</summary>
 [NonParallelizable]
 public sealed class AccessJourneyTests
 {
@@ -62,7 +62,29 @@ public sealed class AccessJourneyTests
                 using var currentJson = JsonDocument.Parse(await current.TextAsync());
                 var userId = currentJson.RootElement.GetProperty("id").GetGuid();
                 var displayName = currentJson.RootElement.GetProperty("displayName").GetString()!;
+                var teamCityId = currentJson.RootElement.GetProperty("teamCityId").GetInt64();
+                Assert.That(teamCityId, Is.Positive);
                 await ExpectAsync(person, origin + "/api/v1/users", 403);
+
+                phase = "issue-before-grant";
+                await person.GotoAsync(origin + "/Identity/Account/Manage/Tokens");
+                await person.GetByLabel("Label", new() { Exact = true }).FillAsync("Owned current-grant key");
+                await person.GetByRole(AriaRole.Button, new() { Name = "Get token", Exact = true }).ClickAsync();
+                await person.GetByRole(AriaRole.Heading, new() { Name = "New token", Exact = true }).WaitForAsync();
+                var credential = (await person.Locator("#token").InputValueAsync()).Trim();
+                Assert.That(credential.Length > 100, Is.True, "The one-time framework credential is absent.");
+                await BearerExpectAsync(person, origin + "/api/v1/users", credential, 403);
+                await using (var tokenCurrent = await person.Context.APIRequest.GetAsync(origin + "/api/v1/users/current",
+                    new() { Headers = new Dictionary<string, string> { ["Authorization"] = "Bearer " + credential } }))
+                {
+                    Assert.That(tokenCurrent.Status, Is.EqualTo(200));
+                    using var tokenAccount = JsonDocument.Parse(await tokenCurrent.TextAsync());
+                    Assert.That(tokenAccount.RootElement.GetProperty("id").GetGuid(), Is.EqualTo(userId));
+                    Assert.That(tokenAccount.RootElement.GetProperty("teamCityId").GetInt64(), Is.EqualTo(teamCityId));
+                }
+                await person.GetByRole(AriaRole.Link, new() { Name = "Done", Exact = true }).ClickAsync();
+                Assert.That(await person.Locator("#token").CountAsync(), Is.Zero);
+                await person.GotoAsync(origin + "/access");
 
                 phase = "installation-sign-in";
                 var operatorPage = installation.Page;
@@ -82,6 +104,7 @@ public sealed class AccessJourneyTests
                     response => response.Url == assignmentUrl && response.Request.Method == "PUT");
                 Assert.That(grant.Status, Is.EqualTo(204));
                 await ExpectAsync(person, origin + "/api/v1/users", 200);
+                await BearerExpectAsync(person, origin + "/api/v1/users", credential, 200);
                 await person.ReloadAsync();
                 await person.GetByRole(AriaRole.Button, new() { Name = displayName, Exact = true }).WaitForAsync();
                 await person.GetByRole(AriaRole.Button, new() { Name = displayName, Exact = true }).ClickAsync();
@@ -93,6 +116,7 @@ public sealed class AccessJourneyTests
                     response => response.Url == assignmentUrl && response.Request.Method == "DELETE");
                 Assert.That(withdraw.Status, Is.EqualTo(204));
                 await ExpectAsync(person, origin + "/api/v1/users", 403);
+                await BearerExpectAsync(person, origin + "/api/v1/users", credential, 403);
                 await person.ReloadAsync();
                 await person.GetByText("Current permissions do not allow access management.", new() { Exact = true }).WaitForAsync();
 
@@ -103,6 +127,7 @@ public sealed class AccessJourneyTests
                     response => response.Url == enabledUrl && response.Request.Method == "PUT");
                 Assert.That(disabled.Status, Is.EqualTo(204));
                 await ExpectAsync(person, origin + "/api/v1/users/current", 401);
+                await BearerExpectAsync(person, origin + "/api/v1/users/current", credential, 401);
                 phase = "enable-account";
                 var enabled = await operatorPage.RunAndWaitForResponseAsync(
                     () => operatorPage.GetByRole(AriaRole.Button, new() { Name = "Enable account", Exact = true }).ClickAsync(),
@@ -110,6 +135,36 @@ public sealed class AccessJourneyTests
                 Assert.That(enabled.Status, Is.EqualTo(204));
                 await ExpectAsync(person, origin + "/api/v1/users/current", 200);
                 await ExpectAsync(person, origin + "/api/v1/users", 403);
+                await BearerExpectAsync(person, origin + "/api/v1/users/current", credential, 200);
+                await BearerExpectAsync(person, origin + "/api/v1/users", credential, 403);
+
+                phase = "installation-key-exclusion";
+                await using (var excluded = await operatorPage.Context.APIRequest.GetAsync(
+                    origin + "/Identity/Account/Manage/Tokens", new() { MaxRedirects = 0 }))
+                {
+                    Assert.That(excluded.Status, Is.EqualTo(403));
+                }
+                var verifier = new string('v', 43);
+                var challenge = Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.ASCII.GetBytes(verifier))).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+                var authorize = origin + "/connect/authorize?client_id=vivarium-token-ui&response_type=code&scope=vivarium_api"
+                    + "&redirect_uri=" + Uri.EscapeDataString(origin + "/signin-vivarium-token")
+                    + "&code_challenge_method=S256&code_challenge=" + challenge + "&vivarium_label=Owned&vivarium_lifetime_days=1";
+                await using (var excluded = await operatorPage.Context.APIRequest.GetAsync(authorize, new() { MaxRedirects = 0 }))
+                    Assert.That(excluded.Status, Is.EqualTo(403));
+                var redemption = operatorPage.Context.APIRequest.CreateFormData();
+                redemption.Set("grant_type", "authorization_code"); redemption.Set("client_id", "vivarium-token-ui");
+                redemption.Set("redirect_uri", origin + "/signin-vivarium-token");
+                redemption.Set("code_verifier", verifier); redemption.Set("code", "owned-no-installation-code");
+                await using (var excluded = await operatorPage.Context.APIRequest.PostAsync(origin + "/connect/token", new() { Form = redemption }))
+                {
+                    // An installation cookie cannot substitute for the first-party client's proof.
+                    // Its inability to acquire a valid code is checked at authorize above.
+                    Assert.That(excluded.Status, Is.EqualTo(401));
+                    using var rejected = JsonDocument.Parse(await excluded.TextAsync());
+                    Assert.That(rejected.RootElement.GetProperty("error").GetString(), Is.EqualTo("invalid_client"));
+                    Assert.That(rejected.RootElement.TryGetProperty("access_token", out _), Is.False);
+                }
 
                 await using var state = new NpgsqlConnection(postgres.MaintenanceConnection);
                 await state.OpenAsync();
@@ -151,6 +206,13 @@ public sealed class AccessJourneyTests
     private static async Task ExpectAsync(IPage page, string url, int status)
     {
         await using var response = await page.Context.APIRequest.GetAsync(url);
+        Assert.That(response.Status, Is.EqualTo(status));
+    }
+
+    private static async Task BearerExpectAsync(IPage page, string url, string credential, int status)
+    {
+        await using var response = await page.Context.APIRequest.GetAsync(url,
+            new() { Headers = new Dictionary<string, string> { ["Authorization"] = "Bearer " + credential } });
         Assert.That(response.Status, Is.EqualTo(status));
     }
 }

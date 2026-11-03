@@ -17,7 +17,7 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
     private string? installed;
     private string? lastErrorCode;
 
-    internal async Task AuthenticateAsync(string credential)
+    internal async Task AuthenticateAsync(string credential, string expectedUserName = "owned-scoped-user")
     {
         var repository = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "Vivarium.slnx"))) repository = repository.Parent;
@@ -38,7 +38,7 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         var status = await RunAsync(credential, 0, "-p", "owned-r0", "auth", "status");
         Assert.That(status.GetProperty("authenticated").GetBoolean(), Is.True);
         Assert.That(status.GetProperty("identity").ValueKind, Is.EqualTo(JsonValueKind.Object));
-        Assert.That(status.GetProperty("identity").GetProperty("username").GetString(), Is.EqualTo("owned-scoped-user"));
+        Assert.That(status.GetProperty("identity").GetProperty("username").GetString(), Is.EqualTo(expectedUserName));
     }
 
     internal async Task RunBuildAsync(string credential, HttpClient native)
@@ -95,6 +95,7 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         {
             var next = await RunAsync(credential, exit, "-p", "owned-r0", "jobs", "run", "P_LocalSmoke", "--param", "env.MODE=" + mode,
                 "--wait", "--timeout", "2m", "--interval", "1s");
+            Assert.That(lastErrorCode, Is.EqualTo(exit == 0 ? null : "build.failed"), "A sequential run must reach its actual terminal outcome.");
             Assert.That(next.GetProperty("build").GetProperty("statusText").GetString(), Is.EqualTo(text));
         }
         facts.Add(new { kind = "SUCCESS_FAILURE_ARTIFACT", successBuildId = build.GetProperty("id").GetInt64(),
@@ -132,20 +133,29 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
             root, environment, allowFailure: true, deadline: TimeSpan.FromMinutes(3));
         Assert.That(Encoding.UTF8.GetString(result.Output).Contains(credential, StringComparison.Ordinal), Is.False);
         Assert.That(Encoding.UTF8.GetString(result.Error).Contains(credential, StringComparison.Ordinal), Is.False);
-        invocations.Add(new { arguments, exitCode = result.ExitCode, stdoutSha256 = Convert.ToHexStringLower(SHA256.HashData(result.Output)),
-            stderrSha256 = Convert.ToHexStringLower(SHA256.HashData(result.Error)) });
-        if (result.ExitCode != expectedExit)
-            TestContext.Progress.WriteLine("Published CLI failure: " + Encoding.UTF8.GetString(result.Error));
-        await SaveAsync();
-        Assert.That(result.ExitCode, Is.EqualTo(expectedExit), "Published CLI command: " + string.Join(' ', arguments));
+        using var document = JsonDocument.Parse(result.Output.Length == 0 ? result.Error : result.Output);
+        var value = document.RootElement;
         lastErrorCode = null;
         if (result.ExitCode != 0)
         {
             using var failure = JsonDocument.Parse(result.Error);
             lastErrorCode = failure.RootElement.GetProperty("error").GetProperty("code").GetString();
         }
-        using var document = JsonDocument.Parse(result.Output.Length == 0 ? result.Error : result.Output);
-        return document.RootElement.Clone();
+        var buildResponse = value.TryGetProperty("build", out var returnedBuild) ? returnedBuild
+            : arguments.Contains("builds") || arguments.Contains("queue") ? value : default;
+        long? returnedBuildId = buildResponse.ValueKind == JsonValueKind.Object && buildResponse.TryGetProperty("id", out var returnedId)
+            && returnedId.ValueKind == JsonValueKind.Number && returnedId.TryGetInt64(out var numericId) ? numericId : null;
+        string? BuildString(string name) => buildResponse.ValueKind == JsonValueKind.Object && buildResponse.TryGetProperty(name, out var field)
+            && field.ValueKind == JsonValueKind.String ? field.GetString() : null;
+        invocations.Add(new { arguments, exitCode = result.ExitCode, returnedBuildId, errorCode = lastErrorCode,
+            buildState = BuildString("state"), buildStatus = BuildString("status"), buildStatusText = BuildString("statusText"),
+            stdoutSha256 = Convert.ToHexStringLower(SHA256.HashData(result.Output)),
+            stderrSha256 = Convert.ToHexStringLower(SHA256.HashData(result.Error)) });
+        if (result.ExitCode != expectedExit)
+            TestContext.Progress.WriteLine("Published CLI failure: " + Encoding.UTF8.GetString(result.Error));
+        await SaveAsync();
+        Assert.That(result.ExitCode, Is.EqualTo(expectedExit), "Published CLI command: " + string.Join(' ', arguments));
+        return value.Clone();
     }
 
     private async Task SaveAsync()

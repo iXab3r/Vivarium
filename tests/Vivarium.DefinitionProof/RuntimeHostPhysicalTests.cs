@@ -157,7 +157,7 @@ public sealed class RuntimeHostPhysicalTests
                         ["DefinitionSources"] = JsonSerializer.SerializeToNode(new
                         { RepositoryId = "host-fixture", Path = definitions, SettingsRepositories = Array.Empty<object>() }),
                     },
-                    ["vivarium-database"] = new() { ["ConnectionString"] = postgres.ConnectionString },
+                    ["vivarium-database"] = new() { ["ConnectionString"] = postgres.PooledConnectionString },
                     ["vivarium-identity"] = identity,
                     ["vivarium-storage"] = JsonSerializer.SerializeToNode(new
                     {
@@ -602,7 +602,7 @@ public sealed class RuntimeHostPhysicalTests
         }
     }
 
-    private static async Task<HttpResponseMessage> LoginAsync(HttpClient http, string password)
+    internal static async Task<HttpResponseMessage> LoginAsync(HttpClient http, string password)
     {
         using var page = await http.GetAsync("/Identity/Account/Login");
         Assert.That(page.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -616,14 +616,14 @@ public sealed class RuntimeHostPhysicalTests
         }));
     }
 
-    private static int Port()
+    internal static int Port()
     {
         using var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
         return ((IPEndPoint)listener.LocalEndpoint).Port;
     }
 
-    private static (string Path, string Thumbprint) Certificate(string root, string name, bool tls)
+    internal static (string Path, string Thumbprint) Certificate(string root, string name, bool tls)
     {
         using var key = RSA.Create(2048);
         var request = new CertificateRequest("CN=owned-r0-" + name, key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
@@ -640,7 +640,7 @@ public sealed class RuntimeHostPhysicalTests
         return (path, certificate.Thumbprint);
     }
 
-    private static System.Diagnostics.Process StartAgent(string bootstrap, string data)
+    internal static System.Diagnostics.Process StartAgent(string bootstrap, string data)
     {
         var directory = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Vivarium.slnx"))) directory = directory.Parent;
@@ -700,7 +700,7 @@ public sealed class RuntimeHostPhysicalTests
         throw new AssertionException("The owned catalogue Build did not finish.");
     }
 
-    private sealed class PrivateStartupLog : ILoggerProvider, ILogger
+    internal sealed class PrivateStartupLog : ILoggerProvider, ILogger
     {
         public string? Password { get; private set; }
         public ILogger CreateLogger(string categoryName) => categoryName == "Vivarium.PrivateStartup" ? this : NullLogger.Instance;

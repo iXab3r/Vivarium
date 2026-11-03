@@ -35,6 +35,7 @@ internal sealed class ScopedKeyScenario : IDisposable
     private string? artifactHref;
     private string? outputHref;
     private Guid userId;
+    private string? issuedKeyId;
     private string? resumeCursor;
     private string? protectedOutputHref;
     private string? retainedCursor;
@@ -42,6 +43,7 @@ internal sealed class ScopedKeyScenario : IDisposable
     private readonly ScenarioClock outputClock = new();
     private readonly ScenarioClock retentionClock = new();
     internal HttpClient BuildClient => api;
+    internal Guid UserId => userId;
     internal void ResetRetentionTime() => retentionClock.Reset();
 
     internal async Task CheckRunSecretAdmissionAsync(HttpClient administrator)
@@ -86,9 +88,8 @@ internal sealed class ScopedKeyScenario : IDisposable
         browser = Create(cookies: true); api = Create(cookies: false);
     }
 
-    internal async Task RunAsync(IServiceProvider services, HttpClient administrator, string csrf, string agentId)
+    internal async Task InitializeUserAsync(IServiceProvider services, string name = "owned-scoped-user")
     {
-        var name = "owned-scoped-user";
         await using (var scope = services.CreateAsyncScope())
         {
             var users = scope.ServiceProvider.GetRequiredService<UserManager<VivariumUser>>();
@@ -115,6 +116,11 @@ internal sealed class ScopedKeyScenario : IDisposable
             }
             finally { accessor.HttpContext = previous; }
         }
+    }
+
+    internal async Task RunAsync(IServiceProvider services, HttpClient administrator, string csrf, string agentId)
+    {
+        await InitializeUserAsync(services);
         await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
         await CreateKeyAsync();
         await cli.AuthenticateAsync(api.DefaultRequestHeaders.Authorization!.Parameter!);
@@ -215,13 +221,7 @@ internal sealed class ScopedKeyScenario : IDisposable
             Assert.That(wrongActor.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest), "Cursor ownership is checked before expiry recovery.");
         using (var tampered = await api.GetAsync(cursorPath[..^1] + "!"))
             Assert.That(tampered.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
-        var id = Regex.Match(html, "name=\"id\"[^>]*value=\"([^\"]+)\"");
-        if (!id.Success) throw new InvalidDataException("The ordinary own-key metadata is absent.");
-        using var revoked = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Revoke",
-            new FormUrlEncodedContent(new Dictionary<string, string> { ["id"] = WebUtility.HtmlDecode(id.Groups[1].Value),
-                ["__RequestVerificationToken"] = Antiforgery(html) }));
-        Assert.That(revoked.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+        await RevokeOwnKeyAsync();
         await AssertCurrentAsync(HttpStatusCode.Unauthorized, HttpStatusCode.Unauthorized);
         await RetainedAdminBytesAsync(administrator);
         await CreateKeyAsync();
@@ -342,9 +342,10 @@ internal sealed class ScopedKeyScenario : IDisposable
         Assert.That(output.RootElement.GetProperty("output").GetProperty("state").GetString(), Is.EqualTo("complete-with-gaps"));
     }
 
-    private async Task CreateKeyAsync(int lifetimeDays = 1)
+    internal async Task CreateKeyAsync(int lifetimeDays = 1)
     {
         var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
+        var prior = KeyIds(html).ToHashSet(StringComparer.Ordinal);
         using var creation = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Create",
             new FormUrlEncodedContent(new Dictionary<string, string> { ["Label"] = "Owned scoped build key", ["LifetimeDays"] = lifetimeDays.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["__RequestVerificationToken"] = Antiforgery(html) }));
@@ -352,7 +353,22 @@ internal sealed class ScopedKeyScenario : IDisposable
         var match = Regex.Match(disclosure, "<textarea[^>]*id=\"token\"[^>]*>(.*?)</textarea>", RegexOptions.Singleline);
         if (!match.Success) throw new InvalidDataException("The ordinary framework key disclosure is absent.");
         api.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", WebUtility.HtmlDecode(match.Groups[1].Value).Trim());
+        issuedKeyId = KeyIds(await browser.GetStringAsync("/Identity/Account/Manage/Tokens")).Except(prior, StringComparer.Ordinal).Single();
     }
+
+    internal async Task RevokeOwnKeyAsync()
+    {
+        var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
+        if (issuedKeyId is null || !KeyIds(html).Contains(issuedKeyId, StringComparer.Ordinal))
+            throw new InvalidDataException("The ordinary own-key metadata is absent.");
+        using var revoked = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Revoke",
+            new FormUrlEncodedContent(new Dictionary<string, string> { ["id"] = issuedKeyId,
+                ["__RequestVerificationToken"] = Antiforgery(html) }));
+        Assert.That(revoked.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+    }
+
+    private static IEnumerable<string> KeyIds(string html) => Regex.Matches(html, "name=\"id\"[^>]*value=\"([^\"]+)\"")
+        .Select(match => WebUtility.HtmlDecode(match.Groups[1].Value));
 
     private sealed class ScenarioClock : TimeProvider
     {
