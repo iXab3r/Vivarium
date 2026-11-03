@@ -31,6 +31,11 @@ now has selected native P/Q isolation, project delegation, grant/eligibility/rev
 queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
 evidence now survives a cold Host restart. D45 adds native per-run secret environments with encrypted
 input/assignment recovery and existing Agent output masking; permanent Project secret storage is deferred.
+The selected fresh `/app/rest` adapter now runs the published unchanged CLI 0.5.6 through ordinary
+login, C#/Git discovery, successful/failed runs, queued/running cancellation and exact artifact
+download. Its bounded integration fixture uses a real Windows Agent and a dedicated Linux/Docker
+Agent, plus shared native reads. Agent enablement is a journalled Git edit through the catalogue
+coordinator; source-file modification times are additive immutable artifact observations.
 Full R0 bindings, remaining output/fault, compatibility and final review gates
 remain open. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy

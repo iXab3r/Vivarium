@@ -136,6 +136,7 @@ public static class BuildExecutor
                         Path = relativePath.Replace('\\', '/'),
                         Sha256 = sha,
                         Size = new FileInfo(fullPath).Length,
+                        ModificationTimeUnixMs = new DateTimeOffset(File.GetLastWriteTimeUtc(fullPath)).ToUnixTimeMilliseconds(),
                     });
                 }
             }

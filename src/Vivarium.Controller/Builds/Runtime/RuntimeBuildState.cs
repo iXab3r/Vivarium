@@ -14,7 +14,7 @@ public sealed class RuntimeBuild
     public required string CorrelationId { get; set; }
     public string State { get; set; } = "QUEUED";
     public string Status { get; set; } = "UNKNOWN";
-    public string StatusText { get; set; } = "Waiting for an eligible Agent";
+    public string StatusText { get; set; } = "Build settings have not been finalized";
     public DateTimeOffset QueuedAt { get; set; }
     public DateTimeOffset? QueueDeadline { get; set; }
     public DateTimeOffset? StartedAt { get; set; }
@@ -22,6 +22,7 @@ public sealed class RuntimeBuild
     public DateTimeOffset? CancelRequestedAt { get; set; }
     public string? CancelReason { get; set; }
     public Guid? CancelOperationId { get; set; }
+    public Guid? CancelActorId { get; set; }
     public string? StopMode { get; set; }
     public DateTimeOffset? StopDeadline { get; set; }
     public DateTimeOffset? StopAcknowledgedAt { get; set; }
@@ -109,6 +110,7 @@ public sealed class RuntimeBuildArtifact
     public required string Path { get; set; }
     public required string Sha256 { get; set; }
     public long Size { get; set; }
+    public DateTimeOffset? ModifiedAt { get; set; }
 }
 
 public sealed class RuntimeBuildOutput

@@ -7,6 +7,7 @@ using Vivarium.Controller.Tokens;
 using Vivarium.Controller.Catalog;
 using Vivarium.Controller.Agents;
 using Vivarium.Controller.Builds.Runtime;
+using Vivarium.Controller.TeamCity;
 
 namespace Vivarium.Controller.Hosting;
 
@@ -37,9 +38,13 @@ public static class VivariumRuntime
         builder.Services.AddVivariumIdentity(builder.Configuration);
         builder.Services.AddVivariumTokens(builder.Configuration);
         builder.Services.AddHostedService<RuntimeStartup>();
+        builder.Services.AddSingleton<RuntimeHostInfo>();
         builder.Services.AddSingleton(provider => CatalogWorker.Sources(provider.GetRequiredService<IConfiguration>()));
         builder.Services.AddSingleton<CatalogService>();
         builder.Services.AddScoped<CatalogQueries>();
+        builder.Services.AddScoped<TeamCityCatalogQueries>();
+        builder.Services.AddSingleton<TeamCityBuildQueries>();
+        builder.Services.AddSingleton<TeamCityAgentService>();
         builder.Services.AddHostedService<CatalogWorker>();
         builder.Services.AddGrpc();
         builder.Services.AddSingleton<AgentCredentials>();
@@ -48,6 +53,7 @@ public static class VivariumRuntime
         builder.Services.AddSingleton<RuntimeAgentSessions>();
         builder.Services.AddSingleton<RuntimeBuildService>();
         builder.Services.AddSingleton<RuntimeBuildBytes>();
+        builder.Services.AddSingleton<RuntimeBuildArtifacts>();
         builder.Services.AddSingleton<RuntimeBuildSecrets>();
         builder.Services.AddSingleton<RuntimeStepCompiler>();
         builder.Services.AddSingleton<RuntimeBuildCoordinator>();
@@ -96,6 +102,10 @@ public static class VivariumRuntime
         RuntimeIdentity.Map(app);
         app.MapAccess();
         app.MapCatalog();
+        app.MapTeamCity();
+        app.MapTeamCityBuilds();
+        app.MapTeamCityArtifacts();
+        app.MapTeamCityAgents();
         app.MapRuntimeAgents();
         app.MapRuntimeBuilds();
         app.MapRuntimeBuildOutput();
@@ -119,7 +129,7 @@ public static class VivariumRuntime
     }
 
     private sealed class RuntimeStartup(NodeConfigurationService settings, IEnumerable<NodeDescriptor> nodes,
-        IConfiguration configuration, IServiceScopeFactory scopes) : IHostedService
+        IConfiguration configuration, IServiceScopeFactory scopes, RuntimeHostInfo host) : IHostedService
     {
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -139,6 +149,7 @@ public static class VivariumRuntime
             await PostgresSchema.VerifyReadyAsync(scope.ServiceProvider.GetRequiredService<VivariumDbContext>(), deadline.Token);
             await scope.ServiceProvider.InitializeVivariumIdentityAsync(deadline.Token);
             await scope.ServiceProvider.InitializeVivariumTokensAsync(deadline.Token);
+            host.Started();
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

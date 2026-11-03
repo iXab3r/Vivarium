@@ -8,6 +8,7 @@ using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Security;
 using Vivarium.Definitions;
 using Vivarium.Controller.Agents;
+using Vivarium.Controller.Rest.Common;
 
 namespace Vivarium.Controller.Catalog;
 
@@ -22,6 +23,71 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
 
     public Task<CatalogChange> ReconcileAsync(ManagementRequestContext actor, CancellationToken token = default) => PrepareAsync(actor, complete: true, token);
     public Task<CatalogChange> SubmitAsync(ManagementRequestContext actor, CancellationToken token = default) => PrepareAsync(actor, complete: false, token);
+
+    internal Task<CatalogChange> SetAgentEnabledAsync(ManagementRequestContext actor, string agentId, bool enabled,
+        string comment, CancellationToken token) => WithLockAsync(async database =>
+    {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(agentId, "^[a-z0-9](?:[a-z0-9.-]{0,125}[a-z0-9])?$"))
+            throw new InvalidDataException("The Agent Git identity is unsupported.");
+        if (System.Text.Encoding.UTF8.GetByteCount(comment) > 4096 || comment.Contains('\0'))
+            throw new RestApiException(400, "invalid_request", "Invalid request", "The Agent enabled comment is invalid");
+        var operation = new CatalogChange { Id = Guid.NewGuid(), ActorId = Guid.Parse(actor.Principal.ActorId),
+            CredentialKind = actor.Principal.CredentialKind, CorrelationId = actor.CorrelationId, RequestId = actor.RequestId,
+            Kind = "AGENT_ENABLEMENT", TargetAgentId = agentId, RepositoryId = sources.RepositoryId,
+            CandidateCommit = "", SelectedRevisionsJson = "[]", CreatedAt = time.GetUtcNow() };
+        if (!await CanActivateAsync(database, actor, token, operation))
+        {
+            new PostgresAuditStore(database).Stage(AuditEventDraft.Create(actor, time.GetUtcNow(), "agent.settings",
+                "agent", agentId, AuditOutcome.Denied, "permission_denied"));
+            await database.SaveChangesAsync(token); throw new AccessPermissionException();
+        }
+        await RecoverCoreAsync(database, token);
+        if (!await database.AgentRegistrations.AnyAsync(a => a.AgentId == agentId && a.DeletedAt == null, token))
+            throw new InvalidDataException("The Agent does not exist.");
+        var active = await database.ActiveCatalogs.AsNoTracking().SingleOrDefaultAsync(a => a.RepositoryId == sources.RepositoryId, token)
+            ?? throw new InvalidDataException("Activate the catalogue before changing Agent settings.");
+        var prior = await database.CatalogRevisions.AsNoTracking().SingleAsync(r => r.Id == active.RevisionId, token);
+        var reader = ControlReader();
+        if (await reader.HeadAsync(token: token) != prior.ControlCommit)
+            throw new CatalogBusyException(); // An unaccepted source change must not acquire this actor's authority.
+        var setting = new CatalogAgentSetting(agentId, enabled, comment, DateTimeOffset.FromUnixTimeSeconds(time.GetUtcNow().ToUnixTimeSeconds()));
+        var updates = new Dictionary<string, string>
+        {
+            [".vivarium/agents/" + agentId + ".yaml"] = CatalogAgentSettings.Render(setting),
+            [".vivarium/repository.yaml"] = DefinitionGitReader.Manifest(sources.RepositoryId, control: true, agents: true) + "\n",
+        };
+        var writer = new DefinitionGitWriter(sources.Path);
+        operation.CandidateCommit = await writer.PrepareAsync(prior.ControlCommit, updates, operation.Id,
+            actor.Principal.ActorId, actor.CorrelationId, token);
+        operation.BaseRevisionId = prior.Id;
+        var materialized = await AgentDefinitionAsync(database, operation, token);
+        operation.MaterializedJson = JsonSerializer.Serialize(materialized, DefinitionValidation.Json);
+        operation.SelectedRevisionsJson = JsonSerializer.Serialize(materialized.Members, DefinitionValidation.Json);
+        operation.State = "EVALUATED";
+        database.CatalogChanges.Add(operation);
+        new PostgresAuditStore(database).Stage(AuditEventDraft.Create(actor.WithRequestId(operation.Id.ToString()),
+            time.GetUtcNow(), "configuration.prepare", "agent", agentId) with { ResultRevision = operation.CandidateCommit });
+        await database.SaveChangesAsync(token);
+        await using (var permissionFence = await database.Database.BeginTransactionAsync(token))
+        {
+            await database.Database.ExecuteSqlRawAsync("""
+                LOCK TABLE "AspNetUsers", "UserRoleGrants", "RolePermissions", "IncludedRoles", "GroupRoleGrants" IN SHARE MODE
+                """, token);
+            if (!await CanActivateAsync(database, actor, token, operation))
+            {
+                await RejectAsync(database, operation, "permission_denied", AuditOutcome.Denied, token);
+                await permissionFence.CommitAsync(token); return operation;
+            }
+            if (!await writer.AcceptAsync(prior.ControlCommit, operation.CandidateCommit, token))
+            {
+                await RejectAsync(database, operation, "accepted_ref_changed", AuditOutcome.Failed, token, conflict: true);
+                await permissionFence.CommitAsync(token); return operation;
+            }
+            await permissionFence.CommitAsync(token);
+        }
+        await ContinueAsync(database, operation, token);
+        return operation;
+    }, token);
 
     private Task<CatalogChange> PrepareAsync(ManagementRequestContext actor, bool complete, CancellationToken token) =>
         WithLockAsync(async database =>
@@ -57,6 +123,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
 
     private async Task<int> RecoverCoreAsync(VivariumDbContext database, CancellationToken token)
     {
+        if (!string.IsNullOrWhiteSpace(sources.Path)) await new DefinitionGitWriter(sources.Path).RecoverAsync(token);
         // The installation journal owns these identities independently of the current source
         // resource name. The shared PG coordination lock excludes a live peer coordinator.
         var unreconciled = await database.CatalogEvaluations.Where(e => !e.CleanupConfirmed).ToArrayAsync(token);
@@ -83,12 +150,20 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
     private async Task ContinueAsync(VivariumDbContext database, CatalogChange operation, CancellationToken token)
     {
         var actor = Actor(operation);
-        if (!await CanActivateAsync(database, actor, token))
+        if (!await CanActivateAsync(database, actor, token, operation))
         { await RejectAsync(database, operation, "permission_denied", AuditOutcome.Denied, token); return; }
         if (await ControlReader().HeadAsync(token: token) != operation.CandidateCommit)
         { await RejectAsync(database, operation, "accepted_ref_changed", AuditOutcome.Failed, token, conflict: true); return; }
         try
         {
+            if (operation.Kind == "AGENT_ENABLEMENT")
+            {
+                var verified = await AgentDefinitionAsync(database, operation, token);
+                if (operation.State != "EVALUATED" || operation.MaterializedJson is null
+                    || JsonSerializer.Serialize(verified, DefinitionValidation.Json) != JsonSerializer.Serialize(
+                        JsonSerializer.Deserialize<CatalogDefinition>(operation.MaterializedJson, DefinitionValidation.Json), DefinitionValidation.Json))
+                    throw new InvalidDataException("The retained Agent mutation differs.");
+            }
             var selected = JsonSerializer.Deserialize<CatalogMember[]>(operation.SelectedRevisionsJson, DefinitionValidation.Json)
                 ?? throw new InvalidDataException("Selected source revisions are missing.");
             if (!await RefsMatchAsync(selected, token))
@@ -115,7 +190,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
             await database.Database.ExecuteSqlRawAsync("""
                 LOCK TABLE "AspNetUsers", "UserRoleGrants", "RolePermissions", "IncludedRoles", "GroupRoleGrants" IN SHARE MODE
                 """, token);
-            if (!await CanActivateAsync(database, actor, token))
+            if (!await CanActivateAsync(database, actor, token, operation))
             {
                 await transaction.RollbackAsync(token);
                 await RejectAsync(database, operation, "permission_denied", AuditOutcome.Denied, token);
@@ -329,12 +404,37 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
     private DefinitionGitReader ControlReader() => new(sources.Path, sources.RepositoryId);
     private DefinitionRepository BoundRepository(string id) => sources.SettingsRepositories.SingleOrDefault(r => r.Id == id && r.Id != sources.RepositoryId)
         ?? throw new InvalidDataException("The settings repository is not configured.");
-    private async Task<bool> CanActivateAsync(VivariumDbContext database, ManagementRequestContext actor, CancellationToken token)
+    private async Task<bool> CanActivateAsync(VivariumDbContext database, ManagementRequestContext actor, CancellationToken token,
+        CatalogChange? operation = null)
     {
         if (actor.Principal.ActorType != "user" || !Guid.TryParse(actor.Principal.ActorId, out var id)) return false;
         var access = new CurrentAccess(database, configuration);
+        if (operation?.Kind == "AGENT_ENABLEMENT") return await access.AllowsAsync(id, "enable_disable_agent", cancellationToken: token);
         // This native operation reconciles the entire configured installation catalogue.
         return await access.AllowsAllAsync(id, ["edit_project", "create_sub_project"], cancellationToken: token);
+    }
+
+    private async Task<CatalogDefinition> AgentDefinitionAsync(VivariumDbContext database, CatalogChange operation, CancellationToken token)
+    {
+        if (operation.BaseRevisionId is null || operation.TargetAgentId is null) throw new InvalidDataException("The Agent mutation has no base.");
+        var prior = await database.CatalogRevisions.AsNoTracking().SingleAsync(r => r.Id == operation.BaseRevisionId, token);
+        var reader = ControlReader();
+        var paths = await reader.ChangedPathsAsync(prior.ControlCommit, operation.CandidateCommit, token);
+        if (paths.Length > 2 || paths.Any(p => p != ".vivarium/repository.yaml" && p != ".vivarium/agents/" + operation.TargetAgentId + ".yaml"))
+            throw new InvalidDataException("The Agent mutation changes another resource.");
+        var definition = JsonSerializer.Deserialize<CatalogDefinition>(prior.DefinitionJson, DefinitionValidation.Json)
+            ?? throw new InvalidDataException("The active catalogue is invalid.");
+        if (IsolatedDefinitionEvaluator.Hash(JsonSerializer.Serialize(definition, DefinitionValidation.Json)) != prior.DefinitionHash)
+            throw new InvalidDataException("The active catalogue integrity differs.");
+        var candidate = await reader.ReadAsync(operation.CandidateCommit, control: true, token);
+        var agents = CatalogAgentSettings.Read(candidate);
+        if (!agents.Any(a => a.Id == operation.TargetAgentId)
+            || (definition.Agents ?? []).Any(a => a.Id != operation.TargetAgentId && !agents.Contains(a)))
+            throw new InvalidDataException("The Agent mutation changes another declaration.");
+        // Reuse the already validated C# output: all its source bytes are unchanged. Do not rerun
+        // user computations merely because an independent fleet property changed.
+        return definition with { Members = definition.Members.Select(m => m.RepositoryId == sources.RepositoryId && m.Branch == "refs/heads/main"
+            ? m with { Commit = operation.CandidateCommit } : m).ToArray(), Agents = agents };
     }
     private static ManagementRequestContext Actor(CatalogChange operation) => new(
         new ManagementPrincipal("user", operation.ActorId.ToString(), operation.CredentialKind, null),

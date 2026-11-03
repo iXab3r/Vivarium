@@ -52,6 +52,22 @@ Agents in the same activation transaction. Changes additionally require current 
 `enable_disable_agent`. Predeclared Agents receive the accepted projection when they enroll.
 Removing these declarations is rejected until the owning removal contract is implemented.
 
+Fresh compatible Agent enablement uses this same catalogue coordinator. The managed-local writer
+prepares a private Git index, validates an Agent-only candidate against the active control revision,
+journals the operation, then accepts the ref with compare-and-swap under current permission fencing.
+An unaccepted control HEAD is a conflict. `spec.enabledComment` and `spec.enabledChangedAt` retain
+the enabled-state comment and UTC change time in the Agent document; they are projected with
+`spec.enabled`. The response is successful only after activation. A project-scoped Agent read does
+not grant the global enablement permission.
+
+An Agent-only edit reuses the immutable validated C# output after proving that the source paths are
+unchanged. It does not rerun user computations. Recovery revalidates the mutation's scope and current
+authority; it completes a previously accepted checkout without inventing an unperformed ref update.
+Checkout conflicts retain local edits and the recovery journal. Writer operations disable hooks,
+fsmonitor and configured clean/smudge/process filters, including commands selected by authored
+attributes. Candidate diffs disable external diff and text-conversion helpers. This narrow managed edit does not
+implement general C# authoring or a second desired-state store.
+
 R0 starts with a managed-local control repository on its configured authoritative ref. Its Project
 and BuildType are real catalogue identities. The selected declarations use
 `.vivarium/projects/{projectId}/Control.g.cs` for each Project's control ownership and

@@ -392,6 +392,12 @@ and a manifest to 128 files; broader T3 publication remains a delivery prerequis
 of this subset as full TeamCity artifact compatibility. Legacy assignments remain unchanged. Tag 7
 on AgentMsg stays reserved for the separate structured service-message transport.
 
+The result manifest adds optional `Artifact.modification_time_unix_ms` at tag 4. The Agent reports
+the source file's observed modification time; the Host validates its representable range and retains
+it with the immutable artifact reference. Older senders leave the field absent. Neither a Storage
+upload timestamp nor Build completion substitutes for an unknown source-file time. Bootstrap and
+existing field numbers remain unchanged.
+
 R0's native output contract requires the additive `teamcity.build-output.v1` capability. The fresh
 Host explicitly opts into negotiating it; the legacy controller does not. An output-required
 assignment carries `output_contract_major = 1` and is never sent to an Agent without that negotiated

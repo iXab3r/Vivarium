@@ -46,7 +46,7 @@ public sealed class RuntimeHostPhysicalTests
     }
 
     [Test]
-    public async Task Real_Host_restores_nodes_and_framework_login_and_keeps_object_HTTP_private_across_restart()
+    public async Task Ordinary_published_CLI_runs_fails_cancels_downloads_and_retains_builds_across_Host_restart()
     {
         await using var postgres = new OwnedPostgres();
         await postgres.StartAsync();
@@ -62,9 +62,18 @@ public sealed class RuntimeHostPhysicalTests
         await SourceCompiler.GitAsync(definitions, "config", "user.name", "Owned Host fixture");
         await SourceCompiler.GitAsync(definitions, "config", "user.email", "fixture@example.invalid");
         var source = ProductionEvaluatorPhysicalTests.Sources();
-        var smokeSettings = source["Settings.g.cs"].Replace("echo from CSharp Git",
-            "echo from CSharp Git\\necho owned-smoke-artifact>proof.txt\\n" + (OperatingSystem.IsWindows()
-                ? "echo ##teamcity[publishArtifacts 'proof.txt']" : "echo \\\"##teamcity[publishArtifacts 'proof.txt']\\\""), StringComparison.Ordinal);
+        // The first line is a cmd label and a complete sh program. Both actual Agents run the same
+        // committed configuration; MODE controls the source fixture's success/failure/long variants.
+        var cliScript = """
+            :; if [ "$MODE" = fail ]; then exit 7; fi; if [ "$MODE" = fail8 ]; then exit 8; fi; if [ "$MODE" = long ]; then trap 'i=0; while [ ! -f /data/allow-cancel-exit ] && [ $i -lt 100 ]; do sleep 0.1; i=$((i+1)); done; exit 0' TERM; echo owned-running-start; while :; do sleep 0.1; done; fi; echo from CSharp Git; printf 'owned-smoke-artifact\n' > proof.txt; echo "##teamcity[publishArtifacts 'proof.txt']"; exit 0
+            if "%MODE%"=="fail" exit /b 7
+            if "%MODE%"=="fail8" exit /b 8
+            if "%MODE%"=="long" (echo owned-running-start&ping -n 60 127.0.0.1 >nul)
+            echo from CSharp Git
+            echo owned-smoke-artifact>proof.txt
+            echo ##teamcity[publishArtifacts 'proof.txt']
+            """;
+        var smokeSettings = source["Settings.g.cs"].Replace("\"echo from CSharp Git\"", JsonSerializer.Serialize(cliScript), StringComparison.Ordinal);
         var waitingScript = OperatingSystem.IsWindows()
             ? "echo owned-running-start\nping -n 60 127.0.0.1 >nul" : "trap '' TERM\necho owned-running-start\nsleep 60";
         smokeSettings = smokeSettings.Replace("new(\"P_LocalSmoke\",", $$"""
@@ -142,7 +151,7 @@ public sealed class RuntimeHostPhysicalTests
                 {
                     ["vivarium-host"] = new()
                     {
-                        ["PublicOrigin"] = origin, ["ListenUrl"] = origin,
+                        ["PublicOrigin"] = origin, ["ListenUrl"] = $"https://0.0.0.0:{publicPort}",
                         ["StorageListenUrl"] = storageOrigin, ["CertificatePath"] = certificate.Path,
                         ["OutputRetentionDays"] = 1,
                         ["DefinitionSources"] = JsonSerializer.SerializeToNode(new
@@ -175,7 +184,7 @@ public sealed class RuntimeHostPhysicalTests
                 && remote.Thumbprint == certificate.Thumbprint,
         };
         using var http = new HttpClient(handler) { BaseAddress = new Uri(origin), Timeout = TimeSpan.FromSeconds(15) };
-        using var scopedActor = new ScopedKeyScenario(new Uri(origin), certificate.Thumbprint);
+        using var scopedActor = new ScopedKeyScenario(new Uri(origin), certificate.Thumbprint, root, certificate.Path);
         string oldPassword;
         long? executedBuild = null;
         string? outputResumeCursor = null;

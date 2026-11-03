@@ -107,10 +107,25 @@ browser contour is prepared with `python tools/identity/prepare.py`, then execut
 `python tools/identity/run.py <printed-context-path>`. Its summaries require clean owned processes
 and container removal; it is not the D43 author-code evaluator or complete R0/story acceptance.
 
+`RuntimeHostPhysicalTests` additionally executes the published, byte-verified TeamCity CLI 0.5.6
+as separate Node processes, with an isolated profile and stock ordinary-account credentials.
+It requires both pinned npm tarballs in `artifacts/us013-cli056-20261102` and matching installed
+`@eyeauras/teamcity-cli` / sibling `@eyeauras/cli-factory` packages; `VIVARIUM_PROOF_TEAMCITY_CLI`
+can select the CLI package directory. Fetch the exact tarballs with `npm pack` for version `0.5.6`;
+the fixture verifies the recorded archive digests and every packaged installed file. The owned Host
+listens on its allocated public port for the dedicated Docker Agent; Storage remains loopback-only.
+The Linux process uses pinned runtime image
+`mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3`,
+its own labelled volume and unprivileged UID, and is removed before the later Windows secret journey.
+`DefinitionGitWriterPhysicalTests` separately cover real Git CAS, checkout recovery, local-edit
+preservation, and rejection of hook/filter execution. These are supporting integration checks;
+the R0 ledger still requires explicit complete-case bindings and milestone review.
+
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
 ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
-invoked `tests/Vivarium.TeamCity.Conformance` project; its raw five-case product-ready run remains nonzero while
-the compatible routes are missing. No delivered TeamCity GREEN selection exists yet, and broader
+invoked `tests/Vivarium.TeamCity.Conformance` project; its legacy-controller raw five-case product-ready
+run remains nonzero. Fresh Host process checks do not replace that baseline or create delivered
+TeamCity GREEN cases. Broader
 P0 foundation was delivered in PR #164; R0 product binding and cumulative conformance remain open.
 The [local mutation cohort](design/teamcity-rest-local-mutations.md)
 separately records twelve observed/replay-bound workflows and ten product-prerequisite-blocked variants.

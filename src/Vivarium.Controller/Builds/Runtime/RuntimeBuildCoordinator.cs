@@ -312,12 +312,20 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                         throw new InvalidDataException("Artifact content metadata is invalid.");
                     var upload = await database.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == build.Id && u.Sha256 == artifact.Sha256, token);
                     if (upload is null || artifact.Size != upload.Size) throw new InvalidDataException("Artifact content is not owned/verified.");
+                    DateTimeOffset? modifiedAt = null;
+                    if (artifact.HasModificationTimeUnixMs)
+                    {
+                        try { modifiedAt = DateTimeOffset.FromUnixTimeMilliseconds(artifact.ModificationTimeUnixMs); }
+                        catch (ArgumentOutOfRangeException) { throw new InvalidDataException("Artifact modification time is invalid."); }
+                    }
                     database.RuntimeBuildArtifacts.Add(new() { BuildId = build.Id, Ordinal = ordinal, Path = artifact.Path,
-                        Sha256 = artifact.Sha256, Size = artifact.Size });
+                        Sha256 = artifact.Sha256, Size = artifact.Size, ModifiedAt = modifiedAt });
                 }
                 database.RuntimeBuildResults.Add(new() { BuildId = build.Id, Evidence = result.ToByteArray(), SemanticHash = hash,
                     OriginalOutcome = result.Outcome.ToString(), ReceivedAt = time.GetUtcNow() });
                 build.Status = result.Outcome switch { BuildOutcome.Succeeded => "SUCCESS", BuildOutcome.Failed => "FAILURE", _ => "UNKNOWN" };
+                if (result.Outcome == BuildOutcome.Failed)
+                    build.StatusText = await RuntimeBuildStatus.FailureAsync(database, build, result, token);
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.accepted", workload: workload, token: token);
                 execution.Phase = "TERMINAL"; execution.TerminalReceivedAt = time.GetUtcNow();
                 execution.OutputDeadline = time.GetUtcNow().AddSeconds(30); build.State = "RELEASING";

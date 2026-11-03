@@ -13,7 +13,7 @@ public sealed class DefinitionGitReader(string repositoryPath, string repository
     private static readonly UTF8Encoding Utf8 = new(false, true);
     private readonly IReadOnlyDictionary<string, string?> environment = GitEnvironment();
 
-    private static Dictionary<string, string?> GitEnvironment()
+    internal static Dictionary<string, string?> GitEnvironment()
     {
         var values = Environment.GetEnvironmentVariables().Keys.Cast<string>()
             .Where(key => key.StartsWith("GIT_", StringComparison.OrdinalIgnoreCase))
@@ -33,6 +33,13 @@ public sealed class DefinitionGitReader(string repositoryPath, string repository
             cancellationToken: token);
         ObjectId(commit);
         return commit;
+    }
+
+    internal async Task<string[]> ChangedPathsAsync(string before, string after, CancellationToken token)
+    {
+        ObjectId(before); ObjectId(after);
+        return Decode(await git.RunBytesAsync(["diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z", before, after], environment,
+            cancellationToken: token)).Split('\0', StringSplitOptions.RemoveEmptyEntries);
     }
 
     public async Task<DefinitionTree> ReadAsync(string commit, bool control, CancellationToken token = default)

@@ -339,6 +339,7 @@ message Artifact {
   string path = 1;      // relative to workdir (forward slashes)
   string sha256 = 2;
   int64 size = 3;
+  optional int64 modification_time_unix_ms = 4; // observed source-file time; absent for older Agents
 }
 
 message BuildResult {

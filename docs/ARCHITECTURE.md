@@ -1076,7 +1076,10 @@ Generate the method/path/request-variant inventory from client source/tests, ref
 and other consumers. The required conformance gate uses unchanged clients and isolated mutation
 fixtures, not production TeamCity writes. See
 [`design/teamcity-rest-compatibility.md`](design/teamcity-rest-compatibility.md) and the stable
-`TC-WIR-*` requirements in the parity catalog. This facade is planned, not implemented.
+`TC-WIR-*` requirements in the parity catalog. The fresh R0 Host implements a selected adapter for
+current-user/server/catalogue reads, source-free Build run/inspect/cancel, private artifact reads and
+Git-backed Agent enabled-state management. Published CLI process evidence covers selected ordinary
+flows; full reference bindings, remaining variants and milestone acceptance remain open.
 
 Owner clarification, 2026-10-31: adopted TeamCity operations inherit TeamCity's handling, including
 defaults, validation, permissions, state transitions, collection mutation, ordering, retry/reuse,

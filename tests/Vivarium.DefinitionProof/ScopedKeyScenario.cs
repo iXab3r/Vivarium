@@ -25,6 +25,8 @@ namespace Vivarium.DefinitionProof;
 /// <summary>One real ordinary account/key journey. Credentials stay only in private in-memory HTTP state.</summary>
 internal sealed class ScopedKeyScenario : IDisposable
 {
+    private readonly UnchangedCliScenario cli;
+    private readonly LinuxCliCancellationScenario linux;
     private readonly HttpClient browser;
     private readonly HttpClient api;
     private readonly Uri origin;
@@ -72,9 +74,11 @@ internal sealed class ScopedKeyScenario : IDisposable
             provider.GetRequiredService<IConfiguration>(), retentionClock, provider.GetRequiredService<ILogger<RuntimeOutputRetention>>())));
     }
 
-    internal ScopedKeyScenario(Uri origin, string thumbprint)
+    internal ScopedKeyScenario(Uri origin, string thumbprint, string root, string certificatePath)
     {
         this.origin = origin;
+        cli = new(root, origin, certificatePath);
+        linux = new(root, origin, certificatePath);
         HttpClient Create(bool cookies) => new(new HttpClientHandler { AllowAutoRedirect = false,
             UseCookies = cookies, CookieContainer = cookies ? browserCookies : new CookieContainer(),
             ServerCertificateCustomValidationCallback = (_, certificate, _, _) => certificate?.Thumbprint == thumbprint })
@@ -113,13 +117,33 @@ internal sealed class ScopedKeyScenario : IDisposable
         }
         await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
         await CreateKeyAsync();
+        await cli.AuthenticateAsync(api.DefaultRequestHeaders.Authorization!.Parameter!);
+        await cli.RunBuildAsync(api.DefaultRequestHeaders.Authorization!.Parameter!, api);
         Assert.That((await api.GetAsync("/api/v1/users/current")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
         await DelegationAsync(services, administrator, csrf);
         using (var denied = await api.PutAsync($"/api/v1/agents/{agentId}/authorization",
             new StringContent("{\"authorized\":false}", Encoding.UTF8, "application/json")))
             Assert.That(denied.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        int compatibleAgent;
         using (var control = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/agents/{agentId}")))
+        {
             Assert.That(control.RootElement.GetProperty("authorized").GetBoolean(), Is.True);
+            compatibleAgent = control.RootElement.GetProperty("teamCityId").GetInt32();
+        }
+        var enabledPath = $"/app/rest/agents/id:{compatibleAgent}/enabledInfo?fields=status,comment(text,timestamp)";
+        api.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        administrator.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        using (var enabled = JsonDocument.Parse(await api.GetStringAsync(enabledPath)))
+            Assert.That(enabled.RootElement.GetProperty("status").GetBoolean(), Is.True);
+        await MutateAsync(api, csrf, HttpMethod.Put, enabledPath, "{\"status\":false}", HttpStatusCode.Forbidden);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, enabledPath,
+            "{\"status\":false,\"comment\":{\"text\":\"Owned CLI queued cancellation\"}}", HttpStatusCode.OK);
+        var cliQueued = await cli.CancelQueuedAsync(api.DefaultRequestHeaders.Authorization!.Parameter!, api);
+        await linux.RunAsync(administrator, api, csrf, api.DefaultRequestHeaders.Authorization!.Parameter!, cli, agentId);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, enabledPath,
+            "{\"status\":true,\"comment\":{\"text\":\"Owned CLI queued cancellation complete\"}}", HttpStatusCode.OK);
+        using (var retained = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{cliQueued}")))
+            Assert.That(retained.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
 
         // A real Q Build/artifact is the protected positive control, not a guessed absent identity.
         var protectedId = await SubmitAsync(administrator, "Q_LocalSmoke", csrf);
@@ -131,6 +155,15 @@ internal sealed class ScopedKeyScenario : IDisposable
             Assert.That((await api.GetAsync(href)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
         Assert.That((await api.GetAsync($"/api/v1/builds/{protectedId}")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        foreach (var path in new[] { "/app/rest/buildTypes/id:Q_LocalSmoke", $"/app/rest/builds/id:{protectedId}",
+            $"/app/rest/builds/id:{protectedId}/artifacts/files/proof.txt" })
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, path);
+            request.Headers.Accept.ParseAdd(path.Contains("/artifacts/", StringComparison.Ordinal) ? "*/*" : "application/json");
+            using var denied = await api.SendAsync(request);
+            Assert.That(denied.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden), path);
+            Assert.That(await denied.Content.ReadAsStringAsync(), Does.Not.Contain("owned-smoke-artifact"));
+        }
         using (var protectedOutput = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/builds/{protectedId}/output")))
         {
             protectedOutputHref = protectedOutput.RootElement.GetProperty("items").EnumerateArray().First(e => e.GetProperty("kind").GetString() == "data")
@@ -439,6 +472,16 @@ internal sealed class ScopedKeyScenario : IDisposable
             using var response = await api.GetAsync(path);
             Assert.That(response.StatusCode, Is.EqualTo(expected), "The same ordinary key must use current eligibility/grants for metadata and bytes.");
             Assert.That(response.Headers.Location, Is.Null);
+        }
+        foreach (var path in new[] { "/app/rest/users/current", $"/app/rest/builds/id:{buildId}",
+            $"/app/rest/builds/id:{buildId}/artifacts/files/proof.txt" })
+        {
+            var expected = path == "/app/rest/users/current" ? identityStatus
+                : resourceStatus == HttpStatusCode.NotFound ? HttpStatusCode.Forbidden : resourceStatus;
+            using var response = await api.GetAsync(path);
+            Assert.That(response.StatusCode, Is.EqualTo(expected), "Compatible reads use the same current credential and grants: " + path);
+            if (expected == HttpStatusCode.Unauthorized)
+                Assert.That(await response.Content.ReadAsStringAsync(), Is.EqualTo("Could not authenticate with provided token\n"));
         }
     }
 

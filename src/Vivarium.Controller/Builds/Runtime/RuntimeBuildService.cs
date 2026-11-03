@@ -147,6 +147,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         if (build.CancelRequestedAt is null)
         {
             build.CancelRequestedAt = time.GetUtcNow(); build.CancelReason = reason; build.CancelOperationId = Guid.NewGuid();
+            build.CancelActorId = Guid.Parse(actor.Principal.ActorId);
         }
         if (changed) { build.StopMode = mode; build.StopDeadline = time.GetUtcNow().AddSeconds(mode == "FORCE" ? 15 : 30); }
         build.Status = "UNKNOWN";
@@ -165,11 +166,15 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             registry.TrySend(connection!, CancelMessage(build, execution));
     }
 
-    internal async Task<RuntimeBuild?> VisibleAsync(VivariumDbContext database, ManagementRequestContext actor, long id, CancellationToken token)
+    internal async Task<RuntimeBuild?> VisibleAsync(VivariumDbContext database, ManagementRequestContext actor, long id, CancellationToken token,
+        bool discloseDenied = false)
     {
         var build = await database.RuntimeBuilds.SingleOrDefaultAsync(b => b.Id == id, token);
-        return build is not null && await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, ["view_project"],
-            await RuntimeBuildAccess.AncestryAsync(database, build.ProjectId, token), token) ? build : null;
+        if (build is null) return null;
+        if (await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, ["view_project"],
+            await RuntimeBuildAccess.AncestryAsync(database, build.ProjectId, token), token)) return build;
+        if (discloseDenied) throw new AccessPermissionException();
+        return null;
     }
 
     internal static Vivarium.Contracts.V1.ControllerMsg CancelMessage(RuntimeBuild build, RuntimeBuildExecution execution) => new()

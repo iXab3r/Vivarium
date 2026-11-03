@@ -215,7 +215,7 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
         var build = await database.RuntimeBuilds.SingleAsync(b => b.Id == buildId, token);
         build.State = "FINISHED"; build.FinishedAt = time.GetUtcNow();
         build.Status = raw.Outcome switch { BuildOutcome.Succeeded => "SUCCESS", BuildOutcome.Failed => "FAILURE", _ => "UNKNOWN" };
-        build.StatusText = raw.Outcome switch { BuildOutcome.Succeeded => "Success", BuildOutcome.Failed => "Failure",
+        build.StatusText = raw.Outcome switch { BuildOutcome.Succeeded => "Success", BuildOutcome.Failed => build.StatusText,
             BuildOutcome.Cancelled => "Cancelled", _ => "Infrastructure failure" };
         await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.output.sealed",
             reason: output.State == "COMPLETE" ? "complete" : "complete_with_gaps", workload: execution.WorkloadId, token: token);

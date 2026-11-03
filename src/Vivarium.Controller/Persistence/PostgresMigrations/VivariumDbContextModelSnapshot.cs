@@ -369,6 +369,12 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<string>("DesiredRevision")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("EnabledChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EnabledComment")
+                        .HasColumnType("text");
+
                     b.Property<string>("EnrollmentTokenHash")
                         .HasColumnType("text");
 
@@ -587,6 +593,9 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<long>("BuildTypeId")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid?>("CancelActorId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("CancelOperationId")
                         .HasColumnType("uuid");
 
@@ -677,6 +686,9 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     b.Property<int>("Ordinal")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Path")
                         .IsRequired()
@@ -1203,6 +1215,12 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<string>("FailureCode")
                         .HasColumnType("text");
 
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("RECONCILE");
+
                     b.Property<string>("MaterializedJson")
                         .HasColumnType("jsonb");
 
@@ -1226,12 +1244,17 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("TargetAgentId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RepositoryId", "CreatedAt");
 
                     b.ToTable("CatalogChanges", null, t =>
                         {
+                            t.HasCheckConstraint("CK_CatalogChanges_Kind", "(\"Kind\" = 'RECONCILE' AND \"TargetAgentId\" IS NULL) OR (\"Kind\" = 'AGENT_ENABLEMENT' AND \"TargetAgentId\" IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_CatalogChanges_Origin", "\"Origin\" = 'MANAGED'");
 
                             t.HasCheckConstraint("CK_CatalogChanges_State", "\"State\" IN ('PENDING','EVALUATED','APPLIED','REJECTED','CONFLICT')");

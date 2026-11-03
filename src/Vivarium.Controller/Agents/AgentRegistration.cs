@@ -10,6 +10,8 @@ public sealed class AgentRegistration
     public bool MaintenanceDrain { get; set; }
     public bool DesiredEnabled { get; set; }
     public string? DesiredRevision { get; set; }
+    public string? EnabledComment { get; set; }
+    public DateTimeOffset? EnabledChangedAt { get; set; }
     public string? DesiredName { get; set; }
     public string CustomParametersJson { get; set; } = "{}";
     public DateTimeOffset FirstSeenAt { get; set; }

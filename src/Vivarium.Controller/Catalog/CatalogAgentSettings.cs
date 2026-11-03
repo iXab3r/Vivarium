@@ -28,12 +28,36 @@ internal static class CatalogAgentSettings
             if (!Regex.IsMatch(id, "^[a-z0-9](?:[a-z0-9.-]{0,125}[a-z0-9])?$", RegexOptions.CultureInvariant))
                 throw new InvalidDataException("The Agent Git document path is unsupported.");
             var normalized = source.ReplaceLineEndings("\n").TrimEnd('\n');
+            var lines = normalized.Split('\n');
+            var prefix = string.Join('\n', lines.Take(5));
             var yes = Encoding.UTF8.GetString(ConfigurationTreeValidator.RenderAgent(id, true)).TrimEnd('\n');
             var no = Encoding.UTF8.GetString(ConfigurationTreeValidator.RenderAgent(id, false)).TrimEnd('\n');
-            if (normalized != yes && normalized != no) throw new InvalidDataException("The Agent Git declaration is invalid.");
-            result.Add(new(id, normalized == yes));
+            if (prefix != yes && prefix != no) throw new InvalidDataException("The Agent Git declaration is invalid.");
+            string? comment = null; DateTimeOffset? changedAt = null;
+            if (lines.Length != 5)
+            {
+                if (lines.Length != 7 || !lines[5].StartsWith("  enabledComment: ", StringComparison.Ordinal)
+                    || !lines[6].StartsWith("  enabledChangedAt: ", StringComparison.Ordinal))
+                    throw new InvalidDataException("The Agent Git declaration is invalid.");
+                try
+                {
+                    comment = JsonSerializer.Deserialize<string>(lines[5]["  enabledComment: ".Length..]);
+                    changedAt = JsonSerializer.Deserialize<DateTimeOffset>(lines[6]["  enabledChangedAt: ".Length..]);
+                }
+                catch (JsonException) { throw new InvalidDataException("The Agent Git declaration is invalid."); }
+                if (comment is null || Encoding.UTF8.GetByteCount(comment) > 4096 || comment.Contains('\0'))
+                    throw new InvalidDataException("The Agent enabled comment is invalid.");
+            }
+            result.Add(new(id, prefix == yes, comment, changedAt));
         }
         return result.OrderBy(a => a.Id, StringComparer.Ordinal).ToArray();
+    }
+
+    internal static string Render(CatalogAgentSetting setting)
+    {
+        var text = Encoding.UTF8.GetString(ConfigurationTreeValidator.RenderAgent(setting.Id, setting.Enabled)).ReplaceLineEndings("\n").TrimEnd('\n');
+        return setting.ChangedAt is null ? text + "\n" : text + "\n  enabledComment: " + JsonSerializer.Serialize(setting.Comment ?? "")
+            + "\n  enabledChangedAt: " + JsonSerializer.Serialize(setting.ChangedAt.Value) + "\n";
     }
 
     internal static async Task<bool> ChangedAsync(VivariumDbContext database, Guid? priorId,
@@ -44,7 +68,7 @@ internal static class CatalogAgentSettings
         var after = next.Agents ?? [];
         if (before.Any(old => !after.Any(item => item.Id == old.Id)))
             throw new InvalidDataException("Agent declaration removal requires its owning lifecycle contract.");
-        return after.Any(item => !before.Any(old => old.Id == item.Id && old.Enabled == item.Enabled));
+        return after.Any(item => !before.Contains(item));
     }
 
     internal static async Task ApplyAsync(VivariumDbContext database, CatalogRevision revision,
@@ -55,8 +79,10 @@ internal static class CatalogAgentSettings
         foreach (var row in rows)
         {
             var selected = definition.Agents!.Single(a => a.Id == row.AgentId);
-            if (row.DesiredRevision is not null && row.DesiredEnabled == selected.Enabled) continue;
+            if (row.DesiredRevision is not null && row.DesiredEnabled == selected.Enabled
+                && row.EnabledComment == selected.Comment && row.EnabledChangedAt == selected.ChangedAt) continue;
             row.DesiredEnabled = selected.Enabled;
+            row.EnabledComment = selected.Comment; row.EnabledChangedAt = selected.ChangedAt;
             row.DesiredRevision = revision.RepositoryId + "@" + revision.ControlCommit;
         }
     }
@@ -73,5 +99,6 @@ internal static class CatalogAgentSettings
             ?.SingleOrDefault(a => a.Id == row.AgentId);
         if (selected is null) return;
         row.DesiredEnabled = selected.Enabled; row.DesiredRevision = revision.RepositoryId + "@" + revision.ControlCommit;
+        row.EnabledComment = selected.Comment; row.EnabledChangedAt = selected.ChangedAt;
     }
 }

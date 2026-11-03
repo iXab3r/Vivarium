@@ -109,6 +109,19 @@ ambiguous behavior.
 
 ### Target
 
+The fresh R0 Host now has a selected `/app/rest` adapter over the same framework credential,
+current-access, catalogue, Build and private-artifact services. It exposes current-user and truthful
+Vivarium server metadata, Project/BuildType reads, ordinary source-free run/inspect/cancel, artifact
+listing/download and Git-backed Agent enabled-state reads/writes. Its selected JSON/XML representations
+and field selection preserve the pinned client's request shape. Compatible protected-resource
+disclosure and plain-text rejected-token responses remain distinct from native Problem Details.
+This implementation subset and published CLI process evidence do not discharge the complete R0
+reference cases or imply full TeamCity REST conformance.
+
+Both artifact read surfaces use the same current authorization before and after private Storage
+reads. Native artifact metadata additionally exposes nullable `modifiedAt` from the immutable Agent
+manifest; compatible file metadata omits `modificationTime` when that observation is absent.
+
 - `/api/v1` is the canonical public management API for UI, CLI, CI, and integrations.
 - Both TeamCity and AgentExplorer call the same controller application services from REST; transport
   handlers contain no domain logic.

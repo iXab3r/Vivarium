@@ -11,6 +11,8 @@ public sealed class CatalogChange
     public required string CredentialKind { get; set; }
     public string? RequestId { get; set; }
     public string Origin { get; set; } = "MANAGED";
+    public string Kind { get; set; } = "RECONCILE";
+    public string? TargetAgentId { get; set; }
     public required string RepositoryId { get; set; }
     public required string CandidateCommit { get; set; }
     public required string SelectedRevisionsJson { get; set; }
@@ -63,7 +65,9 @@ public sealed record CatalogProject(Project Control, EvaluatedDefinition Definit
 public sealed record CatalogDefinition(CatalogMember[] Members, CatalogProject[] Projects,
     string CompilerImage, string CompilerSdk, string ContractHash, string SchemaVersion,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] CatalogAgentSetting[]? Agents = null);
-public sealed record CatalogAgentSetting(string Id, bool Enabled);
+public sealed record CatalogAgentSetting(string Id, bool Enabled,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Comment = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] DateTimeOffset? ChangedAt = null);
 
 public sealed record DefinitionRepository(string Id, string Path, string TrustReference);
 public sealed record CatalogSources(string RepositoryId, string Path, DefinitionRepository[] SettingsRepositories);

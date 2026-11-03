@@ -77,11 +77,13 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
         change.Property(entry => entry.MaterializedJson).HasColumnType("jsonb");
         change.Property(entry => entry.SelectedRevisionsJson).HasColumnType("jsonb");
         change.Property(entry => entry.RepositoryId).UseCollation("C");
+        change.Property(entry => entry.Kind).HasDefaultValue("RECONCILE");
         change.HasIndex(entry => new { entry.RepositoryId, entry.CreatedAt });
         change.ToTable("CatalogChanges", table =>
         {
             table.HasCheckConstraint("CK_CatalogChanges_State", "\"State\" IN ('PENDING','EVALUATED','APPLIED','REJECTED','CONFLICT')");
             table.HasCheckConstraint("CK_CatalogChanges_Origin", "\"Origin\" = 'MANAGED'");
+            table.HasCheckConstraint("CK_CatalogChanges_Kind", "(\"Kind\" = 'RECONCILE' AND \"TargetAgentId\" IS NULL) OR (\"Kind\" = 'AGENT_ENABLEMENT' AND \"TargetAgentId\" IS NOT NULL)");
         });
         var evaluation = modelBuilder.Entity<CatalogEvaluation>();
         evaluation.HasKey(entry => entry.Id);
