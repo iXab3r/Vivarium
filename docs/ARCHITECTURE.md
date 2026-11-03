@@ -1133,6 +1133,10 @@ settings service. Large log/artifact bytes use EyeAuras.Storage where its contra
 owns references, manifests, authorization, retention and import lineage. Framework keys/settings need
 private durable storage and backup; “PostgreSQL for state” does not mean binary artifacts inside SQL.
 
+The selected R0 output policy uses optional Chiral Host `OutputRetentionDays` (disabled by default),
+PostgreSQL availability epochs/expiry marks and retryable Storage deletion. It never rewrites
+published producer ranges. The broader TeamCity/per-project retention policy remains later scope.
+
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
 adapters, a frontend runtime server, and an extra application framework are not required. Workbench

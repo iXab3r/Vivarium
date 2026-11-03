@@ -857,6 +857,9 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<long>("NextPosition")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("RetentionEpoch")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("text");
@@ -865,6 +868,8 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     b.ToTable("RuntimeBuildOutputs", null, t =>
                         {
+                            t.HasCheckConstraint("CK_RuntimeBuildOutputs_Retention", "\"RetentionEpoch\" >= 0");
+
                             t.HasCheckConstraint("CK_RuntimeBuildOutputs_State", "\"State\" IN ('OPEN','SEALING','COMPLETE','COMPLETE_WITH_GAPS') AND \"NextPosition\" > 0");
                         });
                 });
@@ -917,6 +922,28 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("RuntimeBuildResults", null, t =>
                         {
                             t.HasCheckConstraint("CK_RuntimeBuildResults_Hash", "\"SemanticHash\" ~ '^[a-f0-9]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputExpiry", b =>
+                {
+                    b.Property<Guid>("RangeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("RangeId");
+
+                    b.HasIndex("DeletedAt")
+                        .HasFilter("\"DeletedAt\" IS NULL");
+
+                    b.ToTable("RuntimeOutputExpiries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeOutputExpiries_Deletion", "\"DeletedAt\" IS NULL OR \"DeletedAt\" >= \"ExpiredAt\"");
                         });
                 });
 
@@ -1705,6 +1732,15 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputExpiry", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeOutputRange", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeOutputExpiry", "RangeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

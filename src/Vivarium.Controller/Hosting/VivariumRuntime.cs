@@ -51,6 +51,7 @@ public static class VivariumRuntime
         builder.Services.AddSingleton<RuntimeStepCompiler>();
         builder.Services.AddSingleton<RuntimeBuildCoordinator>();
         builder.Services.AddSingleton<RuntimeBuildOutputStore>();
+        builder.Services.AddSingleton<RuntimeOutputRetention>();
         builder.Services.AddHostedService<RuntimeBuildWorker>();
         builder.Services.AddSingleton<Vivarium.Controller.Rest.Common.RestCursorCodec>();
         builder.WebHost.ConfigureKestrel(options =>

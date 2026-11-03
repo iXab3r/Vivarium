@@ -114,6 +114,15 @@ public sealed class RuntimeBuildOutput
     public long BuildId { get; set; }
     public string State { get; set; } = "OPEN";
     public long NextPosition { get; set; } = 1;
+    public long RetentionEpoch { get; set; }
+}
+
+// Availability metadata does not rewrite the immutable producer range or its published position.
+public sealed class RuntimeOutputExpiry
+{
+    public Guid RangeId { get; set; }
+    public DateTimeOffset ExpiredAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public sealed class RuntimeOutputStream

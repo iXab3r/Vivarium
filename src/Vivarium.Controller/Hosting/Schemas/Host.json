@@ -7,6 +7,7 @@
     "StorageListenUrl": { "type": "string", "format": "uri", "minLength": 1 },
     "CertificatePath": { "type": ["string", "null"] },
     "CertificatePassword": { "type": ["string", "null"], "writeOnly": true },
+    "OutputRetentionDays": { "type": ["integer", "null"], "minimum": 1, "maximum": 3650 },
     "DefinitionSources": {
       "type": "object", "additionalProperties": false,
       "properties": {

@@ -63,6 +63,7 @@ internal static class RuntimeBuildModel
 
         var output = model.Entity<RuntimeBuildOutput>(); output.HasKey(o => o.BuildId);
         output.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildOutput>(o => o.BuildId).OnDelete(DeleteBehavior.Restrict);
+        output.ToTable("RuntimeBuildOutputs", t => t.HasCheckConstraint("CK_RuntimeBuildOutputs_Retention", "\"RetentionEpoch\" >= 0"));
         output.ToTable("RuntimeBuildOutputs", t => t.HasCheckConstraint("CK_RuntimeBuildOutputs_State",
             "\"State\" IN ('OPEN','SEALING','COMPLETE','COMPLETE_WITH_GAPS') AND \"NextPosition\" > 0"));
         var stream = model.Entity<RuntimeOutputStream>(); stream.HasKey(s => new { s.BuildId, s.StepIndex, s.Stream });
@@ -78,6 +79,10 @@ internal static class RuntimeBuildModel
             t.HasCheckConstraint("CK_RuntimeOutputStreams_Final", "(\"FinalSequence\" IS NULL AND \"FinalBytes\" IS NULL) OR (\"FinalSequence\" IS NOT NULL AND \"FinalBytes\" IS NOT NULL AND \"FinalSequence\" BETWEEN 0 AND 18446744073709551615 AND \"FinalBytes\" BETWEEN 0 AND 18446744073709551615)");
         });
         var range = model.Entity<RuntimeOutputRange>(); range.HasKey(r => r.Id);
+        var expiry = model.Entity<RuntimeOutputExpiry>(); expiry.HasKey(e => e.RangeId);
+        expiry.HasOne<RuntimeOutputRange>().WithOne().HasForeignKey<RuntimeOutputExpiry>(e => e.RangeId).OnDelete(DeleteBehavior.Restrict);
+        expiry.HasIndex(e => e.DeletedAt).HasFilter("\"DeletedAt\" IS NULL");
+        expiry.ToTable("RuntimeOutputExpiries", t => t.HasCheckConstraint("CK_RuntimeOutputExpiries_Deletion", "\"DeletedAt\" IS NULL OR \"DeletedAt\" >= \"ExpiredAt\""));
         range.HasOne<RuntimeOutputStream>().WithMany().HasForeignKey(r => new { r.BuildId, r.StepIndex, r.Stream }).OnDelete(DeleteBehavior.Restrict);
         range.Property(r => r.Start).HasColumnType("numeric(20,0)"); range.Property(r => r.End).HasColumnType("numeric(20,0)");
         range.Property(r => r.ByteStart).HasColumnType("numeric(20,0)"); range.Property(r => r.ByteEnd).HasColumnType("numeric(20,0)");

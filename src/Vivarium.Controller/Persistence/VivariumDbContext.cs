@@ -41,6 +41,7 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<RuntimeBuildOutput> RuntimeBuildOutputs => Set<RuntimeBuildOutput>();
     public DbSet<RuntimeOutputStream> RuntimeOutputStreams => Set<RuntimeOutputStream>();
     public DbSet<RuntimeOutputRange> RuntimeOutputRanges => Set<RuntimeOutputRange>();
+    public DbSet<RuntimeOutputExpiry> RuntimeOutputExpiries => Set<RuntimeOutputExpiry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

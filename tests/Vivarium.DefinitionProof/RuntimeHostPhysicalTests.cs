@@ -110,7 +110,7 @@ public sealed class RuntimeHostPhysicalTests
         var certificate = Certificate(root, "https", tls: true);
         var identity = new JsonObject
         {
-            ["SuperuserEnabled"] = true, ["TokenLifetimeDays"] = 1,
+            ["SuperuserEnabled"] = true, ["TokenLifetimeDays"] = 3,
             ["DataProtectionDirectory"] = Path.Combine(root, "keys"),
             ["Providers"] = new JsonArray(), ["TokenCreationPermitLimit"] = 10,
             ["TokenCreationWindowSeconds"] = 60, ["TokenCreationConcurrencyLimit"] = 2,
@@ -140,6 +140,7 @@ public sealed class RuntimeHostPhysicalTests
                     {
                         ["PublicOrigin"] = origin, ["ListenUrl"] = origin,
                         ["StorageListenUrl"] = storageOrigin, ["CertificatePath"] = certificate.Path,
+                        ["OutputRetentionDays"] = 1,
                         ["DefinitionSources"] = JsonSerializer.SerializeToNode(new
                         { RepositoryId = "host-fixture", Path = definitions, SettingsRepositories = Array.Empty<object>() }),
                     },
@@ -178,8 +179,11 @@ public sealed class RuntimeHostPhysicalTests
         using var payloadPause = new BoundedPayloadPause();
         RuntimeBuildBytes? compilerBytes = null;
         await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(capture), services =>
+        {
+            scopedActor.ConfigureServices(services);
             services.Replace(ServiceDescriptor.Singleton<RuntimeStepCompiler>(provider => new RuntimeStepCompiler(
-                compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause))))))
+                compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause))));
+        }))
         {
             // This owned logger receives only the product's intended private disclosure. It never
             // writes the password, form, token or cookie into console/TRX/diagnostic artifacts.
@@ -463,7 +467,7 @@ public sealed class RuntimeHostPhysicalTests
             finally { payloadPause.Release(); await app.StopAsync(); compilerBytes?.Dispose(); }
         }
         var restartedCapture = new PrivateStartupLog();
-        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(restartedCapture)))
+        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(restartedCapture), scopedActor.ConfigureServices))
         {
             await app.StartAsync();
             try
@@ -488,7 +492,7 @@ public sealed class RuntimeHostPhysicalTests
                 var retainedArtifact = retainedArtifacts.RootElement.GetProperty("items").EnumerateArray().Single();
                 var retainedArtifactBytes = await http.GetByteArrayAsync(retainedArtifact.GetProperty("href").GetString());
                 Assert.That(System.Text.Encoding.UTF8.GetString(retainedArtifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
-                await scopedActor.AfterRestartAndRevokeAsync();
+                await scopedActor.AfterRestartAndRevokeAsync(app.Services, http);
                 Assert.That(retainedBuild.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
                 Assert.That(retainedBuild.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
                 using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
@@ -523,6 +527,30 @@ public sealed class RuntimeHostPhysicalTests
             }
             finally { await app.StopAsync(); }
         }
+        var recoveryErrors = new FailureTypesLog();
+        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(recoveryErrors), scopedActor.ConfigureServices))
+        {
+            await app.StartAsync();
+            try { await scopedActor.AfterRetentionRestartAsync(() => recoveryErrors.Failures); }
+            finally { await app.StopAsync(); }
+        }
+    }
+
+    private sealed class FailureTypesLog : ILoggerProvider, ILogger
+    {
+        private readonly System.Collections.Concurrent.ConcurrentQueue<string> failures = new();
+        internal string Failures => string.Join("; ", failures);
+        public ILogger CreateLogger(string categoryName) => categoryName == "Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware" ? this : NullLogger.Instance;
+        public bool IsEnabled(LogLevel level) => level >= LogLevel.Error;
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public void Dispose() { }
+        public void Log<TState>(LogLevel level, EventId id, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            // Never format arbitrary framework messages, URLs or credential-bearing requests.
+            for (var current = exception; current is not null; current = current.InnerException)
+                failures.Enqueue(current.GetType().Name + ":" + string.Join(",", Regex.Matches(current.Message, @"\b(?:ID|IDX)[0-9]{4,8}\b").Select(m => m.Value))
+                    + ":" + new System.Diagnostics.StackTrace(current).GetFrame(0)?.GetMethod()?.Name);
+        }
     }
 
     private static async Task<HttpResponseMessage> LoginAsync(HttpClient http, string password)
@@ -556,7 +584,8 @@ public sealed class RuntimeHostPhysicalTests
             names.AddIpAddress(IPAddress.Loopback);
             request.CertificateExtensions.Add(names.Build());
         }
-        using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-1), DateTimeOffset.UtcNow.AddDays(2));
+        // Credential-expiry scenarios advance validation by two days while transport/signing keys remain valid.
+        using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-1), DateTimeOffset.UtcNow.AddDays(30));
         var path = Path.Combine(root, name + ".pfx");
         File.WriteAllBytes(path, certificate.Export(X509ContentType.Pfx));
         return (path, certificate.Thumbprint);

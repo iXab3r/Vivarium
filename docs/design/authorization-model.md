@@ -41,7 +41,9 @@ Its model tests include delegation, immediate loss of removed administrator perm
 failed audit that rolls back a grant. The Access UI has selected real browser evidence. An owned
 Host/PG/Windows-Agent journey now issues an ordinary My keys credential, proves bounded project
 delegation, runs/downloads P results, denies Q bytes and Agent control, and rechecks the same key after
-grant withdrawal, account disablement, Host restart and own-key revocation. Its prior ordinary
+grant withdrawal, account disablement, Host restart and own-key revocation. Credential expiry
+uses the stock validation TimeProvider with separate one-/three-day keys;
+the longer-lived key stays usable by the same subject after the shorter key expires. The prior ordinary
 Identity session is arranged through the actual audited SignInManager; the separate external-issuer
 browser cases own OIDC login evidence. The native current-account read resolves one framework credential and
 rereads eligibility, without falling back from an explicit bearer to a browser cookie.

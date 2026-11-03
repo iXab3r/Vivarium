@@ -66,6 +66,12 @@ default. `migrate` separately reads `{"ConnectionString":"<maintenance connectio
 it never persists that privileged input as runtime configuration. Run local maintenance with the
 Host stopped. Runtime DB credentials may have narrower permissions than maintenance credentials.
 
+The optional managed Host `OutputRetentionDays` setting enables age expiry of completed Build output
+after restart (1–3650 days). Omission/null preserves output by age; ingestion quotas still apply.
+Expiry records availability gaps without changing producer evidence, then retries private Storage
+deletion. Already committed expiry/deletion intent survives restart or later policy disablement.
+Artifacts and full TeamCity/per-project retention remain separate contracts.
+
 `nodes` emits masked Chiral views. Saves remain separate from active resources until restart;
 startup refuses missing/unready nodes, pending/unknown/checksum-drifted schema and unusable Identity
 keys before opening listeners. Object HTTP stays on a distinct loopback listener. The installation

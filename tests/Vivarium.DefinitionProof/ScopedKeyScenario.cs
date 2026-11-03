@@ -6,8 +6,19 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.DataProtection;
+using OpenIddict.Validation;
 using Vivarium.Controller.Identity;
 using Vivarium.Controller.Security;
+using Vivarium.Controller.Rest.Common;
+using Vivarium.Controller.Builds.Runtime;
+using Vivarium.Controller.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using EyeAuras.Storage.Contracts;
+using EyeAuras.Storage;
 
 namespace Vivarium.DefinitionProof;
 
@@ -22,6 +33,22 @@ internal sealed class ScopedKeyScenario : IDisposable
     private string? artifactHref;
     private string? outputHref;
     private Guid userId;
+    private string? resumeCursor;
+    private string? protectedOutputHref;
+    private string? retainedCursor;
+    private readonly ScenarioClock validationClock = new();
+    private readonly ScenarioClock outputClock = new();
+    private readonly ScenarioClock retentionClock = new();
+
+    internal void ConfigureServices(IServiceCollection services)
+    {
+        services.Configure<OpenIddictValidationOptions>(options => options.TimeProvider = validationClock);
+        services.Replace(ServiceDescriptor.Singleton<RestCursorCodec>(provider =>
+            new RestCursorCodec(provider.GetRequiredService<IDataProtectionProvider>(), outputClock)));
+        services.Replace(ServiceDescriptor.Singleton<RuntimeOutputRetention>(provider => new RuntimeOutputRetention(
+            provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>(), provider.GetRequiredService<RuntimeBuildBytes>(),
+            provider.GetRequiredService<IConfiguration>(), retentionClock, provider.GetRequiredService<ILogger<RuntimeOutputRetention>>())));
+    }
 
     internal ScopedKeyScenario(Uri origin, string thumbprint)
     {
@@ -63,14 +90,7 @@ internal sealed class ScopedKeyScenario : IDisposable
             finally { accessor.HttpContext = previous; }
         }
         await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
-        var keysHtml = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
-        using var creation = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Create",
-            new FormUrlEncodedContent(new Dictionary<string, string> { ["Label"] = "Owned scoped build key", ["LifetimeDays"] = "1",
-                ["__RequestVerificationToken"] = Antiforgery(keysHtml) }));
-        var disclosure = await FollowAsync(creation);
-        var match = Regex.Match(disclosure, "<textarea[^>]*id=\"token\"[^>]*>(.*?)</textarea>", RegexOptions.Singleline);
-        if (!match.Success) throw new InvalidDataException("The ordinary framework key disclosure is absent.");
-        api.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", WebUtility.HtmlDecode(match.Groups[1].Value).Trim());
+        await CreateKeyAsync();
         Assert.That((await api.GetAsync("/api/v1/users/current")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
         await DelegationAsync(services, administrator, csrf);
         using (var denied = await api.PutAsync($"/api/v1/agents/{agentId}/authorization",
@@ -89,14 +109,25 @@ internal sealed class ScopedKeyScenario : IDisposable
             Assert.That((await api.GetAsync(href)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
         Assert.That((await api.GetAsync($"/api/v1/builds/{protectedId}")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        using (var protectedOutput = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/builds/{protectedId}/output")))
+        {
+            protectedOutputHref = protectedOutput.RootElement.GetProperty("items").EnumerateArray().First(e => e.GetProperty("kind").GetString() == "data")
+                .GetProperty("content").GetProperty("href").GetString();
+            Assert.That((await administrator.GetByteArrayAsync(protectedOutputHref)).Length, Is.Positive);
+            Assert.That((await api.GetAsync(protectedOutputHref)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That((await api.GetAsync($"/api/v1/builds/{protectedId}/output")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        }
 
         buildId = await SubmitAsync(api, "P_LocalSmoke");
         await FinishedAsync(api, buildId);
         using (var artifacts = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}/artifacts")))
             artifactHref = artifacts.RootElement.GetProperty("items")[0].GetProperty("href").GetString();
         using (var output = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}/output")))
+        {
+            resumeCursor = output.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString();
             outputHref = output.RootElement.GetProperty("items").EnumerateArray().First(i => i.GetProperty("kind").GetString() == "data")
                 .GetProperty("content").GetProperty("href").GetString();
+        }
         Assert.That((await api.GetByteArrayAsync(artifactHref)).Length, Is.Positive);
         Assert.That((await api.GetByteArrayAsync(outputHref)).Length, Is.Positive);
         await FailureAndCancellationAsync(administrator, csrf);
@@ -111,9 +142,24 @@ internal sealed class ScopedKeyScenario : IDisposable
         await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
     }
 
-    internal async Task AfterRestartAndRevokeAsync()
+    internal async Task AfterRestartAndRevokeAsync(IServiceProvider services, HttpClient administrator)
     {
         await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+        var cursorPath = $"/api/v1/builds/{buildId}/output?cursor=" + Uri.EscapeDataString(resumeCursor!);
+        using (var resumed = await api.GetAsync(cursorPath)) Assert.That(resumed.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        outputClock.Advance(TimeSpan.FromMinutes(16));
+        using (var expired = await api.GetAsync(cursorPath))
+        {
+            Assert.That(expired.StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+            using var problem = JsonDocument.Parse(await expired.Content.ReadAsStringAsync());
+            Assert.That(problem.RootElement.GetProperty("code").GetString(), Is.EqualTo("cursor_expired"));
+            using var recovered = await api.GetAsync(problem.RootElement.GetProperty("recovery").GetProperty("href").GetString());
+            Assert.That(recovered.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+        using (var wrongActor = await administrator.GetAsync(cursorPath))
+            Assert.That(wrongActor.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest), "Cursor ownership is checked before expiry recovery.");
+        using (var tampered = await api.GetAsync(cursorPath[..^1] + "!"))
+            Assert.That(tampered.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
         var id = Regex.Match(html, "name=\"id\"[^>]*value=\"([^\"]+)\"");
         if (!id.Success) throw new InvalidDataException("The ordinary own-key metadata is absent.");
@@ -122,6 +168,142 @@ internal sealed class ScopedKeyScenario : IDisposable
                 ["__RequestVerificationToken"] = Antiforgery(html) }));
         Assert.That(revoked.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
         await AssertCurrentAsync(HttpStatusCode.Unauthorized, HttpStatusCode.Unauthorized);
+        await RetainedAdminBytesAsync(administrator);
+        await CreateKeyAsync();
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+        var shorterKey = api.DefaultRequestHeaders.Authorization;
+        await CreateKeyAsync(lifetimeDays: 3);
+        var longerKey = api.DefaultRequestHeaders.Authorization;
+        api.DefaultRequestHeaders.Authorization = shorterKey;
+        validationClock.Advance(TimeSpan.FromDays(2));
+        await AssertCurrentAsync(HttpStatusCode.Unauthorized, HttpStatusCode.Unauthorized);
+        await RetainedAdminBytesAsync(administrator);
+        api.DefaultRequestHeaders.Authorization = longerKey;
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+        await RetentionAsync(services, administrator);
+    }
+
+    private async Task RetainedAdminBytesAsync(HttpClient administrator)
+    {
+        Assert.That((await administrator.GetByteArrayAsync(artifactHref)).Length, Is.Positive);
+        Assert.That((await administrator.GetByteArrayAsync(outputHref)).Length, Is.Positive);
+    }
+
+    private async Task RetentionAsync(IServiceProvider services, HttpClient administrator)
+    {
+        var databases = services.GetRequiredService<IDbContextFactory<VivariumDbContext>>();
+        RuntimeOutputRange[] original;
+        await using (var database = await databases.CreateDbContextAsync())
+            original = await database.RuntimeOutputRanges.AsNoTracking().Where(r => r.BuildId == buildId).OrderBy(r => r.ReceiptOrder).ToArrayAsync();
+        var producerHash = System.Security.Cryptography.SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(original));
+        using var current = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}/output"));
+        var currentCursor = current.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString()!;
+        var entryId = Guid.Parse(new Uri(origin, outputHref).Segments[^2].Trim('/'));
+        var stored = await services.GetRequiredService<IObjectStorage>().DownloadAsync(new GetDownloadUrl(
+            original.Single(r => r.Id == entryId).ObjectKey!, "owned-output.bin"));
+        using var privateStorage = new HttpClient(new HttpClientHandler { UseCookies = false, AllowAutoRedirect = false })
+            { Timeout = TimeSpan.FromSeconds(15) };
+        Assert.That((await privateStorage.GetAsync(stored.Url)).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        await using (var database = await databases.CreateDbContextAsync())
+        {
+            await database.Database.ExecuteSqlRawAsync("""
+                CREATE TABLE "OwnedRetentionDeleteFault" ("RangeId" uuid PRIMARY KEY);
+                CREATE FUNCTION public.owned_reject_retention_delete_mark() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN IF OLD."DeletedAt" IS NULL AND NEW."DeletedAt" IS NOT NULL AND EXISTS (
+                    SELECT 1 FROM "OwnedRetentionDeleteFault" fault WHERE fault."RangeId" = NEW."RangeId")
+                    THEN RAISE EXCEPTION 'Owned retention deletion commit fault' USING ERRCODE = '23514'; END IF;
+                    RETURN NEW; END $$;
+                CREATE TRIGGER "OwnedRetention_DeleteCommitFault" BEFORE UPDATE ON "RuntimeOutputExpiries"
+                    FOR EACH ROW EXECUTE FUNCTION public.owned_reject_retention_delete_mark();
+                """);
+            await database.Database.ExecuteSqlInterpolatedAsync($"""INSERT INTO "OwnedRetentionDeleteFault" ("RangeId") VALUES ({entryId})""");
+        }
+        // Only the production retention clock advances. The just-issued pagination cursor has not
+        // aged out: this checks the retained-view epoch rather than the separate 15-minute timeout.
+        retentionClock.Advance(TimeSpan.FromDays(2));
+        using var bound = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var faultObserved = false;
+        while (true)
+        {
+            try { await services.GetRequiredService<RuntimeOutputRetention>().TickAsync(bound.Token); }
+            catch (Npgsql.PostgresException error) when (error.SqlState == "23514" && !faultObserved)
+            {
+                faultObserved = true;
+                await using var state = await databases.CreateDbContextAsync(bound.Token);
+                Assert.That(await state.RuntimeOutputExpiries.AnyAsync(e => e.RangeId == entryId && e.DeletedAt == null, bound.Token), Is.True);
+                Assert.That((await privateStorage.GetAsync(stored.Url, bound.Token)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+                Assert.That((await api.GetAsync(outputHref, bound.Token)).StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+                await state.Database.ExecuteSqlRawAsync("""
+                    DROP TRIGGER "OwnedRetention_DeleteCommitFault" ON "RuntimeOutputExpiries";
+                    DROP FUNCTION public.owned_reject_retention_delete_mark();
+                    DROP TABLE "OwnedRetentionDeleteFault";
+                    """, bound.Token);
+            }
+            await using var database = await databases.CreateDbContextAsync(bound.Token);
+            if (await database.RuntimeOutputExpiries.AnyAsync(e => e.RangeId == entryId && e.DeletedAt != null, bound.Token)) break;
+        }
+        Assert.That(faultObserved, Is.True, "A physical deletion succeeded before its acknowledgement transaction failed; retry must adopt it.");
+        using (var expiredCursor = await api.GetAsync($"/api/v1/builds/{buildId}/output?cursor=" + Uri.EscapeDataString(currentCursor)))
+        {
+            Assert.That(expiredCursor.StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+            using var problem = JsonDocument.Parse(await expiredCursor.Content.ReadAsStringAsync());
+            Assert.That(problem.RootElement.GetProperty("code").GetString(), Is.EqualTo("cursor_expired"));
+            using var recovered = JsonDocument.Parse(await api.GetStringAsync(problem.RootElement.GetProperty("recovery").GetProperty("href").GetString()));
+            Assert.That(recovered.RootElement.GetProperty("output").GetProperty("state").GetString(), Is.EqualTo("complete-with-gaps"));
+            Assert.That(recovered.RootElement.GetProperty("output").GetProperty("retention").GetProperty("days").GetInt32(), Is.EqualTo(1));
+            retainedCursor = recovered.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString();
+            Assert.That(recovered.RootElement.GetProperty("items").EnumerateArray().All(e =>
+                e.GetProperty("kind").GetString() == "gap" && e.GetProperty("reason").GetString() == "retention" && !e.TryGetProperty("content", out _)), Is.True);
+        }
+        Assert.That((await api.GetAsync(outputHref)).StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+        Assert.That((await privateStorage.GetAsync(stored.Url)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That((await api.GetAsync($"/api/v1/builds/{buildId}/output/{Guid.NewGuid()}/content")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That((await api.GetAsync(protectedOutputHref)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        await using (var database = await databases.CreateDbContextAsync())
+        {
+            var unchanged = await database.RuntimeOutputRanges.AsNoTracking().Where(r => r.BuildId == buildId).OrderBy(r => r.ReceiptOrder).ToArrayAsync();
+            Assert.That(System.Security.Cryptography.SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(unchanged)), Is.EqualTo(producerHash));
+            Assert.That(await database.AuditEvents.CountAsync(e => e.Action == "build.output.expired" && e.TargetId == buildId.ToString()), Is.EqualTo(1));
+        }
+        var shell = await administrator.GetStringAsync("/");
+        using var session = JsonDocument.Parse(Regex.Match(shell, "<script id=\"vivarium-session\" type=\"application/json\">(.*?)</script>", RegexOptions.Singleline).Groups[1].Value);
+        var csrf = session.RootElement.GetProperty("requestVerificationToken").GetString()!;
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, RolePath, null, HttpStatusCode.NoContent);
+        Assert.That((await api.GetAsync(outputHref)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
+        Assert.That((await api.GetAsync(outputHref)).StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+    }
+
+    internal async Task AfterRetentionRestartAsync(Func<string> failureTypes)
+    {
+        using var build = await api.GetAsync($"/api/v1/builds/{buildId}");
+        Assert.That(build.StatusCode, Is.EqualTo(HttpStatusCode.OK), failureTypes());
+        using var expired = await api.GetAsync(outputHref);
+        Assert.That(expired.StatusCode, Is.EqualTo(HttpStatusCode.Gone));
+        using var resumed = await api.GetAsync($"/api/v1/builds/{buildId}/output?cursor=" + Uri.EscapeDataString(retainedCursor!));
+        Assert.That(resumed.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        using var output = JsonDocument.Parse(await resumed.Content.ReadAsStringAsync());
+        Assert.That(output.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
+        Assert.That(output.RootElement.GetProperty("output").GetProperty("state").GetString(), Is.EqualTo("complete-with-gaps"));
+    }
+
+    private async Task CreateKeyAsync(int lifetimeDays = 1)
+    {
+        var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
+        using var creation = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Create",
+            new FormUrlEncodedContent(new Dictionary<string, string> { ["Label"] = "Owned scoped build key", ["LifetimeDays"] = lifetimeDays.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["__RequestVerificationToken"] = Antiforgery(html) }));
+        var disclosure = await FollowAsync(creation);
+        var match = Regex.Match(disclosure, "<textarea[^>]*id=\"token\"[^>]*>(.*?)</textarea>", RegexOptions.Singleline);
+        if (!match.Success) throw new InvalidDataException("The ordinary framework key disclosure is absent.");
+        api.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", WebUtility.HtmlDecode(match.Groups[1].Value).Trim());
+    }
+
+    private sealed class ScenarioClock : TimeProvider
+    {
+        private long offset;
+        public override DateTimeOffset GetUtcNow() => System.GetUtcNow().AddTicks(Interlocked.Read(ref offset));
+        internal void Advance(TimeSpan elapsed) => Interlocked.Add(ref offset, elapsed.Ticks);
     }
 
     private async Task DelegationAsync(IServiceProvider services, HttpClient administrator, string csrf)

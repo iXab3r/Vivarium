@@ -15,6 +15,7 @@ public sealed class HostNodeConfiguration(IConfiguration configuration,
             ["CertificatePath"] = "Kestrel:Certificates:Default:Path",
             ["CertificatePassword"] = "Kestrel:Certificates:Default:Password",
             ["DefinitionSources"] = "Vivarium:Definitions",
+            ["OutputRetentionDays"] = "Vivarium:OutputRetentionDays",
         })
 {
     public override bool ApplyOnRestart => true;

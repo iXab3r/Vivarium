@@ -65,6 +65,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 if (entry.Phase == "PREPARING") StartPreparation(entry.BuildId, token);
             }
         }
+        if (preparations.Count >= 2) return;
         var claimed = await ClaimAsync(token);
         if (claimed is not null) StartPreparation(claimed.Value, token);
     }

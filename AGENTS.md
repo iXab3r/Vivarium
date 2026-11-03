@@ -28,7 +28,8 @@ HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real W
 independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
 and retained bytes/cursors after a Host restart have selected integration evidence. An ordinary key
 now has selected native P/Q isolation, project delegation, grant/eligibility/revocation, failure and
-queue/running-cancel evidence. Full R0 bindings, fault/retention, compatibility and final review gates
+queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
+evidence now survives a cold Host restart. Full R0 bindings, remaining output/fault, compatibility and final review gates
 remain open. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.

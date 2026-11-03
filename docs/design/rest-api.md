@@ -749,6 +749,18 @@ contains explicit `retention` gaps for purged ranges and reports retained comple
 relabel an empty retained tail as a complete original log. Cursors identify the retained view they
 can resume. Retention markers are availability metadata, not late producer bytes rewriting a sealed log.
 
+The fresh Host publishes `output.retention` with nullable `days` and a nonnegative `epoch`.
+Automatic age expiry is disabled when the managed Host `OutputRetentionDays` setting is absent/null;
+an explicit period from 1 through 3650 days applies to completed Builds by their finish time after
+Host restart. The worker processes one completed Build and at most 64 pending byte deletions per
+tick, independently of execution coordination. Committed expiry remains effective if the policy is
+later disabled. The PostgreSQL availability mark commits before retryable Storage deletion; the
+producer range, hash and published position remain immutable. A current authorized read of known
+expired content returns `410 output_expired`; unknown/hidden entries remain 404. A new epoch expires
+an otherwise young cursor with the same `cursor_expired` recovery contract. A fresh view reports
+`retention` gaps and `complete-with-gaps` when producer bytes were purged. This selected Host policy
+does not implement full TeamCity/per-project retention configuration.
+
 The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
 registered-secret masking before transport/persistence, per-stream sequence identity, independent
 output acknowledgement and the terminal watermark barrier. Persist content before publishing its
