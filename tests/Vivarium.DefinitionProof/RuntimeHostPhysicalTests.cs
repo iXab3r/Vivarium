@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Vivarium.Controller.Hosting;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Catalog;
 
 namespace Vivarium.DefinitionProof;
 
@@ -214,6 +215,67 @@ public sealed class RuntimeHostPhysicalTests
                 Assert.That(applied, Is.True);
                 using var catalog = JsonDocument.Parse(await http.GetStringAsync("/api/v1/projects/P/build-configurations"));
                 Assert.That(catalog.RootElement.GetProperty("items")[0].GetProperty("id").GetString(), Is.EqualTo("P_LocalSmoke"));
+                using (var noEnrollmentCsrf = await http.PostAsync("/api/v1/enrollment-tokens", content: null))
+                    Assert.That(noEnrollmentCsrf.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+                using var enrollmentRequest = new HttpRequestMessage(HttpMethod.Post, "/api/v1/enrollment-tokens");
+                enrollmentRequest.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                using var enrollmentResponse = await http.SendAsync(enrollmentRequest);
+                Assert.That(enrollmentResponse.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+                using var enrollment = JsonDocument.Parse(await enrollmentResponse.Content.ReadAsStringAsync());
+                using var publicCertificate = X509CertificateLoader.LoadPkcs12FromFile(certificate.Path, null,
+                    X509KeyStorageFlags.EphemeralKeySet);
+                var agentBootstrap = Path.Combine(root, "agent-bootstrap.json");
+                await File.WriteAllTextAsync(agentBootstrap, JsonSerializer.Serialize(new
+                {
+                    controllerUrl = origin, certFingerprint = publicCertificate.GetCertHashString(HashAlgorithmName.SHA256),
+                    enrollToken = enrollment.RootElement.GetProperty("token").GetString(),
+                }));
+                var agentData = Path.Combine(root, "agent-data");
+                var agent = StartAgent(agentBootstrap, agentData);
+                var agentOutput = agent.StandardOutput.ReadToEndAsync();
+                var agentError = agent.StandardError.ReadToEndAsync();
+                try
+                {
+                    var registration = await WaitAgentAsync(http, value => value.GetProperty("connected").GetBoolean());
+                    var agentId = registration.GetProperty("id").GetString()!;
+                    using var authorize = new HttpRequestMessage(HttpMethod.Put, "/api/v1/agents/" + agentId + "/authorization");
+                    authorize.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                    authorize.Content = new StringContent("{\"authorized\":true}", System.Text.Encoding.UTF8, "application/json");
+                    using var authorization = await http.SendAsync(authorize);
+                    Assert.That(authorization.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+                    var proven = await WaitAgentAsync(http, value => value.GetProperty("authorized").GetBoolean()
+                        && value.GetProperty("reconciled").GetBoolean() && value.GetProperty("connected").GetBoolean());
+                    Assert.That(proven.GetProperty("connectionGeneration").GetInt64(), Is.GreaterThan(1),
+                        "Credential delivery must close the pending stream and prove the persisted bearer in a new Hello.");
+                    Assert.That(proven.GetProperty("teamCityId").GetInt32(), Is.Positive);
+                    Assert.That(proven.GetProperty("ready").GetBoolean(), Is.False,
+                        "A real connection cannot invent the missing Git enablement projection.");
+                    await File.WriteAllTextAsync(Path.Combine(definitions, ".vivarium/repository.yaml"),
+                        DefinitionGitReader.Manifest("host-fixture", control: true, agents: true));
+                    var agentDocument = Path.Combine(definitions, ".vivarium/agents", agentId + ".yaml");
+                    Directory.CreateDirectory(Path.GetDirectoryName(agentDocument)!);
+                    await File.WriteAllTextAsync(agentDocument, $"""
+                        apiVersion: vivarium.io/v1alpha1
+                        kind: Agent
+                        id: {agentId}
+                        spec:
+                          enabled: true
+                        """);
+                    await SourceCompiler.GitAsync(definitions, "add", "--all");
+                    await SourceCompiler.GitAsync(definitions, "commit", "-m", "fixture: enable the enrolled Agent through Git");
+                    await ReconcileAsync(http, session.RootElement.GetProperty("requestVerificationToken").GetString()!);
+                    var ready = await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId
+                        && value.GetProperty("ready").GetBoolean());
+                    Assert.That(ready.GetProperty("teamCityId").GetInt32(), Is.EqualTo(proven.GetProperty("teamCityId").GetInt32()));
+                    Assert.That(ready.GetProperty("appliedConfigurationRevision").GetString(), Does.StartWith("host-fixture@"));
+                }
+                finally
+                {
+                    if (!agent.HasExited) agent.Kill(entireProcessTree: true);
+                    await agent.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+                    await Task.WhenAll(agentOutput, agentError).WaitAsync(TimeSpan.FromSeconds(10));
+                    agent.Dispose();
+                }
                 var installationRoles = "/api/v1/users/53a74e90-6a7c-4965-a530-8d498c4e523e/roles/SYSTEM_ADMIN/g";
                 using (var noCsrf = await http.PutAsync(installationRoles, content: null))
                     Assert.That(noCsrf.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
@@ -293,6 +355,28 @@ public sealed class RuntimeHostPhysicalTests
                 Assert.That((await LoginAsync(http, oldPassword)).StatusCode, Is.EqualTo(HttpStatusCode.OK), "Old password must fail normal login.");
                 Assert.That((await LoginAsync(http, restartedCapture.Password!)).StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                 Assert.That((await http.GetAsync("/api/v1/build-configurations/P_LocalSmoke")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
+                var oldAgent = priorAgents.RootElement.GetProperty("items")[0];
+                var oldAgentId = oldAgent.GetProperty("id").GetString();
+                var oldGeneration = oldAgent.GetProperty("connectionGeneration").GetInt64();
+                var reconnected = StartAgent(Path.Combine(root, "agent-bootstrap.json"), Path.Combine(root, "agent-data"));
+                var reconnectOutput = reconnected.StandardOutput.ReadToEndAsync();
+                var reconnectError = reconnected.StandardError.ReadToEndAsync();
+                try
+                {
+                    var currentAgent = await WaitAgentAsync(http, value => value.GetProperty("connected").GetBoolean()
+                        && value.GetProperty("reconciled").GetBoolean());
+                    Assert.That(currentAgent.GetProperty("id").GetString(), Is.EqualTo(oldAgentId));
+                    Assert.That(currentAgent.GetProperty("connectionGeneration").GetInt64(), Is.GreaterThan(oldGeneration));
+                    Assert.That(currentAgent.GetProperty("authorized").GetBoolean(), Is.True);
+                }
+                finally
+                {
+                    if (!reconnected.HasExited) reconnected.Kill(entireProcessTree: true);
+                    await reconnected.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+                    await Task.WhenAll(reconnectOutput, reconnectError).WaitAsync(TimeSpan.FromSeconds(10));
+                    reconnected.Dispose();
+                }
                 var objects = app.Services.GetRequiredService<IObjectStorage>();
                 var download = await objects.DownloadAsync(new GetDownloadUrl("owned-r0/object", "owned.bin"));
                 using var retained = await http.GetAsync(download.Url);
@@ -340,6 +424,52 @@ public sealed class RuntimeHostPhysicalTests
         var path = Path.Combine(root, name + ".pfx");
         File.WriteAllBytes(path, certificate.Export(X509ContentType.Pfx));
         return (path, certificate.Thumbprint);
+    }
+
+    private static System.Diagnostics.Process StartAgent(string bootstrap, string data)
+    {
+        var directory = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Vivarium.slnx"))) directory = directory.Parent;
+        var root = directory?.FullName ?? throw new InvalidOperationException("Repository root is absent.");
+        var dotnet = Path.GetFullPath(Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
+            "../../..", OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet"));
+        return ProofProcess.Start(dotnet, [Path.Combine(root, "src/Vivarium.Agent/bin/Debug/net10.0/Vivarium.Agent.dll"),
+            "--config", bootstrap, "--data", data], root);
+    }
+
+    private static async Task<JsonElement> WaitAgentAsync(HttpClient http, Func<JsonElement, bool> condition)
+    {
+        var until = DateTimeOffset.UtcNow.AddSeconds(45);
+        while (DateTimeOffset.UtcNow < until)
+        {
+            using var response = await http.GetAsync("/api/v1/agents");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            foreach (var value in body.RootElement.GetProperty("items").EnumerateArray())
+                if (condition(value)) return value.Clone();
+            await Task.Delay(100);
+        }
+        throw new AssertionException("The owned Agent did not reach the required public state.");
+    }
+
+    private static async Task ReconcileAsync(HttpClient http, string csrf)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/configuration-changes/reconcile");
+        request.Headers.Add("RequestVerificationToken", csrf);
+        using var response = await http.SendAsync(request);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+        var until = DateTimeOffset.UtcNow.AddSeconds(60);
+        while (DateTimeOffset.UtcNow < until)
+        {
+            using var status = await http.GetAsync(response.Headers.Location);
+            Assert.That(status.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var change = JsonDocument.Parse(await status.Content.ReadAsStringAsync());
+            var state = change.RootElement.GetProperty("state").GetString();
+            if (state == "applied") return;
+            Assert.That(state, Is.EqualTo("pending").Or.EqualTo("evaluated"));
+            await Task.Delay(100);
+        }
+        throw new AssertionException("The owned Git policy did not activate.");
     }
 
     private sealed class PrivateStartupLog : ILoggerProvider, ILogger

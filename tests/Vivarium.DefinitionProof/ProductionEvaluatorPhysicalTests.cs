@@ -123,6 +123,23 @@ public sealed class ProductionEvaluatorPhysicalTests
     {
         var invocation = Guid.NewGuid();
         var evaluator = new IsolatedDefinitionEvaluator(invocation);
+        try
+        {
+            await KillCoordinatorAfterAuthorStartsAsync(invocation);
+            // Neither the Host timer nor its finally/cleanup can now stop the container.
+            var stopped = await ProofProcess.RunAsync("docker", ["wait", evaluator.Name], deadline: TimeSpan.FromSeconds(40));
+            Assert.That(stopped.Text, Is.EqualTo("137"));
+            var final = await ProofProcess.RunAsync("docker", ["inspect", evaluator.Name]);
+            using var state = JsonDocument.Parse(final.Output);
+            Assert.That(state.RootElement[0].GetProperty("State").GetProperty("Running").GetBoolean(), Is.False);
+        }
+        finally { await IsolatedDefinitionEvaluator.RemoveOwnedAsync(evaluator.Name); }
+        await AssertRemovedAsync(evaluator);
+    }
+
+    internal static async Task KillCoordinatorAfterAuthorStartsAsync(Guid invocation)
+    {
+        var evaluator = new IsolatedDefinitionEvaluator(invocation);
         var dotnet = Path.GetFullPath(Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
             "../../..", OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet"));
         using var worker = ProofProcess.Start(dotnet,
@@ -142,19 +159,11 @@ public sealed class ProductionEvaluatorPhysicalTests
             Assert.That(running, Is.True, "Do not substitute compile-only interruption for actual running author code.");
             worker.Kill(entireProcessTree: true);
             await worker.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
-            // Neither the Host timer nor its finally/cleanup can now stop the container.
-            var stopped = await ProofProcess.RunAsync("docker", ["wait", evaluator.Name], deadline: TimeSpan.FromSeconds(40));
-            Assert.That(stopped.Text, Is.EqualTo("137"));
-            var final = await ProofProcess.RunAsync("docker", ["inspect", evaluator.Name]);
-            using var state = JsonDocument.Parse(final.Output);
-            Assert.That(state.RootElement[0].GetProperty("State").GetProperty("Running").GetBoolean(), Is.False);
         }
         finally
         {
             if (!worker.HasExited) { worker.Kill(entireProcessTree: true); await worker.WaitForExitAsync(); }
-            await IsolatedDefinitionEvaluator.RemoveOwnedAsync(evaluator.Name);
         }
-        await AssertRemovedAsync(evaluator);
     }
 
     private static async Task AssertRemovedAsync(IsolatedDefinitionEvaluator evaluator)

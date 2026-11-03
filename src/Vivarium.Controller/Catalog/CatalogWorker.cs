@@ -4,7 +4,7 @@ using Vivarium.Controller.Configuration.Git;
 namespace Vivarium.Controller.Catalog;
 
 /// <summary>Resume journalled operations; a Git push alone never invents a managed actor.</summary>
-internal sealed class CatalogWorker(IConfiguration configuration, IServiceProvider services,
+internal sealed class CatalogWorker(IServiceProvider services,
     ILogger<CatalogWorker> logger) : BackgroundService
 {
     internal static bool Configured(IConfiguration configuration) =>
@@ -13,6 +13,8 @@ internal sealed class CatalogWorker(IConfiguration configuration, IServiceProvid
     internal static CatalogSources Sources(IConfiguration configuration)
     {
         var section = configuration.GetSection("Vivarium:Definitions");
+        // Recovery still owns journalled containers when the optional source resource was removed.
+        if (!Configured(configuration)) return new("", "", []);
         return new(section["RepositoryId"] ?? throw new InvalidDataException("Configure the definition repository identity."),
             section["Path"] ?? throw new InvalidDataException("Configure the definition repository path."),
             section.GetSection("SettingsRepositories").Get<DefinitionRepository[]>() ?? []);
@@ -24,8 +26,7 @@ internal sealed class CatalogWorker(IConfiguration configuration, IServiceProvid
         {
             try
             {
-                if (Configured(configuration))
-                    await services.GetRequiredService<CatalogService>().RecoverAsync(stoppingToken);
+                await services.GetRequiredService<CatalogService>().RecoverAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (CatalogBusyException) { }

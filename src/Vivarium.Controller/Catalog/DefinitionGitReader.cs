@@ -62,7 +62,8 @@ public sealed class DefinitionGitReader(string repositoryPath, string repository
                 throw new InvalidDataException("The settings tree exceeds its byte bound.");
             // Only fixed declaration files and the version manifest enter the evaluator boundary.
             if (path == ".vivarium/repository.yaml" || path.EndsWith("/Control.g.cs", StringComparison.Ordinal)
-                || path.EndsWith("/Settings.g.cs", StringComparison.Ordinal) || path.EndsWith("/UserCode.cs", StringComparison.Ordinal))
+                || path.EndsWith("/Settings.g.cs", StringComparison.Ordinal) || path.EndsWith("/UserCode.cs", StringComparison.Ordinal)
+                || path.StartsWith(".vivarium/agents/", StringComparison.Ordinal) && path.EndsWith(".yaml", StringComparison.Ordinal))
             {
                 var blob = await git.RunBytesAsync(["cat-file", "blob", fields[2]], environment, cancellationToken: token);
                 if (blob.Length != size) throw new InvalidDataException("Git blob size differs.");
@@ -70,17 +71,18 @@ public sealed class DefinitionGitReader(string repositoryPath, string repository
             }
         }
         if (!sources.TryGetValue(".vivarium/repository.yaml", out var manifest)
-            || manifest.ReplaceLineEndings("\n").TrimEnd('\n') != Manifest(repositoryId, control))
+            || manifest.ReplaceLineEndings("\n").TrimEnd('\n') != Manifest(repositoryId, control)
+                && (!control || manifest.ReplaceLineEndings("\n").TrimEnd('\n') != Manifest(repositoryId, control, agents: true)))
             throw new InvalidDataException("The selected definition repository/schema is unsupported.");
         return new(repositoryId, commit, sources);
     }
 
-    public static string Manifest(string repositoryId, bool control)
+    public static string Manifest(string repositoryId, bool control, bool agents = false)
     {
         DefinitionValidation.Identity(repositoryId);
         if (repositoryId.Any(c => c is ':' or '#' or '"' or '\'' || char.IsWhiteSpace(c)))
             throw new InvalidDataException("The repository identity is invalid.");
-        return $"""
+        var text = $"""
             apiVersion: vivarium.io/v1alpha1
             kind: Repository
             id: {repositoryId}
@@ -89,6 +91,7 @@ public sealed class DefinitionGitReader(string repositoryPath, string repository
               documentKinds:
                 - {(control ? "Project" : "Settings")}
             """.ReplaceLineEndings("\n");
+        return agents && control ? text + "\n    - Agent" : text;
     }
 
     private static void ObjectId(string value)

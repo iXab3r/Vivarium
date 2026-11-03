@@ -31,6 +31,10 @@ invocation identities, rejects interrupted evaluation and retains active/LKG; al
 evaluations retain their original compiler/contract identity and are not executed again.
 The journal pins each selected settings member before evaluating its code. Restart cannot silently
 resolve that member to a newer head or recompute a completed phase with changed compiler inputs.
+Recovery owns journalled invocation identities even if the optional source resource is renamed or
+removed. It cleans those containers and rejects pending operations for the removed owner rather
+than adopting them under the new resource. The compiler contract fingerprint includes the Host
+module build identity, covering trusted project/scaffold changes as well as embedded declarations.
 The activation transaction also projects stable positive PostgreSQL Project/BuildType keys and
 their exact owner relations. Per-BuildType definitions are immutable, foreign-key-backed members
 of the materialized revision; rename updates the current index without replacing identity or old
@@ -39,6 +43,14 @@ silently convert a retained configuration to a template or move it between Proje
 retain their separately due reference contracts.
 
 ## Selected source boundary
+
+The control manifest may additionally declare `Agent`. Canonical
+`.vivarium/agents/{agentId}.yaml` documents retain the existing v1alpha1 `Agent`/`spec.enabled`
+shape; they are controller-only desired policy, never evaluator inputs or build submission.
+Their effective values are retained in the immutable catalogue snapshot and projected to registered
+Agents in the same activation transaction. Changes additionally require current global
+`enable_disable_agent`. Predeclared Agents receive the accepted projection when they enroll.
+Removing these declarations is rejected until the owning removal contract is implemented.
 
 R0 starts with a managed-local control repository on its configured authoritative ref. Its Project
 and BuildType are real catalogue identities. The selected declarations use

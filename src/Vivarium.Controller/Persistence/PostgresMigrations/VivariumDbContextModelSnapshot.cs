@@ -296,6 +296,163 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Agents.AgentEnrollment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClaimedAgentId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClaimedAgentId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("AgentEnrollments");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Agents.AgentRegistration", b =>
+                {
+                    b.Property<string>("AgentId")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<string>("AdvertisedCapabilitiesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("AuthTokenHash")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Authorized")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("ConnectionGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CredentialGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CurrentSessionId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentWorkloadId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomParametersJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("DesiredEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("DesiredName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DesiredRevision")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EnrollmentTokenHash")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("FirstSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Health")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HealthReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LastHeartbeatAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("LastHeartbeatSequence")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<DateTimeOffset>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("MaintenanceDrain")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NegotiatedCapabilitiesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ProcessInstanceId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProtectedPendingAuthToken")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Quarantined")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("Reconciled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ReportedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReportedParametersJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("SessionAuthenticated")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("SessionCredentialGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StaticObservationJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("TeamCityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("TeamCityId"));
+
+                    b.HasKey("AgentId");
+
+                    b.HasIndex("TeamCityId")
+                        .IsUnique();
+
+                    b.ToTable("AgentRegistrations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AgentRegistrations_EnabledProjection", "NOT \"DesiredEnabled\" OR \"DesiredRevision\" IS NOT NULL");
+
+                            t.HasCheckConstraint("CK_AgentRegistrations_Generations", "\"CredentialGeneration\" >= 0 AND \"ConnectionGeneration\" >= 0 AND \"SessionCredentialGeneration\" >= 0");
+
+                            t.HasCheckConstraint("CK_AgentRegistrations_Health", "\"Health\" IN ('UNKNOWN','HEALTHY','UNHEALTHY')");
+
+                            t.HasCheckConstraint("CK_AgentRegistrations_HeartbeatSequence", "\"LastHeartbeatSequence\" BETWEEN 0 AND 18446744073709551615");
+
+                            t.HasCheckConstraint("CK_AgentRegistrations_TeamCityId", "\"TeamCityId\" > 0");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Auditing.PersistentAuditEvent", b =>
                 {
                     b.Property<string>("Id")
@@ -938,6 +1095,14 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Navigation("Application");
 
                     b.Navigation("Authorization");
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Agents.AgentEnrollment", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Agents.AgentRegistration", null)
+                        .WithMany()
+                        .HasForeignKey("ClaimedAgentId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Vivarium.Controller.Catalog.CatalogActive", b =>

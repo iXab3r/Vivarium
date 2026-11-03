@@ -261,5 +261,35 @@ public sealed class ProductionCatalogPhysicalTests
         Assert.That(foreign.State, Is.EqualTo("REJECTED"));
         await using (var database = await factory.CreateDbContextAsync())
             Assert.That((await database.ActiveCatalogs.SingleAsync()).RevisionId, Is.EqualTo(boundRevision));
+
+        var abandoned = await handoff.SubmitAsync(actor);
+        var invocation = Guid.NewGuid();
+        var evaluator = new IsolatedDefinitionEvaluator(invocation);
+        await using (var database = await factory.CreateDbContextAsync())
+        {
+            // Arrange the durable boundary left by a dead coordinator; code still executes through
+            // the real production evaluator, never a fake Docker or alternate compilation path.
+            database.CatalogEvaluations.Add(new CatalogEvaluation
+            { Id = invocation, ChangeId = abandoned.Id, ProjectId = "P", Phase = "SETTINGS", InputHashesJson = "{}" });
+            await database.SaveChangesAsync();
+        }
+        try
+        {
+            await ProductionEvaluatorPhysicalTests.KillCoordinatorAfterAuthorStartsAsync(invocation);
+            var removedSource = new CatalogService(factory, configuration, new("", "", []), TimeProvider.System);
+            Assert.That(await removedSource.RecoverAsync(), Is.EqualTo(1));
+            await using var database = await factory.CreateDbContextAsync();
+            var rejected = (await database.CatalogChanges.FindAsync(abandoned.Id))!;
+            Assert.That(rejected.State, Is.EqualTo("REJECTED"));
+            Assert.That(rejected.FailureCode, Is.EqualTo("source_configuration_changed"));
+            Assert.That(rejected.Origin, Is.EqualTo("MANAGED"));
+            Assert.That((await database.CatalogEvaluations.FindAsync(invocation))!.CleanupConfirmed, Is.True);
+            Assert.That((await database.ActiveCatalogs.SingleAsync()).RevisionId, Is.EqualTo(boundRevision));
+            Assert.That(await database.AuditEvents.AnyAsync(a => a.RequestId == abandoned.Id.ToString()
+                && a.Action == "configuration.activate" && a.TargetId == "local" && a.Outcome == "FAILED"), Is.True);
+            var remaining = await ProofProcess.RunAsync("docker", ["ps", "-a", "--filter", "name=^/" + evaluator.Name + "$", "--format", "{{.ID}}"]);
+            Assert.That(remaining.Text, Is.Empty);
+        }
+        finally { await IsolatedDefinitionEvaluator.RemoveOwnedAsync(evaluator.Name); }
     }
 }

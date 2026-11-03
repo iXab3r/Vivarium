@@ -32,7 +32,10 @@ public sealed class IsolatedDefinitionEvaluator
         return reader.ReadToEnd();
     }
 
-    public static string ContractHash(bool controlOnly = false) => Hash(Resource("DefinitionModel.cs") + "\0"
+    // The trusted project/scaffold/bounds live in this module as well as embedded source resources.
+    // Pin its build identity without relying on Assembly.Location (empty in a single-file publish).
+    public static string ContractHash(bool controlOnly = false) => Hash(typeof(IsolatedDefinitionEvaluator).Module.ModuleVersionId + "\0"
+        + Resource("DefinitionModel.cs") + "\0"
         + Resource("Evaluator.ControlReader.cs.txt") + (controlOnly ? "" : "\0" + Resource("Evaluator.Program.cs.txt")));
 
     public IsolatedDefinitionEvaluator(Guid invocation)

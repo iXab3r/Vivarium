@@ -5,6 +5,7 @@ using Vivarium.Controller.Identity;
 using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Tokens;
 using Vivarium.Controller.Catalog;
+using Vivarium.Controller.Agents;
 
 namespace Vivarium.Controller.Hosting;
 
@@ -33,6 +34,11 @@ public static class VivariumRuntime
         builder.Services.AddSingleton<CatalogService>();
         builder.Services.AddScoped<CatalogQueries>();
         builder.Services.AddHostedService<CatalogWorker>();
+        builder.Services.AddGrpc();
+        builder.Services.AddSingleton<AgentCredentials>();
+        builder.Services.AddSingleton<AgentLifecycleCoordinator>();
+        builder.Services.AddSingleton(provider => new AgentRegistry(timeProvider: provider.GetRequiredService<TimeProvider>()));
+        builder.Services.AddSingleton<RuntimeAgentSessions>();
         builder.WebHost.ConfigureKestrel(options =>
             options.Configure(builder.Configuration.GetSection("Kestrel"), reloadOnChange: false));
         builder.Services.DeferVivariumIdentityPreload();
@@ -73,6 +79,8 @@ public static class VivariumRuntime
         RuntimeIdentity.Map(app);
         app.MapAccess();
         app.MapCatalog();
+        app.MapRuntimeAgents();
+        app.MapGrpcService<RuntimeAgentHub>();
         app.MapWorkbench();
         app.MapVivariumTokens();
         app.MapGet("/health/live", () => Results.Text("Healthy"));

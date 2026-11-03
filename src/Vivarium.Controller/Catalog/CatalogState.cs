@@ -1,4 +1,5 @@
 using Vivarium.Definitions;
+using System.Text.Json.Serialization;
 
 namespace Vivarium.Controller.Catalog;
 
@@ -60,7 +61,9 @@ public sealed record CatalogMember(string RepositoryId, string Branch, string Co
 public sealed record CatalogProject(Project Control, EvaluatedDefinition Definition, string SettingsRepositoryId,
     string SettingsCommit, string SettingsPath);
 public sealed record CatalogDefinition(CatalogMember[] Members, CatalogProject[] Projects,
-    string CompilerImage, string CompilerSdk, string ContractHash, string SchemaVersion);
+    string CompilerImage, string CompilerSdk, string ContractHash, string SchemaVersion,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] CatalogAgentSetting[]? Agents = null);
+public sealed record CatalogAgentSetting(string Id, bool Enabled);
 
 public sealed record DefinitionRepository(string Id, string Path, string TrustReference);
 public sealed record CatalogSources(string RepositoryId, string Path, DefinitionRepository[] SettingsRepositories);

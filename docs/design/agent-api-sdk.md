@@ -20,6 +20,23 @@ names, user-role membership, VM provider verbs, or a UI framework.
 
 ## Current state
 
+The fresh D34/D35 Host now has a separate PostgreSQL-backed credential and session composition
+using the existing Agent binary, proto fields and bounded live-session kernel. An authorized current
+operator issues a single-use enrollment proof, observes the pending Agent, and authorizes credential
+delivery through native REST. Only a subsequent bearer-authenticated Hello reconciles the session.
+The positive TeamCity Agent facet and credential/connection generations survive Host and Agent
+restart. Pending credential delivery is Data Protection-protected; issuance and authorization commit
+with audit, and management reads never serialize credential entities. Human OIDC remains separate.
+
+For this installation, the control repository can declare canonical Agent enablement documents
+alongside its C# Project sources. Activation requires current `enable_disable_agent` when those
+declarations change. The applied Git projection and activation commit atomically; registration and
+activation share a short PostgreSQL fence so a newly enrolled Agent cannot miss its declared policy.
+Missing policy leaves an Agent disabled. The real Host test proves enrollment, authorization,
+bearer reconnect, Git enablement and cold identity continuity. This does not yet accept fresh Build
+assignment/completion, busy-session recovery, durable output, upgrades or the full Agent REST family.
+The legacy execution composition below remains available until its replacement gates pass.
+
 The Phase 1 implementation already provides:
 
 - One bidirectional proto3 `AgentHub.Session` stream per agent over pinned TLS.

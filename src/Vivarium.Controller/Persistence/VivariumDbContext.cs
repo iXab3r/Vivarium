@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Identity;
 using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Catalog;
+using Vivarium.Controller.Agents;
 
 namespace Vivarium.Controller.Persistence;
 
@@ -25,10 +26,35 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<CatalogProjectIdentity> CatalogProjects => Set<CatalogProjectIdentity>();
     public DbSet<CatalogBuildType> CatalogBuildTypes => Set<CatalogBuildType>();
     public DbSet<CatalogBuildDefinition> CatalogBuildDefinitions => Set<CatalogBuildDefinition>();
+    public DbSet<AgentRegistration> AgentRegistrations => Set<AgentRegistration>();
+    public DbSet<AgentEnrollment> AgentEnrollments => Set<AgentEnrollment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        var agent = modelBuilder.Entity<AgentRegistration>();
+        agent.HasKey(entry => entry.AgentId);
+        agent.Property(entry => entry.AgentId).UseCollation("C");
+        agent.Property(entry => entry.TeamCityId).UseIdentityAlwaysColumn();
+        agent.HasIndex(entry => entry.TeamCityId).IsUnique();
+        agent.Property(entry => entry.LastHeartbeatSequence).HasColumnType("numeric(20,0)");
+        agent.Property(entry => entry.CustomParametersJson).HasColumnType("jsonb");
+        agent.Property(entry => entry.ReportedParametersJson).HasColumnType("jsonb");
+        agent.Property(entry => entry.AdvertisedCapabilitiesJson).HasColumnType("jsonb");
+        agent.Property(entry => entry.NegotiatedCapabilitiesJson).HasColumnType("jsonb");
+        agent.Property(entry => entry.StaticObservationJson).HasColumnType("jsonb");
+        agent.ToTable("AgentRegistrations", table =>
+        {
+            table.HasCheckConstraint("CK_AgentRegistrations_TeamCityId", "\"TeamCityId\" > 0");
+            table.HasCheckConstraint("CK_AgentRegistrations_Generations", "\"CredentialGeneration\" >= 0 AND \"ConnectionGeneration\" >= 0 AND \"SessionCredentialGeneration\" >= 0");
+            table.HasCheckConstraint("CK_AgentRegistrations_HeartbeatSequence", "\"LastHeartbeatSequence\" BETWEEN 0 AND 18446744073709551615");
+            table.HasCheckConstraint("CK_AgentRegistrations_Health", "\"Health\" IN ('UNKNOWN','HEALTHY','UNHEALTHY')");
+            table.HasCheckConstraint("CK_AgentRegistrations_EnabledProjection", "NOT \"DesiredEnabled\" OR \"DesiredRevision\" IS NOT NULL");
+        });
+        var enrollment = modelBuilder.Entity<AgentEnrollment>();
+        enrollment.HasKey(entry => entry.Id);
+        enrollment.HasIndex(entry => entry.TokenHash).IsUnique();
+        enrollment.HasOne<AgentRegistration>().WithMany().HasForeignKey(entry => entry.ClaimedAgentId).OnDelete(DeleteBehavior.Restrict);
         var change = modelBuilder.Entity<CatalogChange>();
         change.HasKey(entry => entry.Id);
         change.Property(entry => entry.MaterializedJson).HasColumnType("jsonb");

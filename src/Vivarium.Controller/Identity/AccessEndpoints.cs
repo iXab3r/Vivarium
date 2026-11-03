@@ -1,8 +1,6 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Antiforgery;
 using Vivarium.Controller.Rest.Common;
-using Vivarium.Controller.Security;
+using static Vivarium.Controller.Identity.RuntimeManagement;
 
 namespace Vivarium.Controller.Identity;
 
@@ -54,38 +52,6 @@ internal static class AccessEndpoints
                 if (input is null) return InvalidInput(http);
                 return Result(http, await changes.SetOrdinaryUserEnabledAsync(actor, userId, input.Enabled, http.RequestAborted), userId);
             }, mutation: true));
-    }
-
-    private static async Task<IResult> ExecuteAsync(HttpContext http, Func<ManagementRequestContext, Task<IResult>> action,
-        bool mutation = false)
-    {
-        var user = await http.RequestServices.GetRequiredService<RuntimeIdentity>().CurrentAsync(http);
-        if (user is null)
-        {
-            http.Response.Headers.WWWAuthenticate = "Bearer";
-            return RestProblems.AuthenticationRequired(http);
-        }
-        try
-        {
-            var bearer = http.Request.Headers.ContainsKey("Authorization");
-            if (mutation && !bearer)
-                await http.RequestServices.GetRequiredService<IAntiforgery>().ValidateRequestAsync(http);
-            var actor = http.RequestServices.GetRequiredService<RuntimeRequestContext>()
-                .ForUser(user.Id, bearer ? "openid-bearer" : "identity-cookie", "access");
-            return await action(actor);
-        }
-        catch (AccessPermissionException)
-        {
-            return RestProblems.Create(http, 403, "permission_denied", "Permission is denied",
-                "Global profile-read or user-management permission is required.");
-        }
-        catch (AntiforgeryValidationException)
-        {
-            return RestProblems.Create(http, 400, "invalid_antiforgery_token", "Request verification failed",
-                "Use the current browser request-verification token.");
-        }
-        catch (JsonException) { return InvalidInput(http); }
-        catch (BadHttpRequestException) { return InvalidInput(http); }
     }
 
     private static IResult Result(HttpContext http, AccessMutationResult result, Guid userId) => result switch

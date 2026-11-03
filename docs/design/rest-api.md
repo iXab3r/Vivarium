@@ -528,6 +528,17 @@ Agent registration/credential authorization is an audited security action; desir
 custom properties are versioned settings. Define their shared concurrency/activation boundary without
 inventing a Git authority over users or credentials. Current authorization comes from PostgreSQL.
 
+The fresh Host now exposes `POST /api/v1/enrollment-tokens` (no body, 201 with one-time proof),
+`PUT /api/v1/agents/{agentId}/authorization` (`{"authorized":true|false}`, 204), and paged
+`GET /api/v1/agents` / detail reads. Issuance and authorization require current global
+`authorize_agent`; reads require `view_agent_details`. Browser mutations use normal request
+verification. Reads expose stable native/positive TeamCity identity, separate authorization,
+Git enablement, connection, reconciliation and health axes, generations and applied configuration
+revision; no authentication secret is returned there. Ready requires a proven current bearer session
+and all eligibility axes. This is the bounded fresh registration contribution, not the complete
+Agent REST family or proof of fresh Build assignment. The existing legacy resources above retain
+their own implementation evidence.
+
 C# replaces submitted YAML for the new catalog (D32). Existing `vivarium.yaml` snapshots are legacy
 evidence, not a permanent target schema. C# editability and compatible mutations must be settled in
 P0 before implementing the catalog; writes target the owning repository and its configured workflow.

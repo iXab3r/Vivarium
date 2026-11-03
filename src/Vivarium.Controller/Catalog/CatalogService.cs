@@ -7,6 +7,7 @@ using Vivarium.Controller.Identity;
 using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Security;
 using Vivarium.Definitions;
+using Vivarium.Controller.Agents;
 
 namespace Vivarium.Controller.Catalog;
 
@@ -15,7 +16,7 @@ internal sealed class CatalogEvaluationException(string code) : Exception(code);
 
 /// <summary>One accepted Git revision set becomes visible only through the final PG activation fence.</summary>
 public sealed class CatalogService(IDbContextFactory<VivariumDbContext> databases, IConfiguration configuration,
-    CatalogSources sources, TimeProvider time)
+    CatalogSources sources, TimeProvider time, AgentRegistry? agentRegistry = null)
 {
     private const long CoordinationLock = 90695025115;
 
@@ -56,8 +57,9 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
 
     private async Task<int> RecoverCoreAsync(VivariumDbContext database, CancellationToken token)
     {
-        var unreconciled = await database.CatalogEvaluations.Where(e => !e.CleanupConfirmed
-            && database.CatalogChanges.Any(c => c.Id == e.ChangeId && c.RepositoryId == sources.RepositoryId)).ToArrayAsync(token);
+        // The installation journal owns these identities independently of the current source
+        // resource name. The shared PG coordination lock excludes a live peer coordinator.
+        var unreconciled = await database.CatalogEvaluations.Where(e => !e.CleanupConfirmed).ToArrayAsync(token);
         foreach (var invocation in unreconciled)
         {
             await IsolatedDefinitionEvaluator.RemoveOwnedAsync(new IsolatedDefinitionEvaluator(invocation.Id).Name);
@@ -65,11 +67,13 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
             if (invocation.State == "RUNNING") { invocation.State = "INTERRUPTED"; invocation.FailureCode = "evaluation_interrupted"; }
         }
         await database.SaveChangesAsync(token);
-        var pending = await database.CatalogChanges.Where(c => c.RepositoryId == sources.RepositoryId
-            && (c.State == "PENDING" || c.State == "EVALUATED")).OrderBy(c => c.CreatedAt).ToArrayAsync(token);
+        var pending = await database.CatalogChanges.Where(c => c.State == "PENDING" || c.State == "EVALUATED")
+            .OrderBy(c => c.CreatedAt).ToArrayAsync(token);
         foreach (var operation in pending)
         {
-            if (await database.CatalogEvaluations.AnyAsync(e => e.ChangeId == operation.Id && e.State == "INTERRUPTED", token))
+            if (operation.RepositoryId != sources.RepositoryId)
+                await RejectAsync(database, operation, "source_configuration_changed", AuditOutcome.Failed, token);
+            else if (await database.CatalogEvaluations.AnyAsync(e => e.ChangeId == operation.Id && e.State == "INTERRUPTED", token))
                 await RejectAsync(database, operation, "evaluation_interrupted", AuditOutcome.Failed, token);
             else await ContinueAsync(database, operation, token);
         }
@@ -105,6 +109,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
             if (!await RefsMatchAsync(materialized.Members, token))
             { await RejectAsync(database, operation, "accepted_ref_changed", AuditOutcome.Failed, token, conflict: true); return; }
             await using var transaction = await database.Database.BeginTransactionAsync(token);
+            await CatalogAgentSettings.LockProjectionAsync(database, token);
             // Keep the current grant/eligibility read valid through the short activation commit.
             // This fence takes no locks while Docker or source compilation is running.
             await database.Database.ExecuteSqlRawAsync("""
@@ -123,6 +128,13 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
                 await RejectAsync(database, operation, "activation_changed", AuditOutcome.Failed, token, conflict: true);
                 return;
             }
+            if (await CatalogAgentSettings.ChangedAsync(database, active?.RevisionId, materialized, token)
+                && !await new CurrentAccess(database, configuration).AllowsAsync(operation.ActorId, "enable_disable_agent", cancellationToken: token))
+            {
+                await transaction.RollbackAsync(token);
+                await RejectAsync(database, operation, "permission_denied", AuditOutcome.Denied, token);
+                return;
+            }
             var revision = new CatalogRevision
             {
                 Id = Guid.NewGuid(), ChangeId = operation.Id, RepositoryId = sources.RepositoryId,
@@ -134,6 +146,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
             };
             database.CatalogRevisions.Add(revision);
             await CatalogProjection.ApplyAsync(database, revision, materialized, token);
+            await CatalogAgentSettings.ApplyAsync(database, revision, materialized, token);
             if (active is null)
             {
                 active = new CatalogActive { RepositoryId = sources.RepositoryId };
@@ -148,6 +161,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
                 with { ResultRevision = operation.CandidateCommit });
             await database.SaveChangesAsync(token);
             await transaction.CommitAsync(token);
+            foreach (var agent in materialized.Agents ?? []) agentRegistry?.SetEnabled(agent.Id, agent.Enabled);
         }
         catch (Exception error) when (error is InvalidDataException or JsonException or ConfigurationRepositoryException or CatalogEvaluationException)
         {
@@ -217,8 +231,10 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
             projects.Add(new(project, evaluated, selected.RepositoryId, selected.Commit, settingsPath));
         }
         ValidateGraph(projects);
+        var agents = CatalogAgentSettings.Read(control);
         return new(members.Values.OrderBy(m => m.RepositoryId, StringComparer.Ordinal).ThenBy(m => m.Branch, StringComparer.Ordinal).ToArray(),
-            projects.ToArray(), IsolatedDefinitionEvaluator.Image, IsolatedDefinitionEvaluator.Sdk, IsolatedDefinitionEvaluator.ContractHash(), "1");
+            projects.ToArray(), IsolatedDefinitionEvaluator.Image, IsolatedDefinitionEvaluator.Sdk, IsolatedDefinitionEvaluator.ContractHash(), "1",
+            agents.Length == 0 ? null : agents);
     }
 
     private async Task<string> EvaluateAsync(VivariumDbContext database, CatalogChange operation, string project,
@@ -328,7 +344,7 @@ public sealed class CatalogService(IDbContextFactory<VivariumDbContext> database
     {
         operation.State = conflict ? "CONFLICT" : "REJECTED"; operation.FailureCode = code; operation.CompletedAt = time.GetUtcNow();
         new PostgresAuditStore(database).Stage(AuditEventDraft.Create(Actor(operation).WithRequestId(operation.Id.ToString()),
-            time.GetUtcNow(), "configuration.activate", "repository", sources.RepositoryId, outcome, code)
+            time.GetUtcNow(), "configuration.activate", "repository", operation.RepositoryId, outcome, code)
             with { ResultRevision = operation.CandidateCommit });
         await database.SaveChangesAsync(token);
     }

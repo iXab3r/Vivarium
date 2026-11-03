@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Identity;
 using Vivarium.Controller.Persistence;
@@ -93,21 +92,12 @@ internal static class CatalogEndpoints
         diagnostics = diagnostics ?? [],
     };
 
-    private static async Task<IResult> ExecuteAsync(HttpContext http, Func<ManagementRequestContext, Task<IResult>> action, bool mutation = false)
-    {
-        var user = await http.RequestServices.GetRequiredService<RuntimeIdentity>().CurrentAsync(http);
-        if (user is null) { http.Response.Headers.WWWAuthenticate = "Bearer"; return RestProblems.AuthenticationRequired(http); }
-        try
+    private static Task<IResult> ExecuteAsync(HttpContext http, Func<ManagementRequestContext, Task<IResult>> action, bool mutation = false) =>
+        RuntimeManagement.ExecuteAsync(http, async actor =>
         {
-            var bearer = http.Request.Headers.ContainsKey("Authorization");
-            if (mutation && !bearer) await http.RequestServices.GetRequiredService<IAntiforgery>().ValidateRequestAsync(http);
-            return await action(http.RequestServices.GetRequiredService<RuntimeRequestContext>()
-                .ForUser(user.Id, bearer ? "openid-bearer" : "identity-cookie", "catalogue"));
-        }
-        catch (AccessPermissionException) { return RestProblems.Create(http, 403, "permission_denied", "Permission is denied", "Current installation-wide configuration permissions are required."); }
-        catch (CatalogBusyException) { return RestProblems.Create(http, 409, "catalogue_busy", "Catalogue is busy", "Retry after the current configuration operation completes."); }
-        catch (AntiforgeryValidationException) { return RestProblems.Create(http, 400, "invalid_antiforgery_token", "Request verification failed", "Use the current browser request-verification token."); }
-    }
+            try { return await action(actor); }
+            catch (CatalogBusyException) { return RestProblems.Create(http, 409, "catalogue_busy", "Catalogue is busy", "Retry after the current configuration operation completes."); }
+        }, mutation, "catalogue");
     private static async Task<bool> CanManageAsync(ManagementRequestContext actor, CurrentAccess access, CancellationToken token) =>
         Guid.TryParse(actor.Principal.ActorId, out var id)
         && await access.AllowsAllAsync(id, ["edit_project", "create_sub_project"], cancellationToken: token);
