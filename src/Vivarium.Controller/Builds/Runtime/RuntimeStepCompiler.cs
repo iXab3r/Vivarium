@@ -13,7 +13,7 @@ namespace Vivarium.Controller.Builds.Runtime;
 internal sealed record RuntimePreparedAssignment(BuildAssignment Assignment, RuntimeBuildPayload[] Payloads);
 
 /// <summary>Translate the selected C#/Git process contract to the existing files-in/process Agent SDK.</summary>
-internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes)
+internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildSecrets secrets)
 {
     internal async Task<RuntimePreparedAssignment> PrepareAsync(RuntimeBuild build, RuntimeBuildInput input,
         CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token)
@@ -26,12 +26,16 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes)
         var overrides = JsonSerializer.Deserialize<Dictionary<string, string>>(input.OverridesJson)
             ?? throw new InvalidDataException("Collected Build parameters are invalid.");
         foreach (var (name, value) in overrides) values[name] = value;
-        values["build.counter"] = build.Counter.ToString(CultureInfo.InvariantCulture);
-        values["build.number"] = build.Number;
+        var counter = build.Counter ?? throw new InvalidDataException("The claimed Build has no counter.");
+        var number = build.Number ?? throw new InvalidDataException("The claimed Build has no number.");
+        values["build.counter"] = counter.ToString(CultureInfo.InvariantCulture);
+        values["build.number"] = number;
         values["teamcity.build.id"] = build.Id.ToString(CultureInfo.InvariantCulture);
         string Expand(string value) => Regex.Replace(value, "%([^%\\r\\n]+)%", match =>
             values.TryGetValue(match.Groups[1].Value, out var resolved) ? resolved : match.Value, RegexOptions.CultureInvariant);
         var assignment = new BuildAssignment { BuildId = execution.WorkloadId, OutputContractMajor = 1, ArtifactPublicationContractMajor = 1 };
+        var environment = secrets.ReadEnvironment(build.Id, input.ProtectedEnvironment);
+        assignment.OutputSecrets.AddRange(environment.Values.Distinct(StringComparer.Ordinal).Select(Google.Protobuf.ByteString.CopyFromUtf8));
         var payloads = new List<RuntimeBuildPayload>();
         for (var index = 0; index < config.Steps.Length; index++)
         {
@@ -52,10 +56,20 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes)
             if (windows) step.Args.Add(["/d", "/c", path.Replace('/', '\\')]); else step.Args.Add(path);
             foreach (var (name, value) in values.Where(p => p.Key.StartsWith("env.", StringComparison.Ordinal)))
                 step.Env[name[4..]] = Expand(value);
-            step.Env["BUILD_NUMBER"] = build.Number;
+            step.Env["BUILD_NUMBER"] = number;
             step.Env["BUILD_ID"] = build.Id.ToString(CultureInfo.InvariantCulture);
+            // Explicit run secrets override ordinary env parameters, including case aliases on
+            // Windows. They never participate in script or parameter expansion.
+            foreach (var (name, value) in environment)
+            {
+                foreach (var alias in step.Env.Keys.Where(k => string.Equals(k, name, StringComparison.OrdinalIgnoreCase)).ToArray())
+                    step.Env.Remove(alias);
+                step.Env[name] = value;
+            }
             assignment.Steps.Add(step);
         }
+        if (assignment.CalculateSize() > 3 * 1024 * 1024)
+            throw new InvalidDataException("The prepared assignment exceeds the selected transport profile.");
         return new(assignment, payloads.DistinctBy(p => p.Sha256).ToArray());
     }
 

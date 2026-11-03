@@ -423,6 +423,11 @@ release barrier additionally requires durable sealing and workload reconciliatio
 watermarks after a bounded deadline become explicit unknown-tail gaps, never invented empty output
 or proof of process termination. These fields specify the selected implementation seam; acceptance
 still requires the real owning services, Agent, PostgreSQL and Storage variants in R0.
+An already accepted result may be replayed after lease release, including while the same Agent owns
+newer work. The fresh Host authenticates the current Agent session and unchanged credential generation,
+compares the immutable prior receipt, and repeats only its ACK. It does not reopen the old lease or
+alter the current workload. A conflicting repeat still quarantines the Agent and preserves accepted
+evidence; an unknown workload, stale session or replaced credential does not qualify as a retained replay.
 `BuildResult.output_producer_lost` (new tag 8) explicitly reports a lost producer or incomplete pipe
 drain instead of asserting final watermarks. A genuine zero-step Build has no streams and is empty.
 

@@ -443,6 +443,14 @@ proves the distinction with per-project authorization enabled, a denied new run 
 verified artifact from the original accepted Build. It does not generalize to PAT revocation,
 account disablement or pool-policy changes.
 
+The selected source-free lifecycle allocates no number/counter merely on queue admission. An
+unassigned queued cancellation finishes with number `N/A` without consuming a counter. A suitable
+Agent claim allocates the number once and exposes `running`, `startDate` and current `SUCCESS`
+before assignment acceptance; acceptance and process execution remain distinct receipts. The
+[paused owned-Agent observation](../tests/Vivarium.Tests/TeamCity/Reference/claimed-counter-observations.json)
+proves that distinction. A later observed step failure changes the current outcome to `FAILURE`;
+cancellation is `UNKNOWN`, and internal output finalization remains publicly `running` until finished.
+
 `Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
 matrix expands into a **matrix build** whose cells are ordinary builds, aggregated composite-style.
@@ -1458,6 +1466,36 @@ activation, HTTP mode/completion or authorization implementation. R0 consumes an
 smoke and PILOT uses C#/Git preparation; full editable/language-specific variants remain allocated
 to their owners before exposure. XML/Kotlin compatibility is not waived. This decision resolves the
 shared source-authority/edit mechanism; exact unproved variants remain visible verification gaps.
+
+### D45. US-013 uses private runtime-only environment secrets
+
+US-013 accepts temporary secret environment values with one run. They are runtime inputs, not
+Project desired configuration, ordinary parameters, evaluator context or a persistent Project
+secret store. Native admission requires current `run_build` and `customize_build_parameters` under
+the same Project/target policy as other executable inputs. Values are never returned by management
+reads or mutation receipts and never copied into Git, collected plans, script payloads or audit.
+
+For the initial Host, existing private persistent ASP.NET Data Protection keys encrypt the collected
+environment and every newly retained Agent assignment with separate per-Build purposes. Recovery
+requires those keys together with PostgreSQL and object data; losing keys fails closed. Old pre-secret
+assignments have an explicit legacy version and cannot contain a registered-secret list. Protected
+assignments are never retried as plaintext after a decryption/version failure. This does not protect
+against a trusted Host/Agent administrator or replace private key-directory access controls.
+
+Only the selected authenticated Agent receives resolved values, as step environment entries plus
+ephemeral exact UTF-8 masks. Explicit secret entries override ordinary environment aliases; they do
+not participate in script/parameter expansion. Admission accepts at most 64 distinct environment
+names (ASCII letters/digits/underscore, non-digit first, at most 128 characters, case-insensitive
+uniqueness), nonempty NUL-free values of at most 4096 UTF-8 bytes, and 16 KiB serialized total. The
+native run request is bounded to 2 MiB. A prepared assignment is bounded to 3 MiB, failing preparation
+before delivery if ordinary environment expansion and run secrets together exceed that profile.
+
+The Agent masks registered exact values across stdout/stderr chunk boundaries before its durable
+output spool and transport; Host logs, errors and public output retain only masked bytes. This is
+not detection of transformed/unregistered secrets or redaction of arbitrary artifact files. The
+selected workload is trusted to use its credential for its intended external operation. Permanent
+Project secrets, rotation and user-managed secret references require their own story. Native runtime
+integration and its acceptance evidence do not establish TeamCity secure-parameter wire compatibility.
 
 ## 5. Protocol sketch
 

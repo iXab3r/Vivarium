@@ -411,8 +411,9 @@ must include the previous released agent once that release gate exists (D20).
    accept an unauthenticated new pin?
 4. Is commit signing optional per repository or required for protected projects, and which key types
    and trust store are in scope?
-5. Which local secret store ships without adding an external service dependency, and how are secret
-   values encrypted, backed up, rotated, and scoped to a step?
+5. Which permanent Project secret store ships, and how are values backed up, rotated and scoped to
+   a step? [D45](../ARCHITECTURE.md#d45-us-013-uses-private-runtime-only-environment-secrets) resolves
+   only temporary US-013 run environments and encrypted recovery through existing private Data Protection keys.
 6. What initial file roots, command allow/deny policy, process-protection list, and software-management
    transaction model are acceptable on physical agents?
 7. What default log, inventory, Git, blob, artifact, and command quotas fit a small single-node farm,

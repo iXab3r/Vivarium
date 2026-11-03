@@ -16,7 +16,7 @@ namespace Vivarium.Controller.Builds.Runtime;
 /// <summary>One PG-owned queue/lease lifecycle. Live sessions are delivery handles, never owners.</summary>
 internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContext> databases,
     RuntimeAgentSessions sessions, AgentRegistry registry, RuntimeStepCompiler compiler,
-    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger)
+    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger, RuntimeBuildSecrets secrets)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     // Delivery/preparation tasks are bounded coordination aids. PG intent/lease/deadlines remain
@@ -132,7 +132,16 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                         cleanPolicy = "clean-workdir", input.RevisionId, definition.PlanHash }, Json),
                 };
                 database.RuntimeBuildExecutions.Add(execution); agent.CurrentWorkloadId = execution.WorkloadId;
-                build.State = "RUNNING"; build.StartedAt = now; build.StatusText = "Preparing execution";
+                // The source queue-cancel observation has no number and does not consume the next
+                // started Build counter. Reserve only when a suitable Agent is actually claimed.
+                if (build.Counter is null)
+                {
+                    var counter = await database.RuntimeBuildCounters.SingleOrDefaultAsync(c => c.BuildTypeId == build.BuildTypeId, token);
+                    if (counter is null) { counter = new() { BuildTypeId = build.BuildTypeId }; database.RuntimeBuildCounters.Add(counter); }
+                    build.Counter = counter.NextValue; counter.NextValue = checked(counter.NextValue + 1);
+                    build.Number = build.Counter.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                }
+                build.State = "RUNNING"; build.StartedAt = now; build.Status = "SUCCESS"; build.StatusText = "Preparing execution";
                 await RuntimeBuildAudit.StageAsync(database, build, now, "build.assignment.prepared", workload: execution.WorkloadId, token: token);
                 await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
                 registry.Reconcile(connection.Handle, execution.WorkloadId);
@@ -212,7 +221,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 await transaction.RollbackAsync(token);
                 await FailAsync(id, "Execution target changed before delivery", safeUnsent: true, token); return;
             }
-            owner.Assignment = prepared.Assignment.ToByteArray(); owner.Phase = "DISPATCHING";
+            owner.Assignment = secrets.ProtectAssignment(id, prepared.Assignment); owner.AssignmentProtectionVersion = 1; owner.Phase = "DISPATCHING";
             owner.TargetSnapshotJson = JsonSerializer.Serialize(new { selection = JsonSerializer.Deserialize<JsonElement>(owner.SelectionSnapshotJson),
                 currentAgent.AgentId, currentAgent.TeamCityId, currentAgent.ReportedName, currentAgent.DesiredName,
                 reportedParameters = reported, customParameters = custom, currentAgent.CredentialGeneration,
@@ -227,7 +236,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         if (connected && owner.Phase == "DISPATCHING" && EligibleForDelivery(currentAgent))
         {
             owner.SentAt ??= now;
-            message = new() { Build = BuildAssignment.Parser.ParseFrom(owner.Assignment) };
+            message = new() { Build = secrets.ReadAssignment(id, owner.Assignment, owner.AssignmentProtectionVersion) };
         }
         else if (connected && currentBuild.CancelRequestedAt is not null && owner.TerminalReceivedAt is null)
             message = RuntimeBuildService.CancelMessage(currentBuild, owner);
@@ -251,10 +260,19 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         await AgentCredentials.LockAgentAsync(database, connection.Handle.AgentId, token);
         var agent = await database.AgentRegistrations.SingleAsync(a => a.AgentId == connection.Handle.AgentId, token);
         var execution = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == workload, token);
-        if (execution is null || !Owner(agent, execution, connection) || execution.SentAt is null)
+        if (execution is null || execution.SentAt is null)
+            throw new InvalidDataException("Workload ownership differs.");
+        var existing = message.MsgCase == AgentMsg.MsgOneofCase.Result
+            ? await database.RuntimeBuildResults.SingleOrDefaultAsync(r => r.BuildId == execution.BuildId, token) : null;
+        // A result send can already be queued when its ACK releases the Agent's local ownership.
+        // Authenticate a late retained receipt without adopting its old lease or changing newer work.
+        var retainedReplay = existing is not null && execution.ReleasedAt is not null && execution.TerminalReceivedAt is not null
+            && Current(agent, connection) && execution.AgentId == agent.AgentId
+            && execution.CredentialGeneration == agent.CredentialGeneration;
+        if (!retainedReplay && !Owner(agent, execution, connection))
             throw new InvalidDataException("Workload ownership differs.");
         var build = await database.RuntimeBuilds.SingleAsync(b => b.Id == execution.BuildId, token);
-        if (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result)
+        if (!retainedReplay && (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result))
         {
             if (execution.AcceptedAt is null)
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.assignment.accepted", workload: workload, token: token);
@@ -269,11 +287,10 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         if (message.MsgCase == AgentMsg.MsgOneofCase.Result)
         {
             var result = message.Result;
-            var assignment = BuildAssignment.Parser.ParseFrom(execution.Assignment);
+            var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             ValidateResult(result, assignment);
             var semantic = result.Clone(); semantic.SessionId = "";
             var hash = Convert.ToHexStringLower(SHA256.HashData(semantic.ToByteArray()));
-            var existing = await database.RuntimeBuildResults.SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
             if (existing is not null && existing.SemanticHash != hash)
             {
                 agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "conflicting_build_result";
@@ -300,6 +317,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 }
                 database.RuntimeBuildResults.Add(new() { BuildId = build.Id, Evidence = result.ToByteArray(), SemanticHash = hash,
                     OriginalOutcome = result.Outcome.ToString(), ReceivedAt = time.GetUtcNow() });
+                build.Status = result.Outcome switch { BuildOutcome.Succeeded => "SUCCESS", BuildOutcome.Failed => "FAILURE", _ => "UNKNOWN" };
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.accepted", workload: workload, token: token);
                 execution.Phase = "TERMINAL"; execution.TerminalReceivedAt = time.GetUtcNow();
                 execution.OutputDeadline = time.GetUtcNow().AddSeconds(30); build.State = "RELEASING";
@@ -340,6 +358,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         // A durable send intent always wins over a caller's earlier unsent observation.
         safeUnsent &= execution.SentAt is null;
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        build.Number ??= "N/A";
         build.FailedToStart = build.CancelRequestedAt is null && execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow();
         if (safeUnsent && agent.CurrentWorkloadId == execution.WorkloadId) agent.CurrentWorkloadId = null;
@@ -371,6 +390,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     private async Task FinishUnassignedAsync(VivariumDbContext database, RuntimeBuild build, string reason, CancellationToken token)
     {
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        build.Number ??= "N/A";
         build.FailedToStart = true; build.FinishedAt = time.GetUtcNow();
         await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.queue.expired", AuditOutcome.Failed,
             "queue_deadline", token: token);

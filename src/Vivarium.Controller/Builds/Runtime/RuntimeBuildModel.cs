@@ -18,7 +18,7 @@ internal static class RuntimeBuildModel
         build.HasIndex(b => new { b.State, b.QueuedAt, b.Id });
         build.ToTable("RuntimeBuilds", table =>
         {
-            table.HasCheckConstraint("CK_RuntimeBuilds_Id", "\"Id\" > 0 AND \"Counter\" > 0");
+            table.HasCheckConstraint("CK_RuntimeBuilds_Id", "\"Id\" > 0 AND (\"Counter\" IS NULL OR \"Counter\" > 0)");
             table.HasCheckConstraint("CK_RuntimeBuilds_State", "\"State\" IN ('QUEUED','RUNNING','RELEASING','FINISHED')");
             table.HasCheckConstraint("CK_RuntimeBuilds_Status", "\"Status\" IN ('UNKNOWN','SUCCESS','FAILURE')");
             table.HasCheckConstraint("CK_RuntimeBuilds_Stop", "\"StopMode\" IS NULL OR \"StopMode\" IN ('GRACEFUL','FORCE')");

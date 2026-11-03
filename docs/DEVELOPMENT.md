@@ -72,6 +72,14 @@ Expiry records availability gaps without changing producer evidence, then retrie
 deletion. Already committed expiry/deletion intent survives restart or later policy disablement.
 Artifacts and full TeamCity/per-project retention remain separate contracts.
 
+Native C#/Git run admission accepts optional `secretEnvironment` under `run_build` plus
+`customize_build_parameters`. These D45 temporary values override ordinary Agent environment
+aliases, never expand into scripts/parameters, and have no readback API. Recovering queued/running
+work requires the existing persistent Identity Data Protection directory as well as PostgreSQL and
+object data: collected secret input and new durable assignments are encrypted per Build. Registered
+exact UTF-8 values are masked in stdout/stderr before Agent spool persistence, including across
+chunk boundaries. Permanent Project secrets and arbitrary artifact redaction are separate scope.
+
 `nodes` emits masked Chiral views. Saves remain separate from active resources until restart;
 startup refuses missing/unready nodes, pending/unknown/checksum-drifted schema and unusable Identity
 keys before opening listeners. Object HTTP stays on a distinct loopback listener. The installation

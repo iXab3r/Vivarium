@@ -54,6 +54,7 @@ public sealed class RuntimeHostPhysicalTests
             "artifacts/r0-host/runtime-" + Guid.NewGuid().ToString("N")));
         ownedRoot = root;
         Directory.CreateDirectory(root);
+        var secretScenario = new RuntimeSecretScenario(root);
         var definitions = Path.Combine(root, "definitions");
         Directory.CreateDirectory(definitions);
         await SourceCompiler.GitAsync(definitions, "init", "-b", "main");
@@ -67,6 +68,9 @@ public sealed class RuntimeHostPhysicalTests
         var waitingScript = OperatingSystem.IsWindows()
             ? "echo owned-running-start\nping -n 60 127.0.0.1 >nul" : "trap '' TERM\necho owned-running-start\nsleep 60";
         smokeSettings = smokeSettings.Replace("new(\"P_LocalSmoke\",", $$"""
+            new("P_Secret", "Secret", [], [
+                new("secret", "Secret", "simpleRunner", [new("script.content", {{JsonSerializer.Serialize(secretScenario.Script)}}, null)])
+            ], [], [], [], 2, []),
             new("P_Nonzero", "Nonzero", [], [
                 new("fail", "Fail", "simpleRunner", [new("script.content", "echo owned-nonzero\nexit 7", null)])
             ], [], [], [], 1, []),
@@ -182,7 +186,8 @@ public sealed class RuntimeHostPhysicalTests
         {
             scopedActor.ConfigureServices(services);
             services.Replace(ServiceDescriptor.Singleton<RuntimeStepCompiler>(provider => new RuntimeStepCompiler(
-                compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause))));
+                compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause),
+                provider.GetRequiredService<RuntimeBuildSecrets>())));
         }))
         {
             // This owned logger receives only the product's intended private disclosure. It never
@@ -333,6 +338,7 @@ public sealed class RuntimeHostPhysicalTests
                     Assert.That(System.Text.Encoding.UTF8.GetString(artifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
                     Assert.That(Convert.ToHexStringLower(SHA256.HashData(artifactBytes)), Is.EqualTo(artifact.GetProperty("sha256").GetString()));
                     await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId && value.GetProperty("ready").GetBoolean());
+                    await RuntimeResultReplayScenario.VerifyAsync(app.Services, executedBuild.Value);
                     using var resumed = await http.GetAsync($"/api/v1/builds/{executedBuild}/output?cursor="
                         + Uri.EscapeDataString(output.RootElement.GetProperty("output").GetProperty("resumeCursor").GetString()!));
                     Assert.That(resumed.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -387,6 +393,20 @@ public sealed class RuntimeHostPhysicalTests
                     Assert.That(journal.All(a => a.ResultRevision is { Length: 40 }), Is.True);
                     await scopedActor.RunAsync(app.Services, http,
                         session.RootElement.GetProperty("requestVerificationToken").GetString()!, agentId);
+                }
+                catch
+                {
+                    await using var diagnostic = await app.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+                    var lifecycle = await (from build in diagnostic.RuntimeBuilds.AsNoTracking()
+                        join owner in diagnostic.RuntimeBuildExecutions.AsNoTracking() on build.Id equals owner.BuildId into owners
+                        from owner in owners.DefaultIfEmpty()
+                        select new { build.Id, build.State, build.Status, build.FailedToStart,
+                            Phase = owner == null ? null : owner.Phase, AcceptedAt = owner == null ? null : owner.AcceptedAt,
+                            TerminalAt = owner == null ? null : owner.TerminalReceivedAt }).ToArrayAsync();
+                    var capacity = await diagnostic.AgentRegistrations.AsNoTracking().Select(a => new
+                        { a.CurrentSessionId, a.Reconciled, a.Authorized, a.Health, a.HealthReason, a.Quarantined, a.CurrentWorkloadId }).ToArrayAsync();
+                    TestContext.Progress.WriteLine(JsonSerializer.Serialize(new { lifecycle, capacity }));
+                    throw;
                 }
                 finally
                 {
@@ -467,72 +487,92 @@ public sealed class RuntimeHostPhysicalTests
             finally { payloadPause.Release(); await app.StopAsync(); compilerBytes?.Dispose(); }
         }
         var restartedCapture = new PrivateStartupLog();
-        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(restartedCapture), scopedActor.ConfigureServices))
+        System.Diagnostics.Process? reconnected = null;
+        Task<string>? reconnectOutput = null;
+        Task<string>? reconnectError = null;
+        try
         {
-            await app.StartAsync();
-            try
+            await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(restartedCapture), scopedActor.ConfigureServices))
             {
-                Assert.That(restartedCapture.Password is not null && restartedCapture.Password != oldPassword, Is.True);
-                Assert.That((await LoginAsync(http, oldPassword)).StatusCode, Is.EqualTo(HttpStatusCode.OK), "Old password must fail normal login.");
-                Assert.That((await LoginAsync(http, restartedCapture.Password!)).StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
-                Assert.That((await http.GetAsync("/api/v1/build-configurations/P_LocalSmoke")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
-                Assert.That(executedBuild, Is.Not.Null);
-                using var retainedBuild = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}"));
-                using var retainedOutput = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/output"));
-                using var coldResume = await http.GetAsync($"/api/v1/builds/{executedBuild}/output?cursor=" + Uri.EscapeDataString(outputResumeCursor!));
-                Assert.That(coldResume.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-                using var coldEnd = JsonDocument.Parse(await coldResume.Content.ReadAsStringAsync());
-                Assert.That(coldEnd.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
-                var retainedStdout = new List<byte>();
-                foreach (var entry in retainedOutput.RootElement.GetProperty("items").EnumerateArray())
-                    if (entry.GetProperty("kind").GetString() == "data" && entry.GetProperty("stream").GetString() == "stdout")
-                        retainedStdout.AddRange(await http.GetByteArrayAsync(entry.GetProperty("content").GetProperty("href").GetString()));
-                Assert.That(System.Text.Encoding.UTF8.GetString(retainedStdout.ToArray()), Does.Contain("from CSharp Git"));
-                using var retainedArtifacts = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/artifacts"));
-                var retainedArtifact = retainedArtifacts.RootElement.GetProperty("items").EnumerateArray().Single();
-                var retainedArtifactBytes = await http.GetByteArrayAsync(retainedArtifact.GetProperty("href").GetString());
-                Assert.That(System.Text.Encoding.UTF8.GetString(retainedArtifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
-                await scopedActor.AfterRestartAndRevokeAsync(app.Services, http);
-                Assert.That(retainedBuild.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
-                Assert.That(retainedBuild.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
-                using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
-                var oldAgent = priorAgents.RootElement.GetProperty("items")[0];
-                var oldAgentId = oldAgent.GetProperty("id").GetString();
-                var oldGeneration = oldAgent.GetProperty("connectionGeneration").GetInt64();
-                var reconnected = StartAgent(Path.Combine(root, "agent-bootstrap.json"), Path.Combine(root, "agent-data"));
-                var reconnectOutput = reconnected.StandardOutput.ReadToEndAsync();
-                var reconnectError = reconnected.StandardError.ReadToEndAsync();
+                await app.StartAsync();
                 try
                 {
+                    Assert.That(restartedCapture.Password is not null && restartedCapture.Password != oldPassword, Is.True);
+                    Assert.That((await LoginAsync(http, oldPassword)).StatusCode, Is.EqualTo(HttpStatusCode.OK), "Old password must fail normal login.");
+                    Assert.That((await LoginAsync(http, restartedCapture.Password!)).StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+                    Assert.That((await http.GetAsync("/api/v1/build-configurations/P_LocalSmoke")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    Assert.That(executedBuild, Is.Not.Null);
+                    using var retainedBuild = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}"));
+                    using var retainedOutput = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/output"));
+                    using var coldResume = await http.GetAsync($"/api/v1/builds/{executedBuild}/output?cursor=" + Uri.EscapeDataString(outputResumeCursor!));
+                    Assert.That(coldResume.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    using var coldEnd = JsonDocument.Parse(await coldResume.Content.ReadAsStringAsync());
+                    Assert.That(coldEnd.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
+                    var retainedStdout = new List<byte>();
+                    foreach (var entry in retainedOutput.RootElement.GetProperty("items").EnumerateArray())
+                        if (entry.GetProperty("kind").GetString() == "data" && entry.GetProperty("stream").GetString() == "stdout")
+                            retainedStdout.AddRange(await http.GetByteArrayAsync(entry.GetProperty("content").GetProperty("href").GetString()));
+                    Assert.That(System.Text.Encoding.UTF8.GetString(retainedStdout.ToArray()), Does.Contain("from CSharp Git"));
+                    using var retainedArtifacts = JsonDocument.Parse(await http.GetStringAsync($"/api/v1/builds/{executedBuild}/artifacts"));
+                    var retainedArtifact = retainedArtifacts.RootElement.GetProperty("items").EnumerateArray().Single();
+                    var retainedArtifactBytes = await http.GetByteArrayAsync(retainedArtifact.GetProperty("href").GetString());
+                    Assert.That(System.Text.Encoding.UTF8.GetString(retainedArtifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
+                    await scopedActor.AfterRestartAndRevokeAsync(app.Services, http);
+                    Assert.That(retainedBuild.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
+                    Assert.That(retainedBuild.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
+                    using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
+                    var oldAgent = priorAgents.RootElement.GetProperty("items")[0];
+                    var oldAgentId = oldAgent.GetProperty("id").GetString();
+                    var oldGeneration = oldAgent.GetProperty("connectionGeneration").GetInt64();
+                    reconnected = StartAgent(Path.Combine(root, "agent-bootstrap.json"), Path.Combine(root, "agent-data"));
+                    reconnectOutput = reconnected.StandardOutput.ReadToEndAsync();
+                    reconnectError = reconnected.StandardError.ReadToEndAsync();
                     var currentAgent = await WaitAgentAsync(http, value => value.GetProperty("connected").GetBoolean()
                         && value.GetProperty("reconciled").GetBoolean());
                     Assert.That(currentAgent.GetProperty("id").GetString(), Is.EqualTo(oldAgentId));
                     Assert.That(currentAgent.GetProperty("connectionGeneration").GetInt64(), Is.GreaterThan(oldGeneration));
                     Assert.That(currentAgent.GetProperty("authorized").GetBoolean(), Is.True);
+                    var objects = app.Services.GetRequiredService<IObjectStorage>();
+                    var download = await objects.DownloadAsync(new GetDownloadUrl("owned-r0/object", "owned.bin"));
+                    using var retained = await http.GetAsync(download.Url);
+                    Assert.That(retained.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    Assert.That(await retained.Content.ReadAsByteArrayAsync(), Is.EqualTo("owned-r0-object\n"u8.ToArray()));
+                    await objects.DeleteAsync("owned-r0/object", CancellationToken.None);
+                    Assert.That((await http.GetAsync(download.Url)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+                    scopedActor.ResetRetentionTime();
+                    await scopedActor.CheckRunSecretAdmissionAsync(http);
+                    await secretScenario.BeforeRestartAsync(scopedActor.BuildClient, app.Services);
+                    await RuntimeResultReplayScenario.VerifyAsync(app.Services, executedBuild!.Value);
                 }
-                finally
-                {
-                    if (!reconnected.HasExited) reconnected.Kill(entireProcessTree: true);
-                    await reconnected.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
-                    await Task.WhenAll(reconnectOutput, reconnectError).WaitAsync(TimeSpan.FromSeconds(10));
-                    reconnected.Dispose();
-                }
-                var objects = app.Services.GetRequiredService<IObjectStorage>();
-                var download = await objects.DownloadAsync(new GetDownloadUrl("owned-r0/object", "owned.bin"));
-                using var retained = await http.GetAsync(download.Url);
-                Assert.That(retained.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-                Assert.That(await retained.Content.ReadAsByteArrayAsync(), Is.EqualTo("owned-r0-object\n"u8.ToArray()));
-                await objects.DeleteAsync("owned-r0/object", CancellationToken.None);
-                Assert.That((await http.GetAsync(download.Url)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+                finally { await app.StopAsync(); }
             }
-            finally { await app.StopAsync(); }
+            var recoveryErrors = new FailureTypesLog();
+            await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(recoveryErrors), scopedActor.ConfigureServices))
+            {
+                await app.StartAsync();
+                try
+                {
+                    await scopedActor.AfterRetentionRestartAsync(() => recoveryErrors.Failures);
+                    await secretScenario.AfterRestartAsync(scopedActor.BuildClient, app.Services);
+                    await RuntimeResultReplayScenario.RejectConflictAsync(app.Services, executedBuild!.Value);
+                    if (!reconnected!.HasExited) reconnected.Kill(entireProcessTree: true);
+                    await reconnected.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+                }
+                finally { await app.StopAsync(); }
+            }
         }
-        var recoveryErrors = new FailureTypesLog();
-        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(recoveryErrors), scopedActor.ConfigureServices))
+        finally
         {
-            await app.StartAsync();
-            try { await scopedActor.AfterRetentionRestartAsync(() => recoveryErrors.Failures); }
-            finally { await app.StopAsync(); }
+            if (reconnected is not null)
+            {
+                if (!reconnected.HasExited) reconnected.Kill(entireProcessTree: true);
+                await reconnected.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+                await Task.WhenAll(reconnectOutput!, reconnectError!).WaitAsync(TimeSpan.FromSeconds(10));
+                secretScenario.AssertPrivate(reconnectOutput!.Result); secretScenario.AssertPrivate(reconnectError!.Result);
+                reconnected.Dispose();
+            }
+            // Scan only after Host/Agent release their ownership locks and mutable spool handles.
+            secretScenario.AssertOwnedFilesPrivate();
         }
     }
 

@@ -11,6 +11,8 @@ internal static class RuntimeBuildEndpoints
         app.MapPost("/api/v1/builds", (HttpContext http, RuntimeBuildService builds) => RuntimeManagement.ExecuteAsync(http, async actor =>
         {
             if (!http.Request.HasJsonContentType()) return JsonRequired(http);
+            var limit = http.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
+            if (limit is { IsReadOnly: false }) limit.MaxRequestBodySize = 2 * 1024 * 1024;
             var request = await http.Request.ReadFromJsonAsync<RuntimeRunRequest>(http.RequestAborted);
             if (request is null) return RuntimeManagement.InvalidInput(http);
             var accepted = await builds.SubmitAsync(actor, request, http.RequestAborted);

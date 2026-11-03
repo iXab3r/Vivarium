@@ -29,7 +29,9 @@ independent result/output receipts and a bounded literal-artifact publisher. Two
 and retained bytes/cursors after a Host restart have selected integration evidence. An ordinary key
 now has selected native P/Q isolation, project delegation, grant/eligibility/revocation, failure and
 queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
-evidence now survives a cold Host restart. Full R0 bindings, remaining output/fault, compatibility and final review gates
+evidence now survives a cold Host restart. D45 adds native per-run secret environments with encrypted
+input/assignment recovery and existing Agent output masking; permanent Project secret storage is deferred.
+Full R0 bindings, remaining output/fault, compatibility and final review gates
 remain open. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.
@@ -216,6 +218,9 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   Git owner per Project/field. Disabled synchronization uses managed-local Git, not PG desired state;
   an ancestor source cannot seize an independently owned child. Reference modes/completion and
   XML/Kotlin obligations remain; the source studies are not full SDK or product acceptance.
+- D45 scopes US-013 secrets to one run's Agent environment, with private per-Build encrypted recovery
+  input/assignments and Agent-side exact-value output masking. No raw values in Git, collected plans,
+  payload scripts, public representations or audit; permanent Project secret storage is a separate story.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

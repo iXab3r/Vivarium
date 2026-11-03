@@ -224,11 +224,12 @@ type, safe message, stable error code, and stack trace only after sanitization. 
 names are allowlisted per event; arbitrary object destructuring is forbidden. Messages and properties
 have byte limits, with a visible truncation flag.
 
-Known build secrets are exact-value masked in stdout/stderr using the resolved secret registry. Values
-shorter than a safe minimum are not accepted as mask patterns because they corrupt ordinary output.
-Encoding, transformed, split-across-chunk, or previously unknown secrets cannot be guaranteed masked;
-the product documentation must say so. Chunk-boundary masking retains a small overlap without retaining
-unbounded text.
+Known build secrets are exact-value masked in stdout/stderr before the Agent's durable spool and
+transport. D45 run secrets accept nonempty values within their explicit bounds; very short values
+can consequently redact ordinary text. Chunk-boundary masking retains a bounded suffix and masks
+an exact registered value even when it spans reads. Encoded, transformed or previously unknown
+secrets and arbitrary artifact files are outside that guarantee. Mask registration is ephemeral;
+the Host retains encrypted recovery input/assignments rather than a plaintext registry.
 
 ### Installation-account startup password exception
 

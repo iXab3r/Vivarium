@@ -7,8 +7,8 @@ public sealed class RuntimeBuild
     public long Id { get; set; }
     public long BuildTypeId { get; set; }
     public long ProjectId { get; set; }
-    public long Counter { get; set; }
-    public required string Number { get; set; }
+    public long? Counter { get; set; }
+    public string? Number { get; set; }
     public Guid ActorId { get; set; }
     public required string CredentialKind { get; set; }
     public required string CorrelationId { get; set; }
@@ -45,6 +45,7 @@ public sealed class RuntimeBuildInput
     public DateTimeOffset CollectedAt { get; set; }
     public required string OverridesJson { get; set; }
     public required string AdmissionJson { get; set; }
+    public byte[] ProtectedEnvironment { get; set; } = [];
 }
 
 public sealed class RuntimeBuildExecution
@@ -61,6 +62,7 @@ public sealed class RuntimeBuildExecution
     public required string SelectionSnapshotJson { get; set; }
     public string? TargetSnapshotJson { get; set; }
     public required byte[] Assignment { get; set; }
+    public int AssignmentProtectionVersion { get; set; }
     public string Phase { get; set; } = "PREPARING";
     public DateTimeOffset PreparedAt { get; set; }
     public DateTimeOffset PreparationDeadline { get; set; }

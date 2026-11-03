@@ -39,6 +39,28 @@ internal sealed class ScopedKeyScenario : IDisposable
     private readonly ScenarioClock validationClock = new();
     private readonly ScenarioClock outputClock = new();
     private readonly ScenarioClock retentionClock = new();
+    internal HttpClient BuildClient => api;
+    internal void ResetRetentionTime() => retentionClock.Reset();
+
+    internal async Task CheckRunSecretAdmissionAsync(HttpClient administrator)
+    {
+        var shell = await administrator.GetStringAsync("/access");
+        var bootstrap = Regex.Match(shell, "<script id=\"vivarium-session\" type=\"application/json\">(.*?)</script>", RegexOptions.Singleline);
+        using var session = JsonDocument.Parse(bootstrap.Groups[1].Value);
+        var csrf = session.RootElement.GetProperty("requestVerificationToken").GetString()!;
+        var runOnly = $"/api/v1/users/{userId}/roles/OWNED_RUN_ONLY/projects/P";
+        var viewer = $"/api/v1/users/{userId}/roles/PROJECT_VIEWER/projects/P";
+        await MutateAsync(administrator, csrf, HttpMethod.Put, runOnly, null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, viewer, null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, RolePath, null, HttpStatusCode.NoContent);
+        const string input = "{\"configurationId\":\"P_Secret\",\"secretEnvironment\":{\"US013_SECRET\":\"owned-denied-secret\"}}";
+        await MutateAsync(api, csrf, HttpMethod.Post, "/api/v1/builds", input, HttpStatusCode.Forbidden);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, runOnly, null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, viewer, null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Post, "/api/v1/builds", input.Replace("P_Secret", "Q_Secret"), HttpStatusCode.NotFound);
+        await MutateAsync(api, csrf, HttpMethod.Post, "/api/v1/builds", input.Replace("US013_SECRET", "env.SECRET"), HttpStatusCode.BadRequest);
+    }
 
     internal void ConfigureServices(IServiceCollection services)
     {
@@ -304,6 +326,7 @@ internal sealed class ScopedKeyScenario : IDisposable
         private long offset;
         public override DateTimeOffset GetUtcNow() => System.GetUtcNow().AddTicks(Interlocked.Read(ref offset));
         internal void Advance(TimeSpan elapsed) => Interlocked.Add(ref offset, elapsed.Ticks);
+        internal void Reset() => Interlocked.Exchange(ref offset, 0);
     }
 
     private async Task DelegationAsync(IServiceProvider services, HttpClient administrator, string csrf)
@@ -356,7 +379,9 @@ internal sealed class ScopedKeyScenario : IDisposable
         Assert.That(failed.GetProperty("status").GetString(), Is.EqualTo("FAILURE"));
         Assert.That(failed.GetProperty("failedToStart").GetBoolean(), Is.False);
         var runningId = await SubmitAsync(api, "P_Wait");
-        await WaitBuildAsync(api, runningId, value => value.GetProperty("executionPhase").GetString() == "accepted");
+        var running = await WaitBuildAsync(api, runningId, value => value.GetProperty("executionPhase").GetString() == "accepted");
+        Assert.That(running.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"),
+            "The reference reports a running Build with no observed failure as SUCCESS, independently of terminal state.");
         using (var bound = new CancellationTokenSource(TimeSpan.FromSeconds(15)))
         {
             var observed = false;
@@ -372,13 +397,19 @@ internal sealed class ScopedKeyScenario : IDisposable
             }
         }
         var queuedId = await SubmitAsync(api, "P_LocalSmoke");
+        using var previous = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}"));
+        var previousNumber = int.Parse(previous.RootElement.GetProperty("number").GetString()!, System.Globalization.CultureInfo.InvariantCulture);
         using (var queued = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{queuedId}")))
+        {
             Assert.That(queued.RootElement.GetProperty("state").GetString(), Is.EqualTo("queued"));
+            Assert.That(queued.RootElement.GetProperty("number").ValueKind, Is.EqualTo(JsonValueKind.Null));
+        }
         await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/builds/{queuedId}/cancellation",
             "{\"reason\":\"Owned queued cancellation\"}", HttpStatusCode.Accepted);
         var cancelled = await WaitBuildAsync(api, queuedId, value => value.GetProperty("state").GetString() == "finished");
         Assert.That(cancelled.GetProperty("agentId").ValueKind, Is.EqualTo(JsonValueKind.Null));
         Assert.That(cancelled.GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
+        Assert.That(cancelled.GetProperty("number").GetString(), Is.EqualTo("N/A"));
         await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/builds/{runningId}/cancellation",
             "{\"reason\":\"Owned running cancellation\"}", HttpStatusCode.Accepted);
         using (var pending = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{runningId}")))
@@ -392,7 +423,11 @@ internal sealed class ScopedKeyScenario : IDisposable
         Assert.That(stopped.GetProperty("cancelReason").GetString(), Is.EqualTo("Owned running cancellation"));
         Assert.That(stopped.GetProperty("statusText").GetString(), Is.EqualTo("Cancelled"));
         // Actual later work proves the old queue entry does not run and the stopped lease releases.
-        await FinishedAsync(api, await SubmitAsync(api, "P_LocalSmoke"));
+        var nextId = await SubmitAsync(api, "P_LocalSmoke");
+        await FinishedAsync(api, nextId);
+        using var next = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{nextId}"));
+        Assert.That(next.RootElement.GetProperty("number").GetString(), Is.EqualTo((previousNumber + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            "The reference queued-cancel case has N/A and does not consume the next started Build number.");
         using var retained = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{queuedId}"));
         Assert.That(retained.RootElement.GetProperty("agentId").ValueKind, Is.EqualTo(JsonValueKind.Null));
     }

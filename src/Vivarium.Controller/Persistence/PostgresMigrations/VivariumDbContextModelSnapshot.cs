@@ -600,7 +600,7 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("Counter")
+                    b.Property<long?>("Counter")
                         .HasColumnType("bigint");
 
                     b.Property<string>("CredentialKind")
@@ -614,7 +614,6 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long>("ProjectId")
@@ -661,7 +660,7 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     b.ToTable("RuntimeBuilds", null, t =>
                         {
-                            t.HasCheckConstraint("CK_RuntimeBuilds_Id", "\"Id\" > 0 AND \"Counter\" > 0");
+                            t.HasCheckConstraint("CK_RuntimeBuilds_Id", "\"Id\" > 0 AND (\"Counter\" IS NULL OR \"Counter\" > 0)");
 
                             t.HasCheckConstraint("CK_RuntimeBuilds_State", "\"State\" IN ('QUEUED','RUNNING','RELEASING','FINISHED')");
 
@@ -744,6 +743,9 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<byte[]>("Assignment")
                         .IsRequired()
                         .HasColumnType("bytea");
+
+                    b.Property<int>("AssignmentProtectionVersion")
+                        .HasColumnType("integer");
 
                     b.Property<long>("CredentialGeneration")
                         .HasColumnType("bigint");
@@ -835,6 +837,10 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
+
+                    b.Property<byte[]>("ProtectedEnvironment")
+                        .IsRequired()
+                        .HasColumnType("bytea");
 
                     b.Property<Guid>("RevisionId")
                         .HasColumnType("uuid");
