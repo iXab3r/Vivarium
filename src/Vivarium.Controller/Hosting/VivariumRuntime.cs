@@ -14,6 +14,12 @@ namespace Vivarium.Controller.Hosting;
 public static class VivariumRuntime
 {
     public static WebApplication Build(string settingsDirectory, Action<ILoggingBuilder>? configureLogging = null)
+        => Build(settingsDirectory, configureLogging, configureServices: null);
+
+    // Deterministic composition tests control time and bounded external actors without introducing
+    // another settings authority or replacing the production application services.
+    internal static WebApplication Build(string settingsDirectory, Action<ILoggingBuilder>? configureLogging,
+        Action<IServiceCollection>? configureServices)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
@@ -50,6 +56,7 @@ public static class VivariumRuntime
         builder.WebHost.ConfigureKestrel(options =>
             options.Configure(builder.Configuration.GetSection("Kestrel"), reloadOnChange: false));
         builder.Services.DeferVivariumIdentityPreload();
+        configureServices?.Invoke(builder.Services);
         var app = builder.Build();
         app.UseExceptionHandler(errors => errors.Run(context =>
         {

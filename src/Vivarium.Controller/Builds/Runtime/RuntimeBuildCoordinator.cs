@@ -8,6 +8,7 @@ using Vivarium.Controller.Agents;
 using Vivarium.Controller.Agents.Compatibility;
 using Vivarium.Controller.Catalog;
 using Vivarium.Controller.Persistence;
+using Vivarium.Controller.Auditing;
 using Vivarium.Definitions;
 
 namespace Vivarium.Controller.Builds.Runtime;
@@ -18,38 +19,66 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    // Delivery/preparation tasks are bounded coordination aids. PG intent/lease/deadlines remain
+    // authoritative and startup resumes PREPARING rows; this map never grants work ownership.
+    private readonly Dictionary<long, Task> preparations = [];
 
     internal async Task RunAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            try { await TickAsync(stoppingToken); }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
-            catch (Exception error) when (error is System.Data.Common.DbException or DbUpdateException or IOException or TimeoutException
-                || error is OperationCanceledException && !stoppingToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                // Neither SQL diagnostics nor runner/parameter values belong in Host diagnostics.
-                logger.LogWarning("Build coordination is unavailable; durable ownership is retained.");
+                try { await TickAsync(stoppingToken); }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
+                catch (Exception error) when (error is System.Data.Common.DbException or DbUpdateException or IOException or TimeoutException
+                    || error is OperationCanceledException && !stoppingToken.IsCancellationRequested)
+                {
+                    // Neither SQL diagnostics nor runner/parameter values belong in Host diagnostics.
+                    logger.LogWarning("Build coordination is unavailable; durable ownership is retained.");
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(250), time, stoppingToken);
             }
-            await Task.Delay(TimeSpan.FromMilliseconds(250), time, stoppingToken);
+        }
+        finally
+        {
+            try { await Task.WhenAll(preparations.Values); }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { }
         }
     }
 
     internal async Task TickAsync(CancellationToken token)
     {
+        foreach (var completed in preparations.Where(p => p.Value.IsCompleted).ToArray())
+        {
+            preparations.Remove(completed.Key); await completed.Value;
+        }
         await sessions.ExpireSilentAsync(token);
         await using (var database = await databases.CreateDbContextAsync(token))
         {
             var active = await database.RuntimeBuildExecutions.AsNoTracking().Where(e => e.ReleasedAt == null)
-                .OrderBy(e => e.BuildId).Select(e => e.BuildId).ToArrayAsync(token);
-            foreach (var id in active)
+                .OrderBy(e => e.BuildId).Select(e => new { e.BuildId, e.Phase }).ToArrayAsync(token);
+            foreach (var entry in active)
             {
-                await output.SealAsync(id, token);
-                await AdvanceAsync(id, token);
+                await output.SealAsync(entry.BuildId, token);
+                await AdvanceAsync(entry.BuildId, token);
+                if (entry.Phase == "PREPARING") StartPreparation(entry.BuildId, token);
             }
         }
         var claimed = await ClaimAsync(token);
-        if (claimed is not null) await AdvanceAsync(claimed.Value, token);
+        if (claimed is not null) StartPreparation(claimed.Value, token);
+    }
+
+    private void StartPreparation(long id, CancellationToken token)
+    {
+        if (preparations.Count >= 2 || preparations.ContainsKey(id)) return;
+        preparations.Add(id, Task.Run(async () =>
+        {
+            try { await AdvanceAsync(id, token, prepare: true); }
+            catch (Exception error) when (error is System.Data.Common.DbException or DbUpdateException or IOException or TimeoutException
+                || error is OperationCanceledException && !token.IsCancellationRequested)
+            { logger.LogWarning("Build preparation is unavailable; its durable intent/deadline is retained."); }
+        }, CancellationToken.None));
     }
 
     private async Task<long?> ClaimAsync(CancellationToken token)
@@ -103,6 +132,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 };
                 database.RuntimeBuildExecutions.Add(execution); agent.CurrentWorkloadId = execution.WorkloadId;
                 build.State = "RUNNING"; build.StartedAt = now; build.StatusText = "Preparing execution";
+                await RuntimeBuildAudit.StageAsync(database, build, now, "build.assignment.prepared", workload: execution.WorkloadId, token: token);
                 await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
                 registry.Reconcile(connection.Handle, execution.WorkloadId);
                 return build.Id;
@@ -112,7 +142,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         return null;
     }
 
-    private async Task AdvanceAsync(long id, CancellationToken token)
+    private async Task AdvanceAsync(long id, CancellationToken token, bool prepare = false)
     {
         RuntimeBuildExecution snapshot;
         RuntimeBuild build;
@@ -131,9 +161,12 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             os = selection.RootElement.GetProperty("reportedParameters").GetProperty("system.os.family").GetString()!;
         }
         RuntimePreparedAssignment? prepared = null;
-        if (snapshot.Phase == "PREPARING" && build.CancelRequestedAt is null && time.GetUtcNow() < snapshot.PreparationDeadline)
+        if (prepare && snapshot.Phase == "PREPARING" && build.CancelRequestedAt is null && time.GetUtcNow() < snapshot.PreparationDeadline)
         {
-            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, token); }
+            var remaining = snapshot.PreparationDeadline - time.GetUtcNow();
+            using var timeout = new CancellationTokenSource(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, time);
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
+            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token); }
             catch (Exception error) when (error is InvalidDataException or HttpRequestException or IOException or TimeoutException
                 || error is OperationCanceledException && !token.IsCancellationRequested)
             { await FailAsync(id, "Execution preparation failed", safeUnsent: true, token); return; }
@@ -187,6 +220,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             owner.AcknowledgementDeadline = now.AddSeconds(30);
             foreach (var payload in prepared.Payloads) state.RuntimeBuildPayloads.Add(payload);
             currentBuild.StatusText = "Starting execution";
+            await RuntimeBuildAudit.StageAsync(state, currentBuild, now, "build.assignment.dispatching", workload: owner.WorkloadId, token: token);
         }
         ControllerMsg? message = null;
         if (connected && owner.Phase == "DISPATCHING" && EligibleForDelivery(currentAgent))
@@ -221,6 +255,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         var build = await database.RuntimeBuilds.SingleAsync(b => b.Id == execution.BuildId, token);
         if (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result)
         {
+            if (execution.AcceptedAt is null)
+                await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.assignment.accepted", workload: workload, token: token);
             execution.AcceptedAt ??= time.GetUtcNow();
             if (execution.Phase == "DISPATCHING") execution.Phase = "ACCEPTED";
             var input = await database.RuntimeBuildInputs.SingleAsync(i => i.BuildId == build.Id, token);
@@ -237,7 +273,16 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var semantic = result.Clone(); semantic.SessionId = "";
             var hash = Convert.ToHexStringLower(SHA256.HashData(semantic.ToByteArray()));
             var existing = await database.RuntimeBuildResults.SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
-            if (existing is not null && existing.SemanticHash != hash) throw new InvalidDataException("Terminal evidence conflicts.");
+            if (existing is not null && existing.SemanticHash != hash)
+            {
+                agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "conflicting_build_result";
+                await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.conflict", AuditOutcome.Failed,
+                    "conflicting_result", workload, new Dictionary<string, string> { ["acceptedHash"] = existing.SemanticHash,
+                        ["submittedHash"] = hash }, token);
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason);
+                throw new InvalidDataException("Terminal evidence conflicts.");
+            }
             if (existing is null)
             {
                 if (result.Artifacts.Count > 128 || result.Artifacts.Select(a => a.Path).Distinct(StringComparer.OrdinalIgnoreCase).Count() != result.Artifacts.Count)
@@ -254,6 +299,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 }
                 database.RuntimeBuildResults.Add(new() { BuildId = build.Id, Evidence = result.ToByteArray(), SemanticHash = hash,
                     OriginalOutcome = result.Outcome.ToString(), ReceivedAt = time.GetUtcNow() });
+                await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.accepted", workload: workload, token: token);
                 execution.Phase = "TERMINAL"; execution.TerminalReceivedAt = time.GetUtcNow();
                 execution.OutputDeadline = time.GetUtcNow().AddSeconds(30); build.State = "RELEASING";
                 var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "SEALING";
@@ -293,11 +339,15 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         // A durable send intent always wins over a caller's earlier unsent observation.
         safeUnsent &= execution.SentAt is null;
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
-        build.FailedToStart = execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
+        build.FailedToStart = build.CancelRequestedAt is null && execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow();
         if (safeUnsent && agent.CurrentWorkloadId == execution.WorkloadId) agent.CurrentWorkloadId = null;
         else { agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "workload_ownership_expired"; }
         var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == id, token);
+        var cancelledBeforeSend = build.CancelRequestedAt is not null && safeUnsent;
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), cancelledBeforeSend ? "build.cancel.completed" : "build.execution.unavailable",
+            cancelledBeforeSend ? AuditOutcome.Succeeded : AuditOutcome.Failed,
+            cancelledBeforeSend ? "cancelled_before_execution" : "execution_unavailable", execution.WorkloadId, token: token);
         output.State = safeUnsent ? "COMPLETE" : "COMPLETE_WITH_GAPS";
         if (safeUnsent)
             foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == id).ToArrayAsync(token))
@@ -321,6 +371,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     {
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
         build.FailedToStart = true; build.FinishedAt = time.GetUtcNow();
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.queue.expired", AuditOutcome.Failed,
+            "queue_deadline", token: token);
         var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "COMPLETE";
         foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == build.Id).ToArrayAsync(token))
         { stream.FinalSequence = 0; stream.FinalBytes = 0; }

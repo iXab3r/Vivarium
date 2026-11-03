@@ -1418,6 +1418,24 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("Groups");
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Identity.TeamCityPermissionDefinition", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .UseCollation("C");
+
+                    b.Property<bool>("IsGlobal")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PermissionDefinitions");
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Identity.TeamCityRole", b =>
                 {
                     b.Property<string>("Id")

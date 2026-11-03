@@ -211,6 +211,8 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
         if (execution.TerminalReceivedAt is null || execution.ReleasedAt is not null) return false;
         var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == execution.BuildId, token);
         if (output.State is not ("COMPLETE" or "COMPLETE_WITH_GAPS")) return false;
+        var build = await database.RuntimeBuilds.SingleAsync(b => b.Id == execution.BuildId, token);
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.lease.released", workload: execution.WorkloadId, token: token);
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow(); row.CurrentWorkloadId = null;
         return true;
     }

@@ -118,7 +118,8 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             StageAudit(database, actor, "build.cancel", "build", id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Denied);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw Missing();
         }
-        if (!await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, ["cancel_build"],
+        var permissions = mode == "FORCE" ? new[] { "cancel_build", AuthorizationPermissionIds.BuildForceStop } : ["cancel_build"];
+        if (!await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, permissions,
             await RuntimeBuildAccess.AncestryAsync(database, build.ProjectId, token), token))
         {
             StageAudit(database, actor, "build.cancel", "build", id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Denied);

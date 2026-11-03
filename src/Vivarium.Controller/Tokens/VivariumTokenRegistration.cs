@@ -12,6 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Identity;
 using Vivarium.Controller.Persistence;
+using System.Net.Security;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Vivarium.Controller.Tokens;
 
@@ -82,6 +85,8 @@ internal static class VivariumTokenRegistration
                 .SetOrder(OpenIddictServerHandlers.AttachSignInParameters.Descriptor.Order - 500));
         }).AddClient(options =>
         {
+            options.UseSystemNetHttp().ConfigureHttpClientHandler((registration, handler) =>
+                ConfigureSelfClientTls(registration, handler, configuration));
             options.AddEventHandler<OpenIddictClientEvents.ProcessAuthenticationContext>(handler => handler
                 .UseInlineHandler(context =>
                 {
@@ -116,6 +121,26 @@ internal static class VivariumTokenRegistration
             options.Registrations.Add(registration);
         });
         return services;
+    }
+
+    internal static void ConfigureSelfClientTls(OpenIddictClientRegistration registration, HttpClientHandler handler,
+        IConfiguration configuration)
+    {
+        if (registration.RegistrationId != VivariumTokenProfile.Client) return;
+        var origin = VivariumIdentityRegistration.PublicOrigin(configuration);
+        var path = configuration["Kestrel:Certificates:Default:Path"]
+            ?? throw new InvalidOperationException("The Host HTTPS certificate is unavailable.");
+        using var certificate = X509CertificateLoader.LoadPkcs12FromFile(path,
+            configuration["Kestrel:Certificates:Default:Password"], X509KeyStorageFlags.EphemeralKeySet);
+        var fingerprint = certificate.GetCertHash(HashAlgorithmName.SHA256);
+        handler.AllowAutoRedirect = false;
+        // Trust the exact Host TLS fingerprint only for its same-origin native client.
+        // CA-valid public TLS also works through a reverse proxy; external providers
+        // retain ordinary TLS validation and no machine trust store is changed.
+        handler.ServerCertificateCustomValidationCallback = (request, remote, _, errors) =>
+            request.RequestUri?.GetLeftPart(UriPartial.Authority) == origin.GetLeftPart(UriPartial.Authority)
+            && remote is not null && (errors == SslPolicyErrors.None
+                || CryptographicOperations.FixedTimeEquals(remote.GetCertHash(HashAlgorithmName.SHA256), fingerprint));
     }
 
     public static async Task InitializeVivariumTokensAsync(this IServiceProvider services, CancellationToken cancellationToken)

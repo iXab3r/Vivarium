@@ -1,0 +1,300 @@
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Vivarium.Controller.Identity;
+using Vivarium.Controller.Security;
+
+namespace Vivarium.DefinitionProof;
+
+/// <summary>One real ordinary account/key journey. Credentials stay only in private in-memory HTTP state.</summary>
+internal sealed class ScopedKeyScenario : IDisposable
+{
+    private readonly HttpClient browser;
+    private readonly HttpClient api;
+    private readonly Uri origin;
+    private readonly CookieContainer browserCookies = new();
+    private long buildId;
+    private string? artifactHref;
+    private string? outputHref;
+    private Guid userId;
+
+    internal ScopedKeyScenario(Uri origin, string thumbprint)
+    {
+        this.origin = origin;
+        HttpClient Create(bool cookies) => new(new HttpClientHandler { AllowAutoRedirect = false,
+            UseCookies = cookies, CookieContainer = cookies ? browserCookies : new CookieContainer(),
+            ServerCertificateCustomValidationCallback = (_, certificate, _, _) => certificate?.Thumbprint == thumbprint })
+            { BaseAddress = origin, Timeout = TimeSpan.FromSeconds(15) };
+        browser = Create(cookies: true); api = Create(cookies: false);
+    }
+
+    internal async Task RunAsync(IServiceProvider services, HttpClient administrator, string csrf, string agentId)
+    {
+        var name = "owned-scoped-user";
+        await using (var scope = services.CreateAsyncScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<VivariumUser>>();
+            var user = new VivariumUser { Id = Guid.NewGuid(), UserName = name, DisplayName = "Owned scoped actor" };
+            Assert.That((await users.CreateAsync(user)).Succeeded, Is.True);
+            userId = user.Id;
+            // Prior state: an eligible ordinary Identity session. OrdinaryIdentityTests owns the
+            // real external-issuer/browser login proof. This HTTP journey starts at My keys and
+            // uses the actual audited SignInManager/cookie handler, without a test auth scheme.
+            var accessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            var previous = accessor.HttpContext;
+            var context = new DefaultHttpContext { RequestServices = scope.ServiceProvider };
+            context.Request.Scheme = origin.Scheme; context.Request.Host = new HostString(origin.Host, origin.Port);
+            try
+            {
+                accessor.HttpContext = context;
+                var signIn = scope.ServiceProvider.GetRequiredService<SignInManager<VivariumUser>>();
+                signIn.Context = context;
+                Assert.That(await signIn.CanSignInAsync(user), Is.True);
+                await signIn.SignInAsync(user, isPersistent: false);
+                foreach (var header in Microsoft.Net.Http.Headers.SetCookieHeaderValue.ParseList(context.Response.Headers.SetCookie.Select(value => value!).ToArray()))
+                    browserCookies.Add(origin, new Cookie(header.Name.ToString(), header.Value.ToString(), header.Path.ToString())
+                        { HttpOnly = header.HttpOnly, Secure = header.Secure });
+            }
+            finally { accessor.HttpContext = previous; }
+        }
+        await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
+        var keysHtml = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
+        using var creation = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Create",
+            new FormUrlEncodedContent(new Dictionary<string, string> { ["Label"] = "Owned scoped build key", ["LifetimeDays"] = "1",
+                ["__RequestVerificationToken"] = Antiforgery(keysHtml) }));
+        var disclosure = await FollowAsync(creation);
+        var match = Regex.Match(disclosure, "<textarea[^>]*id=\"token\"[^>]*>(.*?)</textarea>", RegexOptions.Singleline);
+        if (!match.Success) throw new InvalidDataException("The ordinary framework key disclosure is absent.");
+        api.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", WebUtility.HtmlDecode(match.Groups[1].Value).Trim());
+        Assert.That((await api.GetAsync("/api/v1/users/current")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        await DelegationAsync(services, administrator, csrf);
+        using (var denied = await api.PutAsync($"/api/v1/agents/{agentId}/authorization",
+            new StringContent("{\"authorized\":false}", Encoding.UTF8, "application/json")))
+            Assert.That(denied.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        using (var control = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/agents/{agentId}")))
+            Assert.That(control.RootElement.GetProperty("authorized").GetBoolean(), Is.True);
+
+        // A real Q Build/artifact is the protected positive control, not a guessed absent identity.
+        var protectedId = await SubmitAsync(administrator, "Q_LocalSmoke", csrf);
+        await FinishedAsync(administrator, protectedId);
+        using (var protectedArtifacts = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/builds/{protectedId}/artifacts")))
+        {
+            var href = protectedArtifacts.RootElement.GetProperty("items")[0].GetProperty("href").GetString()!;
+            Assert.That((await administrator.GetByteArrayAsync(href)).Length, Is.Positive);
+            Assert.That((await api.GetAsync(href)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        }
+        Assert.That((await api.GetAsync($"/api/v1/builds/{protectedId}")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+
+        buildId = await SubmitAsync(api, "P_LocalSmoke");
+        await FinishedAsync(api, buildId);
+        using (var artifacts = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}/artifacts")))
+            artifactHref = artifacts.RootElement.GetProperty("items")[0].GetProperty("href").GetString();
+        using (var output = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{buildId}/output")))
+            outputHref = output.RootElement.GetProperty("items").EnumerateArray().First(i => i.GetProperty("kind").GetString() == "data")
+                .GetProperty("content").GetProperty("href").GetString();
+        Assert.That((await api.GetByteArrayAsync(artifactHref)).Length, Is.Positive);
+        Assert.That((await api.GetByteArrayAsync(outputHref)).Length, Is.Positive);
+        await FailureAndCancellationAsync(administrator, csrf);
+
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, RolePath, null, HttpStatusCode.NoContent);
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.NotFound);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, $"/api/v1/users/{userId}/enabled", "{\"enabled\":false}", HttpStatusCode.NoContent);
+        await AssertCurrentAsync(HttpStatusCode.Unauthorized, HttpStatusCode.Unauthorized);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, $"/api/v1/users/{userId}/enabled", "{\"enabled\":true}", HttpStatusCode.NoContent);
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+    }
+
+    internal async Task AfterRestartAndRevokeAsync()
+    {
+        await AssertCurrentAsync(HttpStatusCode.OK, HttpStatusCode.OK);
+        var html = await browser.GetStringAsync("/Identity/Account/Manage/Tokens");
+        var id = Regex.Match(html, "name=\"id\"[^>]*value=\"([^\"]+)\"");
+        if (!id.Success) throw new InvalidDataException("The ordinary own-key metadata is absent.");
+        using var revoked = await browser.PostAsync("/Identity/Account/Manage/Tokens?handler=Revoke",
+            new FormUrlEncodedContent(new Dictionary<string, string> { ["id"] = WebUtility.HtmlDecode(id.Groups[1].Value),
+                ["__RequestVerificationToken"] = Antiforgery(html) }));
+        Assert.That(revoked.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+        await AssertCurrentAsync(HttpStatusCode.Unauthorized, HttpStatusCode.Unauthorized);
+    }
+
+    private async Task DelegationAsync(IServiceProvider services, HttpClient administrator, string csrf)
+    {
+        Guid targetId;
+        await using (var scope = services.CreateAsyncScope())
+        {
+            var user = new VivariumUser { Id = Guid.NewGuid(), UserName = "owned-delegation-target" };
+            Assert.That((await scope.ServiceProvider.GetRequiredService<UserManager<VivariumUser>>().CreateAsync(user)).Succeeded, Is.True);
+            targetId = user.Id;
+            var actor = new ManagementRequestContext(new ManagementPrincipal("user", VivariumIdentityConstants.SuperuserId.ToString(),
+                "owned-component", null), ManagementIdentifiers.NewId(), null, "owned-role-prior-state");
+            var changes = scope.ServiceProvider.GetRequiredService<TeamCityAccessService>();
+            Assert.That(await changes.SetRoleAsync(actor, "OWNED_DELEGATOR", "Owned narrow delegator",
+                ["change_user_roles_in_project", "view_project", "view_user_profile"]), Is.EqualTo(AccessMutationResult.Applied));
+            Assert.That(await changes.SetRoleAsync(actor, "OWNED_RUN_ONLY", "Owned run only", ["run_build"]), Is.EqualTo(AccessMutationResult.Applied));
+        }
+        string Target(string role, string project) => $"/api/v1/users/{targetId}/roles/{role}/projects/{project}";
+        string Own(string role) => $"/api/v1/users/{userId}/roles/{role}/projects/P";
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("PROJECT_DEVELOPER", "P"), null, HttpStatusCode.Forbidden);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, Own("PROJECT_ADMIN"), null, HttpStatusCode.NoContent);
+        Assert.That((await api.GetAsync("/api/v1/roles")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That((await api.GetAsync($"/api/v1/users/{targetId}/roles")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("PROJECT_DEVELOPER", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("PROJECT_ADMIN", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("PROJECT_DEVELOPER", "Q"), null, HttpStatusCode.Forbidden);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("SYSTEM_ADMIN", "P"), null, HttpStatusCode.Forbidden);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("AGENT_MANAGER", "P"), null, HttpStatusCode.Forbidden);
+        await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/users/{targetId}/roles/PROJECT_DEVELOPER/g", null, HttpStatusCode.Forbidden);
+        await MutateAsync(api, csrf, HttpMethod.Delete, Target("PROJECT_DEVELOPER", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Delete, Target("PROJECT_ADMIN", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, Own("PROJECT_ADMIN"), null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, RolePath, null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, Own("OWNED_DELEGATOR"), null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("OWNED_DELEGATOR", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(api, csrf, HttpMethod.Put, Target("OWNED_RUN_ONLY", "P"), null, HttpStatusCode.Forbidden);
+        await MutateAsync(api, csrf, HttpMethod.Delete, Target("OWNED_DELEGATOR", "P"), null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Delete, Own("OWNED_DELEGATOR"), null, HttpStatusCode.NoContent);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, RolePath, null, HttpStatusCode.NoContent);
+        using var grants = JsonDocument.Parse(await administrator.GetStringAsync($"/api/v1/users/{targetId}/roles"));
+        Assert.That(grants.RootElement.GetProperty("items").GetArrayLength(), Is.Zero);
+    }
+
+    private string RolePath => $"/api/v1/users/{userId}/roles/PROJECT_DEVELOPER/projects/P";
+
+    private async Task FailureAndCancellationAsync(HttpClient administrator, string csrf)
+    {
+        var failedId = await SubmitAsync(api, "P_Nonzero");
+        var failed = await WaitBuildAsync(api, failedId, value => value.GetProperty("state").GetString() == "finished");
+        Assert.That(failed.GetProperty("status").GetString(), Is.EqualTo("FAILURE"));
+        Assert.That(failed.GetProperty("failedToStart").GetBoolean(), Is.False);
+        var runningId = await SubmitAsync(api, "P_Wait");
+        await WaitBuildAsync(api, runningId, value => value.GetProperty("executionPhase").GetString() == "accepted");
+        using (var bound = new CancellationTokenSource(TimeSpan.FromSeconds(15)))
+        {
+            var observed = false;
+            while (!observed)
+            {
+                using var output = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{runningId}/output", bound.Token));
+                foreach (var entry in output.RootElement.GetProperty("items").EnumerateArray().Where(e => e.GetProperty("kind").GetString() == "data"))
+                {
+                    var text = await api.GetStringAsync(entry.GetProperty("content").GetProperty("href").GetString(), bound.Token);
+                    observed |= text.Contains("owned-running-start", StringComparison.Ordinal);
+                }
+                if (!observed) await Task.Delay(100, bound.Token);
+            }
+        }
+        var queuedId = await SubmitAsync(api, "P_LocalSmoke");
+        using (var queued = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{queuedId}")))
+            Assert.That(queued.RootElement.GetProperty("state").GetString(), Is.EqualTo("queued"));
+        await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/builds/{queuedId}/cancellation",
+            "{\"reason\":\"Owned queued cancellation\"}", HttpStatusCode.Accepted);
+        var cancelled = await WaitBuildAsync(api, queuedId, value => value.GetProperty("state").GetString() == "finished");
+        Assert.That(cancelled.GetProperty("agentId").ValueKind, Is.EqualTo(JsonValueKind.Null));
+        Assert.That(cancelled.GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
+        await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/builds/{runningId}/cancellation",
+            "{\"reason\":\"Owned running cancellation\"}", HttpStatusCode.Accepted);
+        using (var pending = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{runningId}")))
+            Assert.That(pending.RootElement.GetProperty("state").GetString(), Is.Not.EqualTo("finished"),
+                "A stop request is not process completion while the owned console process remains alive.");
+        const string force = "{\"reason\":\"Owned explicit escalation\",\"mode\":\"force\"}";
+        await MutateAsync(api, csrf, HttpMethod.Put, $"/api/v1/builds/{runningId}/cancellation", force, HttpStatusCode.Forbidden);
+        await MutateAsync(administrator, csrf, HttpMethod.Put, $"/api/v1/builds/{runningId}/cancellation", force, HttpStatusCode.Accepted);
+        var stopped = await WaitBuildAsync(api, runningId, value => value.GetProperty("state").GetString() == "finished");
+        Assert.That(stopped.GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
+        Assert.That(stopped.GetProperty("cancelReason").GetString(), Is.EqualTo("Owned running cancellation"));
+        Assert.That(stopped.GetProperty("statusText").GetString(), Is.EqualTo("Cancelled"));
+        // Actual later work proves the old queue entry does not run and the stopped lease releases.
+        await FinishedAsync(api, await SubmitAsync(api, "P_LocalSmoke"));
+        using var retained = JsonDocument.Parse(await api.GetStringAsync($"/api/v1/builds/{queuedId}"));
+        Assert.That(retained.RootElement.GetProperty("agentId").ValueKind, Is.EqualTo(JsonValueKind.Null));
+    }
+    private async Task AssertCurrentAsync(HttpStatusCode identityStatus, HttpStatusCode resourceStatus)
+    {
+        foreach (var (path, expected) in new[] { ("/api/v1/users/current", identityStatus), ($"/api/v1/builds/{buildId}", resourceStatus),
+            (artifactHref!, resourceStatus), (outputHref!, resourceStatus) })
+        {
+            using var response = await api.GetAsync(path);
+            Assert.That(response.StatusCode, Is.EqualTo(expected), "The same ordinary key must use current eligibility/grants for metadata and bytes.");
+            Assert.That(response.Headers.Location, Is.Null);
+        }
+    }
+
+    private async Task<string> FollowAsync(HttpResponseMessage first)
+    {
+        var response = first;
+        try
+        {
+            for (var remaining = 0; remaining < 12; remaining++)
+            {
+                if (response.StatusCode == HttpStatusCode.OK) return await response.Content.ReadAsStringAsync();
+                if (response.StatusCode is not (HttpStatusCode.Redirect or HttpStatusCode.SeeOther) || response.Headers.Location is null)
+                {
+                    var body = await response.Content.ReadAsStringAsync();
+                    var code = "none";
+                    try
+                    {
+                        using var failure = JsonDocument.Parse(body);
+                        if (failure.RootElement.TryGetProperty("error", out var value) && value.GetString() is
+                            "invalid_request" or "invalid_client" or "invalid_scope" or "server_error" or "access_denied" or "unauthorized_client")
+                            code = value.GetString()!;
+                    }
+                    catch (JsonException) { }
+                    var reference = Regex.Match(body, "https://documentation\\.openiddict\\.com/errors/(ID[0-9]{4})").Groups[1].Value;
+                    throw new InvalidDataException($"The ordinary authorization-code flow did not complete: status {(int)response.StatusCode}, step {remaining}, route {response.RequestMessage?.RequestUri?.AbsolutePath}, media {response.Content.Headers.ContentType?.MediaType}, bytes {Encoding.UTF8.GetByteCount(body)}, protocol {code}, reference {reference}.");
+                }
+                var next = response.Headers.Location.IsAbsoluteUri ? response.Headers.Location : new Uri(origin, response.Headers.Location);
+                if (next.GetLeftPart(UriPartial.Authority) != origin.GetLeftPart(UriPartial.Authority))
+                    throw new InvalidDataException("The ordinary token flow left its owned origin.");
+                var previous = response; response = await browser.GetAsync(next);
+                if (!ReferenceEquals(previous, first)) previous.Dispose();
+            }
+            throw new InvalidDataException("The ordinary token redirect bound was exceeded.");
+        }
+        finally { if (!ReferenceEquals(response, first)) response.Dispose(); }
+    }
+
+    private static string Antiforgery(string html)
+    {
+        var match = Regex.Match(html, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
+        return match.Success ? WebUtility.HtmlDecode(match.Groups[1].Value)
+            : throw new InvalidDataException("The ordinary form request-verification token is absent.");
+    }
+    private static async Task MutateAsync(HttpClient http, string csrf, HttpMethod method, string path, string? body, HttpStatusCode expected)
+    {
+        using var request = new HttpRequestMessage(method, path); request.Headers.Add("RequestVerificationToken", csrf);
+        if (body is not null) request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+        using var response = await http.SendAsync(request); Assert.That(response.StatusCode, Is.EqualTo(expected));
+    }
+    private static async Task<long> SubmitAsync(HttpClient http, string configuration, string? csrf = null)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/builds")
+        { Content = new StringContent(JsonSerializer.Serialize(new { configurationId = configuration }), Encoding.UTF8, "application/json") };
+        if (csrf is not null) request.Headers.Add("RequestVerificationToken", csrf);
+        using var response = await http.SendAsync(request); Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+        using var value = JsonDocument.Parse(await response.Content.ReadAsStringAsync()); return value.RootElement.GetProperty("id").GetInt64();
+    }
+    private static async Task FinishedAsync(HttpClient http, long id)
+    {
+        var finished = await WaitBuildAsync(http, id, value => value.GetProperty("state").GetString() == "finished");
+        Assert.That(finished.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
+    }
+    private static async Task<JsonElement> WaitBuildAsync(HttpClient http, long id, Func<JsonElement, bool> predicate)
+    {
+        using var bound = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+        while (true)
+        {
+            using var response = await http.GetAsync($"/api/v1/builds/{id}", bound.Token);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var value = JsonDocument.Parse(await response.Content.ReadAsStringAsync(bound.Token));
+            if (predicate(value.RootElement)) return value.RootElement.Clone();
+            await Task.Delay(100, bound.Token);
+        }
+    }
+    public void Dispose() { api.Dispose(); browser.Dispose(); }
+}

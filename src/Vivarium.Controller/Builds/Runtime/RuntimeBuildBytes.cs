@@ -5,9 +5,9 @@ using EyeAuras.Storage;
 namespace Vivarium.Controller.Builds.Runtime;
 
 /// <summary>Internal Storage bytes; signed URLs never cross the public management boundary.</summary>
-internal sealed class RuntimeBuildBytes(IObjectStorage storage) : IDisposable
+internal sealed class RuntimeBuildBytes(IObjectStorage storage, HttpMessageHandler? handler = null) : IDisposable
 {
-    private readonly HttpClient http = new(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(15) };
+    private readonly HttpClient http = new(handler ?? new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(15) };
 
     internal async Task PutAsync(string key, ReadOnlyMemory<byte> bytes, CancellationToken token)
     {

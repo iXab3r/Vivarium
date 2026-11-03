@@ -52,6 +52,12 @@ internal static class AccessEndpoints
                 if (input is null) return InvalidInput(http);
                 return Result(http, await changes.SetOrdinaryUserEnabledAsync(actor, userId, input.Enabled, http.RequestAborted), userId);
             }, mutation: true));
+        app.MapPut("/api/v1/users/{userId:guid}/roles/{roleId}/projects/{projectId}",
+            (HttpContext http, Guid userId, string roleId, string projectId, TeamCityAccessService changes) => ExecuteAsync(http, async actor =>
+                Result(http, await changes.SetProjectUserRoleAsync(actor, userId, roleId, projectId, true, http.RequestAborted), userId), mutation: true));
+        app.MapDelete("/api/v1/users/{userId:guid}/roles/{roleId}/projects/{projectId}",
+            (HttpContext http, Guid userId, string roleId, string projectId, TeamCityAccessService changes) => ExecuteAsync(http, async actor =>
+                Result(http, await changes.SetProjectUserRoleAsync(actor, userId, roleId, projectId, false, http.RequestAborted), userId), mutation: true));
     }
 
     private static IResult Result(HttpContext http, AccessMutationResult result, Guid userId) => result switch

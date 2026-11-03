@@ -10,12 +10,14 @@ using EyeAuras.Storage;
 using EyeAuras.Storage.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Vivarium.Controller.Hosting;
 using Vivarium.Controller.Persistence;
 using Vivarium.Controller.Catalog;
+using Vivarium.Controller.Builds.Runtime;
 
 namespace Vivarium.DefinitionProof;
 
@@ -59,6 +61,20 @@ public sealed class RuntimeHostPhysicalTests
         await SourceCompiler.GitAsync(definitions, "config", "user.name", "Owned Host fixture");
         await SourceCompiler.GitAsync(definitions, "config", "user.email", "fixture@example.invalid");
         var source = ProductionEvaluatorPhysicalTests.Sources();
+        var smokeSettings = source["Settings.g.cs"].Replace("echo from CSharp Git",
+            "echo from CSharp Git\\necho owned-smoke-artifact>proof.txt\\n" + (OperatingSystem.IsWindows()
+                ? "echo ##teamcity[publishArtifacts 'proof.txt']" : "echo \\\"##teamcity[publishArtifacts 'proof.txt']\\\""), StringComparison.Ordinal);
+        var waitingScript = OperatingSystem.IsWindows()
+            ? "echo owned-running-start\nping -n 60 127.0.0.1 >nul" : "trap '' TERM\necho owned-running-start\nsleep 60";
+        smokeSettings = smokeSettings.Replace("new(\"P_LocalSmoke\",", $$"""
+            new("P_Nonzero", "Nonzero", [], [
+                new("fail", "Fail", "simpleRunner", [new("script.content", "echo owned-nonzero\nexit 7", null)])
+            ], [], [], [], 1, []),
+            new("P_Wait", "Wait", [], [
+                new("wait", "Wait", "simpleRunner", [new("script.content", {{JsonSerializer.Serialize(waitingScript)}}, null)])
+            ], [], [], [], 2, []),
+            new("P_LocalSmoke",
+            """, StringComparison.Ordinal);
         var files = new Dictionary<string, string>
         {
             [".vivarium/repository.yaml"] = """
@@ -71,10 +87,11 @@ public sealed class RuntimeHostPhysicalTests
                     - Project
                 """,
             [".vivarium/projects/P/Control.g.cs"] = source["Control.g.cs"],
-            [".vivarium/unbound/P/Settings.g.cs"] = source["Settings.g.cs"].Replace("echo from CSharp Git",
-                "echo from CSharp Git\\necho owned-smoke-artifact>proof.txt\\n" + (OperatingSystem.IsWindows()
-                    ? "echo ##teamcity[publishArtifacts 'proof.txt']" : "echo \\\"##teamcity[publishArtifacts 'proof.txt']\\\""), StringComparison.Ordinal),
+            [".vivarium/unbound/P/Settings.g.cs"] = smokeSettings,
             [".vivarium/unbound/P/UserCode.cs"] = source["UserCode.cs"],
+            [".vivarium/projects/Q/Control.g.cs"] = source["Control.g.cs"].Replace("\"P\"", "\"Q\"").Replace("Project P", "Project Q"),
+            [".vivarium/unbound/Q/Settings.g.cs"] = smokeSettings.Replace("\"P\"", "\"Q\"").Replace("P_", "Q_"),
+            [".vivarium/unbound/Q/UserCode.cs"] = source["UserCode.cs"],
         };
         foreach (var (path, text) in files)
         {
@@ -153,11 +170,16 @@ public sealed class RuntimeHostPhysicalTests
                 && remote.Thumbprint == certificate.Thumbprint,
         };
         using var http = new HttpClient(handler) { BaseAddress = new Uri(origin), Timeout = TimeSpan.FromSeconds(15) };
+        using var scopedActor = new ScopedKeyScenario(new Uri(origin), certificate.Thumbprint);
         string oldPassword;
         long? executedBuild = null;
         string? outputResumeCursor = null;
         var capture = new PrivateStartupLog();
-        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(capture)))
+        using var payloadPause = new BoundedPayloadPause();
+        RuntimeBuildBytes? compilerBytes = null;
+        await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(capture), services =>
+            services.Replace(ServiceDescriptor.Singleton<RuntimeStepCompiler>(provider => new RuntimeStepCompiler(
+                compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause))))))
         {
             // This owned logger receives only the product's intended private disclosure. It never
             // writes the password, form, token or cookie into console/TRX/diagnostic artifacts.
@@ -318,14 +340,49 @@ public sealed class RuntimeHostPhysicalTests
                     using var repeatedResponse = await http.SendAsync(repeatRequest);
                     Assert.That(repeatedResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
                     using var repeated = JsonDocument.Parse(await repeatedResponse.Content.ReadAsStringAsync());
-                    var next = await WaitBuildAsync(http, repeated.RootElement.GetProperty("id").GetInt64());
+                    var cancelledId = repeated.RootElement.GetProperty("id").GetInt64();
+                    await payloadPause.Entered.WaitAsync(TimeSpan.FromSeconds(10));
+                    using var cancellation = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/builds/{cancelledId}/cancellation");
+                    cancellation.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                    cancellation.Content = new StringContent("{\"reason\":\"Owned preparation cancellation\",\"mode\":\"force\"}",
+                        System.Text.Encoding.UTF8, "application/json");
+                    using var cancelledResponse = await http.SendAsync(cancellation);
+                    Assert.That(cancelledResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+                    using (var bound = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+                    {
+                        var cancelled = await WaitBuildAsync(http, cancelledId, bound.Token);
+                        Assert.That(cancelled.GetProperty("cancelReason").GetString(), Is.EqualTo("Owned preparation cancellation"));
+                        Assert.That(cancelled.GetProperty("failedToStart").GetBoolean(), Is.False);
+                    }
+                    payloadPause.Release();
+                    await payloadPause.Completed.WaitAsync(TimeSpan.FromSeconds(10));
+                    await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId && value.GetProperty("ready").GetBoolean());
+                    using var afterCancel = new HttpRequestMessage(HttpMethod.Post, "/api/v1/builds");
+                    afterCancel.Headers.Add("RequestVerificationToken", session.RootElement.GetProperty("requestVerificationToken").GetString());
+                    afterCancel.Content = new StringContent("{\"configurationId\":\"P_LocalSmoke\"}", System.Text.Encoding.UTF8, "application/json");
+                    using var nextResponse = await http.SendAsync(afterCancel);
+                    Assert.That(nextResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
+                    using var nextAdmitted = JsonDocument.Parse(await nextResponse.Content.ReadAsStringAsync());
+                    var next = await WaitBuildAsync(http, nextAdmitted.RootElement.GetProperty("id").GetInt64());
                     Assert.That(next.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
-                    Assert.That(next.GetProperty("number").GetString(), Is.EqualTo("2"));
+                    Assert.That(next.GetProperty("number").GetString(), Is.EqualTo("3"));
                     Assert.That(next.GetProperty("agentId").GetString(), Is.EqualTo(agentId));
                     using var wrongBuildCursor = await http.GetAsync($"/api/v1/builds/{next.GetProperty("id").GetInt64()}/output?cursor="
                         + Uri.EscapeDataString(outputResumeCursor!));
                     Assert.That(wrongBuildCursor.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
                     await WaitAgentAsync(http, value => value.GetProperty("id").GetString() == agentId && value.GetProperty("ready").GetBoolean());
+                    await using var check = await app.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+                    var cancelledExecution = await check.RuntimeBuildExecutions.AsNoTracking().SingleAsync(e => e.BuildId == cancelledId);
+                    Assert.That(cancelledExecution.SentAt, Is.Null, "A late payload response cannot revive a cancelled preparation.");
+                    Assert.That(await check.RuntimeBuildResults.AnyAsync(r => r.BuildId == cancelledId), Is.False);
+                    var journal = await check.AuditEvents.AsNoTracking().Where(a => a.TargetType == "build" && a.TargetId == executedBuild.Value.ToString())
+                        .ToArrayAsync();
+                    Assert.That(journal.Select(a => a.Action), Is.EquivalentTo(new[] { "build.submit", "build.assignment.prepared",
+                        "build.assignment.dispatching", "build.assignment.accepted", "build.result.accepted", "build.output.sealed", "build.lease.released" }));
+                    Assert.That(journal.Select(a => a.CorrelationId).Distinct().ToArray(), Has.Length.EqualTo(1));
+                    Assert.That(journal.All(a => a.ResultRevision is { Length: 40 }), Is.True);
+                    await scopedActor.RunAsync(app.Services, http,
+                        session.RootElement.GetProperty("requestVerificationToken").GetString()!, agentId);
                 }
                 finally
                 {
@@ -354,7 +411,8 @@ public sealed class RuntimeHostPhysicalTests
                 await using (var state = new VivariumDbContext(new DbContextOptionsBuilder<VivariumDbContext>()
                     .UseNpgsql(postgres.ConnectionString).Options))
                 {
-                    Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"),
+                    Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"
+                        && entry.ActorId == "53a74e90-6a7c-4965-a530-8d498c4e523e"),
                         Is.EqualTo(1));
                     await state.Database.ExecuteSqlRawAsync("""
                         CREATE FUNCTION public.owned_reject_signin_audit() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -377,7 +435,8 @@ public sealed class RuntimeHostPhysicalTests
                             .Any(cookie => cookie.Name.Contains("Identity.Application", StringComparison.Ordinal)), Is.False);
                         Assert.That(rejected.Headers.TryGetValues("Set-Cookie", out var cookies)
                             && cookies.Any(value => value.Contains("Identity.Application", StringComparison.Ordinal)), Is.False);
-                        Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"),
+                        Assert.That(await state.AuditEvents.CountAsync(entry => entry.Action == "authentication.authorize_cookie"
+                            && entry.ActorId == "53a74e90-6a7c-4965-a530-8d498c4e523e"),
                             Is.EqualTo(1));
                     }
                     finally
@@ -401,7 +460,7 @@ public sealed class RuntimeHostPhysicalTests
                 using var uploaded = await http.PutAsync(upload.Url, bytes);
                 Assert.That(uploaded.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
             }
-            finally { await app.StopAsync(); }
+            finally { payloadPause.Release(); await app.StopAsync(); compilerBytes?.Dispose(); }
         }
         var restartedCapture = new PrivateStartupLog();
         await using (var app = VivariumRuntime.Build(directory, logs => logs.ClearProviders().AddProvider(restartedCapture)))
@@ -429,6 +488,7 @@ public sealed class RuntimeHostPhysicalTests
                 var retainedArtifact = retainedArtifacts.RootElement.GetProperty("items").EnumerateArray().Single();
                 var retainedArtifactBytes = await http.GetByteArrayAsync(retainedArtifact.GetProperty("href").GetString());
                 Assert.That(System.Text.Encoding.UTF8.GetString(retainedArtifactBytes).ReplaceLineEndings("\n"), Is.EqualTo("owned-smoke-artifact\n"));
+                await scopedActor.AfterRestartAndRevokeAsync();
                 Assert.That(retainedBuild.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
                 Assert.That(retainedBuild.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
                 using var priorAgents = JsonDocument.Parse(await http.GetStringAsync("/api/v1/agents"));
@@ -548,16 +608,16 @@ public sealed class RuntimeHostPhysicalTests
         throw new AssertionException("The owned Git policy did not activate.");
     }
 
-    private static async Task<JsonElement> WaitBuildAsync(HttpClient http, long id)
+    private static async Task<JsonElement> WaitBuildAsync(HttpClient http, long id, CancellationToken token = default)
     {
         var until = DateTimeOffset.UtcNow.AddSeconds(45);
         while (DateTimeOffset.UtcNow < until)
         {
-            using var response = await http.GetAsync($"/api/v1/builds/{id}");
+            using var response = await http.GetAsync($"/api/v1/builds/{id}", token);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             using var build = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (build.RootElement.GetProperty("state").GetString() == "finished") return build.RootElement.Clone();
-            await Task.Delay(100);
+            await Task.Delay(100, token);
         }
         throw new AssertionException("The owned catalogue Build did not finish.");
     }

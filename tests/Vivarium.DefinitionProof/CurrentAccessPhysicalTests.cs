@@ -28,6 +28,7 @@ public sealed class CurrentAccessPhysicalTests
             new TeamCityRole { Id = "VIEWER", Name = "Viewer" });
         reader.RolePermissions.AddRange(new RolePermission { RoleId = "SYSTEM_ADMIN", PermissionId = "manage_roles" },
             new RolePermission { RoleId = "RUNNER", PermissionId = "run_build" },
+            new RolePermission { RoleId = "RUNNER", PermissionId = "view_user_profile" },
             new RolePermission { RoleId = "VIEWER", PermissionId = "view_project" });
         reader.IncludedRoles.Add(new IncludedRole { RoleId = "RUNNER", IncludedRoleId = "VIEWER" });
         reader.UserRoleGrants.Add(new UserRoleGrant { UserId = userId, RoleId = "RUNNER", Scope = "p:P" });
@@ -37,6 +38,10 @@ public sealed class CurrentAccessPhysicalTests
         Assert.That(await access.AllowsAsync(userId, "view_project", ["P.Child", "P", "_Root"]), Is.True);
         Assert.That(await access.AllowsAsync(userId, "run_build", ["Sibling", "_Root"]), Is.False);
         Assert.That(await access.AllowsAsync(userId, "run_build"), Is.False);
+        Assert.That(await access.AllowsAsync(userId, "view_user_profile"), Is.True,
+            "The pinned reference exposes this global-only permission through a role assigned to one project.");
+        Assert.That(await access.AllowsAllAsync(userId, ["view_user_profile", "run_build"], ["Sibling", "_Root"]), Is.False,
+            "A global-only permission must not widen a separate project permission in the same check.");
 
         await using (var writer = Open())
         {

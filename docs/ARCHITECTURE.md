@@ -1108,6 +1108,13 @@ and API credentials; no stale role-claim authority. Native `/api/v1` and TeamCit
 that evaluator and persistence. New AgentExplorer-only actions use separate permission IDs/scopes
 without weakening or restricting the copied TeamCity permission semantics.
 
+R0 implementation evidence now includes 79 reference-observed permission applicability records,
+current global-only permissions through project assignments, and native project delegation limited
+to the actor's effective permissions. This is an observed subset, not the complete permission
+catalogue or compatible wire acceptance. The native force-stop extension retains D31's separate
+`build.force-stop` authorization in addition to TeamCity `cancel_build`; ordinary TeamCity
+cancellation does not acquire that extra requirement.
+
 Ordinary identity lifecycle and compatible token/user endpoints must be specified from actual clients;
 Depot's deferred account deletion/linking and package token scopes are not automatically Vivarium
 limits. Adoption of the framework does not prove wire compatibility. Required evidence includes

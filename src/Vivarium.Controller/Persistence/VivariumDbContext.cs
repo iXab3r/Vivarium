@@ -16,6 +16,7 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<PersistentAuditEvent> AuditEvents => Set<PersistentAuditEvent>();
     public DbSet<TeamCityRole> Roles => Set<TeamCityRole>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<TeamCityPermissionDefinition> PermissionDefinitions => Set<TeamCityPermissionDefinition>();
     public DbSet<IncludedRole> IncludedRoles => Set<IncludedRole>();
     public DbSet<UserRoleGrant> UserRoleGrants => Set<UserRoleGrant>();
     public DbSet<TeamCityGroup> Groups => Set<TeamCityGroup>();
@@ -161,6 +162,9 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
         role.HasKey(entry => entry.Id);
         role.Property(entry => entry.Id).UseCollation("C");
         var permission = modelBuilder.Entity<RolePermission>();
+        var permissionDefinition = modelBuilder.Entity<TeamCityPermissionDefinition>();
+        permissionDefinition.HasKey(entry => entry.Id);
+        permissionDefinition.Property(entry => entry.Id).UseCollation("C");
         permission.HasKey(entry => new { entry.RoleId, entry.PermissionId });
         permission.Property(entry => entry.RoleId).UseCollation("C");
         permission.Property(entry => entry.PermissionId).UseCollation("C");

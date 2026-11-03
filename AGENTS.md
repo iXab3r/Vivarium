@@ -26,8 +26,10 @@ and `run` commands now compose managed Chiral Host/Database/Identity/Storage set
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
 HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real Windows Agent with
 independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
-and retained bytes/cursors after a Host restart have selected integration evidence; R0 scoped-actor,
-cancel/fault, compatibility and final review gates remain open. Ordinary OIDC/current
+and retained bytes/cursors after a Host restart have selected integration evidence. An ordinary key
+now has selected native P/Q isolation, project delegation, grant/eligibility/revocation, failure and
+queue/running-cancel evidence. Full R0 bindings, fault/retention, compatibility and final review gates
+remain open. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.
 

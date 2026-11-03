@@ -13,6 +13,14 @@ public sealed class RolePermission
     public required string PermissionId { get; set; }
 }
 
+// Read-only server permission characteristics, separate from editable role membership and grants.
+public sealed class TeamCityPermissionDefinition
+{
+    public required string Id { get; set; }
+    public required string Name { get; set; }
+    public bool IsGlobal { get; set; }
+}
+
 public sealed class IncludedRole
 {
     public required string RoleId { get; set; }
