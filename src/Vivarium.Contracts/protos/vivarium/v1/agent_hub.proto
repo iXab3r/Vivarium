@@ -18,7 +18,8 @@ message AgentMsg {
     BuildResult result = 4;
     Heartbeat heartbeat = 5;
     AssignmentAccepted assignment_accepted = 6; // ownership accepted by this exact session (D4/D14)
-    UpgradeHealthConfirmed upgrade_health_confirmed = 8; // tag 7 remains reserved for TeamCity service messages (D14)
+    BuildNumberChanged build_number_changed = 7; // negotiated literal service-message metadata (D14/D50)
+    UpgradeHealthConfirmed upgrade_health_confirmed = 8;
     UpgradeCommitConfirmed upgrade_commit_confirmed = 9; // durable launcher commit marker written (D30)
     UpgradeFinalizationConfirmed upgrade_finalization_confirmed = 10; // server-recorded marker persisted locally (D30)
     BuildStopAcknowledged build_stop_acknowledged = 11; // exact fenced graceful/force intent entered Agent control loop (D31)
@@ -216,6 +217,13 @@ message BuildAssignment {
   repeated bytes output_secrets = 8; // ephemeral exact-value masks; never desired Git data or ordinary logs
   uint32 artifact_publication_contract_major = 9; // 1: literal.v1; 2: negotiated teamcity.artifact-publisher.rules.v1
   VcsCheckout vcs_checkout = 10; // requires negotiated teamcity.vcs-checkout.v1
+  uint32 number_reporting_contract_major = 11; // 1: negotiated teamcity.build-number.literal.v1
+}
+
+message BuildNumberChanged {
+  string build_id = 1;
+  uint32 sequence = 2;
+  string value = 3;
 }
 
 message VcsCheckout {
@@ -396,6 +404,7 @@ message BuildResult {
   repeated BuildOutputWatermark output_watermarks = 7;
   bool output_producer_lost = 8; // no final watermark can be asserted (crash or incomplete pipe drain)
   VcsCheckoutReceipt vcs_checkout = 9;
+  repeated BuildNumberChanged number_changes = 10; // bounded terminal recovery; independent of outcome/counter
 }
 
 message BuildResultAccepted {

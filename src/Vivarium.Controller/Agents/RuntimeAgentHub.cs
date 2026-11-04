@@ -64,7 +64,7 @@ internal sealed class RuntimeAgentHub(RuntimeAgentSessions sessions, RuntimeBuil
                     catch (InvalidDataException) { throw new RpcException(new Status(StatusCode.InvalidArgument, "Output range is invalid.")); }
                 }
                 else if (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result
-                    or AgentMsg.MsgOneofCase.BuildStopAcknowledged or AgentMsg.MsgOneofCase.Status)
+                    or AgentMsg.MsgOneofCase.BuildStopAcknowledged or AgentMsg.MsgOneofCase.Status or AgentMsg.MsgOneofCase.BuildNumberChanged)
                 {
                     try { await builds.ReceiveAsync(connection, message, lifetime.Token); }
                     catch (InvalidDataException) { throw new RpcException(new Status(StatusCode.FailedPrecondition, "Workload ownership/evidence differs.")); }

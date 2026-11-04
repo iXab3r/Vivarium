@@ -302,7 +302,7 @@ the current session, never against the version string alone.
 The fresh Host opts into negotiation; a stale Agent without it remains eligible for supported
 source-free work and receives no checkout assignment. Missing Git or per-run access failure does not
 erase binary support or quarantine a healthy Agent. macOS does not advertise this implementation.
-No Bootstrap or AgentMsg tag 7 change is involved.
+This checkout capability does not change Bootstrap or allocate AgentMsg tag 7.
 
 The owning TeamCity operation supplies one anonymous `http`/`https`/`git` source, canonical branch,
 selected 40-character commit and root checkout with up to 32 literal top-level exclusions. URLs have
@@ -353,7 +353,7 @@ This extension is under implementation, not final PILOT acceptance.
 step-completion observation and terminal result. Only an installed Linux x64 module advertises it;
 the fresh Host explicitly negotiates it and rechecks support and typed platform observations at
 selection and delivery. Other controllers and stale Agents keep their existing process contract.
-Bootstrap and reserved AgentMsg tag 7 remain unchanged. This contract has selected real
+This container contract leaves Bootstrap and AgentMsg tag 7 unchanged. It has selected real
 private-Engine, ordinary REST failure/cancel and full Docker → Windows PowerShell → Docker chain
 evidence; PILOT acceptance remains open.
 
@@ -440,8 +440,8 @@ Protocol rules:
 1. Existing proto field tags and enum numbers are immutable and never reused.
 2. New optional fields and new `oneof` cases are appended. Unknown fields and messages are tolerated
    according to proto3 behavior.
-3. The next conceptual extension is designed before tags are allocated. `AgentMsg` tag 7 is already
-   reserved for D14 TeamCity service messages.
+3. The next conceptual extension is designed before tags are allocated. D50 assigns the D14-planned
+   `AgentMsg` tag 7 to negotiated literal Build-number metadata; it was unused by earlier senders.
 4. The controller gates every outbound message on negotiated support. A stale agent is allowed to
    remain connected and finish/recover supported work.
 5. Every executable unit carries a stable work/operation ID, accepting session ID, deadline,
@@ -495,7 +495,33 @@ existing upload/result-manifest contract. It does not advertise glob/directory/a
 rules or general service-message projection. The current fresh byte profile bounds a file to 64 KiB
 and a manifest to 128 files; broader T3 publication remains a delivery prerequisite, not acceptance
 of this subset as full TeamCity artifact compatibility. Legacy assignments remain unchanged. Tag 7
-on AgentMsg stays reserved for the separate structured service-message transport.
+on AgentMsg now carries the separate D50 typed Build-number message.
+
+### Selected literal Build-number messages (D50)
+
+`teamcity.build-number.literal.v1` is an explicit fresh-Host negotiation opt-in.
+`BuildAssignment.number_reporting_contract_major` at new tag 11 is zero for older/default
+assignments and one only for a peer that negotiated the profile. The SDK observes bounded complete
+single-attribute stdout `buildNumber` lines across UTF-8 reads, decodes the selected TeamCity escapes,
+and masks registered exact values before producing `AgentMsg.build_number_changed` at the D14-planned
+tag 7. Unrelated output still follows its original durable masked output path. The same collector
+handles native and container stdout without changing process ownership, outcome or Bootstrap.
+
+Typed changes carry the exact workload ID, monotonically increasing sequence and literal value.
+The selected bound is 128 observations and 4096 UTF-8 bytes per nonempty NUL-free value, with 64 KiB
+line/chunk bounds. `{build.number}` substitution and general service-message families remain outside
+this literal profile. The Agent's result adds the complete bounded `number_changes` list at tag 10;
+the existing encrypted/private terminal result retry retains it through reconnect and acknowledgement.
+Live delivery is best effort, while a complete terminal list repairs missing live frames. Partial
+infrastructure fallback may omit observations and cannot erase previously committed metadata.
+
+The Host independently checks negotiated assignment support, current authenticated workload/session/
+lease, bounds, exact-secret exclusion and consistency against its immutable sequenced PG observations.
+It changes the ordinary display number and audit in that same transaction, leaving numeric counters,
+identity, selected inputs, current management authorization and independent process/byte outcomes
+unchanged. Exact replay is harmless; contradictory values or retracted complete snapshots quarantine
+the owner. Both REST projections and Workbench read the same display field. This is the used recipe
+profile, not complete Build-number REST or generic service-message acceptance.
 
 The result manifest adds optional `Artifact.modification_time_unix_ms` at tag 4. The Agent reports
 the source file's observed modification time; the Host validates its representable range and retains

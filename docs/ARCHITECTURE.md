@@ -1657,6 +1657,32 @@ queued request to an existing producer; it never substitutes an assigned physica
 Agent still proves its own actual checkout independently. Source failure retains its ordinary
 numbered failed-to-start outcome rather than inventing user execution or a successful source receipt.
 
+### D50. Used inline Build numbers are typed metadata with terminal recovery
+
+US-013's recipe emits literal `buildNumber` service messages. The pinned TeamCity capture proves
+semver and escaped quoted values during execution and after success/exit7. Change the ordinary
+Build display number while preserving its numeric configuration counter, identity, selected inputs
+and independently determined process outcome. Native and compatible reads project the same value.
+
+Negotiate `teamcity.build-number.literal.v1` and an additive assignment contract before parsing the
+selected single-attribute stdout profile. Use the D14-planned AgentMsg tag7 for a typed sequenced
+number change, not a generic command, arbitrary JSON or authority to change machine/build outcome.
+Legacy assignments remain unchanged. Bound a value to 4096 UTF-8 bytes and a Build to 128 observations,
+with bounded split-read/line parsing. Decode TeamCity escapes and mask registered exact secret values
+before transport; the Host independently rejects raw registered values. This selected SDK profile
+does not accept template substitution, generic service messages or the complete number API family.
+
+The Host authenticates the exact workload/session/Agent lease, retains immutable sequenced
+observations and updates the display projection/audit in one PG transaction. Repeated identical
+observations are harmless; contradictory values or terminal snapshots quarantine the owner rather
+than overwrite evidence. The retained terminal result includes the complete bounded observation
+list, allowing recovery after a lost live frame or Host reconnect; it cannot retract previously
+committed observations. An infrastructure fallback may omit observations, preserving prior committed
+metadata; submitted contradictions still fail. Existing private terminal-result recovery and acknowledgements apply.
+Already committed values survive Host restart. Metadata never proves a user process succeeded,
+stopped or produced correct bytes. No Bootstrap change, extra scheduler or desired-setting write
+is introduced; final whole-story Agent/REST/Security gates remain due.
+
 ## 5. Protocol sketch
 
 ```proto

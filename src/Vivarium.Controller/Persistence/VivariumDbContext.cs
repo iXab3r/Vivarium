@@ -36,6 +36,7 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<RuntimeVcsRootInstance> RuntimeVcsRootInstances => Set<RuntimeVcsRootInstance>();
     public DbSet<RuntimeBuildSourceSelection> RuntimeBuildSourceSelections => Set<RuntimeBuildSourceSelection>();
     public DbSet<RuntimeBuildSourceReceipt> RuntimeBuildSourceReceipts => Set<RuntimeBuildSourceReceipt>();
+    public DbSet<RuntimeBuildNumberObservation> RuntimeBuildNumberObservations => Set<RuntimeBuildNumberObservation>();
     public DbSet<RuntimeBuildDependency> RuntimeBuildDependencies => Set<RuntimeBuildDependency>();
     public DbSet<RuntimeBuildResolution> RuntimeBuildResolutions => Set<RuntimeBuildResolution>();
     public DbSet<RuntimeBuildConsumedArtifact> RuntimeBuildConsumedArtifacts => Set<RuntimeBuildConsumedArtifact>();

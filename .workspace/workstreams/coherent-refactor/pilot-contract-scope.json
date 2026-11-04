@@ -126,11 +126,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -171,11 +171,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001",
       "product_test_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
@@ -218,11 +218,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
       "product_test_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
@@ -265,11 +265,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "display_name": "PILOT-CHAIN-ROOT-CANCEL-001",
       "product_test_name": "PILOT-CHAIN-ROOT-CANCEL-001"
@@ -327,11 +327,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -368,11 +368,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -411,11 +411,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -459,11 +459,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -507,11 +507,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -554,11 +554,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "product_test_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001"
     },
@@ -611,11 +611,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -667,11 +667,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -723,11 +723,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -787,11 +787,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -851,11 +851,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -915,11 +915,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -979,11 +979,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1036,11 +1036,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1093,11 +1093,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1149,11 +1149,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1205,11 +1205,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1240,7 +1240,11 @@
         "path": "docs/ARCHITECTURE.md",
         "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
         "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
-        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted."
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d48-architecture.source",
+        "revision": "d3126765d452ae16a0a183a0fcb97084222ff134",
+        "working_tree_eol": "CRLF",
+        "sha256_basis": "capture_path; exact original recorded bytes verified by reconstructing the committed document with its recorded CRLF checkout"
       },
       "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
       "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
@@ -1257,11 +1261,11 @@
       ],
       "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1292,7 +1296,11 @@
         "path": "docs/ARCHITECTURE.md",
         "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
         "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
-        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted."
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d48-architecture.source",
+        "revision": "d3126765d452ae16a0a183a0fcb97084222ff134",
+        "working_tree_eol": "CRLF",
+        "sha256_basis": "capture_path; exact original recorded bytes verified by reconstructing the committed document with its recorded CRLF checkout"
       },
       "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
       "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
@@ -1309,11 +1317,11 @@
       ],
       "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
     },
     {
@@ -1368,16 +1376,253 @@
       },
       "limits": "Explicit successful-only anonymous single-root/default-branch profile without run secrets. Reference does not cover custom parameters, arbitrary branches/settings differences, source queue optimization timing or full wire/artifact families.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
-        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
-        "cohort_passed": 24,
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
         "cohort_failed": 0,
-        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       },
       "green_effect": "Actual fresh Host/PG/Storage/anonymous Git and Linux Agent:3 executions on first SHA, only a new Release on unchanged SHA after Host restart (4 total), then3 new executions on pushed SHA (7 total); coherent revisions and exact owned artifact bytes."
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SEMVER-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:semver",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(0)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SUCCESS-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:success",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(1)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-FAILURE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:failure",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(2)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-RESULT-RECOVERY-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d50-used-inline-build-numbers-are-typed-metadata-with-terminal-recovery",
+        "sha256": "3db20e60709a6bea5ce7c03d8dc298edceb197890354bf885a0ae778800a415a",
+        "interpretation": "Authored native SDK D45/D50 recovery/secrecy contract, not TeamCity secret-parameter wire conformance.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d50-architecture.source",
+        "sha256_basis": "capture_path; exact authored native contract bytes at this checkpoint"
+      },
+      "principal": "Ordinary six-permission P key.",
+      "seed": "Fresh Host/PG/Git/Storage with a dedicated real Linux Agent; a bounded transport interceptor drops only the owned metadata frame in the recovery case.",
+      "entry": "Ordinary build admission, real AgentHub and native/compatible Build/output reads.",
+      "effect": "A real Agent emits one number frame; the bounded server interceptor drops that frame and records the actual terminal metadata. The complete retained result repairs the display number and Host restart retains it, without changing the numeric counter.",
+      "completion": "Actual user process, independently retained result and sequenced PG metadata; exact replay/contradiction/retraction/infrastructure-omission controls run production validation.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Terminal_metadata_recovers_a_lost_live_number_frame",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Selected literal metadata and native recovery/secret extension, not generic service messages, parameter/template substitution or full wire/API acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SECRET-MASK-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d50-used-inline-build-numbers-are-typed-metadata-with-terminal-recovery",
+        "sha256": "3db20e60709a6bea5ce7c03d8dc298edceb197890354bf885a0ae778800a415a",
+        "interpretation": "Authored native SDK D45/D50 recovery/secrecy contract, not TeamCity secret-parameter wire conformance.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d50-architecture.source",
+        "sha256_basis": "capture_path; exact authored native contract bytes at this checkpoint"
+      },
+      "principal": "Ordinary six-permission P key.",
+      "seed": "Fresh Host/PG/Git/Storage with a dedicated real Linux Agent; a bounded transport interceptor drops only the owned metadata frame in the recovery case.",
+      "entry": "Ordinary build admission, real AgentHub and native/compatible Build/output reads.",
+      "effect": "An ordinary native run supplies a synthetic registered secret used by the actual stdout number command. Metadata/output/result and public reads retain only REDACTED; the Host also rejects a raw registered value without changing the accepted observation.",
+      "completion": "Actual user process, independently retained result and sequenced PG metadata; exact replay/contradiction/retraction/infrastructure-omission controls run production validation.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Registered_run_secrets_are_masked_in_number_metadata_and_output",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Selected literal metadata and native recovery/secret extension, not generic service messages, parameter/template substitution or full wire/API acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
     }
   ],
-  "remaining_due": "Complete #78/#116/#117/#118: used buildNumber service-message effects, remaining current-rights/fault/UI readiness/cancel/history, used triggers/quiet-period/exclusions/coexistence/single publisher, actual T3 build/package without built GUI/CLI launch and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential cards timed out; independent work continues.24 selected story cases do not close full API families.",
+  "remaining_due": "Complete #78/#116/#117/#118: used VCS quiet period/exclusions/coexistence and single-publisher ownership, remaining current-rights/fault/UI readiness/cancel/history profiles, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential cards timed out; independent work continues.29 selected cases do not close full API families.",
   "global_variant_denominator": null,
   "api_complete": false,
   "native_http_operations": [

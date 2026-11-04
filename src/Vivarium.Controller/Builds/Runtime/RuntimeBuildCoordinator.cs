@@ -270,6 +270,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         CatalogBuildDefinition definition;
         string os;
         bool artifactRules;
+        bool buildNumbers;
         await using (var database = await databases.CreateDbContextAsync(token))
         {
             snapshot = await database.RuntimeBuildExecutions.AsNoTracking().SingleAsync(e => e.BuildId == id, token);
@@ -284,6 +285,9 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             artifactRules = selection.RootElement.GetProperty("negotiatedCapabilities").EnumerateArray().Any(c =>
                 c.GetProperty("capabilityId").GetString() == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId
                 && c.GetProperty("contractMajor").GetInt32() == 1);
+            buildNumbers = selection.RootElement.GetProperty("negotiatedCapabilities").EnumerateArray().Any(c =>
+                c.GetProperty("capabilityId").GetString() == Vivarium.Contracts.BuildNumberProfile.CapabilityId
+                && c.GetProperty("contractMajor").GetInt32() == 1);
         }
         if (os is not ("windows" or "linux" or "macos"))
         { await FailAsync(id, "Execution platform is unavailable", safeUnsent: snapshot.SentAt is null, token); return; }
@@ -293,7 +297,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var remaining = snapshot.PreparationDeadline - time.GetUtcNow();
             using var timeout = new CancellationTokenSource(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, time);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
-            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token, artifactRules); }
+            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token, artifactRules, buildNumbers); }
             catch (RuntimeArtifactResolutionException)
             { await FailAsync(id, "Failed to resolve artifact dependency", safeUnsent: true, token, artifactFailure: true); return; }
             catch (RuntimeSourceCollectionException)
@@ -337,6 +341,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var effective = new Dictionary<string, string>(reported, StringComparer.Ordinal);
             foreach (var pair in custom) effective[pair.Key] = pair.Value;
             if (prepared.Assignment.ArtifactPublicationContractMajor == 2 && !connection!.Protocol.SupportsArtifactRules
+                || prepared.Assignment.NumberReportingContractMajor == 1 && !connection!.Protocol.SupportsBuildNumbers
                 || RuntimeStepCompiler.RequiresContainer(ReadDefinition(definition)) && !connection!.Protocol.SupportsContainerRunner
                 || reported.GetValueOrDefault("system.os.family") != os || !RuntimeStepCompiler.MatchesRunnerPlatform(ReadDefinition(definition), reported, currentAgent.StaticObservationJson) || ReadDefinition(definition).Requirements
                 .Any(r => !effective.TryGetValue(r.Name, out var value) || value != r.Value))
@@ -360,8 +365,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         ControllerMsg? message = null;
         if (connected && owner.Phase == "DISPATCHING" && EligibleForDelivery(currentAgent))
         {
+            var delivery = secrets.ReadAssignment(id, owner.Assignment, owner.AssignmentProtectionVersion);
+            if (delivery.NumberReportingContractMajor == 1 && !connection!.Protocol.SupportsBuildNumbers)
+            {
+                await transaction.RollbackAsync(token);
+                await FailAsync(id, "Execution target changed before delivery", owner.SentAt is null, token); return;
+            }
             owner.SentAt ??= now;
-            message = new() { Build = secrets.ReadAssignment(id, owner.Assignment, owner.AssignmentProtectionVersion) };
+            message = new() { Build = delivery };
         }
         else if (connected && currentBuild.CancelRequestedAt is not null && owner.TerminalReceivedAt is null)
             message = RuntimeBuildService.CancelMessage(currentBuild, owner);
@@ -377,6 +388,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             AgentMsg.MsgOneofCase.Result => (message.Result.BuildId, message.Result.SessionId),
             AgentMsg.MsgOneofCase.BuildStopAcknowledged => (message.BuildStopAcknowledged.BuildId, message.BuildStopAcknowledged.SessionId),
             AgentMsg.MsgOneofCase.Status => (message.Status.BuildId, connection.Handle.SessionId),
+            AgentMsg.MsgOneofCase.BuildNumberChanged => (message.BuildNumberChanged.BuildId, connection.Handle.SessionId),
             _ => throw new InvalidDataException("Unexpected workload message."),
         };
         if (session != connection.Handle.SessionId || workload.Length == 0) throw new InvalidDataException("Workload session differs.");
@@ -387,7 +399,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         var execution = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == workload, token);
         if (execution is null || execution.SentAt is null)
             throw new InvalidDataException("Workload ownership differs.");
-        var existing = message.MsgCase == AgentMsg.MsgOneofCase.Result
+        var existing = message.MsgCase is AgentMsg.MsgOneofCase.Result or AgentMsg.MsgOneofCase.BuildNumberChanged
             ? await database.RuntimeBuildResults.SingleOrDefaultAsync(r => r.BuildId == execution.BuildId, token) : null;
         // A result send can already be queued when its ACK releases the Agent's local ownership.
         // Authenticate a late retained receipt without adopting its old lease or changing newer work.
@@ -414,7 +426,18 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             if (minutes > 0) execution.ExecutionDeadline ??= execution.AcceptedAt.Value.AddMinutes(minutes);
         }
         ControllerMsg? acknowledgement = null;
-        if (message.MsgCase == AgentMsg.MsgOneofCase.Status)
+        if (message.MsgCase == AgentMsg.MsgOneofCase.BuildNumberChanged)
+        {
+            var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
+            if (!connection.Protocol.SupportsBuildNumbers || !await RuntimeBuildNumbers.ApplyAsync(database, build, assignment,
+                [message.BuildNumberChanged], complete: false, closed: execution.TerminalReceivedAt is not null, time.GetUtcNow(), token))
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_number_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("Build number evidence conflicts.");
+            }
+        }
+        else if (message.MsgCase == AgentMsg.MsgOneofCase.Status)
         {
             var status = message.Status;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
@@ -497,6 +520,13 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
                 registry.Quarantine(agent.AgentId, agent.HealthReason);
                 throw new InvalidDataException("Terminal evidence conflicts.");
+            }
+            if (!await RuntimeBuildNumbers.ApplyAsync(database, build, assignment, result.NumberChanges,
+                complete: result.Outcome != BuildOutcome.InfrastructureFailed, closed: execution.TerminalReceivedAt is not null, time.GetUtcNow(), token))
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_number_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("Build number evidence conflicts.");
             }
             if (existing is null)
             {

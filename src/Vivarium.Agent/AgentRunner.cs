@@ -52,6 +52,7 @@ public sealed class AgentRunner
     private volatile bool vcsCheckoutNegotiated;
     private volatile bool containerRunnerNegotiated;
     private volatile bool artifactRulesNegotiated;
+    private volatile bool buildNumbersNegotiated;
     private ActiveBuild? activeBuild;
     private PlatformFactSnapshot? platformFacts;
     private ulong credentialGeneration;
@@ -282,6 +283,7 @@ public sealed class AgentRunner
         vcsCheckoutNegotiated = false;
         containerRunnerNegotiated = false;
         artifactRulesNegotiated = false;
+        buildNumbersNegotiated = false;
         try
         {
             await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
@@ -300,6 +302,7 @@ public sealed class AgentRunner
                         vcsCheckoutNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && c.ContractMajor == 1);
                         containerRunnerNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId && c.ContractMajor == 1);
                         artifactRulesNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == ArtifactRuleProfile.CapabilityId && c.ContractMajor == 1);
+                        buildNumbersNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == BuildNumberProfile.CapabilityId && c.ContractMajor == 1);
                         ClockSkew = DateTimeOffset.FromUnixTimeMilliseconds(msg.Welcome.ServerTimeUnixMs) - DateTimeOffset.UtcNow;
                         if (msg.Welcome.SelectedProtocolVersion != 0 &&
                             msg.Welcome.SelectedProtocolVersion is < MinimumProtocolVersion or > CurrentProtocolVersion)
@@ -700,6 +703,8 @@ public sealed class AgentRunner
         if (assignment.ArtifactPublicationContractMajor > 2 || assignment.ArtifactPublicationContractMajor == 1 && !literalPublisherNegotiated
             || assignment.ArtifactPublicationContractMajor == 2 && !artifactRulesNegotiated)
             throw new InvalidDataException("The required artifact publisher was not negotiated.");
+        if (assignment.NumberReportingContractMajor > 1 || assignment.NumberReportingContractMajor == 1 && !buildNumbersNegotiated)
+            throw new InvalidDataException("The required number reporting contract was not negotiated.");
         if (assignment.VcsCheckout is not null && !vcsCheckoutNegotiated
             || assignment.VcsCheckout is null && (assignment.Payload.Any(p => p.PrivateInput) || assignment.Steps.Any(s => s.ScriptInput.Length != 0)))
             throw new InvalidDataException("The required VCS checkout contract was not negotiated.");
@@ -931,6 +936,7 @@ public sealed class AgentRunner
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildOutputCapabilityId, ContractMajor = 1 });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactPublisherCapabilityId, ContractMajor = 1 });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactRuleProfile.CapabilityId, ContractMajor = 1 });
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildNumberProfile.CapabilityId, ContractMajor = 1 });
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             hello.Capabilities.Add(new CapabilitySupport { CapabilityId = Vivarium.Contracts.VcsCheckoutProfile.CapabilityId, ContractMajor = 1 });
         if (options.DockerRuntime is not null && OperatingSystem.IsLinux() && RuntimeInformation.ProcessArchitecture == Architecture.X64)

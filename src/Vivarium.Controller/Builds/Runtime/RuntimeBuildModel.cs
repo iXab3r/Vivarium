@@ -109,6 +109,11 @@ internal static class RuntimeBuildModel
             t.HasCheckConstraint("CK_RuntimeBuildExecutions_Phase", "\"Phase\" IN ('PREPARING','DISPATCHING','ACCEPTED','TERMINAL','RELEASED')");
         });
         var observation = model.Entity<RuntimeBuildObservation>();
+        var number = model.Entity<RuntimeBuildNumberObservation>();
+        number.HasKey(n => new { n.BuildId, n.Sequence });
+        number.HasOne<RuntimeBuild>().WithMany().HasForeignKey(n => n.BuildId).OnDelete(DeleteBehavior.Restrict);
+        number.ToTable("RuntimeBuildNumberObservations", t => t.HasCheckConstraint("CK_RuntimeBuildNumberObservations_Bounds",
+            "\"Sequence\" BETWEEN 1 AND 128 AND octet_length(\"Value\") BETWEEN 1 AND 4096"));
         observation.HasKey(o => new { o.BuildId, o.Ordinal });
         observation.HasIndex(o => new { o.BuildId, o.Phase, o.StepIndex }).IsUnique();
         observation.HasOne<RuntimeBuildExecution>().WithMany().HasForeignKey(o => o.BuildId).OnDelete(DeleteBehavior.Restrict);

@@ -938,6 +938,29 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildNumberObservation", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildId", "Sequence");
+
+                    b.ToTable("RuntimeBuildNumberObservations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildNumberObservations_Bounds", "\"Sequence\" BETWEEN 1 AND 128 AND octet_length(\"Value\") BETWEEN 1 AND 4096");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildObservation", b =>
                 {
                     b.Property<long>("BuildId")
@@ -2066,6 +2089,15 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", "BuildId", "BuildTypeId", "ProjectId")
                         .HasPrincipalKey("Vivarium.Controller.Builds.Runtime.RuntimeBuild", "Id", "BuildTypeId", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildNumberObservation", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

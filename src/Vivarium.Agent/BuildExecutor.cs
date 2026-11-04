@@ -44,6 +44,18 @@ public static partial class BuildExecutor
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
+        var numbers = assignment.NumberReportingContractMajor == 1 ? new BuildNumberPublisher(assignment.BuildId, assignment.OutputSecrets) : null;
+        var sendOriginal = send;
+        send = async (message, token) =>
+        {
+            if (numbers is not null && message.Log is { Stream: LogStream.Stdout } log)
+                foreach (var change in numbers.Append(log.Data.Span))
+                {
+                    result.NumberChanges.Add(change.Clone());
+                    await sendOriginal(new AgentMsg { BuildNumberChanged = change }, token);
+                }
+            await sendOriginal(message, token);
+        };
         var publisher = assignment.ArtifactPublicationContractMajor is 1 or 2
             ? new LiteralArtifactPublisher(allowRules: assignment.ArtifactPublicationContractMajor == 2) : null;
 
@@ -126,6 +138,12 @@ public static partial class BuildExecutor
                 continue;
             }
             result.Steps.Add(execution.Result);
+            if (execution.OutputComplete && numbers?.FinishStep() is { } finalNumber)
+            {
+                result.NumberChanges.Add(finalNumber.Clone());
+                if (stop.Mode == BuildStopMode.Unspecified)
+                    await sendOriginal(new AgentMsg { BuildNumberChanged = finalNumber }, stepToken);
+            }
             if (stop.Mode != BuildStopMode.Force)
             {
                 try

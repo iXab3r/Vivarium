@@ -19,7 +19,8 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
     IDbContextFactory<Vivarium.Controller.Persistence.VivariumDbContext> databases, RuntimeBuildSources sources)
 {
     internal async Task<RuntimePreparedAssignment> PrepareAsync(RuntimeBuild build, RuntimeBuildInput input,
-        CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token, bool artifactRules = false)
+        CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token, bool artifactRules = false,
+        bool buildNumbers = false)
     {
         var config = JsonSerializer.Deserialize<ResolvedConfiguration>(definition.PlanJson, DefinitionValidation.Json)
             ?? throw new InvalidDataException("The collected Build definition is invalid.");
@@ -37,6 +38,7 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         string Expand(string value) => Regex.Replace(value, "%([^%\\r\\n]+)%", match =>
             values.TryGetValue(match.Groups[1].Value, out var resolved) ? resolved : match.Value, RegexOptions.CultureInvariant);
         var assignment = new BuildAssignment { BuildId = execution.WorkloadId, OutputContractMajor = 1, ArtifactPublicationContractMajor = artifactRules ? 2u : 1u };
+        assignment.NumberReportingContractMajor = buildNumbers ? 1u : 0u;
         assignment.VcsCheckout = await sources.SelectAsync(input, execution, token);
         var environment = secrets.ReadEnvironment(build.Id, input.ProtectedEnvironment);
         assignment.OutputSecrets.AddRange(environment.Values.Distinct(StringComparer.Ordinal).Select(Google.Protobuf.ByteString.CopyFromUtf8));

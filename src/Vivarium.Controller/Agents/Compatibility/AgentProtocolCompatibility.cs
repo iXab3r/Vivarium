@@ -26,6 +26,7 @@ internal sealed record AgentProtocolNegotiation(
     public bool SupportsVcsCheckout => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId);
     public bool SupportsContainerRunner => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId);
     public bool SupportsArtifactRules => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId);
+    public bool SupportsBuildNumbers => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.BuildNumberProfile.CapabilityId);
 }
 
 /// <summary>
@@ -60,7 +61,8 @@ internal static class AgentProtocolCompatibility
         };
 
     public static AgentProtocolNegotiation Negotiate(Hello hello, bool enableDurableBuildOutput = false,
-        bool enableLiteralArtifactPublisher = false, bool enableVcsCheckout = false, bool enableContainerRunner = false, bool enableArtifactRules = false)
+        bool enableLiteralArtifactPublisher = false, bool enableVcsCheckout = false, bool enableContainerRunner = false, bool enableArtifactRules = false,
+        bool enableBuildNumbers = false)
     {
         ArgumentNullException.ThrowIfNull(hello);
 
@@ -124,7 +126,8 @@ internal static class AgentProtocolCompatibility
                 || enableLiteralArtifactPublisher && capability.CapabilityId == ArtifactPublisherCapabilityId && capability.ContractMajor == 1
                 || enableVcsCheckout && capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && capability.ContractMajor == 1
                 || enableContainerRunner && capability.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId && capability.ContractMajor == 1
-                || enableArtifactRules && capability.CapabilityId == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId && capability.ContractMajor == 1)
+                || enableArtifactRules && capability.CapabilityId == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId && capability.ContractMajor == 1
+                || enableBuildNumbers && capability.CapabilityId == Vivarium.Contracts.BuildNumberProfile.CapabilityId && capability.ContractMajor == 1)
             .Select(capability => capability.Clone())
             .ToArray();
 

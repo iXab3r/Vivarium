@@ -104,6 +104,14 @@ public sealed class RuntimeBuildSourceReceipt
     public DateTimeOffset ReceivedAt { get; set; }
 }
 
+public sealed class RuntimeBuildNumberObservation
+{
+    public long BuildId { get; set; }
+    public int Sequence { get; set; }
+    public string Value { get; set; } = "";
+    public DateTimeOffset ReceivedAt { get; set; }
+}
+
 // Actual selections between ordinary Builds; desired edges remain in the immutable Git plan.
 public sealed class RuntimeBuildDependency
 {
