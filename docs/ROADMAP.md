@@ -1,5 +1,8 @@
 # Roadmap
 
+Current delivery — 2026-11-05: selected PILOT gates are reviewed and ready for parent delivery. See the [canonical final delivery record](../.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+
+
 Current delivery: [2026-11-04 D52 PILOT checkpoint](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure) records fresh unchanged CLI 0.5.6 Prepare 1 / Windows 2 / Release root 3 SUCCESS, version1297/release434492192 and subsequent read-only acceptance. The original EF observer FAIL remains raw; root8/version918 remains historical provenance. Full PILOT/main remains open. D34/D35 R0 was delivered by PR #165; the planning status below is historical.
 
 Ordered so that every phase ends with something usable. Decision references (D1…D40) point into

@@ -1,6 +1,11 @@
 # Handover
 
+Current delivery — 2026-11-05: selected PILOT gates are reviewed and ready for parent delivery. See the [canonical final delivery record](pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+
+
 ## Current state — 2026-11-04
+
+Historical checkpoint; the 2026-11-05 delivery record above supersedes its pending-review statements.
 
 The [current PILOT checkpoint](t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure)
 is the resume authority for fresh unchanged CLI 0.5.6 Prepare 1 / Windows 2 / Release root 3
