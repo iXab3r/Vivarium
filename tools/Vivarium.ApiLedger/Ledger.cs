@@ -14,6 +14,7 @@ public sealed record ObservedResult(string TestName, string Outcome);
 public sealed class Report
 {
     public string Status { get; set; } = "PARTIAL_BASELINE_P0_OPEN";
+    public string AccountingState => Status == "INVALID_ACCOUNTING" ? "INVALID" : "VALID";
     public required string Candidate { get; init; }
     public string? ObservedHead { get; set; }
     public string? ExecutionBase { get; set; }
@@ -41,6 +42,7 @@ public sealed class Report
     public int SelectedCoreSourceAllocationRows { get; set; }
     public int ProductionSourceDispositionRows { get; set; }
     public string KnownSourceAllocationState { get; set; } = "UNVERIFIED";
+    public int DeclaredPilotVariants { get; set; }
     public int SpecifiedR0Variants { get; set; }
     public int SelectedR0ReferenceCases { get; set; }
     public string R0ContractEvidenceState => "SPECIFIED_PRODUCT_UNBOUND; not materialized TCREST, replay or product GREEN";
@@ -157,6 +159,7 @@ public static partial class Ledger
             Tasks(row["contract_task"]); Tasks(row["acceptance_task"]);
             Require(row["asserted_effect"].Length > 0 && row["product_prerequisite"].Length > 0, "Missing effect/prerequisite binding.");
         }
+        ValidatePilotDeclarations(root, byApi, byCase, byOwner, bySlice, metadataInputs, report);
         var r0Variants = ValidateR0Contract(root, byCase, byOwner, bySlice, contributions, metadataInputs, report);
         foreach (var contribution in contributions)
         {

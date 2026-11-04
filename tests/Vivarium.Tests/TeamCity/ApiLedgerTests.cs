@@ -759,6 +759,7 @@ public sealed partial class ApiLedgerTests
         foreach (var path in Directory.GetFiles(Path.Combine(root, Ledger.Workstream), "*.tsv")
             .Concat(new[] { "source-union-checkpoint.json", "supplemental-source-inputs.json", "r0-client-selection.json", "r0-contract-scope.json" }
                 .Select(path => Path.Combine(root, Ledger.Workstream + path)))
+            .Concat(new[] { Path.Combine(root, Ledger.Workstream + "pilot-contract-scope.json") }.Where(File.Exists))
             .Concat(SupplementalFixtureInputs.Select(path => Path.Combine(root, path)).Where(File.Exists)).Order(StringComparer.Ordinal))
         {
             var relative = Path.GetRelativePath(root, path).Replace('\\', '/');

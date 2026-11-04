@@ -1817,7 +1817,7 @@
       }
     }
   ],
-  "remaining_due": "Whole US-013 remains Open: remaining due authority/fault/readiness review, actual T3 build/package without built GUI/CLI launch, scoped test-release partial-draft recovery/single-publisher proof, cumulative33-story/SDK and R0/ledger/independent reviews/main. Prior29-row story cohort is retained at2bee9bc; four new trigger/UI rows have case-specific current PASS and root700/0 with raw12NotExecuted. Global denominator unknown; API-complete=false.",
+  "remaining_due": "Whole US-013 remains Open: current authority/fault/readiness and model/reference gaps, qualified cumulative33-story/SDK evidence, exact-candidate ledger, independent aggregate/Security reviews, zero debt and main delivery. Fresh unchanged CLI0.5.6 Prepare1/Windows2/Release3 succeeded, version1297 test release434492192; raw EF observer FAIL and separate read-only continuation PASS remain distinct. Prior34/34 and root700 evidence require input-specific reuse assessment. Seven explicit-selection declarations are pending wire bindings, not materialized/GREEN cases. Ordinary authority, changed-HEAD and conflict/missing-byte obligations remain unknown. Global denominator unknown; API-complete=false.",
   "global_variant_denominator": null,
   "api_complete": false,
   "native_http_operations": [
@@ -1881,5 +1881,14 @@
       "source": "docs/design/rest-api.md",
       "status": "SELECTED_PRODUCT_GREEN_NOT_COMPLETE_HISTORY_API"
     }
+  ],
+  "declared_variant_ids": [
+    "TCREST-PILOT-EXPLICIT-SELECTION-DIRECT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-INDIRECT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-PASSWORD-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-MISSING-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-CONFLICT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-AUTHORITY-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-SOURCE-001"
   ]
 }

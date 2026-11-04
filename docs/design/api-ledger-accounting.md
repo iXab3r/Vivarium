@@ -180,3 +180,19 @@ with valid product GREEN reproduced the defect before the fix; all 47 current ac
 and root build then passed. The 183 product/reference inputs and prior execution receipts remain
 unchanged. Product raw, reference/composition and unaffected ordinary evidence are explicitly reused;
 no new full ordinary/raw run or final milestone review is claimed for this one-line error-path fix.
+
+### PILOT declarations
+
+`api-ledger.tsv` keeps materialized wire bindings in `variant_case_ids`. Its optional
+`declared_variant_ids` relation joins the bounded `pilot-contract-variants.tsv` inventory and
+`pilot-contract-scope.json` declaration roster. These retain existing IDs, owners, tasks,
+source pointers and unresolved reference variants. The reader checks both API join directions,
+unique identity, PILOT slice/task ownership and source existence. Declarations increase only
+`declared_pilot_variants`; selected story/product receipts remain separate and do not establish
+materialized, executed or GREEN wire cases. R0 retains its original inventory and scope.
+
+`accounting_state` distinguishes structurally valid registries from execution evidence status.
+`VALID` with `STALE_OR_INVALID_EVIDENCE` still exits nonzero and grants no GREEN or acceptance.
+An invalidation assessment retains original receipts; new required metadata absent from those
+receipts remains an explicit stale-evidence error, even after the registry itself is repaired.
+Source-disposition hashes observe current source bytes only and do not renew replacement proof.
