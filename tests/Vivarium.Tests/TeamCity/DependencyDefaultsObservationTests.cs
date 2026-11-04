@@ -8,6 +8,19 @@ namespace Vivarium.Tests.TeamCity;
 public sealed class DependencyDefaultsObservationTests
 {
     [Test]
+    public void Legacy_CSharp_snapshot_canonical_bytes_survive_optional_reuse_declarations()
+    {
+        const string original = "{\"configuration\":\"P_Prepare\",\"failure\":\"CANCEL\",\"cancel\":\"CANCEL\"}";
+        var options = Vivarium.Controller.Catalog.DefinitionValidation.Json;
+        var old = JsonSerializer.Deserialize<Vivarium.Definitions.Snapshot>(original, options)!;
+        Assert.That(old.ReuseBuilds, Is.False);
+        Assert.That(old.SuccessfulOnly, Is.False);
+        Assert.That(JsonSerializer.Serialize(old, options), Is.EqualTo(original), "Old immutable collected plan hashes must remain valid.");
+        var explicitReuse = old with { ReuseBuilds = true, SuccessfulOnly = true };
+        Assert.That(JsonSerializer.Deserialize<Vivarium.Definitions.Snapshot>(JsonSerializer.Serialize(explicitReuse, options), options), Is.EqualTo(explicitReuse));
+    }
+
+    [Test]
     public void Omitted_snapshot_properties_and_missing_artifact_selector_retain_the_observed_reference_contract()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory,

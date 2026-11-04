@@ -27,6 +27,12 @@ internal sealed record RuntimeBuildView(long Id, string? Number, string State, s
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? ArtifactDependencies { get; init; }
 }
 internal sealed record RuntimeBuildSelectionView(long Id, string ConfigurationId, string State, string Status);
+internal sealed record RuntimeBuildDependencyHandle
+{
+    public required string Kind { get; init; }
+    public long BuildTypeId { get; init; }
+    public long Id { get; init; }
+}
 
 internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> databases, IConfiguration configuration,
     AgentRegistry registry, TimeProvider time, RuntimeBuildSecrets secrets)
@@ -83,9 +89,9 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 throw Invalid("The Build dependency graph is cyclic or exceeds the current bound.");
             if (!configurations.TryGetValue(configurationId, out var config) || config.Steps.Length > 128)
                 throw Invalid("A Build dependency definition is unavailable.");
-            if (config.Snapshots.Any(d => d.Failure != "CANCEL" || d.Cancel != "CANCEL"))
+            if (config.Snapshots.Any(d => d.Failure != "CANCEL" || d.Cancel != "CANCEL" || d.ReuseBuilds && !d.SuccessfulOnly))
                 throw new RestApiException(422, "execution_subset_unavailable", "Dependency policy unavailable",
-                    "This cohort requires explicit CANCEL/CANCEL snapshot edges.");
+                    "This cohort requires CANCEL/CANCEL edges and successful-only selection when reuse is enabled.");
             foreach (var dependency in config.Snapshots) await AdmitAsync(dependency.Configuration);
             var member = new RuntimeBuild { BuildTypeId = snapshot.BuildTypeIds[configurationId],
                 ProjectId = snapshot.ProjectIds[selected.Project.Control.Id], ActorId = Guid.Parse(actor.Principal.ActorId),
@@ -134,6 +140,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         await using var snapshot = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
         var build = await VisibleAsync(database, actor, id, token);
         if (build is null) return null;
+        id = build.Id;
         var input = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == id, token);
         var definition = await database.CatalogBuildDefinitions.AsNoTracking().SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
         var type = await database.CatalogBuildTypes.AsNoTracking().SingleAsync(t => t.Id == build.BuildTypeId, token);
@@ -156,8 +163,8 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
 
     internal static async Task<(string Kind, RuntimeBuildSelectionView Build)[]> SelectionViewsAsync(VivariumDbContext database, long id, CancellationToken token)
     {
-        var rows = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.BuildId == id)
-            .Join(database.RuntimeBuilds.AsNoTracking(), d => d.UpstreamBuildId, upstream => upstream.Id, (d, upstream) => new { d.Kind, Build = upstream })
+        var rows = await DependencyHandles(database, id)
+            .Join(database.RuntimeBuilds.AsNoTracking(), d => d.Id, upstream => upstream.Id, (d, upstream) => new { d.Kind, Build = upstream })
             .Join(database.CatalogBuildTypes.AsNoTracking(), d => d.Build.BuildTypeId, t => t.Id,
                 (d, t) => new { d.Kind, d.Build.Id, d.Build.State, d.Build.Status, t.ExternalId })
             .OrderBy(d => d.Id).ToArrayAsync(token);
@@ -165,7 +172,15 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             d.State == "RELEASING" ? "running" : d.State.ToLowerInvariant(), d.Status))).ToArray();
     }
 
-    internal async Task CancelAsync(ManagementRequestContext actor, long id, string reason, string mode, CancellationToken token)
+    internal static IQueryable<RuntimeBuildDependencyHandle> DependencyHandles(VivariumDbContext database, long id) =>
+        from dependency in database.RuntimeBuildDependencies.AsNoTracking()
+        where dependency.BuildId == id
+        join resolution in database.RuntimeBuildResolutions.AsNoTracking() on dependency.UpstreamBuildId equals resolution.RequestedBuildId into matches
+        from resolution in matches.DefaultIfEmpty()
+        select new RuntimeBuildDependencyHandle { Kind = dependency.Kind, BuildTypeId = dependency.UpstreamBuildTypeId,
+            Id = resolution == null ? dependency.UpstreamBuildId : resolution.ResolvedBuildId };
+
+    internal async Task<long> CancelAsync(ManagementRequestContext actor, long id, string reason, string mode, CancellationToken token)
     {
         if (reason.Length > 1024 || mode is not ("GRACEFUL" or "FORCE")) throw Invalid("Cancellation input is invalid.");
         await using var database = await databases.CreateDbContextAsync(token);
@@ -177,6 +192,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             StageAudit(database, actor, "build.cancel", "build", id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Denied);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw Missing();
         }
+        id = build.Id;
         var permissions = mode == "FORCE" ? new[] { "cancel_build", AuthorizationPermissionIds.BuildForceStop } : ["cancel_build"];
         if (!await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, permissions,
             await RuntimeBuildAccess.AncestryAsync(database, build.ProjectId, token), token))
@@ -219,11 +235,13 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         if (execution is not null && registry.TryGetBuildConnection(execution.AgentId, execution.WorkloadId, out var connection))
             registry.TrySend(connection!, CancelMessage(build, execution));
+        return id;
     }
 
     internal async Task<RuntimeBuild?> VisibleAsync(VivariumDbContext database, ManagementRequestContext actor, long id, CancellationToken token,
         bool discloseDenied = false)
     {
+        id = await RuntimeBuildAccess.ResolveAsync(database, id, token);
         var build = await database.RuntimeBuilds.SingleOrDefaultAsync(b => b.Id == id, token);
         if (build is null) return null;
         if (await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, ["view_project"],

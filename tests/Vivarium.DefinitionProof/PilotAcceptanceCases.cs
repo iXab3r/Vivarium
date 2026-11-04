@@ -16,14 +16,15 @@ public sealed class PilotAcceptanceCases
     [OneTimeSetUp] public async Task Prepare() { installation = new(); await installation.StartAsync(); }
     [OneTimeTearDown] public async Task Cleanup() => await installation.DisposeAsync();
 
-    [TestCase("failure", TestName = "PILOT-CHAIN-UPSTREAM-FAILURE-001")]
-    [TestCase("cancel-upstream", TestName = "PILOT-CHAIN-UPSTREAM-CANCEL-001")]
-    [TestCase("cancel-root", TestName = "PILOT-CHAIN-ROOT-CANCEL-001")]
-    public async Task Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction(string mode)
+    [TestCase("failure", false, TestName = "PILOT-CHAIN-UPSTREAM-FAILURE-001")]
+    [TestCase("cancel-upstream", false, TestName = "PILOT-CHAIN-UPSTREAM-CANCEL-001")]
+    [TestCase("cancel-root", false, TestName = "PILOT-CHAIN-ROOT-CANCEL-001")]
+    [TestCase("failure", true, TestName = "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001")]
+    public async Task Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction(string mode, bool reuse)
     {
         await using var host = await installation.CreateCaseAsync(catalogued: true);
         using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
-        var settings = Settings;
+        var settings = reuse ? ReuseSettings : Settings;
         foreach (var name in new[] { "Prepare", "Windows", "Release" })
             settings = settings.Replace("\"" + name + "\"", "\"" + mode + " " + name + "\"", StringComparison.Ordinal);
         if (mode == "failure") settings = settings.Replace("set -eu\\n", "set -eu\\nexit 7\\n", StringComparison.Ordinal);
@@ -77,6 +78,24 @@ public sealed class PilotAcceptanceCases
         }
         await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
         Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.EqualTo(mode == "failure" ? 1 : 0), "Canceled dependents never execute.");
+        if (reuse)
+        {
+            using var again = new StringContent("{\"buildType\":{\"id\":\"P_Release\"}}", Encoding.UTF8, "application/json");
+            using var response = await actor.BuildClient.PostAsync("/app/rest/buildQueue", again);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var admission2 = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var next = admission2.RootElement.GetProperty("id").GetInt64();
+            using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+            JsonElement repeated;
+            while ((repeated = await ReadAsync(actor.BuildClient, next, limit.Token)).GetProperty("state").GetString() != "finished")
+                await Task.Delay(100, limit.Token);
+            var repeatedWindowsId = repeated.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64();
+            Assert.That(repeatedWindowsId, Is.Not.EqualTo(windowsId));
+            var repeatedWindows = await ReadAsync(actor.BuildClient, repeatedWindowsId);
+            Assert.That(repeatedWindows.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64(), Is.Not.EqualTo(prepareId));
+            Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.EqualTo(2), "Successful-only reuse reruns a failed required producer.");
+            Assert.That(repeated.GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
+        }
     }
 
     private static async Task<JsonElement> ReadAsync(HttpClient client, long id, CancellationToken token = default)
@@ -92,6 +111,47 @@ public sealed class PilotAcceptanceCases
     [Test]
     public async Task Unchanged_published_CLI_enters_its_own_complete_chain_and_downloads_the_exact_release()
         => await WholeChainAsync(viaCli: true);
+
+    [Test]
+    public async Task Repeated_Release_reuses_the_successful_producers_selected_by_explicit_snapshot_policy()
+        => await WholeChainAsync(viaCli: false, reuse: true);
+
+    [Test]
+    public async Task Unkeyed_queued_repetition_resolves_old_locators_to_the_new_request_across_restart_and_cancel()
+    {
+        await using var host = await installation.CreateCaseAsync(catalogued: true);
+        using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), ReuseSettings);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: explicit-reuse queued chain identities");
+        Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
+        using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
+        actor.BuildClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        async Task<long> Submit()
+        {
+            using var body = new StringContent("{\"buildType\":{\"id\":\"P_Release\"}}", Encoding.UTF8, "application/json");
+            using var response = await actor.BuildClient.PostAsync("/app/rest/buildQueue", body);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var value = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            return value.RootElement.GetProperty("id").GetInt64();
+        }
+        var first = await Submit(); var second = await Submit();
+        Assert.That(first, Is.Not.EqualTo(second), "Intentional unkeyed requests each retain their admission identity.");
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        while ((await ReadAsync(actor.BuildClient, first, deadline.Token)).GetProperty("id").GetInt64() != second)
+            await Task.Delay(100, deadline.Token);
+        await host.RestartAsync();
+        using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + first));
+        Assert.That(native.RootElement.GetProperty("id").GetInt64(), Is.EqualTo(second));
+        using var cancel = new StringContent("{\"comment\":\"Owned old locator cancellation\",\"readdIntoQueue\":false}", Encoding.UTF8, "application/json");
+        using var canceled = await actor.BuildClient.PostAsync("/app/rest/buildQueue/id:" + first, cancel);
+        Assert.That(canceled.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        using var result = JsonDocument.Parse(await canceled.Content.ReadAsStringAsync());
+        Assert.That(result.RootElement.GetProperty("id").GetInt64(), Is.EqualTo(second));
+        Assert.That(result.RootElement.GetProperty("state").GetString(), Is.EqualTo("finished"));
+        Assert.That((await ReadAsync(actor.BuildClient, second)).GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
+        await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+        Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.Zero);
+    }
 
     [Test]
     public async Task Native_chain_inspection_exposes_active_edges_requirements_and_actual_selected_Builds()
@@ -179,11 +239,11 @@ public sealed class PilotAcceptanceCases
         Assert.That(await database.RuntimeBuilds.CountAsync(), Is.EqualTo(3));
     }
 
-    private async Task WholeChainAsync(bool viaCli)
+    private async Task WholeChainAsync(bool viaCli, bool reuse = false)
     {
         await using var host = await installation.CreateCaseAsync(catalogued: true);
         using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
-        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), Settings);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), reuse ? ReuseSettings : Settings);
         await R0AcceptanceCases.CommitCaseAsync(host, "fixture: prepare the complete small Linux Windows Release chain");
         Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
         using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
@@ -250,7 +310,27 @@ public sealed class PilotAcceptanceCases
             Assert.That(bytes, Is.EqualTo("coherent-reference-version\n"u8.ToArray()));
             Assert.That(Convert.ToHexStringLower(SHA256.HashData(bytes)), Is.EqualTo("97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8"));
         }
+        if (reuse)
+        {
+            using var request = new StringContent("{\"buildType\":{\"id\":\"P_Release\"}}", Encoding.UTF8, "application/json");
+            using var response = await actor.BuildClient.PostAsync("/app/rest/buildQueue", request);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            using var admission = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var repeatedId = admission.RootElement.GetProperty("id").GetInt64();
+            Assert.That(repeatedId, Is.Not.EqualTo(id));
+            var repeated = await FinishedAsync(actor.BuildClient, repeatedId);
+            Assert.That(repeated.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64(), Is.EqualTo(windowsId),
+                "Pinned chain:repeat-release-and-reuse-selection reuses the original successful Windows producer.");
+            Assert.That(repeated.GetProperty("artifact-dependencies").GetProperty("build").EnumerateArray().Select(b => b.GetProperty("id").GetInt64()),
+                Is.EquivalentTo(new[] { prepareId, windowsId }));
+            Assert.That(await actor.BuildClient.GetByteArrayAsync($"/app/rest/builds/id:{repeatedId}/artifacts/files/release.txt"),
+                Is.EqualTo("coherent-reference-version\n"u8.ToArray()));
+            await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+            Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.EqualTo(4), "Only the ordinary Release runs again.");
+        }
     }
+
+    private static string ReuseSettings => Settings.Replace(", \"CANCEL\", \"CANCEL\")", ", \"CANCEL\", \"CANCEL\", true, true)", StringComparison.Ordinal);
 
     private static async Task<JsonElement> FinishedAsync(HttpClient client, long id)
     {

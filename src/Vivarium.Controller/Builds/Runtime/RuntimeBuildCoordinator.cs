@@ -91,13 +91,18 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             .OrderBy(b => b.QueuedAt).ThenBy(b => b.Id).ToArrayAsync(token);
         foreach (var build in queued)
         {
+            var input = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == build.Id, token);
+            var definition = await database.CatalogBuildDefinitions.AsNoTracking()
+                .SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
+            var config = ReadDefinition(definition);
             if (build.QueueDeadline <= time.GetUtcNow())
             {
                 await FinishUnassignedAsync(database, build, "Queue wait timeout expired", "build.queue.expired", "queue_deadline", token);
                 continue;
             }
-            var upstreams = await database.RuntimeBuildDependencies.Where(d => d.BuildId == build.Id && d.Kind == "SNAPSHOT")
-                .Join(database.RuntimeBuilds, d => d.UpstreamBuildId, upstream => upstream.Id, (d, upstream) => upstream)
+            if (await TryResolveQueuedAsync(database, build, input, definition, config, token)) continue;
+            var upstreams = await RuntimeBuildService.DependencyHandles(database, build.Id).Where(d => d.Kind == "SNAPSHOT")
+                .Join(database.RuntimeBuilds, d => d.Id, upstream => upstream.Id, (d, upstream) => upstream)
                 .OrderBy(upstream => upstream.Id).ToArrayAsync(token);
             var failed = upstreams.FirstOrDefault(upstream => upstream.State == "FINISHED" && upstream.Status != "SUCCESS");
             if (failed is not null)
@@ -116,10 +121,6 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             }
             if (upstreams.Any(upstream => upstream.State != "FINISHED"))
             { build.StatusText = "Build dependencies have not been built yet"; continue; }
-            var input = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == build.Id, token);
-            var definition = await database.CatalogBuildDefinitions.AsNoTracking()
-                .SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
-            var config = ReadDefinition(definition);
             var candidates = await database.AgentRegistrations.AsNoTracking().Where(a => a.DeletedAt == null && a.Authorized
                 && a.DesiredEnabled && a.DesiredRevision != null && a.Reconciled && !a.Quarantined
                 && !a.MaintenanceDrain && a.CurrentWorkloadId == null && a.SessionAuthenticated)
@@ -171,6 +172,72 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         }
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         return null;
+    }
+
+    private async Task<bool> TryResolveQueuedAsync(VivariumDbContext database, RuntimeBuild build, RuntimeBuildInput input,
+        CatalogBuildDefinition definition, ResolvedConfiguration config, CancellationToken token)
+    {
+        // This first source-free cohort never compares encrypted secrets or substitutes an
+        // already assigned execution. Queue resolution and actual work ownership are separate.
+        if (input.ProtectedEnvironment.Length != 0
+            || await database.RuntimeBuildExecutions.AnyAsync(e => e.BuildId == build.Id, token)) return false;
+        var incoming = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.UpstreamBuildId == build.Id && d.Kind == "SNAPSHOT")
+            .Join(database.RuntimeBuildInputs.AsNoTracking(), d => d.BuildId, i => i.BuildId, (d, i) => i)
+            .Join(database.CatalogBuildDefinitions.AsNoTracking(), i => new { i.BuildTypeId, i.RevisionId }, d => new { d.BuildTypeId, d.RevisionId }, (i, d) => d)
+            .ToArrayAsync(token);
+        var incomingReuse = incoming.Length != 0 && incoming.All(d => ReadDefinition(d).Snapshots
+            .Any(s => s.Configuration == config.Id && s.ReuseBuilds && s.SuccessfulOnly));
+        var queuedRootReuse = incoming.Length == 0 && config.Snapshots.Length != 0 && config.Snapshots.All(s => s.ReuseBuilds && s.SuccessfulOnly);
+        if (!incomingReuse && !queuedRootReuse) return false;
+        if (incomingReuse && JsonSerializer.Deserialize<Dictionary<string, string>>(input.OverridesJson) is not { Count: 0 }) return false;
+        var requiresArtifacts = await database.RuntimeBuildDependencies.AnyAsync(d => d.UpstreamBuildId == build.Id && d.Kind == "ARTIFACT", token);
+        var expected = await RuntimeBuildService.DependencyHandles(database, build.Id).ToArrayAsync(token);
+        var candidates = from other in database.RuntimeBuilds
+            join otherInput in database.RuntimeBuildInputs.AsNoTracking() on other.Id equals otherInput.BuildId
+            join otherDefinition in database.CatalogBuildDefinitions.AsNoTracking()
+                on new { otherInput.BuildTypeId, otherInput.RevisionId } equals new { otherDefinition.BuildTypeId, otherDefinition.RevisionId }
+            where other.BuildTypeId == build.BuildTypeId && other.ProjectId == build.ProjectId && other.Id != build.Id
+                && otherInput.ProtectedEnvironment.Length == 0 && otherInput.OverridesJson == input.OverridesJson && otherDefinition.PlanHash == definition.PlanHash
+                && (other.State == "QUEUED" && other.Id > build.Id
+                    || incomingReuse && other.State == "FINISHED" && other.Status == "SUCCESS")
+                && !database.RuntimeBuildResolutions.Any(r => r.RequestedBuildId == other.Id)
+                && (!requiresArtifacts || other.State == "QUEUED" || database.RuntimeBuildArtifacts.Any(a => a.BuildId == other.Id))
+            where database.RuntimeBuildDependencies.Count(d => d.BuildId == other.Id) == expected.Length
+            select other;
+        foreach (var handle in expected)
+        {
+            var kind = handle.Kind; var type = handle.BuildTypeId; var id = handle.Id;
+            candidates = candidates.Where(other => (from dependency in database.RuntimeBuildDependencies
+                join resolution in database.RuntimeBuildResolutions on dependency.UpstreamBuildId equals resolution.RequestedBuildId into matches
+                from resolution in matches.DefaultIfEmpty()
+                where dependency.BuildId == other.Id && dependency.Kind == kind && dependency.UpstreamBuildTypeId == type
+                    && (resolution == null ? dependency.UpstreamBuildId : resolution.ResolvedBuildId) == id
+                select dependency.BuildId).Any());
+        }
+        // Filter matching input/provenance in SQL; do not materialize unbounded Build history.
+        var candidate = await candidates.OrderByDescending(other => other.Id).FirstOrDefaultAsync(token);
+        if (candidate is not null)
+        {
+            var now = time.GetUtcNow();
+            // Flatten existing handles in the same transaction before adding this replacement.
+            // The append-only audit preserves each original transition; reads need one lookup
+            // even after thousands of intentional queued requests.
+            await database.RuntimeBuildResolutions.Where(r => r.ResolvedBuildId == build.Id)
+                .ExecuteUpdateAsync(set => set.SetProperty(r => r.ResolvedBuildId, candidate.Id).SetProperty(r => r.UpdatedAt, now), token);
+            database.RuntimeBuildResolutions.Add(new() { RequestedBuildId = build.Id, ResolvedBuildId = candidate.Id,
+                BuildTypeId = build.BuildTypeId, ProjectId = build.ProjectId, CreatedAt = now, UpdatedAt = now });
+            build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = "Resolved to Build " + candidate.Id;
+            build.FinishedAt = now;
+            var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "COMPLETE";
+            foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == build.Id).ToArrayAsync(token))
+            { stream.FinalSequence = 0; stream.FinalBytes = 0; }
+            await RuntimeBuildAudit.StageAsync(database, build, now, "build.queue.resolved", details:
+                new Dictionary<string, string> { ["resolvedBuildId"] = candidate.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    ["kind"] = candidate.State == "QUEUED" ? "queued-replacement" : "successful-snapshot-reuse" }, token: token);
+            await database.SaveChangesAsync(token);
+            return true;
+        }
+        return false;
     }
 
     private async Task AdvanceAsync(long id, CancellationToken token, bool prepare = false)

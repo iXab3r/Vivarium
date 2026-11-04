@@ -33,6 +33,7 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<RuntimeBuild> RuntimeBuilds => Set<RuntimeBuild>();
     public DbSet<RuntimeBuildInput> RuntimeBuildInputs => Set<RuntimeBuildInput>();
     public DbSet<RuntimeBuildDependency> RuntimeBuildDependencies => Set<RuntimeBuildDependency>();
+    public DbSet<RuntimeBuildResolution> RuntimeBuildResolutions => Set<RuntimeBuildResolution>();
     public DbSet<RuntimeBuildConsumedArtifact> RuntimeBuildConsumedArtifacts => Set<RuntimeBuildConsumedArtifact>();
     public DbSet<RuntimeBuildCounter> RuntimeBuildCounters => Set<RuntimeBuildCounter>();
     public DbSet<RuntimeBuildExecution> RuntimeBuildExecutions => Set<RuntimeBuildExecution>();

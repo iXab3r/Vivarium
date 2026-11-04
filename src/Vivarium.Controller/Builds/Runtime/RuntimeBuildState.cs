@@ -35,6 +35,18 @@ public sealed class RuntimeBuildCounter
     public long NextValue { get; set; } = 1;
 }
 
+// Current queue resolution, flattened under the queue fence. Original request/input and every
+// replacement audit event remain retained; an assigned/finished physical execution is never replaced.
+public sealed class RuntimeBuildResolution
+{
+    public long RequestedBuildId { get; set; }
+    public long ResolvedBuildId { get; set; }
+    public long BuildTypeId { get; set; }
+    public long ProjectId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+}
+
 // This is the actually collected settings relation, not a writable PG desired-settings override.
 // Source-free R0 collects it before queue admission; VCS source selection is a distinct later fact.
 public sealed class RuntimeBuildInput

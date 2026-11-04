@@ -31,8 +31,8 @@ internal static class RuntimeBuildEndpoints
                 var request = await http.Request.ReadFromJsonAsync<CancellationInput>(http.RequestAborted);
                 if (request is null) return RuntimeManagement.InvalidInput(http);
                 var mode = request.Mode switch { "graceful" => "GRACEFUL", "force" => "FORCE", _ => "" };
-                await builds.CancelAsync(actor, id, request.Reason ?? "", mode, http.RequestAborted);
-                return Results.Accepted("/api/v1/builds/" + id, new { id });
+                var resolved = await builds.CancelAsync(actor, id, request.Reason ?? "", mode, http.RequestAborted);
+                return Results.Accepted("/api/v1/builds/" + resolved, new { id = resolved });
             }, mutation: true, source: "builds"));
     }
 

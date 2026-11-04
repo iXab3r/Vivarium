@@ -1017,6 +1017,38 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildResolution", b =>
+                {
+                    b.Property<long>("RequestedBuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ResolvedBuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("RequestedBuildId");
+
+                    b.HasIndex("RequestedBuildId", "BuildTypeId", "ProjectId");
+
+                    b.HasIndex("ResolvedBuildId", "BuildTypeId", "ProjectId");
+
+                    b.ToTable("RuntimeBuildResolutions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildResolutions_NotSelf", "\"RequestedBuildId\" <> \"ResolvedBuildId\" AND \"UpdatedAt\" >= \"CreatedAt\"");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", b =>
                 {
                     b.Property<long>("BuildId")
@@ -1917,6 +1949,23 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
                         .WithMany()
                         .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildResolution", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("RequestedBuildId", "BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "BuildTypeId", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("ResolvedBuildId", "BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "BuildTypeId", "ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

@@ -1182,10 +1182,17 @@ the submitted Release remains the returned Build, without an implicit composite.
 source-free chain cohort collects its definitions and selected same-chain producers atomically with
 admission. Downstream work waits on the existing queue until its selected snapshot producers finish.
 Assignment preparation records each consumed producer artifact and destination alongside authorized
-payload references to the exact private content object. Selection and consumption observations are
-immutable PostgreSQL evidence, not Git desired overrides or an independent chain scheduler. This
-cohort implements literal same-chain file transfers on fresh workspaces; source checkout, reuse and
-other selectors, propagation, full recipe runners and publication remain due before PILOT acceptance.
+payload references to the exact private content object. Admission retains immutable requested
+dependency handles. Queue optimization has a separately audited PostgreSQL resolution projection,
+flattened atomically under the existing queue fence; both HTTP surfaces resolve old locators through
+that same projection. A resolution cannot cross a Project/BuildType or replace an assigned/finished
+physical execution. Successful snapshot reuse requires explicit reuse/success-only declarations and
+matching collected plans, ordinary parameters and selected producers; encrypted run-secret inputs
+are not compared for this cohort. Actual assignment/consumed producer/file/destination evidence
+remains immutable. This is runtime resolution, not a Git desired override or an independent chain
+scheduler. Literal same-chain transfers and selected CANCEL/CANCEL propagation exist; source
+checkout, other reuse/selector/policy profiles, full recipe runners and publication remain due before
+PILOT acceptance.
 
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router

@@ -16,6 +16,7 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
         await using var database = await databases.CreateDbContextAsync(token);
         await using var transaction = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
         var build = await builds.VisibleAsync(database, actor, id, token, discloseDenied: true) ?? throw RuntimeBuildService.Missing();
+        id = build.Id;
         var type = await database.CatalogBuildTypes.AsNoTracking().SingleAsync(t => t.Id == build.BuildTypeId, token);
         var project = await database.CatalogProjects.AsNoTracking().SingleAsync(p => p.Id == build.ProjectId, token);
         var execution = await database.RuntimeBuildExecutions.AsNoTracking().SingleOrDefaultAsync(e => e.BuildId == id, token);

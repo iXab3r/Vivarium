@@ -35,6 +35,15 @@ internal static class RuntimeBuildModel
         input.Property(i => i.OverridesJson).HasColumnType("jsonb"); input.Property(i => i.AdmissionJson).HasColumnType("jsonb");
         input.ToTable("RuntimeBuildInputs");
 
+        var resolution = model.Entity<RuntimeBuildResolution>();
+        resolution.HasKey(r => r.RequestedBuildId); resolution.Property(r => r.RequestedBuildId).ValueGeneratedNever();
+        resolution.HasOne<RuntimeBuild>().WithMany().HasForeignKey(r => new { r.RequestedBuildId, r.BuildTypeId, r.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        resolution.HasOne<RuntimeBuild>().WithMany().HasForeignKey(r => new { r.ResolvedBuildId, r.BuildTypeId, r.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        resolution.ToTable("RuntimeBuildResolutions", t => t.HasCheckConstraint("CK_RuntimeBuildResolutions_NotSelf",
+            "\"RequestedBuildId\" <> \"ResolvedBuildId\" AND \"UpdatedAt\" >= \"CreatedAt\""));
+
         var dependency = model.Entity<RuntimeBuildDependency>();
         dependency.HasKey(d => new { d.BuildId, d.Kind, d.UpstreamBuildTypeId });
         dependency.HasOne<RuntimeBuild>().WithMany().HasForeignKey(d => d.BuildId).OnDelete(DeleteBehavior.Restrict);

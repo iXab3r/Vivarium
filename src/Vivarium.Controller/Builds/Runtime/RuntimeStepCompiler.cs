@@ -47,10 +47,10 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
             var destinations = new HashSet<string>(osFamily == "windows" ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
             foreach (var relation in config.Artifacts)
             {
-                var selected = await database.RuntimeBuildDependencies.AsNoTracking()
-                    .Join(database.CatalogBuildTypes, d => d.UpstreamBuildTypeId, t => t.Id, (d, t) => new { Dependency = d, t.ExternalId })
-                    .SingleAsync(d => d.Dependency.BuildId == build.Id && d.Dependency.Kind == "ARTIFACT" && d.ExternalId == relation.Configuration, token);
-                var producer = await database.RuntimeBuilds.AsNoTracking().SingleAsync(b => b.Id == selected.Dependency.UpstreamBuildId, token);
+                var selected = await RuntimeBuildService.DependencyHandles(database, build.Id)
+                    .Join(database.CatalogBuildTypes, d => d.BuildTypeId, t => t.Id, (d, t) => new { Dependency = d, t.ExternalId })
+                    .SingleAsync(d => d.Dependency.Kind == "ARTIFACT" && d.ExternalId == relation.Configuration, token);
+                var producer = await database.RuntimeBuilds.AsNoTracking().SingleAsync(b => b.Id == selected.Dependency.Id, token);
                 if (producer.State != "FINISHED" || producer.Status != "SUCCESS")
                     throw new InvalidDataException("The selected artifact producer is not complete.");
                 // Literal rules are the first independently captured cohort; wildcard/archive

@@ -126,9 +126,9 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
       }
     },
@@ -170,11 +170,12 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
-      }
+      },
+      "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
     },
     {
       "id": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
@@ -214,11 +215,12 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
-      }
+      },
+      "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
     },
     {
       "id": "PILOT-CHAIN-ROOT-CANCEL-001",
@@ -258,11 +260,12 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
-      }
+      },
+      "display_name": "PILOT-CHAIN-ROOT-CANCEL-001"
     },
     {
       "id": "PILOT-CHAIN-UNCHANGED-CLI-001",
@@ -317,9 +320,9 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
       }
     },
@@ -357,9 +360,9 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
       }
     },
@@ -399,9 +402,149 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-three-surface-cohort.trx",
-        "sha256": "a62880409ecce7608b1d5a020a3e343e0269b61e71b9d6aec61730327c139664",
-        "cohort_passed": 7,
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
+        "cohort_failed": 0
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-REPEAT-REUSE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "case": "chain:repeat-release-and-reuse-selection",
+        "exchanges": 17
+      },
+      "principal": "Ordinary finite six-permission P account; reference admin-positive effects. Shared current actor/scope authority remains mandatory.",
+      "seed": "Fresh three source-free C#/Git configurations, explicit CANCEL/CANCEL plus reuse=true and successful-only=true. Repeat executes on owned Windows/Linux; queued resolution has no Agent.",
+      "entry": "Ordinary unkeyed compatible Release admission(s), later reads/cancel; native cross-read and restart are native durability additions.",
+      "effect": "A new ordinary Release runs, selecting the original finished successful Prepare/Windows producers and exact bytes; only four actual executions exist after two Release entries.",
+      "completion": "Captured selected physical identity/bytes and old-locator effects with preserved admission intent; no fabricated new executions or transport body-hash dedupe.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Repeated_Release_reuses_the_successful_producers_selected_by_explicit_snapshot_policy",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
+        "cohort_failed": 0
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-QUEUED-RESOLUTION-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "case": "chain:unkeyed-queued-repetition-and-old-locators",
+        "exchanges": 12
+      },
+      "principal": "Ordinary finite six-permission P account; reference admin-positive effects. Shared current actor/scope authority remains mandatory.",
+      "seed": "Fresh three source-free C#/Git configurations, explicit CANCEL/CANCEL plus reuse=true and successful-only=true. Repeat executes on owned Windows/Linux; queued resolution has no Agent.",
+      "entry": "Ordinary unkeyed compatible Release admission(s), later reads/cancel; native cross-read and restart are native durability additions.",
+      "effect": "Two unkeyed admissions return different request IDs. With no available Agent, old locator resolves to the second queued root; cancellation through that locator acts on the resolved Build. Native cross-read and cold Host restart retain this relation.",
+      "completion": "Captured selected physical identity/bytes and old-locator effects with preserved admission intent; no fabricated new executions or transport body-hash dedupe.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Unkeyed_queued_repetition_resolves_old_locators_to_the_new_request_across_restart_and_cancel",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
+        "cohort_failed": 0
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001",
+      "display_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001",
+      "kind": "documented-model-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06"
+      ],
+      "source": {
+        "primary": "https://www.jetbrains.com/help/teamcity/2026.1/snapshot-dependencies.html",
+        "section": "Only use successful builds / Suitable Builds",
+        "supporting": "tests/Vivarium.Tests/TeamCity/Reference/chain-lifecycle-observations.json; literal exit7 and downstream cancellation source",
+        "interpretation": "Documented successful-only suitability requires rerunning the failed producer. No invented complete HTTP transcript or claim about every reuse option."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Same real Linux exit7 chain, explicit CANCEL/CANCEL and reuse=true/successful-only=true; no prior success.",
+      "entry": "Two ordinary compatible Release admissions separated by the first terminal failure.",
+      "effect": "The second chain obtains distinct required producers and actually reruns Prepare; downstream never executes or publishes after either failure.",
+      "completion": "Two actual Prepare execution owners, no Windows/Release execution, second root UNKNOWN with new producer identities.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
+        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
+        "cohort_passed": 10,
         "cohort_failed": 0
       }
     }
