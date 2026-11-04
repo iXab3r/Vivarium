@@ -24,6 +24,7 @@ public sealed class BlobClient : IDisposable
         http = new HttpClient(handler)
         {
             BaseAddress = controllerUrl,
+            Timeout = TimeSpan.FromMinutes(15),
         };
     }
 

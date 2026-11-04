@@ -21,6 +21,14 @@ internal sealed class RuntimeBuildArtifacts(IDbContextFactory<VivariumDbContext>
     internal async Task<byte[]> ReadAsync(ManagementRequestContext actor, long id, int? ordinal, string? path, CancellationToken token,
         bool discloseDenied = false)
     {
+        await using var stream = await OpenAsync(actor, id, ordinal, path, token, discloseDenied);
+        if (stream.Length > 64 * 1024) throw new InvalidDataException("Inline artifact bytes exceed their bound.");
+        using var content = new MemoryStream(); await stream.CopyToAsync(content, token); return content.ToArray();
+    }
+
+    internal async Task<FileStream> OpenAsync(ManagementRequestContext actor, long id, int? ordinal, string? path, CancellationToken token,
+        bool discloseDenied = false)
+    {
         RuntimeArtifactUpload upload;
         await using (var database = await databases.CreateDbContextAsync(token))
         {
@@ -31,9 +39,13 @@ internal sealed class RuntimeBuildArtifacts(IDbContextFactory<VivariumDbContext>
             if (artifact is null) throw new RestApiException(404, "resource_not_found", "Artifact not found", "The artifact is not found");
             upload = await database.RuntimeArtifactUploads.AsNoTracking().SingleAsync(u => u.BuildId == id && u.Sha256 == artifact.Sha256, token);
         }
-        var content = await bytes.ReadAsync(upload.ObjectKey, upload.Size, upload.Sha256, token);
-        await using var current = await databases.CreateDbContextAsync(token);
-        if (await builds.VisibleAsync(current, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
-        return content;
+        var content = await bytes.OpenAsync(upload.ObjectKey, upload.Size, upload.Sha256, token);
+        try
+        {
+            await using var current = await databases.CreateDbContextAsync(token);
+            if (await builds.VisibleAsync(current, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
+            return content;
+        }
+        catch { await content.DisposeAsync(); throw; }
     }
 }

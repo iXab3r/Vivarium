@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using System.Security.Cryptography;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Agents;
@@ -15,7 +14,7 @@ internal static class RuntimeAgentByteEndpoints
     internal static void MapRuntimeAgentBytes(this WebApplication app)
     {
         app.MapPut("/blobs/{sha256}", async (HttpContext http, string sha256, AgentCredentials credentials,
-            IDbContextFactory<VivariumDbContext> databases, RuntimeBuildBytes bytes, TimeProvider time) =>
+            IDbContextFactory<VivariumDbContext> databases, RuntimeBuildBytes bytes, RuntimeBuildSecrets secrets, TimeProvider time) =>
         {
             var scope = await OwnerAsync(http, credentials, databases, time, http.RequestAborted);
             if (scope is null) return Denied(http);
@@ -24,13 +23,19 @@ internal static class RuntimeAgentByteEndpoints
             try
             {
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(http.RequestAborted);
-            deadline.CancelAfter(TimeSpan.FromSeconds(15));
+            var rules = scope.Assignment.Length != 0 && secrets.ReadAssignment(scope.BuildId, scope.Assignment, scope.AssignmentProtectionVersion)
+                .ArtifactPublicationContractMajor == 2;
+            var maximum = rules ? VerifiedArtifactFile.MaximumBytes : 65536;
+            deadline.CancelAfter(rules ? VerifiedArtifactFile.TransferTimeout : TimeSpan.FromSeconds(15));
             if (!Regex.IsMatch(sha256, "^[a-f0-9]{64}$", RegexOptions.CultureInvariant)) return RestProblems.NotFound(http, "blob", sha256);
             if (http.Request.Headers["X-Vivarium-Blob-Declared-Size"].Count != 1
                 || !long.TryParse(http.Request.Headers["X-Vivarium-Blob-Declared-Size"][0], NumberStyles.None, CultureInfo.InvariantCulture, out var declared)
-                || declared is < 0 or > 65536 || http.Request.ContentLength is not null && http.Request.ContentLength != declared)
+                || declared < 0 || declared > maximum || http.Request.ContentLength is not null && http.Request.ContentLength != declared)
                 return RestProblems.Create(http, 413, "artifact_profile_limit", "The selected artifact profile limit was exceeded",
-                    "The selected R0 literal-file upload accepts at most 64 KiB per file.");
+                    rules ? "The selected streaming upload accepts at most 2 GiB per file."
+                        : "The selected R0 literal-file upload accepts at most 64 KiB per file.");
+            var bodyLimit = http.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
+            if (bodyLimit is { IsReadOnly: false }) bodyLimit.MaxRequestBodySize = declared + 1;
             await using (var check = await databases.CreateDbContextAsync(http.RequestAborted))
                 if (await check.RuntimeArtifactUploads.CountAsync(u => u.BuildId == scope.BuildId, http.RequestAborted) >= 128
                     && !await check.RuntimeArtifactUploads.AnyAsync(u => u.BuildId == scope.BuildId && u.Sha256 == sha256, http.RequestAborted))
@@ -38,15 +43,7 @@ internal static class RuntimeAgentByteEndpoints
                         "The selected R0 literal-file upload accepts at most 128 content objects.");
             // Verify the entire bounded entity before any object write. Untrusted bytes never
             // overwrite an existing content address, including another Build's retained object.
-            var content = new byte[checked((int)declared)]; var offset = 0;
-            while (offset < content.Length)
-            {
-                var read = await http.Request.Body.ReadAsync(content.AsMemory(offset), deadline.Token);
-                if (read == 0) break; offset += read;
-            }
-            if (offset != content.Length || await http.Request.Body.ReadAsync(new byte[1], deadline.Token) != 0
-                || Convert.ToHexStringLower(SHA256.HashData(content)) != sha256)
-                return RestProblems.Create(http, 400, "artifact_integrity_mismatch", "Artifact integrity differs", "The declared size and SHA256 must match the exact body.");
+            await using var content = await VerifiedArtifactFile.ReceiveAsync(http.Request.Body, declared, sha256, deadline.Token);
             var key = $"build-artifacts/{scope.BuildId}/{sha256}";
             // Reserve bounded ownership before PUT. A terminal/racing request may never allocate
             // an unjournalled private object, and failed/rejected uploads remain cleanup work.
@@ -82,7 +79,7 @@ internal static class RuntimeAgentByteEndpoints
                     ? Results.NoContent() : Busy(http);
             }
             // Cleanup skips the object row; Agent/queue coordination remains free during I/O.
-            await bytes.PutAsync(key, content, deadline.Token);
+            await bytes.PutAsync(key, content, declared, deadline.Token);
             await AgentCredentials.LockAgentAsync(database, scope.AgentId, deadline.Token);
             var current = await OwnerAsync(http, credentials, databases, time, deadline.Token);
             if (current?.BuildId != scope.BuildId) return Denied(http);
@@ -100,6 +97,8 @@ internal static class RuntimeAgentByteEndpoints
             }
             catch (OperationCanceledException) when (!http.RequestAborted.IsCancellationRequested)
             { return RestProblems.Create(http, 408, "artifact_upload_timeout", "Artifact upload timed out", "Retry the upload within its transfer bound.", retryable: true); }
+            catch (InvalidDataException)
+            { return RestProblems.Create(http, 400, "artifact_integrity_mismatch", "Artifact integrity differs", "The declared size and SHA256 must match the exact body."); }
             finally { UploadSlots.Release(); }
         });
         app.MapGet("/blobs/{sha256}", async (HttpContext http, string sha256, AgentCredentials credentials,
@@ -112,11 +111,16 @@ internal static class RuntimeAgentByteEndpoints
             var payload = await database.RuntimeBuildPayloads.AsNoTracking()
                 .SingleOrDefaultAsync(p => p.BuildId == scope.BuildId && p.Sha256 == sha256, http.RequestAborted);
             if (payload is null) return RestProblems.NotFound(http, "blob", sha256);
-            var content = await bytes.ReadAsync(payload.ObjectKey, payload.Size, payload.Sha256, http.RequestAborted);
+            var content = await bytes.OpenAsync(payload.ObjectKey, payload.Size, payload.Sha256, http.RequestAborted);
             // Storage I/O runs outside SQL. A replacement session cannot retain the old read grant
             // merely because it was current before that I/O started.
-            var current = await OwnerAsync(http, credentials, databases, time, http.RequestAborted);
-            return current?.BuildId == scope.BuildId ? Results.Bytes(content, "application/octet-stream") : Denied(http);
+            try
+            {
+                var current = await OwnerAsync(http, credentials, databases, time, http.RequestAborted);
+                if (current?.BuildId == scope.BuildId) return Results.Stream(content, "application/octet-stream");
+                await content.DisposeAsync(); return Denied(http);
+            }
+            catch { await content.DisposeAsync(); throw; }
         });
     }
 

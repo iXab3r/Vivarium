@@ -44,7 +44,8 @@ public static partial class BuildExecutor
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
-        var publisher = assignment.ArtifactPublicationContractMajor == 1 ? new LiteralArtifactPublisher() : null;
+        var publisher = assignment.ArtifactPublicationContractMajor is 1 or 2
+            ? new LiteralArtifactPublisher(allowRules: assignment.ArtifactPublicationContractMajor == 2) : null;
 
         try
         {
@@ -155,10 +156,13 @@ public static partial class BuildExecutor
             {
                 await SendStatusAsync(
                     send, assignment.BuildId, -1, "COLLECTING", collectionToken);
-                foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect)
-                    .Concat(publisher?.Files(workdir) ?? []).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
+                var publications = MatchCollectGlobs(workdir, assignment.Collect).Select(p => (Source: p, Path: p))
+                    .Concat(publisher?.PublishedFiles(workdir, collectionToken) ?? []).ToArray();
+                if (publications.GroupBy(p => p.Path, StringComparer.OrdinalIgnoreCase).Any(g => g.Select(p => p.Source).Distinct(StringComparer.Ordinal).Count() > 1))
+                    throw new InvalidDataException("Collected artifact paths conflict.");
+                foreach (var file in publications.Distinct().OrderBy(p => p.Path, StringComparer.Ordinal))
                 {
-                    var fullPath = Path.Combine(workdir, relativePath);
+                    var fullPath = Path.Combine(workdir, file.Source);
                     var sha = await blobs.UploadAsync(
                         fullPath,
                         assignment.BuildId,
@@ -166,7 +170,7 @@ public static partial class BuildExecutor
                         collectionToken);
                     result.Artifacts.Add(new Artifact
                     {
-                        Path = relativePath.Replace('\\', '/'),
+                        Path = file.Path.Replace('\\', '/'),
                         Sha256 = sha,
                         Size = new FileInfo(fullPath).Length,
                         ModificationTimeUnixMs = new DateTimeOffset(File.GetLastWriteTimeUtc(fullPath)).ToUnixTimeMilliseconds(),

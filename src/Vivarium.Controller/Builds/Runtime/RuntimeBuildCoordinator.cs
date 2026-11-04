@@ -134,6 +134,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                     || !connection.Protocol.SupportsLiteralArtifactPublisher) continue;
                 if (input.SourceJson is not null && !connection.Protocol.SupportsVcsCheckout) continue;
                 if (RuntimeStepCompiler.RequiresContainer(config) && !connection.Protocol.SupportsContainerRunner) continue;
+                if (RuntimeStepCompiler.RequiresArtifactRules(config) && !connection.Protocol.SupportsArtifactRules) continue;
                 var reported = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.ReportedParametersJson, Json)!;
                 if (!RuntimeStepCompiler.MatchesRunnerPlatform(config, reported, agent.StaticObservationJson)) continue;
                 if (!reported.TryGetValue("system.os.family", out var platform) || platform is not ("windows" or "linux" or "macos")) continue;
@@ -251,6 +252,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         RuntimeBuildInput input;
         CatalogBuildDefinition definition;
         string os;
+        bool artifactRules;
         await using (var database = await databases.CreateDbContextAsync(token))
         {
             snapshot = await database.RuntimeBuildExecutions.AsNoTracking().SingleAsync(e => e.BuildId == id, token);
@@ -262,6 +264,9 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             using var selection = JsonDocument.Parse(snapshot.SelectionSnapshotJson);
             os = selection.RootElement.GetProperty("reportedParameters").TryGetProperty("system.os.family", out var platform)
                 && platform.ValueKind == JsonValueKind.String ? platform.GetString()! : "";
+            artifactRules = selection.RootElement.GetProperty("negotiatedCapabilities").EnumerateArray().Any(c =>
+                c.GetProperty("capabilityId").GetString() == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId
+                && c.GetProperty("contractMajor").GetInt32() == 1);
         }
         if (os is not ("windows" or "linux" or "macos"))
         { await FailAsync(id, "Execution platform is unavailable", safeUnsent: snapshot.SentAt is null, token); return; }
@@ -271,7 +276,9 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var remaining = snapshot.PreparationDeadline - time.GetUtcNow();
             using var timeout = new CancellationTokenSource(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, time);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
-            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token); }
+            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token, artifactRules); }
+            catch (RuntimeArtifactResolutionException)
+            { await FailAsync(id, "Failed to resolve artifact dependency", safeUnsent: true, token, artifactFailure: true); return; }
             catch (RuntimeSourceCollectionException)
             { await FailAsync(id, "Unable to collect changes", safeUnsent: true, token, sourceFailure: true); return; }
             catch (Exception error) when (error is InvalidDataException or HttpRequestException or IOException or TimeoutException
@@ -312,7 +319,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(currentAgent.CustomParametersJson, Json)!;
             var effective = new Dictionary<string, string>(reported, StringComparer.Ordinal);
             foreach (var pair in custom) effective[pair.Key] = pair.Value;
-            if (RuntimeStepCompiler.RequiresContainer(ReadDefinition(definition)) && !connection!.Protocol.SupportsContainerRunner
+            if (prepared.Assignment.ArtifactPublicationContractMajor == 2 && !connection!.Protocol.SupportsArtifactRules
+                || RuntimeStepCompiler.RequiresContainer(ReadDefinition(definition)) && !connection!.Protocol.SupportsContainerRunner
                 || reported.GetValueOrDefault("system.os.family") != os || !RuntimeStepCompiler.MatchesRunnerPlatform(ReadDefinition(definition), reported, currentAgent.StaticObservationJson) || ReadDefinition(definition).Requirements
                 .Any(r => !effective.TryGetValue(r.Name, out var value) || value != r.Value))
             {
@@ -480,7 +488,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 for (var ordinal = 0; ordinal < result.Artifacts.Count; ordinal++)
                 {
                     var artifact = result.Artifacts[ordinal]; LiteralArtifactPath.Validate(artifact.Path);
-                    if (!System.Text.RegularExpressions.Regex.IsMatch(artifact.Sha256, "^[a-f0-9]{64}$") || artifact.Size is < 0 or > 65536)
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(artifact.Sha256, "^[a-f0-9]{64}$") || artifact.Size is < 0 or > VerifiedArtifactFile.MaximumBytes)
                         throw new InvalidDataException("Artifact content metadata is invalid.");
                     var upload = await database.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == build.Id && u.Sha256 == artifact.Sha256, token);
                     if (upload is null || artifact.Size != upload.Size) throw new InvalidDataException("Artifact content is not owned/verified.");
@@ -536,7 +544,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             reason, workload, token: token);
     }
 
-    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token, bool sourceFailure = false)
+    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token, bool sourceFailure = false, bool artifactFailure = false)
     {
         await using var database = await databases.CreateDbContextAsync(token);
         var key = await database.RuntimeBuildExecutions.AsNoTracking().Where(e => e.BuildId == id).Select(e => e.AgentId).SingleAsync(token);
@@ -549,7 +557,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         // A durable send intent always wins over a caller's earlier unsent observation.
         safeUnsent &= execution.SentAt is null;
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
-        if (sourceFailure && build.CancelRequestedAt is null) build.Status = "FAILURE";
+        if ((sourceFailure || artifactFailure) && build.CancelRequestedAt is null) build.Status = "FAILURE";
         build.Number ??= "N/A";
         build.FailedToStart = build.CancelRequestedAt is null && execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow();

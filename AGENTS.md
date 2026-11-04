@@ -34,8 +34,11 @@ the selected recipe now also runs actual Docker Prepare/Release and Windows Desk
 FILE/PS1/x64, with immutable step/container receipts, scoped cache and exact bytes. D47 adds private
 Engine ownership and conservative restart recovery; selected actual owner-death and live synthetic
 secret metadata/output checks have evidence. These runner cohorts do not accept their complete API
-families. Source-aware reuse, remaining source fault/authority profiles, triggers, large artifact
-rules/streaming, targeted chain secrets and actual T3 publication remain due.
+families. The selected recipe artifact rules now map literal/leaf wildcard/recursive paths and
+stream verified private bytes, with exact 257 KiB transfer and missing-required-input evidence plus
+R0 upload/current-authority regressions. This does not accept the complete artifact API or prove
+the 2 GiB transfer ceiling. Ordinary Git metadata inside user steps, source-aware reuse, remaining
+source fault/authority profiles, triggers, targeted CLI chain secrets and actual T3 publication remain due.
 
 Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object

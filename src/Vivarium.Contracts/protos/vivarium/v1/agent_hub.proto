@@ -214,7 +214,7 @@ message BuildAssignment {
   map<string, string> parameters = 6;  // resolved scenario params -> env VIVARIUM_PARAM_* (D18)
   uint32 output_contract_major = 7; // 1 requires negotiated teamcity.build-output.v1
   repeated bytes output_secrets = 8; // ephemeral exact-value masks; never desired Git data or ordinary logs
-  uint32 artifact_publication_contract_major = 9; // 1: negotiated teamcity.artifact-publisher.literal.v1
+  uint32 artifact_publication_contract_major = 9; // 1: literal.v1; 2: negotiated teamcity.artifact-publisher.rules.v1
   VcsCheckout vcs_checkout = 10; // requires negotiated teamcity.vcs-checkout.v1
 }
 

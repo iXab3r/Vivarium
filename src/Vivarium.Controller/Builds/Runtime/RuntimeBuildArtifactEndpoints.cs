@@ -32,8 +32,8 @@ internal static class RuntimeBuildArtifactEndpoints
             RuntimeBuildArtifacts reads) =>
             RuntimeManagement.ExecuteAsync(http, async actor =>
             {
-                var content = await reads.ReadAsync(actor, id, ordinal, null, http.RequestAborted);
-                return Results.Bytes(content, "application/octet-stream");
+                var content = await reads.OpenAsync(actor, id, ordinal, null, http.RequestAborted);
+                return Results.Stream(content, "application/octet-stream");
             }, source: "build-artifacts"));
     }
     private static RestApiException InvalidQuery() => new(400, "invalid_query", "The artifact query is invalid", "Use an artifact cursor and an optional page limit.");

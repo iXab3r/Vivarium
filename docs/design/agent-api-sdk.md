@@ -332,6 +332,13 @@ rules, source-aware reuse, full VCS resource CRUD, Docker runners or their remai
 
 ### Selected container process seam (D47, US-013 PILOT)
 
+The adjacent artifact extension `teamcity.artifact-publisher.rules.v1` selects
+`BuildAssignment.artifact_publication_contract_major=2` on existing tag9. It adds no AgentMsg case,
+uses the existing private byte data plane and ordered artifact result, and leaves negotiated
+literal.v1/contract1 assignments intact. The exact selected rule, mapping and transfer boundaries
+are specified in [Results/Artifacts](results-artifacts.md#v1-artifact-rules-limits-and-precedence).
+This extension is under implementation, not final PILOT acceptance.
+
 `teamcity.container-runner.v1` adds `Step.container` (tag 10) and
 `StepResult.container` (tag 5), retaining the existing Build assignment, lease, session fences,
 step-completion observation and terminal result. Only an installed Linux x64 module advertises it;

@@ -19,7 +19,7 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
     IDbContextFactory<Vivarium.Controller.Persistence.VivariumDbContext> databases, RuntimeBuildSources sources)
 {
     internal async Task<RuntimePreparedAssignment> PrepareAsync(RuntimeBuild build, RuntimeBuildInput input,
-        CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token)
+        CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token, bool artifactRules = false)
     {
         var config = JsonSerializer.Deserialize<ResolvedConfiguration>(definition.PlanJson, DefinitionValidation.Json)
             ?? throw new InvalidDataException("The collected Build definition is invalid.");
@@ -36,7 +36,7 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         values["teamcity.build.id"] = build.Id.ToString(CultureInfo.InvariantCulture);
         string Expand(string value) => Regex.Replace(value, "%([^%\\r\\n]+)%", match =>
             values.TryGetValue(match.Groups[1].Value, out var resolved) ? resolved : match.Value, RegexOptions.CultureInvariant);
-        var assignment = new BuildAssignment { BuildId = execution.WorkloadId, OutputContractMajor = 1, ArtifactPublicationContractMajor = 1 };
+        var assignment = new BuildAssignment { BuildId = execution.WorkloadId, OutputContractMajor = 1, ArtifactPublicationContractMajor = artifactRules ? 2u : 1u };
         assignment.VcsCheckout = await sources.SelectAsync(input, execution, token);
         var environment = secrets.ReadEnvironment(build.Id, input.ProtectedEnvironment);
         assignment.OutputSecrets.AddRange(environment.Values.Distinct(StringComparer.Ordinal).Select(Google.Protobuf.ByteString.CopyFromUtf8));
@@ -54,24 +54,30 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
                 var producer = await database.RuntimeBuilds.AsNoTracking().SingleAsync(b => b.Id == selected.Dependency.Id, token);
                 if (producer.State != "FINISHED" || producer.Status != "SUCCESS")
                     throw new InvalidDataException("The selected artifact producer is not complete.");
-                // Literal rules are the first independently captured cohort; wildcard/archive
-                // profiles remain unimplemented until their selection contract is bound.
-                var rule = relation.Rules.Split("=>", StringSplitOptions.TrimEntries);
-                if (rule.Length != 2 || rule.Any(p => p.Contains('*') || p.Contains('?') || p.Contains('!')))
-                    throw new InvalidDataException("The current artifact rule profile requires one literal file and destination.");
-                var sourcePath = RelativePath(rule[0]);
-                var destination = RelativePath(rule[1]) + "/" + sourcePath.Split('/')[^1];
-                if (destination.StartsWith(".vivarium/", StringComparison.OrdinalIgnoreCase) || !destinations.Add(destination) || consumed.Count >= 128)
-                    throw new InvalidDataException("Artifact destinations conflict or exceed the current bound.");
-                var artifact = await database.RuntimeBuildArtifacts.AsNoTracking()
-                    .SingleOrDefaultAsync(a => a.BuildId == producer.Id && a.Path == sourcePath, token)
-                    ?? throw new InvalidDataException("A required selected artifact is absent.");
-                var upload = await database.RuntimeArtifactUploads.AsNoTracking()
-                    .SingleAsync(u => u.BuildId == producer.Id && u.Sha256 == artifact.Sha256, token);
-                assignment.Payload.Add(new Blob { Sha256 = artifact.Sha256, FileName = destination });
-                payloads.Add(new() { BuildId = build.Id, Sha256 = artifact.Sha256, ObjectKey = upload.ObjectKey, Size = artifact.Size });
-                consumed.Add(new() { BuildId = build.Id, Ordinal = consumed.Count, ProducerBuildId = producer.Id,
-                    ProducerArtifactOrdinal = artifact.Ordinal, DestinationPath = destination });
+                var manifest = await database.RuntimeBuildArtifacts.AsNoTracking().Where(a => a.BuildId == producer.Id)
+                    .OrderBy(a => a.Path).ToArrayAsync(token);
+                foreach (var text in relation.Rules.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var rule = Vivarium.Contracts.ArtifactRuleProfile.Parse(text);
+                    if (rule.Destination is null || !artifactRules && rule.Pattern.Contains('*'))
+                        throw new InvalidDataException("The selected artifact rule profile is unavailable.");
+                    var matched = 0;
+                    foreach (var artifact in manifest)
+                    {
+                        var destination = rule.Map(artifact.Path, ignoreCase: false);
+                        if (destination is null) continue;
+                        if (destination.StartsWith(".vivarium/", StringComparison.OrdinalIgnoreCase) || !destinations.Add(destination) || consumed.Count >= 128)
+                            throw new InvalidDataException("Artifact destinations conflict or exceed the current bound.");
+                        var upload = await database.RuntimeArtifactUploads.AsNoTracking()
+                            .SingleAsync(u => u.BuildId == producer.Id && u.Sha256 == artifact.Sha256, token);
+                        assignment.Payload.Add(new Blob { Sha256 = artifact.Sha256, FileName = destination });
+                        payloads.Add(new() { BuildId = build.Id, Sha256 = artifact.Sha256, ObjectKey = upload.ObjectKey, Size = artifact.Size });
+                        consumed.Add(new() { BuildId = build.Id, Ordinal = consumed.Count, ProducerBuildId = producer.Id,
+                            ProducerArtifactOrdinal = artifact.Ordinal, DestinationPath = destination });
+                        matched++;
+                    }
+                    if (matched == 0) throw new RuntimeArtifactResolutionException();
+                }
             }
         }
         for (var index = 0; index < config.Steps.Length; index++)
@@ -150,6 +156,8 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
     internal static bool RequiresContainer(ResolvedConfiguration config) => config.Steps.Any(s =>
         s.Properties.Any(p => p.Name.StartsWith("plugin.docker.", StringComparison.Ordinal)));
 
+    internal static bool RequiresArtifactRules(ResolvedConfiguration config) => config.Artifacts.Any(a => a.Rules.Contains('*') || a.Rules.Trim().Contains('\n'));
+
     private static ContainerStep ContainerProfile(IReadOnlyDictionary<string, string> properties)
     {
         var names = new[] { "plugin.docker.imageId", "plugin.docker.imagePlatform", "plugin.docker.run.parameters" };
@@ -202,3 +210,5 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         };
     }
 }
+
+internal sealed class RuntimeArtifactResolutionException : IOException;

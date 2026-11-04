@@ -18,7 +18,7 @@ internal static class TeamCityArtifactEndpoints
                     // The selected reference file response is plain text without a charset.
                     // Other artifact media variants retain their explicit conformance obligations.
                     var mediaType = path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ? "text/plain" : "application/octet-stream";
-                    return Results.Bytes(await reads.ReadAsync(actor, id, null, path, http.RequestAborted, discloseDenied: true), mediaType);
+                    return Results.Stream(await reads.OpenAsync(actor, id, null, path, http.RequestAborted, discloseDenied: true), mediaType);
                 }, deniedMessage: TeamCityBuildEndpoints.Denied(id)));
     }
 
