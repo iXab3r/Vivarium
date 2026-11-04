@@ -641,7 +641,7 @@ public sealed class RuntimeHostPhysicalTests
         return (path, certificate.Thumbprint);
     }
 
-    internal static System.Diagnostics.Process StartAgent(string bootstrap, string data)
+    internal static System.Diagnostics.Process StartAgent(string bootstrap, string data, IReadOnlyDictionary<string, string>? environment = null)
     {
         var directory = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Vivarium.slnx"))) directory = directory.Parent;
@@ -649,7 +649,7 @@ public sealed class RuntimeHostPhysicalTests
         var dotnet = Path.GetFullPath(Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
             "../../..", OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet"));
         return ProofProcess.Start(dotnet, [Path.Combine(root, "src/Vivarium.Agent/bin/Debug/net10.0/Vivarium.Agent.dll"),
-            "--config", bootstrap, "--data", data], root);
+            "--config", bootstrap, "--data", data], root, environment);
     }
 
     private static async Task<JsonElement> WaitAgentAsync(HttpClient http, Func<JsonElement, bool> condition)

@@ -1,5 +1,7 @@
 # Roadmap
 
+Current delivery: [2026-11-04 D52 PILOT checkpoint](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure) records selected retained-producer test publication and the remaining acceptance boundaries. Full PILOT/main remains open. D34/D35 R0 was delivered by PR #165; the planning status below is historical.
+
 Ordered so that every phase ends with something usable. Decision references (D1…D40) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
@@ -12,7 +14,7 @@ Owner clarifications: D34 accepts Depot authentication/superuser and TeamCity au
 D35 accepts Chiral configuration ownership, PostgreSQL business state and Depot's actual
 TypeScript/Vite Workbench UI. RF-10 permits each verified milestone to merge separately into main.
 These target decisions are recorded; their runtime replacement is not implemented.
-The [current workstream handover](../.workspace/workstreams/coherent-refactor/handover.md#current-state--2026-11-01)
+The [current workstream handover](../.workspace/workstreams/coherent-refactor/handover.md#current-state--2026-11-04)
 separates the existing product, accepted replacement, delivered P0 tooling and remaining gates.
 
 D36 brings resource/identity/state/mutation/protocol REST decomposition into P0 before implementation.

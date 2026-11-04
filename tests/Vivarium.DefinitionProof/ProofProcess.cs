@@ -25,21 +25,23 @@ internal static class ProofProcess
         info.Environment.Remove("VIVARIUM_PROOF_PG");
         foreach (var argument in arguments) info.ArgumentList.Add(argument);
         foreach (var entry in environment ?? new Dictionary<string, string>()) info.Environment[entry.Key] = entry.Value;
+        info.Environment.Remove("VIVARIUM_US013_TOKEN_FILE");
         return Process.Start(info) ?? throw new InvalidOperationException("Proof child did not start.");
     }
 
     public static async Task<ProofProcessResult> RunAsync(string executable, IEnumerable<string> arguments,
         string? directory = null, IReadOnlyDictionary<string, string>? environment = null,
-        bool allowFailure = false, TimeSpan? deadline = null)
+        bool allowFailure = false, TimeSpan? deadline = null, CancellationToken cancellationToken = default)
     {
         using var child = Start(executable, arguments, directory, environment);
-        return await ObserveAsync(child, allowFailure, deadline);
+        return await ObserveAsync(child, allowFailure, deadline, cancellationToken);
     }
 
     public static async Task<ProofProcessResult> ObserveAsync(Process child, bool allowFailure = false,
-        TimeSpan? deadline = null)
+        TimeSpan? deadline = null, CancellationToken cancellationToken = default)
     {
-        using var timer = new CancellationTokenSource(deadline ?? TimeSpan.FromSeconds(40));
+        using var timer = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timer.CancelAfter(deadline ?? TimeSpan.FromSeconds(40));
         async Task<byte[]> ReadAsync(Stream stream)
         {
             using var bytes = new MemoryStream();

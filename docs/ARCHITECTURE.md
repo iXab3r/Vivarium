@@ -1590,6 +1590,11 @@ authority. Use a dedicated engine for this story's repeatable tests and final bu
 working machine's Docker socket or Agent credentials into a workload. The engine is a trusted
 administrative component, not a VM-grade boundary against kernel/daemon compromise.
 
+The selected checkout's freshly fetched, per-Build Git metadata is writable inside its container,
+including ordinary local configuration updates that create `config.lock`. The source repository is
+never mounted into the workload. Keep generated script inputs and the container gitfile read-only;
+the narrow Git-directory mount does not grant write access to their private parent directory.
+
 Durably record container creation intent before dispatch, then its immutable actual ID and ownership
 labels before starting user work. Container IDs, image identity, actual exit and verified removal
 remain distinct from local PIDs, stream connections and Build outcome. Graceful cancellation sends
@@ -1711,6 +1716,29 @@ active Git, never a fabricated user grant or Superuser request. Retained cause r
 root/event/version; native and compatible reads project that same cause and retain their current
 ordinary-user read/cancel checks. No publication credential is supplied implicitly: D45/D48 remain
 per-run input, and controlled trigger acceptance does not imply a permanent project secret vault.
+
+### D52. Explicit finished dependency selection shares admission authority
+
+US-013 can retain successful finished upstream identities per request. Native `selectedDependencies`
+and compatible `snapshot-dependencies.build` enter common admission under current permission/queue
+fences. The captured profile resolves by Build ID using its actual configuration, including a
+mismatched `buildTypeId`. Direct B retains its immutable A edge; consistent B+A adds no upstream
+execution. Existing artifact handles and source selections remain authoritative.
+
+The bounded implementation requires current graph/configuration membership, unchanged effective
+settings/source declarations, successful finished selections and consistent transitive identities.
+Unsupported profiles fail explicitly; their negative HTTP behavior is not accepted compatibility.
+Never mutate retained producer inputs, decrypt environments or reassign them. D49 automatic
+secret-candidate exclusion remains unchanged. D48 input cannot target an explicitly retained
+producer: reject rather than silently discard or propagate that named environment.
+
+See [literal observations](../tests/Vivarium.Tests/TeamCity/Reference/explicit-selection-observations.json)
+and [acquisition report](../artifacts/pilot-chain/selection-reference-report-20261104.md),
+AC-BLD-07, [#117](https://github.com/iXab3r/Vivarium/issues/117) and
+[#118](https://github.com/iXab3r/Vivarium/issues/118). Tiny unchanged-HEAD ON_SERVER source receipts
+prove selected SHA, not changed-HEAD pinning. Missing bytes, contradictory graph, ordinary selection
+denial, changed settings/branches, multiple-direct graphs and absent-field variants remain
+unaccepted. Token issuance HTTP403 is not a selection-denial oracle. No complete API-family GREEN.
 
 ## 5. Protocol sketch
 

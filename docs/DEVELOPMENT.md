@@ -400,3 +400,88 @@ by the current binaries.
 `enroll` is an **agent** verb (it writes `bootstrap.json` and registers the logon task for
 bootstrap); bootstrap itself stays the frozen dumb loop. Running the agent interactively in a console
 — no service, no task — is a first-class mode for debugging on any machine.
+
+## Owned US-013 actual T3 acceptance
+
+The actual package-only recipe is prepared by `tools/us013-acceptance/prepare-source.py` from
+T3 commit `7ff65cada80dd817aa5d7467b85e78ec30c578a9`. It writes only the owned
+`artifacts/us013-t3-recovery-v3` source/receipts (prior prepared checkouts are preserved); `--clone-from` is read-only. The script verifies
+existing adapted bytes before reuse. Its tracked publisher inputs and source-plan translation
+make preparation reproducible. No built T3 GUI, CLI archive or packaged server is launched.
+
+On the selected Windows machine, using its existing source repository:
+
+```powershell
+python tools/us013-acceptance/prepare-source.py --clone-from D:\Work\t3code
+node --test tools/us013-acceptance/publication-state-tests.mjs
+dotnet test tests/Vivarium.DefinitionProof --filter TestCategory=US013ActualT3Setup
+```
+
+`US013ActualT3Setup` compiles the three real declarations through the isolated evaluator and
+checks fresh Storage configuration; it neither builds T3 nor publishes. The actual
+`US013ActualT3` case requires `VIVARIUM_US013_TOKEN_FILE` to name the private file delivered by
+the secret-entry tool, containing a fine-grained token for only `iXab3r/vivarium-us013-e2e`,
+Contents read/write. The token value must not be put in a command, Git or a log. The fixture
+removes that file-path variable from child environments, and D48 gives the value only to
+Prepare/Release through one encrypted per-run input; Windows receives no publication value.
+
+The real case uses a separate Engine capped at12GiB/8CPU, a dedicated Linux Agent and this
+Windows Agent, explicit physical-host requirement mappings, a fresh PostgreSQL/Storage Host
+and the unchanged published TeamCity CLI. The build deadlines remain90/90/15minutes; the CLI
+wait has210minutes plus a bounded process margin. Prerequisites include the recorded Windows
+VS/Python/vite-plus build tools, Docker and pinned Playwright Chromium. Before heavy work a
+credential probe creates and removes one uniquely named ref in the test repository; this is
+fixture credential preparation, not Agent publication evidence.
+
+```powershell
+$env:VIVARIUM_US013_TOKEN_FILE = '<private secret-card file path>'
+dotnet test tests/Vivarium.DefinitionProof --filter TestCategory=US013ActualT3
+```
+
+The scoped run records progress under `artifacts/us013-t3-acceptance/runs`, retains source,
+actual Agent/result/byte provenance and verifies a controlled partial-draft publisher restart,
+published-state repetition, exact GitHub downloaded asset hashes and native/compatible/UI
+readbacks after Host restart. Default publication is a real test-repository release. An absent
+credential or missing prerequisite is not a successful or skipped acceptance case. The complete
+story still needs the cumulative ledger/R0 and independent milestone review/main gates.
+
+The actual recipe fixture uses a unique short `artifacts/w/<8-hex-id>` Host workspace and explicit `a` Windows Agent data root;
+`workspace.json` in the run evidence records its exact root. It retains that private workspace
+after stopping owned runtime resources, avoiding an unbounded recursive attribute walk through
+installed dependency trees during test teardown. Retained workspaces require separate owned
+cleanup after evidence review. `US013ActualT3Runtime` is a cheap focused regression: supply
+`US013_ESBUILD_PROBE` with the existing Windows esbuild 0.28.2 executable. It checks Node and
+shell spawning in the real fixture path layout and retained-workspace disposal without a build,
+database, credential, publication or application launch.
+
+The focused runtime category also requires `US013_NSIS_PROBE` (installed makensis.exe) and
+`US013_NSIS_TEMPLATES` (existing app-builder-lib templates). It copies the unchanged templates
+into the actual pnpm checkout layout, checks every template path stays below250characters,
+and compiles a real NSIS script including StdUtils.nsh. No installer is executed.
+
+The actual T3 Windows Agent requires native Windows `System32/tar.exe` for Node archive
+extraction with drive-letter paths. Only this owned Agent prepends System32 to its inherited
+PATH, retaining all other toolchain entries; ordinary fixtures and machine settings are unchanged.
+The runtime category proves inherited Cygwin-first failure when present, native tar selection
+and version, and exact extracted bytes from an archive and destination containing spaces.
+
+The actual T3 fixture opts into owned PostgreSQL retention. Terminal disposal retains its
+owned container, volume and network, the case database, Storage objects, definitions, managed
+settings and identity keys. The Windows workspace ACL restricts inherited access before any
+private state is created. `recovery.private.json` inside the case directory contains private
+connection/settings references: never attach it to an issue or print its contents.
+`R0AcceptanceInstallation.ReopenRetainedAsync(checkpoint)` verifies Docker ownership labels,
+connects to the retained PostgreSQL and starts the common Host directly from existing managed
+settings, without seeding, cloning a database or replacing keys. Keep PostgreSQL running at its
+original loopback port. This is fixture retention, not a portable backup or a product restore API.
+`US013Recovery` proves a real tiny Build and authorized artifact SHA through disposal/reopen,
+including denial of an anonymous artifact inventory read. Ordinary fixtures retain their cleanup.
+
+For Release-only recovery, first reopen that private checkpoint and enumerate the original
+builds/artifacts through the existing authorized API. Preserve the recorded source endpoint/SHA
+and restore its read-only Git service, then enroll an owned compatible Linux Agent and submit
+`T3Personal_Release` through the common admission service under the original actor's current
+grants. Verify successful-only dependency selection reuses the original Prepare/Windows builds
+before allowing execution; stop if it selects either producer for execution. Do not seed build
+rows, re-register loose bytes, or change the old adapted source/manifest identity. A further
+heavy run requires root coordination; the one-run acceptance command is not a recovery command.

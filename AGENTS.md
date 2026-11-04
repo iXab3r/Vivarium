@@ -21,6 +21,15 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
+D52 checkpoint (2026-11-04): selected root 8 passed actual test-repository publication with retained
+Prepare 1/Windows 2; only 1/2/3/7/8 executed. The original unchanged CLI chain failed publication;
+a later native Release-only run used a corrected versioned definition and unchanged package source.
+Controlled partial upload/resume, published repetition and remote byte hashes have selected proof.
+See the [current PILOT checkpoint and remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
+Full surface journeys, 33-story/SDK renewal, model negatives/unknowns, independent aggregate and
+Security/Adversarial review, zero-debt and main delivery remain open; no full API percentage is known.
+
+
 The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); the full
 Prepare → Windows → Release integration remains in progress under #116–#118.
 The active PILOT branch has selected real source-free Linux → Windows → Linux chain evidence through

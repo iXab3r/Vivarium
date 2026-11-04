@@ -44,8 +44,14 @@ internal static class DockerWorkload
             mounts.Add(new { Type = "bind", Source = BuildExecutor.PrivateInputsForContainer(workdir, assignment.BuildId),
                 Target = "/vivarium-inputs", ReadOnly = true });
         if (assignment.VcsCheckout is not null)
+        {
+            // Git config updates atomically create config.lock beside config. Only this
+            // Build's fetched metadata is writable; generated script inputs stay read-only.
+            mounts.Add(new { Type = "bind", Source = Path.Combine(BuildExecutor.PrivateInputsForContainer(workdir, assignment.BuildId), "git"),
+                Target = "/vivarium-inputs/git" });
             mounts.Add(new { Type = "bind", Source = Path.Combine(BuildExecutor.PrivateInputsForContainer(workdir, assignment.BuildId), "container.git"),
                 Target = "/workspace/.git", ReadOnly = true });
+        }
         foreach (var cache in spec.Caches)
         {
             var volume = "vivarium-" + options.Scope + '-' + cache.Name;

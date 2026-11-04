@@ -14,7 +14,7 @@ internal sealed class OwnedContainerRuntime : IAsyncDisposable
     private string Graph => Scope + "-graph";
     private readonly List<(string Kind, string Name)> resources = [];
 
-    internal async Task StartAsync()
+    internal async Task StartAsync(bool actualT3 = false)
     {
         await Docker(["network", "create", "--label", "vivarium.owner=" + Scope, Network]);
         resources.Add(("network", Network));
@@ -26,8 +26,8 @@ internal sealed class OwnedContainerRuntime : IAsyncDisposable
         resources.Add(("container", Daemon));
         await Docker(["run", "-d", "--pull", "never", "--name", Daemon, "--label", "vivarium.owner=" + Scope,
             "--hostname", "docker", "--network", Network, "--network-alias", "docker", "--privileged",
-            "--memory", "2g", "--cpus", "2", "--pids-limit", "512", "--env", "DOCKER_TLS_CERTDIR=/certs",
-            "--tmpfs", "/run:rw,nosuid,size=128m", "--tmpfs", "/tmp:rw,nosuid,size=64m",
+            "--memory", actualT3 ? "12g" : "2g", "--cpus", actualT3 ? "8" : "2", "--pids-limit", actualT3 ? "2048" : "512", "--env", "DOCKER_TLS_CERTDIR=/certs",
+            "--tmpfs", "/run:rw,nosuid,size=128m", "--tmpfs", actualT3 ? "/tmp:rw,nosuid,size=1g" : "/tmp:rw,nosuid,size=64m",
             "--mount", $"type=volume,source={Graph},target=/var/lib/docker",
             "--mount", $"type=volume,source={Certificates},target=/certs/client",
             "--mount", $"type=volume,source={Workspace},target=/data/builds", Dind]);

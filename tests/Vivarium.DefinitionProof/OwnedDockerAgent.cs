@@ -6,7 +6,7 @@ using System.Text;
 namespace Vivarium.DefinitionProof;
 
 /// <summary>One dedicated Linux process, with only its own data and bootstrap plus read-only Agent binaries.</summary>
-internal sealed class OwnedDockerAgent(string root, bool gitTools = false, OwnedContainerRuntime? runtime = null) : IAsyncDisposable
+internal sealed class OwnedDockerAgent(string root, bool gitTools = false, OwnedContainerRuntime? runtime = null, bool actualT3 = false, string? hostname = null) : IAsyncDisposable
 {
     private const string Owner = "us013-r0-runtime-proof";
     private string Image => gitTools ? "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
@@ -36,7 +36,8 @@ internal sealed class OwnedDockerAgent(string root, bool gitTools = false, Owned
             "--user", "0:0", Image, "chown", "1654:1654", "/data"]);
         created = true;
         await ProofProcess.RunAsync("docker", ["run", "-d", "--name", name, "--label", "vivarium.owner=" + Owner,
-            "--restart", "no", "--memory", "256m", "--cpus", "1", "--pids-limit", "128", "--cap-drop", "ALL",
+            .. (hostname is null ? Array.Empty<string>() : new[] { "--hostname", hostname }),
+            "--restart", "no", "--memory", actualT3 ? "1g" : "256m", "--cpus", actualT3 ? "2" : "1", "--pids-limit", "128", "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges", "--read-only", "--tmpfs", "/tmp:rw,nosuid,size=16m", "--user", "1654:1654",
             "--mount", $"type=bind,source={binaries},target=/app,readonly",
             "--mount", $"type=bind,source={bootstrap},target=/bootstrap.json,readonly",

@@ -1,0 +1,170 @@
+{
+  "receipt": "artifacts\\pilot-chain\\selection-literal-1793818852261\\receipt.json",
+  "sha256": "418624025ee323773ca77b502602d06c091aebce602a3ab387ca8d49d10f57fa",
+  "source": {
+    "sha": "b52a83e3847d3e6a5dbcfd9fbf1f6041c9075381",
+    "url": "git://explicit-selection-1793818852262-git:9418/source.git"
+  },
+  "cases": [
+    {
+      "label": "direct-B",
+      "id": 242,
+      "selected": {
+        "build": [
+          {
+            "id": 239,
+            "buildTypeId": "VivSelection_1793818852262_B",
+            "status": "SUCCESS",
+            "state": "finished"
+          }
+        ],
+        "count": 1
+      },
+      "artifact": {
+        "bytes": 18,
+        "sha256": "f8ed0eb0a63efd9df782b35853d1ed0bb9c36cc82927bcfe8e6c348e70e65995",
+        "text": "A-237\nB-239\nC-242\n"
+      },
+      "newBuilds": 1
+    },
+    {
+      "label": "consistent-indirect-A",
+      "id": 245,
+      "selected": {
+        "build": [
+          {
+            "id": 239,
+            "buildTypeId": "VivSelection_1793818852262_B",
+            "status": "SUCCESS",
+            "state": "finished"
+          }
+        ],
+        "count": 1
+      },
+      "artifact": {
+        "bytes": 18,
+        "sha256": "0dcaf81e7b25b4ca5c9a341b8c1ea4936d6d137dd82a379b477487d77c164ed0",
+        "text": "A-237\nB-239\nC-245\n"
+      },
+      "newBuilds": 1
+    },
+    {
+      "label": "mismatch-new-A-as-B",
+      "id": 249,
+      "selected": {
+        "build": [
+          {
+            "id": 248,
+            "buildTypeId": "VivSelection_1793818852262_B",
+            "status": "SUCCESS",
+            "state": "finished"
+          }
+        ],
+        "count": 1
+      },
+      "artifact": {
+        "bytes": 18,
+        "sha256": "7fbe26e35acf23101c4c4a6e1655c4f6bbe182fb32a856171e143b652103e898",
+        "text": "A-246\nB-248\nC-249\n"
+      },
+      "newBuilds": 2
+    },
+    {
+      "label": "control-new-A",
+      "id": 252,
+      "selected": {
+        "build": [
+          {
+            "id": 248,
+            "buildTypeId": "VivSelection_1793818852262_B",
+            "status": "SUCCESS",
+            "state": "finished"
+          }
+        ],
+        "count": 1
+      },
+      "artifact": {
+        "bytes": 18,
+        "sha256": "a710d3f5ce0a397dac52f52e61343921fb157a7de624d1642360d40c21dcab48",
+        "text": "A-246\nB-248\nC-252\n"
+      },
+      "newBuilds": 1
+    }
+  ],
+  "queuePosts": [
+    {
+      "exchangeIndex": 62,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_A\"},\"properties\":{\"property\":[{\"name\":\"env.DUMMY_INPUT\",\"value\":\"synthetic-producer-dummy-42\",\"type\":{\"rawValue\":\"password\"}}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 77,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_B\"},\"snapshot-dependencies\":{\"build\":[{\"id\":237,\"buildTypeId\":\"VivSelection_1793818852262_A\"}]},\"properties\":{\"property\":[{\"name\":\"env.DUMMY_INPUT\",\"value\":\"synthetic-producer-dummy-42\",\"type\":{\"rawValue\":\"password\"}}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 96,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":239,\"buildTypeId\":\"VivSelection_1793818852262_B\"}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 114,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":239,\"buildTypeId\":\"VivSelection_1793818852262_B\"},{\"id\":237,\"buildTypeId\":\"VivSelection_1793818852262_A\"}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 131,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_A\"},\"properties\":{\"property\":[{\"name\":\"env.DUMMY_INPUT\",\"value\":\"synthetic-newer-43\",\"type\":{\"rawValue\":\"password\"}}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 147,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":246,\"buildTypeId\":\"VivSelection_1793818852262_B\"}]}}"
+      },
+      "status": 200
+    },
+    {
+      "exchangeIndex": 177,
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+        "body": "{\"buildType\":{\"id\":\"VivSelection_1793818852262_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":246,\"buildTypeId\":\"VivSelection_1793818852262_A\"}]}}"
+      },
+      "status": 200
+    }
+  ],
+  "cleanup": [
+    "project deleted"
+  ],
+  "limits": "ON_SERVER tiny source; unchanged HEAD only, no changed-source pinning, restart or ordinary selection-denial oracle"
+}

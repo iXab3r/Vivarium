@@ -15,12 +15,16 @@ using Vivarium.Controller.Persistence;
 namespace Vivarium.DefinitionProof;
 
 /// <summary>One owned database template; each case starts the actual Host against an independent clone.</summary>
-internal sealed class R0AcceptanceInstallation : IAsyncDisposable
+internal sealed class R0AcceptanceInstallation(string? retainedWorkRoot = null, string? windowsAgentDataRoot = null, IReadOnlyDictionary<string, string>? windowsAgentEnvironment = null, bool retainDatabase = false) : IAsyncDisposable
 {
-    private readonly OwnedPostgres postgres = new();
+    private readonly IReadOnlyDictionary<string, string>? agentEnvironment = windowsAgentEnvironment;
+    private readonly string? agentDataRoot = windowsAgentDataRoot;
+    private OwnedPostgres postgres = new();
     private readonly string template = "r0_template_" + Guid.NewGuid().ToString("N")[..12];
-    private readonly string root = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.WorkDirectory,
-        "artifacts/r0-host/acceptance-" + Guid.NewGuid().ToString("N")));
+    private readonly string root = retainedWorkRoot is null
+        ? Path.GetFullPath(Path.Combine(TestContext.CurrentContext.WorkDirectory,
+            "artifacts/r0-host/acceptance-" + Guid.NewGuid().ToString("N")))
+        : Path.GetFullPath(retainedWorkRoot);
     private readonly Dictionary<string, string> certificates = [];
     private string certificateThumbprint = "";
     private Uri origin = null!;
@@ -32,6 +36,13 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
     internal async Task StartAsync()
     {
         Directory.CreateDirectory(root);
+        if (retainDatabase)
+        {
+            if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Private recovery ACL requires Windows.");
+            var sid = System.Security.Principal.WindowsIdentity.GetCurrent().User!.Value;
+            await ProofProcess.RunAsync("icacls", [root, "/inheritance:r", "/grant:r", "*" + sid + ":(OI)(CI)F"]);
+            postgres.Retain = true;
+        }
         var port = RuntimeHostPhysicalTests.Port(); origin = new($"https://127.0.0.1:{port}");
         foreach (var name in new[] { "https", "ServerSigningCertificate", "ServerEncryptionCertificate", "ClientSigningCertificate", "ClientEncryptionCertificate" })
         {
@@ -62,6 +73,58 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             return await StartHostAsync(Path.Combine(root, name), name, isCase: true, configureServices, outputRetentionDays);
         }
         catch { Interlocked.Decrement(ref activeCases); throw; }
+    }
+
+    internal void ReleaseRetainedPostgres() => postgres.Retain = false;
+
+    internal static async Task<Case> ReopenRetainedAsync(string checkpoint, Action<IServiceCollection>? configureServices = null)
+    {
+        using var json = JsonDocument.Parse(await File.ReadAllTextAsync(checkpoint));
+        var saved = json.RootElement;
+        var installation = new R0AcceptanceInstallation(saved.GetProperty("installationRoot").GetString(), retainDatabase: true);
+        installation.postgres = await OwnedPostgres.ReopenAsync(saved.GetProperty("postgres"));
+        installation.origin = new(saved.GetProperty("origin").GetString()!);
+        installation.certificateThumbprint = saved.GetProperty("thumbprint").GetString()!;
+        foreach (var entry in saved.GetProperty("certificates").EnumerateObject()) installation.certificates.Add(entry.Name, entry.Value.GetString()!);
+        var directory = saved.GetProperty("caseRoot").GetString()!;
+        // Reconcile only a verified retained container's dynamic port through managed settings.
+        var nodes = Path.Combine(directory, "nodes");
+        var builder = Host.CreateApplicationBuilder(); builder.Logging.ClearProviders();
+        builder.Services.AddVivariumNodes(builder.Configuration, nodes);
+        using (var settingsHost = builder.Build())
+        {
+            await settingsHost.StartAsync();
+            try
+            {
+                var settings = settingsHost.Services.GetRequiredService<NodeConfigurationService>();
+                var current = (await settings.GetAsync("vivarium-database")).Value!;
+                var document = current.Config.DeepClone().AsObject();
+                var existing = new NpgsqlConnectionStringBuilder(builder.Configuration["ConnectionStrings:Vivarium"]);
+                var expected = new NpgsqlConnectionStringBuilder(saved.GetProperty("postgres").GetProperty("ConnectionString").GetString()!);
+                if (existing.Host != expected.Host || existing.Username != expected.Username || existing.Password != expected.Password ||
+                    existing.Database != saved.GetProperty("databaseName").GetString())
+                    throw new InvalidDataException("Retained database identity differs.");
+                existing.Port = new NpgsqlConnectionStringBuilder(installation.postgres.ConnectionString).Port;
+                await using (var connection = new NpgsqlConnection(existing.ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    await using var command = new NpgsqlCommand("SELECT count(*) FROM information_schema.tables WHERE table_name = 'RuntimeBuilds'", connection);
+                    if (Convert.ToInt64(await command.ExecuteScalarAsync()) != 1) throw new InvalidDataException("Retained runtime database absent.");
+                }
+                document["ConnectionString"] = existing.ConnectionString;
+                Assert.That((await settings.SaveAsync("vivarium-database", Guid.NewGuid(), true, document, NodeConfigActor.System, current.SavedRevision!.Id)).StatusCode, Is.EqualTo(200));
+                var updated = JsonNode.Parse(await File.ReadAllTextAsync(checkpoint))!.AsObject();
+                updated["postgres"]!["ConnectionString"] = installation.postgres.ConnectionString;
+                await File.WriteAllTextAsync(checkpoint, updated.ToJsonString());
+            }
+            finally { await settingsHost.StopAsync(); }
+        }
+        var log = new RuntimeHostPhysicalTests.PrivateStartupLog();
+        var app = VivariumRuntime.Build(Path.Combine(directory, "nodes"), logging => logging.ClearProviders().AddProvider(log), configureServices);
+        await app.StartAsync();
+        installation.activeCases = 1;
+        return new Case(installation, directory, saved.GetProperty("databaseName").GetString()!, app, log,
+            installation.origin, installation.certificates["https"], installation.certificateThumbprint, true, configureServices);
     }
 
     private async Task PrepareActiveTemplateAsync()
@@ -154,6 +217,13 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
     {
         if (activeCases != 0) throw new InvalidOperationException("An acceptance case is still live.");
         await postgres.DisposeAsync();
+        // Actual package checkouts contain enormous dependency trees. Retain their private
+        // workspace as evidence instead of blocking terminal test reporting on recursive IO.
+        if (retainedWorkRoot is not null)
+        {
+            TestContext.Progress.WriteLine("Retained owned acceptance workspace: " + root);
+            return;
+        }
         var parent = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.WorkDirectory, "artifacts/r0-host")) + Path.DirectorySeparatorChar;
         if (!root.StartsWith(parent, StringComparison.OrdinalIgnoreCase)
             || !System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(root), "^acceptance-[a-f0-9]{32}$"))
@@ -225,7 +295,7 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
         private void StartAgentProcess()
         {
             if (agent is not null) throw new InvalidOperationException("The case already has an Agent process.");
-            agent = RuntimeHostPhysicalTests.StartAgent(Path.Combine(root, "agent-bootstrap.json"), Path.Combine(root, "agent-data"));
+            agent = RuntimeHostPhysicalTests.StartAgent(Path.Combine(root, "agent-bootstrap.json"), owner.agentDataRoot ?? Path.Combine(root, "agent-data"), owner.agentEnvironment);
             agentOutput = agent.StandardOutput.ReadToEndAsync(); agentError = agent.StandardError.ReadToEndAsync();
         }
 
@@ -357,7 +427,18 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
                 using (var pool = new NpgsqlConnection(owner.Connection(databaseName, pooled: true))) NpgsqlConnection.ClearPool(pool);
                 if (isCase)
                 {
-                    try { await owner.DatabaseCommandAsync($"DROP DATABASE \"{databaseName}\" WITH (FORCE)"); }
+                    try
+                    {
+                        if (owner.postgres.Retain)
+                            await File.WriteAllTextAsync(Path.Combine(root, "recovery.private.json"), JsonSerializer.Serialize(new
+                            {
+                                kind = "OWNED_RETAINED_PG_NOT_A_BACKUP", installationRoot = owner.root, caseRoot = root,
+                                databaseName, origin = origin.AbsoluteUri, thumbprint, certificates = owner.certificates,
+                                postgres = owner.postgres.RecoveryState,
+                                retained = new[] { "PostgreSQL container/volume/network", "Storage objects", "managed settings", "identity keys", "definitions" }
+                            }));
+                        else await owner.DatabaseCommandAsync($"DROP DATABASE \"{databaseName}\" WITH (FORCE)");
+                    }
                     finally { Interlocked.Decrement(ref owner.activeCases); }
                 }
             }

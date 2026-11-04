@@ -17,7 +17,8 @@ namespace Vivarium.Controller.Builds.Runtime;
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 internal sealed record RuntimeRunRequest(string ConfigurationId, Dictionary<string, string>? Parameters = null,
-    Dictionary<string, string>? SecretEnvironment = null);
+    Dictionary<string, string>? SecretEnvironment = null, RuntimeSelectedDependency[]? SelectedDependencies = null);
+internal sealed record RuntimeSelectedDependency(long Id, string? BuildTypeId = null);
 internal sealed record RuntimeBuildView(long Id, string? Number, string State, string Status, string StatusText,
     string ConfigurationId, string ProjectId, Guid DefinitionRevisionId, string DefinitionHash,
     DateTimeOffset QueuedAt, DateTimeOffset? StartedAt, DateTimeOffset? FinishedAt,
@@ -139,6 +140,59 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             }
         }
         long? rootInstance = source is null ? null : await RuntimeBuildSources.InstanceAsync(database, snapshot.ProjectIds[selected.Project.Control.Id], source, token);
+        // Explicit identities are distinct from D49 automatic suitability. Never inspect retained secrets.
+        var selectedMembers = new Dictionary<string, RuntimeBuild>(StringComparer.Ordinal);
+        var graph = new HashSet<string>(StringComparer.Ordinal);
+        void Visit(string id)
+        {
+            if (!graph.Add(id)) return;
+            if (graph.Count > 128 || !configurations.TryGetValue(id, out var member)) throw Invalid("Dependency graph unavailable.");
+            foreach (var edge in member.Snapshots) Visit(edge.Configuration);
+        }
+        Visit(request.ConfigurationId);
+        async Task RetainAsync(long id)
+        {
+            var retained = await VisibleAsync(database, actor, id, token) ?? throw Missing();
+            var type = await database.CatalogBuildTypes.SingleAsync(t => t.Id == retained.BuildTypeId, token);
+            if (type.ExternalId == request.ConfigurationId || !graph.Contains(type.ExternalId)
+                || !snapshot.BuildTypeIds.TryGetValue(type.ExternalId, out var activeType) || activeType != retained.BuildTypeId
+                || retained.State != "FINISHED" || retained.Status != "SUCCESS")
+                throw SelectionUnavailable("Only successful finished members of this snapshot graph are supported.");
+            if (selectedMembers.TryGetValue(type.ExternalId, out var previous))
+            {
+                if (previous.Id != retained.Id) throw SelectionUnavailable("Selected snapshot identities conflict.");
+                return;
+            }
+            var retainedInput = await database.RuntimeBuildInputs.SingleAsync(i => i.BuildId == retained.Id, token);
+            var oldDefinition = await database.CatalogBuildDefinitions.SingleAsync(d => d.BuildTypeId == retained.BuildTypeId && d.RevisionId == retainedInput.RevisionId, token);
+            var currentDefinition = await database.CatalogBuildDefinitions.SingleAsync(d => d.BuildTypeId == retained.BuildTypeId && d.RevisionId == snapshot.Revision.Id, token);
+            if (oldDefinition.PlanHash != currentDefinition.PlanHash || retainedInput.VcsRootInstanceId != rootInstance
+                || (retainedInput.SourceJson is null ? null : JsonSerializer.Serialize(JsonSerializer.Deserialize<Source>(retainedInput.SourceJson, DefinitionValidation.Json), DefinitionValidation.Json))
+                    != (source is null ? null : JsonSerializer.Serialize(source, DefinitionValidation.Json)))
+                throw SelectionUnavailable("Selected producer settings or source declaration differ from this supported profile.");
+            if (preparedEnvironments.ContainsKey(type.ExternalId))
+                throw SelectionUnavailable("Prepared input cannot target an explicitly retained producer.");
+            selectedMembers.Add(type.ExternalId, retained);
+            var edges = await DependencyHandles(database, retained.Id).Where(d => d.Kind == "SNAPSHOT").ToArrayAsync(token);
+            if (edges.Length != configurations[type.ExternalId].Snapshots.Length)
+                throw SelectionUnavailable("Selected producer graph differs from the current snapshot graph.");
+            var expectedTypes = configurations[type.ExternalId].Snapshots.Select(d => snapshot.BuildTypeIds[d.Configuration]).Order().ToArray();
+            if (!edges.Select(e => e.BuildTypeId).Order().SequenceEqual(expectedTypes))
+                throw SelectionUnavailable("Selected producer edges differ from current configuration membership.");
+            foreach (var edge in edges) await RetainAsync(edge.Id);
+        }
+        if (request.SelectedDependencies is { } explicitSelection)
+        {
+            if (explicitSelection.Length > 128) throw Invalid("Too many selected dependencies.");
+            foreach (var dependency in explicitSelection) await RetainAsync(dependency.Id);
+            if (source is not null && selectedMembers.Count > 0)
+            {
+                var retainedIds = selectedMembers.Values.Select(b => b.Id).ToArray();
+                var revisions = await database.RuntimeBuildSourceSelections.Where(s => retainedIds.Contains(s.BuildId)).ToArrayAsync(token);
+                if (revisions.Length != retainedIds.Length || revisions.Select(s => s.Version).Distinct().Count() != 1)
+                    throw SelectionUnavailable("Selected source revisions are missing or inconsistent.");
+            }
+        }
         var collected = new Dictionary<string, RuntimeBuild>(StringComparer.Ordinal);
         var visiting = new HashSet<string>(StringComparer.Ordinal);
         async Task<RuntimeBuild> AdmitAsync(string configurationId)
@@ -176,10 +230,12 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 member.Id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Succeeded, snapshot.Revision.ControlCommit);
             collected.Add(configurationId, member); visiting.Remove(configurationId); return member;
         }
+        foreach (var (id, member) in selectedMembers) collected.Add(id, member);
         var build = await AdmitAsync(request.ConfigurationId);
         if (preparedEnvironments.Keys.Any(k => !collected.ContainsKey(k))) throw Invalid("A run input target is outside this dependency graph.");
         foreach (var (configurationId, member) in collected)
         {
+            if (selectedMembers.ContainsKey(configurationId)) continue;
             var config = configurations[configurationId];
             foreach (var dependency in config.Snapshots)
                 database.RuntimeBuildDependencies.Add(new() { BuildId = member.Id, Kind = "SNAPSHOT",
@@ -260,7 +316,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             && !database.RuntimeBuildResolutions.Any(r => r.RequestedBuildId == b.Id));
         var total = await query.CountAsync(token);
         var rows = await query.OrderByDescending(b => b.Id).Skip(offset).Take(limit).Select(b => new RuntimeBuildHistoryView(
-            b.Id, b.Number, b.State == "RELEASING" ? "running" : b.State.ToLower(), b.Status, b.StatusText,
+            b.Id, b.Number, b.State == "QUEUED" ? "queued" : b.State == "FINISHED" ? "finished" : "running", b.Status, b.StatusText,
             b.QueuedAt, b.StartedAt, b.FinishedAt)).ToArrayAsync(token);
         return new(rows, total, offset, limit);
     }
@@ -363,6 +419,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
     private void StageAudit(VivariumDbContext database, ManagementRequestContext actor, string action, string type,
         string id, AuditOutcome outcome, string? revision = null) => new PostgresAuditStore(database).Stage(
             AuditEventDraft.Create(actor, time.GetUtcNow(), action, type, id, outcome) with { ResultRevision = revision });
+    private static RestApiException SelectionUnavailable(string detail) => new(422, "execution_subset_unavailable", "Explicit selection profile unavailable", detail);
     internal static RestApiException Missing() => new(404, "resource_not_found", "Build is not found", "The Build does not exist or is not visible.");
     private static RestApiException Invalid(string detail) => new(400, "invalid_request", "Invalid Build request", detail);
 }

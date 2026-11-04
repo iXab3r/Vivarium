@@ -1,0 +1,9 @@
+{
+  "id": 434059301,
+  "tag_name": "v0.1.6-nightly.20261104.880",
+  "target_commitish": "551ae1f5580629142f8289d360e21122c99c8e21",
+  "draft": true,
+  "prerelease": true,
+  "body": "Vivarium US-013 acceptance source 32610536e7097cfee83016355d4b97e45baf8d2d target 551ae1f5580629142f8289d360e21122c99c8e21\nPersonal T3 Code build/package only. Windows x64 installer, Linux x64 AppImage and matching CLI archives. No built application was launched.",
+  "assets": []
+}

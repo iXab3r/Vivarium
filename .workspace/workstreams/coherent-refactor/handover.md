@@ -1,6 +1,14 @@
 # Handover
 
-## Current state — 2026-11-02
+## Current state — 2026-11-04
+
+The [current PILOT checkpoint](t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure)
+is the resume authority for selected root 8 publication, exact source/definition hashes, qualified
+receipt reuse and the compact remaining acceptance checklist. Keep retained PG/Storage/private
+workspace intact. No new runtime work, push, PR, merge or task closure is part of this checkpoint.
+Root coordinates independent review at the checkpoint commit and due milestone checks later.
+
+## Historical state — 2026-11-02
 
 **Current US-013 P0 continuation:** the [mode/context/concurrency study](us013-mode-concurrency.md)
 now has actual six-cell editability observations, used-context read-only behavior and effective

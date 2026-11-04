@@ -1,0 +1,39 @@
+--- a/integrations/teamcity/src/client.ts
++++ b/integrations/teamcity/src/client.ts
+@@ -197,6 +197,9 @@
+ }
+ 
+ export interface RunJobOptions {
++  /** Unpublished local-lab capture only; no published CLI flag. */
++  selectedDependencies?: readonly { id: number; buildTypeId: string }[];
++  syntheticPasswordProperties?: readonly { name: string; value: string }[];
+   branch?: string;
+   comment?: string;
+   /** Clear this build's entire checkout and fetch its sources again. */
+@@ -582,6 +585,9 @@
+         { fields: buildFields },
+         {
+           buildType: { id: jobId },
++          ...(options.selectedDependencies === undefined ? {} : {
++            "snapshot-dependencies": { build: options.selectedDependencies.map(({ id, buildTypeId }) => ({ id, buildTypeId })) },
++          }),
+           ...(options.cleanSources === undefined
+             ? {}
+             : { triggeringOptions: { cleanSources: options.cleanSources } }),
+@@ -591,11 +597,14 @@
+           ...(options.comment === undefined
+             ? {}
+             : { comment: { text: requiredText(options.comment, "Build comment") } }),
+-          ...(options.properties === undefined || options.properties.length === 0
++          ...((options.properties?.length ?? 0) + (options.syntheticPasswordProperties?.length ?? 0) === 0
+             ? {}
+             : {
+                 properties: {
+-                  property: options.properties.map(({ name, value }) => ({ name, value })),
++                  property: [
++                    ...(options.properties ?? []).map(({ name, value }) => ({ name, value })),
++                    ...(options.syntheticPasswordProperties ?? []).map(({ name, value }) => ({ name, value, type: { rawValue: "password" } })),
++                  ],
+                 },
+               }),
+         },

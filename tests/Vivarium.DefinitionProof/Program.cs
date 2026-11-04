@@ -4,6 +4,8 @@ using Vivarium.Controller.Catalog;
 
 if (args is ["--container-sdk-worker", var runtimeScope])
     return await ContainerSdkPhysicalTests.WorkerAsync(runtimeScope);
+if (args is ["--container-git-worker", var gitScope])
+    return await ContainerGitPhysicalTests.WorkerAsync(gitScope);
 if (args is ["--container-orphan-worker", var orphanScope])
     return await ContainerSdkPhysicalTests.OrphanWorkerAsync(orphanScope);
 if (args is ["--container-recovery-worker", var recoveryScope])

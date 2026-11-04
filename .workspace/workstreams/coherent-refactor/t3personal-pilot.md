@@ -2,6 +2,45 @@
 
 ## Current story delivery plan
 
+### Current checkpoint — 2026-11-04 (not milestone closure)
+
+D52 selected retained-dependency admission and actual T3 publication are checkpoint evidence on
+`feature/us013-whole-chain`. Raw receipt: `artifacts/pilot-chain/release-recovery-20261104-203528/receipt.json`.
+Root 8 is PASS; original Prepare 1 and Windows 2 are reused, and only builds 1/2/3/7/8 executed.
+The initial unchanged CLI chain built Prepare/Windows successfully and failed publication. Later
+native Release-only admission used a corrected, versioned Release definition. This composition
+is not a single successful unchanged-CLI whole-chain journey; original failures remain evidence.
+
+Package source remains `3ae8f481bc7c118747c8d01f0ec14f3f18e8b6ec`.
+Release-definition Git is `893ab2d6aa109f200e3be5b0a5bdba0ca032c5fa`, helper SHA-256
+`eb8ff213db945a4fe858798db0a05c7c5a2590e48415acec446207ee7f73c19e`, script SHA-256
+`7e35344872e34a814b331defc3f2b8951bbe8510b20b9e1f7e99b56cb80ba51c`.
+Controlled exit 75 after the first asset, same-draft resume, published repetition and actual remote
+asset SHA-256 checks passed in the selected recovery proof. Release
+[434102890](https://github.com/iXab3r/vivarium-us013-e2e/releases/tag/v0.1.6-nightly.20261104.918)
+(version `0.1.6-nightly.20261104.918`) is published only in the owned test repository.
+No built application was launched. Receipt and `ActualT3ReleaseRecovery.cs` assertions were inspected;
+this documentation checkpoint performs no remote mutation, download or execution.
+
+Existing candidate receipts report publisher 33 controls, tiny proof/preflight, clean root build and
+root 700 Passed/11 skipped, with 891 source inputs/15 producer copies and zero drift. These are
+qualified reuse of the preceding source candidate, not freshly executed checks on this commit.
+Raw setup failures and earlier failed publication attempts remain separate. Full PILOT/main is open.
+
+Remaining acceptance uses the existing contract and tasks, without another case universe:
+
+| Remaining item / owner | Evidence and cheapest adequate boundary |
+|---|---|
+| [#117](https://github.com/iXab3r/Vivarium/issues/117) model/contract | Reconcile existing explicit-selection variants and AC-BLD-07/TCM bindings against captured literal observations. Ordinary authority, missing bytes, contradictory graph and changed-HEAD reference variants remain unknown/unaccepted; existing conservative controls are not wire GREEN. Use bounded source/reference fixtures before product assertions. Full API denominator remains unknown; no percentage. |
+| [#118](https://github.com/iXab3r/Vivarium/issues/118) cumulative small-chain proof | Renew existing 33 story/SDK cohort (D50's 29 story rows plus SDK/owner-death case, then D51's four cases), preserving raw failures and setup classifications. Confirm actual test discovery/bindings before selecting the cohort; this count does not require 33 new tests or another heavy build. Cover independent UI/REST/unchanged-CLI entries, current rights/byte denial, waiting, upstream failure/cancel, restart/ownership and trigger/quiet-period/exclusion/single-publisher behavior. Use existing shared Host/owned Agents and tiny workloads, with browser evidence only for UI entry/effects. |
+| [#78](https://github.com/iXab3r/Vivarium/issues/78) heavy journey composition | Assess the initial unchanged-CLI build/package plus corrected native Release-only recovery against the heavy-journey contract; explicitly resolve the remaining successful ordinary-entry/readback obligation. Reuse immutable producer bytes where valid. Do not infer full CLI success or rerun heavy work merely for this checkpoint. |
+| Milestone delivery (#78/#118) | Root coordinates exact-revision evidence transfer/invalidation, due cumulative checks and mechanical ledger assessment only with current explicit source seals. Independent aggregate correctness/simplicity and Security/Adversarial review, zero due findings/debt, reviewed main delivery and task closure remain due. This checkpoint neither accepts nor merges the milestone. |
+
+Historical planning and earlier checkpoints below remain provenance; their no-implementation/current
+availability statements describe their dated sessions. Current selected evidence above supersedes
+those status claims, without changing the completion contract below.
+
+
 **Execution update, 2026-11-01:** the owner assigned this plan with “let's work”. The
 [integrated P0 execution checkpoint](us013-p0-execution.md) records actual reference effects,
 replay and C#/Git source experiments, their limits and remaining work. Planning readiness is now

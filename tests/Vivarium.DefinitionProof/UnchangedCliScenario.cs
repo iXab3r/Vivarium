@@ -143,7 +143,13 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         return id;
     }
 
-    internal async Task<JsonElement> RunAsync(string credential, int expectedExit, params string[] arguments)
+    internal Task<JsonElement> RunAsync(string credential, int expectedExit, params string[] arguments) =>
+        RunAsync(credential, expectedExit, TimeSpan.FromMinutes(3), arguments);
+
+    internal Task<JsonElement> RunAsync(string credential, int expectedExit, TimeSpan processDeadline, params string[] arguments) =>
+        RunAsync(credential, expectedExit, processDeadline, CancellationToken.None, arguments);
+
+    internal async Task<JsonElement> RunAsync(string credential, int expectedExit, TimeSpan processDeadline, CancellationToken cancellationToken, params string[] arguments)
     {
         var environment = new Dictionary<string, string>
         {
@@ -152,7 +158,7 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
             ["TEAMCITY_TOKEN"] = credential, ["NODE_EXTRA_CA_CERTS"] = Path.Combine(root, "cli-ca.pem"),
         };
         var result = await ProofProcess.RunAsync("node", new[] { Path.Combine(installed!, "dist/src/bin.js"), "--json" }.Concat(arguments),
-            root, environment, allowFailure: true, deadline: TimeSpan.FromMinutes(3));
+            root, environment, allowFailure: true, deadline: processDeadline, cancellationToken: cancellationToken);
         Assert.That(Encoding.UTF8.GetString(result.Output).Contains(credential, StringComparison.Ordinal), Is.False);
         Assert.That(Encoding.UTF8.GetString(result.Error).Contains(credential, StringComparison.Ordinal), Is.False);
         using var document = JsonDocument.Parse(result.Output.Length == 0 ? result.Error : result.Output);
