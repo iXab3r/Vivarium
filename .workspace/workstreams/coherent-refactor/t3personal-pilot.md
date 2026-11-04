@@ -5,8 +5,12 @@
 Bounded 2026-11-05 implementation checkpoint: the four selected reference gaps have literal outcomes,
 and source/conflict/failed-artifact projection alignment passes the focused real-PG fixture. Required
 solution build passes; solution tests report722 PASS/11 skipped. See [evidence and review boundary](selection-boundaries-20261105.md).
-Prior33-story/SDK evidence is not rerun; exact-candidate --pilot transfer retains a runtime-producer
-renewal gate because Controller IL changed. Aggregate/Security review, zero due debt and main remain due.
+Prior33-story/SDK raw evidence remains historical. The [selected runtime renewal](selection-runtime-renewal-20261105.md)
+qualifies changed explicit branches and renews three ordinary source-reuse/artifact regressions
+with four selected real-PG cases on the final binary, retaining the earlier D52 proof separately.
+Exact-candidate offline accounting binds every normative row and
+SDK separately; Controller IL changes are runtime, never metadata-only. Aggregate/Security review,
+zero due debt and main remain due.
 
 ### Current checkpoint — 2026-11-04 (not milestone closure)
 

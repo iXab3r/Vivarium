@@ -5,6 +5,36 @@ namespace Vivarium.Tests.TeamCity;
 
 public sealed partial class ApiLedgerTests
 {
+    [TestCase("valid")]
+    [TestCase("tamper")]
+    [TestCase("missing-case")]
+    [TestCase("duplicate-case")]
+    [TestCase("wrong-test")]
+    [TestCase("producer")]
+    public void Runtime_qualification_requires_complete_case_decisions_and_exact_targeted_passes(string mutation)
+    {
+        WriteTrx("targeted.trx", [("Read", "Passed", "Proof.Cases", "")]);
+        Write("input.cs", "current");
+        Write(Ledger.Workstream + "pilot-contract-scope.json", """{"cases":[{"id":"PILOT-1","product_binding":"Proof.Cases.Read"}]}""");
+        JsonObject Case(string id) => new() { ["id"] = id, ["binding"] = "Proof.Cases.Read", ["action"] = "qualified_reuse", ["rationale"] = "Ordinary branch exercised by targeted proof", ["proof_ids"] = new JsonArray("ordinary") };
+        var cases = new JsonArray(Case("PILOT-1"), Case("required-sdk"));
+        if (mutation == "missing-case") cases.RemoveAt(1);
+        if (mutation == "duplicate-case") cases[1] = Case("PILOT-1");
+        var qualification = new JsonObject { ["producer_sha256"] = mutation == "producer" ? "wrong" : "current",
+            ["inputs"] = new JsonArray(new JsonObject { ["path"] = "input.cs", ["sha256"] = Hash("input.cs") }),
+            ["cases"] = cases,
+            ["proofs"] = new JsonArray(new JsonObject { ["id"] = "ordinary", ["artifact"] = "targeted.trx", ["sha256"] = Hash("targeted.trx"),
+                ["exit_code"] = 0, ["counters"] = new JsonObject { ["total"] = 1 },
+                ["bindings"] = new JsonArray(mutation == "wrong-test" ? "Proof.Cases.Other" : "Proof.Cases.Read") }) };
+        Write("runtime.json", qualification.ToJsonString());
+        var decision = new JsonObject { ["current_sha256"] = "current", ["runtime_qualification"] = new JsonObject {
+            ["assessment"] = new JsonObject { ["path"] = "runtime.json", ["sha256"] = Hash("runtime.json") } } };
+        if (mutation == "tamper") Write("runtime.json", "{}");
+        var gaps = new List<string>();
+        if (mutation == "valid") { Ledger.QualifyPilotRuntime(root, decision, gaps); Assert.That(gaps, Is.Empty); }
+        else Assert.Throws<InvalidDataException>(() => Ledger.QualifyPilotRuntime(root, decision, gaps));
+    }
+
     [TestCase("binding")]
     [TestCase("tamper")]
     [TestCase("candidate")]

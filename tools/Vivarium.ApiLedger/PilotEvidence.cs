@@ -20,7 +20,7 @@ public sealed class PilotReport
     public int CurrentGreen => Gaps.Count == 0 ? RawPassed : 0;
     public string HeavyComposition { get; set; } = "UNQUALIFIED";
     public List<string> HeavyGaps { get; } = [];
-    public string ReferenceGates => "#117/#118: selection denial, missing bytes, conflict and changed-HEAD reference variants remain due/unaccepted; seven declarations are not literal wire GREEN";
+    public string ReferenceGates => "#117/#118: bounded viewer denial, required filename absence, conflict and advanced HEAD have reference profiles; physical deleted bytes and broader profiles remain unaccepted; seven declarations are not full literal wire GREEN";
     public List<PilotCase> HeavyRawResults { get; } = [];
 }
 public sealed record PilotCase(string Id, string Binding, string Outcome);
@@ -136,7 +136,8 @@ public static partial class Ledger
         if (decisions.Length != 1) { gaps.Add("Missing/duplicate impact assessment: " + path); return; }
         var d = decisions[0]!;
         if (S(d, "previous_sha256") != (previous ?? "ADDED") || S(d, "current_sha256") != Hash(root, path)
-            || S(d, "kind") != kind || S(d, "classification") != "no_selected_behavior_impact"
+            || S(d, "kind") != kind || !(S(d, "classification") == "no_selected_behavior_impact"
+                || kind == "producer" && S(d, "producer_cause") == "runtime" && S(d, "classification") == "targeted_runtime_qualification")
             || new[] { "rationale", "assessor", "affected_binding", "evidence_category", "observed_diff", "independent_review" }
                 .Any(k => string.IsNullOrWhiteSpace(S(d, k)))
             || d["evidence"] is not JsonArray evidence || evidence.Count == 0)
@@ -145,7 +146,53 @@ public static partial class Ledger
             if (Hash(root, S(e!, "path")) != S(e!, "sha256")) gaps.Add("Impact evidence mismatch: " + path);
         // Rationale is an attributed human judgment, not a mechanical behavioral oracle.
         if (kind == "producer" && S(d, "producer_cause") is not ("metadata" or "test_only"))
-            gaps.Add("Unresolved runtime producer impact: " + path);
+        {
+            if (d["runtime_qualification"] is null) gaps.Add("Unresolved runtime producer impact: " + path);
+            else QualifyPilotRuntime(root, d, gaps);
+        }
+    }
+
+    // This is an attributed branch-impact assessment, not a new coverage oracle. Preserve the
+    // original cohort and bind targeted execution separately; never rewrite its raw outcomes.
+    public static void QualifyPilotRuntime(string root, JsonNode decision, List<string> gaps)
+    {
+        var q = decision["runtime_qualification"]!;
+        var binding = q["assessment"]!;
+        Require(Hash(root, S(binding, "path")) == S(binding, "sha256"), "Runtime qualification hash mismatch.");
+        var assessment = Json(root, S(binding, "path"));
+        Require(S(assessment, "producer_sha256") == S(decision, "current_sha256"), "Runtime producer mismatch.");
+        foreach (var input in assessment["inputs"]!.AsArray())
+            Require(Hash(root, S(input!, "path")) == S(input!, "sha256"), "Runtime input mismatch.");
+        Require(assessment["inputs"]!.AsArray().Count > 0, "Missing runtime inputs.");
+        var scope = Json(root, Workstream + "pilot-contract-scope.json")["cases"]!.AsArray();
+        var expected = scope.Select(c => S(c!, "id")).Append("required-sdk").ToHashSet();
+        var cases = assessment["cases"]!.AsArray();
+        Require(cases.Count == expected.Count && cases.Select(c => S(c!, "id")).ToHashSet().SetEquals(expected),
+            "Missing/duplicate runtime case qualification.");
+        var proofs = assessment["proofs"]!.AsArray();
+        Require(proofs.Count > 0 && proofs.Select(p => S(p!, "id")).Distinct().Count() == proofs.Count, "Missing/duplicate runtime proofs.");
+        foreach (var proof in proofs)
+        {
+            var diagnostics = new Report { Candidate = "targeted-runtime" };
+            var rows = Results(root, proof!, diagnostics);
+            gaps.AddRange(diagnostics.Errors);
+            var selected = proof!["bindings"]!.AsArray().Select(b => b!.GetValue<string>()).ToArray();
+            Require(selected.Length > 0 && selected.Distinct().Count() == selected.Length, "Missing/duplicate targeted bindings.");
+            foreach (var test in selected)
+                Require(rows.Count(r => r.Class + "." + r.Name == test && r.Outcome == "Passed") == 1, "Missing targeted runtime PASS: " + test);
+        }
+        foreach (var c in cases)
+        {
+            Require(S(c!, "action") is "renew" or "qualified_reuse" && !string.IsNullOrWhiteSpace(S(c!, "rationale")), "Invalid runtime case decision.");
+            var normative = scope.SingleOrDefault(s => S(s!, "id") == S(c!, "id"));
+            if (normative is not null)
+                Require(S(c!, "binding") == S(normative, "product_binding"), "Runtime normative binding mismatch.");
+            var references = c!["proof_ids"]!.AsArray();
+            Require(references.Count > 0 && references.All(r => proofs.Any(p => S(p!, "id") == r!.GetValue<string>())), "Missing runtime case proof.");
+            if (S(c!, "action") == "renew")
+                Require(proofs.Where(p => references.Any(r => r!.GetValue<string>() == S(p!, "id")))
+                    .Any(p => p!["bindings"]!.AsArray().Any(b => b!.GetValue<string>() == S(c!, "binding"))), "Renewed case absent from targeted proof.");
+        }
     }
 
     public static void ReadPilotHeavy(string root, JsonNode assessment, PilotReport report)
