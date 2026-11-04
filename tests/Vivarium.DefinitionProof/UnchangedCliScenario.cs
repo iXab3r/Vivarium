@@ -104,11 +104,13 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         await SaveAsync();
     }
 
-    internal async Task<long> RunWholeChainAsync(string credential)
+    internal async Task<long> RunWholeChainAsync(string credential, string? runInput = null)
     {
         await RunAsync(credential, 0, "-p", "owned-r0", "permissions", "grant", "Update");
-        var result = await RunAsync(credential, 0, "-p", "owned-r0", "jobs", "run", "P_Release",
-            "--wait", "--timeout", "2m", "--interval", "1s");
+        var arguments = new List<string> { "-p", "owned-r0", "jobs", "run", "P_Release",
+            "--wait", "--timeout", "2m", "--interval", "1s" };
+        if (runInput is not null) arguments.AddRange(["--param", "vivarium.run-input=" + runInput]);
+        var result = await RunAsync(credential, 0, arguments.ToArray());
         Assert.That(result.GetProperty("accepted").GetBoolean(), Is.True);
         Assert.That(result.GetProperty("outcome").GetString(), Is.EqualTo("succeeded"));
         var build = result.GetProperty("build");

@@ -1211,9 +1211,155 @@
         "cohort_failed": 0,
         "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
       }
+    },
+    {
+      "id": "PILOT-RUN-INPUT-CLI-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+        "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted."
+      },
+      "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
+      "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
+      "entry": "Native POST/GET /api/v1/build-run-inputs; explicit native opt-in ordinary parameter through unchanged CLI and shared Build admission.",
+      "effect": "Actual unchanged publishedCLI0.5.6 enters a three-member chain with only an opaque parameter; two named members receive/mask the synthetic environment while the intermediate member gets none. Pending/consumed input and assignment recovery survive Host restarts; duplicate submission conflicts and metadata retains accepted identity.",
+      "completion": "Actual HTTP/application transactions and private recovery state; positive CLI/process/output/exact-artifact proof.",
+      "product_binding": "Vivarium.DefinitionProof.RunInputAcceptanceCases.Unchanged_CLI_consumes_one_private_chain_input_with_targeted_masks_and_restart_recovery",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "D45 per-run environments and D48 one-use requests only; no permanent Project secret store, genuine prior-product RED, publication credential, actual T3 build or full secure-parameter API proof.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07"
+      ],
+      "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/run-input-current-profile.trx",
+        "sha256": "2022fa9bdbe7b631a6a87de19ad9f2cd53f826d6c466a76a1161633b48cf55b2",
+        "cohort_passed": 2,
+        "cohort_failed": 0,
+        "qualification": "Pre-run855 source/metadata hashes and10 producer copies, zero drift before accounting edits; root696passed/12rawNotExecuted; separate unchanged-client/D45 base2/2."
+      }
+    },
+    {
+      "id": "PILOT-RUN-INPUT-ACCESS-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+        "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted."
+      },
+      "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
+      "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
+      "entry": "Native POST/GET /api/v1/build-run-inputs; explicit native opt-in ordinary parameter through unchanged CLI and shared Build admission.",
+      "effect": "Foreign actor, wrong root, graph mismatch, stale catalogue, expiry and current-rights withdrawal admit no Builds. Expiry erases pending ciphertext. Sixteen pending inputs bound an actor; two concurrent submissions consume once and create exactly one three-member graph.",
+      "completion": "Actual HTTP/application transactions and private recovery state; positive CLI/process/output/exact-artifact proof.",
+      "product_binding": "Vivarium.DefinitionProof.RunInputAcceptanceCases.Foreign_wrong_root_stale_expired_and_withdrawn_inputs_cannot_admit_builds",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "D45 per-run environments and D48 one-use requests only; no permanent Project secret store, genuine prior-product RED, publication credential, actual T3 build or full secure-parameter API proof.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07"
+      ],
+      "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/run-input-current-profile.trx",
+        "sha256": "2022fa9bdbe7b631a6a87de19ad9f2cd53f826d6c466a76a1161633b48cf55b2",
+        "cohort_passed": 2,
+        "cohort_failed": 0,
+        "qualification": "Pre-run855 source/metadata hashes and10 producer copies, zero drift before accounting edits; root696passed/12rawNotExecuted; separate unchanged-client/D45 base2/2."
+      }
     }
   ],
-  "remaining_due": "Complete #78/#116/#117/#118: targeted temporary CLI chain inputs, source-aware reuse and remaining source/current-rights/fault variants, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Current selected artifact/runner rows do not close their full API families.",
+  "remaining_due": "Complete #78/#116/#117/#118: source-aware reuse and remaining source/current-rights/fault variants, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential requests timed out without delivery; independent work continues. Selected native/runner/artifact cases do not close their API families.",
   "global_variant_denominator": null,
-  "api_complete": false
+  "api_complete": false,
+  "native_http_operations": [
+    {
+      "id": "NATIVE:POST:/api/v1/build-run-inputs",
+      "method": "POST",
+      "path": "/api/v1/build-run-inputs",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-LOG",
+        "SS-CHAIN"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-RUN-INPUT-CLI-001",
+        "PILOT-RUN-INPUT-ACCESS-001"
+      ],
+      "source": "docs/ARCHITECTURE.md#d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+      "state": "SELECTED_NATIVE_PROFILE_PROVEN_NOT_FULL_FAMILY_OR_GLOBAL_DENOMINATOR"
+    },
+    {
+      "id": "NATIVE:GET:/api/v1/build-run-inputs/{id}",
+      "method": "GET",
+      "path": "/api/v1/build-run-inputs/{id}",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-LOG",
+        "SS-CHAIN"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-RUN-INPUT-CLI-001",
+        "PILOT-RUN-INPUT-ACCESS-001"
+      ],
+      "source": "docs/ARCHITECTURE.md#d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+      "state": "SELECTED_NATIVE_PROFILE_PROVEN_NOT_FULL_FAMILY_OR_GLOBAL_DENOMINATOR"
+    }
+  ]
 }

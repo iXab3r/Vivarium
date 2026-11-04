@@ -51,6 +51,9 @@ now has selected native P/Q isolation, project delegation, grant/eligibility/rev
 queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
 evidence now survives a cold Host restart. D45 adds native per-run secret environments with encrypted
 input/assignment recovery and existing Agent output masking; permanent Project secret storage is deferred.
+D48 adds actor/root/catalogue-bound one-use encrypted chain input, letting ordinary clients carry
+only an opaque parameter while each named Build receives its own D45 environment. Selected real
+CLI/process/masking, restart, expiry, quota, current-rights and concurrent-consumption evidence exists.
 The selected fresh `/app/rest` adapter now runs the published unchanged CLI 0.5.6 through ordinary
 login, C#/Git discovery, successful/failed runs, queued/running cancellation and exact artifact
 download. Its bounded integration fixture uses a real Windows Agent and a dedicated Linux/Docker
@@ -247,6 +250,9 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D45 scopes US-013 secrets to one run's Agent environment, with private per-Build encrypted recovery
   input/assignments and Agent-side exact-value output masking. No raw values in Git, collected plans,
   payload scripts, public representations or audit; permanent Project secret storage is a separate story.
+- D48 permits one-use native prepared chain input for ordinary clients: actor/root/exact-catalogue
+  binding, fifteen-minute expiry, bounded encrypted input and targeted per-Build D45 environments.
+  The explicit opaque run parameter is not bearer authority or a reusable Project secret reference.
 - D46 accepts US-013 by complete actor/process/outcome/stop/recovery/byte behavior. Exact background
   progress estimates and dynamic cancellation timestamp cadence are separately owned by #166 under
   SS-RUN@R2. Four full literal R0 workflows remain required; two distinct behavioral obligations

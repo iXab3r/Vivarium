@@ -6,5 +6,6 @@ internal sealed class RuntimeBuildWorker(IServiceProvider services) : Background
     protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.WhenAll(
         services.GetRequiredService<RuntimeBuildCoordinator>().RunAsync(stoppingToken),
         services.GetRequiredService<RuntimeBuildOutputStore>().RunAsync(stoppingToken),
-        services.GetRequiredService<RuntimeOutputRetention>().RunAsync(stoppingToken));
+        services.GetRequiredService<RuntimeOutputRetention>().RunAsync(stoppingToken),
+        services.GetRequiredService<RuntimeBuildRunInputs>().RunAsync(stoppingToken));
 }

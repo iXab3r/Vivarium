@@ -41,6 +41,31 @@ internal sealed class RuntimeBuildSecrets(IDataProtectionProvider protection)
     internal byte[] ProtectAssignment(long buildId, BuildAssignment assignment)
         => Protect(buildId, "assignment", assignment.ToByteArray());
 
+    internal byte[] ProtectRunInput(Guid id, Dictionary<string, Dictionary<string, string>> inputs)
+    {
+        var plaintext = JsonSerializer.SerializeToUtf8Bytes(inputs);
+        try { return RunInputProtector(id).Protect(plaintext); }
+        finally { CryptographicOperations.ZeroMemory(plaintext); }
+    }
+
+    internal Dictionary<string, Dictionary<string, string>> ReadRunInput(Guid id, byte[] envelope)
+    {
+        byte[] plaintext;
+        try { plaintext = RunInputProtector(id).Unprotect(envelope); }
+        catch (CryptographicException) { throw new InvalidDataException("Run input cannot be decrypted."); }
+        try
+        {
+            var inputs = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(plaintext)
+                ?? throw new InvalidDataException("Run input is unavailable.");
+            RuntimeBuildRunInputs.Validate(inputs);
+            return inputs;
+        }
+        finally { CryptographicOperations.ZeroMemory(plaintext); }
+    }
+
+    private IDataProtector RunInputProtector(Guid id) => protection.CreateProtector(
+        "Vivarium.RuntimeBuildRunInput.v1", id.ToString("N"));
+
     internal BuildAssignment ReadAssignment(long buildId, byte[] envelope, int version = 1)
     {
         // Before runtime secrets were accepted, retained assignments used plain protobuf. They

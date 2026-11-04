@@ -353,7 +353,8 @@ public sealed partial class R0AcceptanceCases
             provider.GetRequiredService<CatalogSources>(), clock, provider.GetRequiredService<AgentRegistry>())));
         services.Replace(ServiceDescriptor.Singleton(provider => new RuntimeBuildService(
             provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>(), provider.GetRequiredService<IConfiguration>(),
-            provider.GetRequiredService<AgentRegistry>(), clock, provider.GetRequiredService<RuntimeBuildSecrets>())));
+            provider.GetRequiredService<AgentRegistry>(), clock, provider.GetRequiredService<RuntimeBuildSecrets>(),
+            provider.GetRequiredService<RuntimeBuildRunInputs>())));
         services.Replace(ServiceDescriptor.Singleton(provider => new RuntimeBuildCoordinator(
             provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>(), provider.GetRequiredService<RuntimeAgentSessions>(),
             provider.GetRequiredService<AgentRegistry>(), provider.GetRequiredService<RuntimeStepCompiler>(), provider.GetRequiredService<RuntimeBuildOutputStore>(),

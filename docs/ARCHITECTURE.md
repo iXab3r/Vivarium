@@ -1557,7 +1557,8 @@ The Agent masks registered exact values across stdout/stderr chunk boundaries be
 output spool and transport; Host logs, errors and public output retain only masked bytes. This is
 not detection of transformed/unregistered secrets or redaction of arbitrary artifact files. The
 selected workload is trusted to use its credential for its intended external operation. Permanent
-Project secrets, rotation and user-managed secret references require their own story. Native runtime
+Project secrets, rotation and reusable user-managed secret references require their own story. D48
+adds one-use prepared execution input without a reusable secret store. Native runtime
 integration and its acceptance evidence do not establish TeamCity secure-parameter wire compatibility.
 
 ### D46. US-013 acceptance preserves behavior while exact background estimation is separately owned
@@ -1608,6 +1609,32 @@ Partial output or lost runtime authority cannot manufacture a successful/clean-h
 Append protocol fields and gate their delivery on negotiated support. This is an execution contract,
 not acceptance of all Docker parameters, compatible error strings or publication behavior; freeze
 and bind the used TeamCity profiles before public integration and retain the D39/PILOT final gates.
+
+### D48. Prepared run input carries one chain's temporary secrets through ordinary clients
+
+The unchanged TeamCity CLI transports only ordinary parameter arguments. Never put a publication
+credential in those arguments. Native `POST /api/v1/build-run-inputs` accepts bounded per-configuration
+secret environments for one root configuration's snapshot graph; `GET /api/v1/build-run-inputs/{id}`
+returns metadata only. The input belongs to its authenticated user, root configuration and exact
+active catalogue revision, expires after fifteen minutes, and requires current project visibility,
+`run_build` and `customize_build_parameters`. The identifier is not bearer authorization.
+
+An explicit native opt-in ordinary parameter, `vivarium.run-input=vri_<uuid>`, consumes that input
+under the existing permission/queue fences in the same transaction as admission of the whole graph.
+Remove this marker from ordinary collected parameters. Deliver each supplied environment only to its
+named graph member, encrypted with the existing per-Build D45 recovery purpose; never implicitly
+propagate root secrets to dependencies. Direct native run secrets remain root-only. Without this
+opt-in, compatible submissions and intentional repeated unkeyed runs keep their existing behavior.
+
+The private input uses a separate per-input Data Protection purpose. Limit it to sixteen graph
+targets, each within D45 environment bounds, 256 KiB total, sixteen live pending inputs per actor,
+and a 2 MiB HTTP request. Consume once, clear the pending ciphertext and retain accepted Build
+identity. A duplicate receives conflict; after a lost submit response, metadata reads recover the
+accepted identity without queuing again. Reject stale catalogue, expired, foreign-actor and wrong-root
+inputs before committing any Build. Bounded background expiry clears pending ciphertext and records
+an internal audit event. Metadata, outcomes and audit never return values. This is a temporary sealed
+execution request for US-013, not permanent Project secret management or TeamCity secure-parameter
+wire conformance. Publication credentials target only the owned acceptance repository.
 
 ## 5. Protocol sketch
 

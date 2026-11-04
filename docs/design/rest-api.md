@@ -674,6 +674,33 @@ children. Generic operations may link to a build but do not replace its lifecycl
 Agent-wide mutation cancellation and exclusivity must be designed with AgentExplorer and Agent API/SDK
 experts before remote exec/process/software endpoints ship.
 
+### Temporary chain run input (D48)
+
+`POST /api/v1/build-run-inputs` accepts `{ configurationId, environments }`, where `environments`
+maps selected snapshot-graph configuration IDs to D45 secret environment dictionaries. It returns
+201, a metadata Location, and `{ reference, configurationId, definitionRevisionId, expiresAt, state,
+acceptedBuildId }`. `GET /api/v1/build-run-inputs/{uuid}` returns the same metadata without values.
+Both responses use `Cache-Control: no-store`. Native cookie mutations retain CSRF verification;
+ordinary current bearer credentials use the same Identity and Project permission services.
+
+The input is actor/root/exact-catalogue bound, valid for fifteen minutes and usable once. Admission
+through either Build surface explicitly opts in with ordinary parameter
+`vivarium.run-input=vri_<uuid>`; the unchanged CLI can transport that non-secret marker. Admission
+requires current visibility, `run_build` and `customize_build_parameters`, removes the marker from
+collected parameters, copies only each named member's environment into its private encrypted Build
+input, and consumes the prepared input atomically with the graph. Direct native `secretEnvironment`
+cannot be mixed with this opt-in and otherwise keeps its root-only meaning.
+
+Metadata reads hide foreign actors with 404 and require current visibility/run/customization rights.
+Submission returns 404 for foreign/wrong-root input, 409 for consumed input or changed catalogue,
+and 410 for expiry. A consumed metadata receipt retains the original accepted Build ID, permitting
+recovery after a lost submit response without submitting another graph. Expiry clears ciphertext in
+bounded audited background batches. Limit sixteen configurations and sixteen live pending requests
+per actor, D45 bounds per environment, 256 KiB total input and 2 MiB HTTP body; quota exhaustion is
+429. Values never appear in public metadata, ordinary parameters, scripts, Git or audit. This native
+execution-input seam does not claim TeamCity secure-parameter compatibility or permanent secret
+management. Existing submissions without the marker retain their ordinary retry/identity behavior.
+
 ## 7. Events, watching, and logs
 
 REST polling is always sufficient to recover current durable state. Server-Sent Events provide an

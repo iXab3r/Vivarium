@@ -35,6 +35,21 @@ public sealed class RuntimeBuildCounter
     public long NextValue { get; set; } = 1;
 }
 
+// One encrypted execution request, not a reusable Project secret reference.
+public sealed class RuntimeBuildRunInput
+{
+    public Guid Id { get; set; }
+    public Guid ActorId { get; set; }
+    public long BuildTypeId { get; set; }
+    public long ProjectId { get; set; }
+    public Guid RevisionId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public string State { get; set; } = "PENDING";
+    public byte[] ProtectedInputs { get; set; } = [];
+    public long? AcceptedBuildId { get; set; }
+}
+
 // Current queue resolution, flattened under the queue fence. Original request/input and every
 // replacement audit event remain retained; an assigned/finished physical execution is never replaced.
 public sealed class RuntimeBuildResolution

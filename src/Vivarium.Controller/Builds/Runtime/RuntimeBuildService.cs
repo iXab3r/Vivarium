@@ -37,19 +37,22 @@ internal sealed record RuntimeBuildDependencyHandle
 }
 
 internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> databases, IConfiguration configuration,
-    AgentRegistry registry, TimeProvider time, RuntimeBuildSecrets secrets)
+    AgentRegistry registry, TimeProvider time, RuntimeBuildSecrets secrets, RuntimeBuildRunInputs runInputs)
 {
     internal async Task<RuntimeBuildView> SubmitAsync(ManagementRequestContext actor, RuntimeRunRequest request, CancellationToken token)
     {
         try { DefinitionValidation.Identity(request.ConfigurationId); }
         catch (InvalidDataException) { throw Invalid("Supply a valid configuration identity."); }
-        var parameters = request.Parameters ?? [];
+        var parameters = request.Parameters is null ? [] : new Dictionary<string, string>(request.Parameters, StringComparer.Ordinal);
         var environment = request.SecretEnvironment ?? [];
         try { RuntimeBuildSecrets.Validate(environment); }
         catch (InvalidDataException) { throw Invalid("Run secret environment is invalid or exceeds its bound."); }
         if (parameters.Count > 256 || parameters.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Key.Length > 128 || p.Value is null)
             || Encoding.UTF8.GetByteCount(JsonSerializer.Serialize(parameters)) > 256 * 1024)
             throw Invalid("Build parameter input exceeds its bound.");
+        var runInputId = RuntimeBuildRunInputs.Extract(parameters);
+        if (runInputId is not null && environment.Count != 0)
+            throw Invalid("Use either direct run secrets or one prepared run input.");
         await using var database = await databases.CreateDbContextAsync(token);
         await using var transaction = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
         await RuntimeBuildAccess.FencePermissionsAsync(database, token);
@@ -65,7 +68,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw Missing();
         }
         var ancestry = snapshot.Ancestry(selected.Project.Control.Id);
-        var permissions = parameters.Count == 0 && environment.Count == 0 ? new[] { "run_build" } : ["run_build", "customize_build_parameters"];
+        var permissions = parameters.Count == 0 && environment.Count == 0 && runInputId is null ? new[] { "run_build" } : ["run_build", "customize_build_parameters"];
         if (!await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, permissions, ancestry, token))
         {
             StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId, AuditOutcome.Denied);
@@ -87,9 +90,25 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             catch (InvalidDataException) { throw new RestApiException(422, "execution_subset_unavailable", "Checkout profile unavailable",
                 "This source profile requires anonymous Git, a canonical branch and root checkout with literal top-level exclusions."); }
         }
-        long? rootInstance = source is null ? null : await RuntimeBuildSources.InstanceAsync(database, snapshot.ProjectIds[selected.Project.Control.Id], source, token);
         var now = time.GetUtcNow();
         var configurations = selected.Project.Definition.Configurations.ToDictionary(c => c.Id, StringComparer.Ordinal);
+        RuntimeBuildRunInput? preparedInput = null;
+        Dictionary<string, Dictionary<string, string>> preparedEnvironments = [];
+        if (runInputId is { } inputId)
+        {
+            try
+            {
+                (preparedInput, preparedEnvironments) = await runInputs.ReadForAdmissionAsync(database, actor, inputId,
+                    snapshot.BuildTypeIds[request.ConfigurationId], snapshot.Revision.Id, token);
+            }
+            catch (RestApiException error)
+            {
+                StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId,
+                    error.Status == 404 ? AuditOutcome.Denied : AuditOutcome.Failed);
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw;
+            }
+        }
+        long? rootInstance = source is null ? null : await RuntimeBuildSources.InstanceAsync(database, snapshot.ProjectIds[selected.Project.Control.Id], source, token);
         var collected = new Dictionary<string, RuntimeBuild>(StringComparer.Ordinal);
         var visiting = new HashSet<string>(StringComparer.Ordinal);
         async Task<RuntimeBuild> AdmitAsync(string configurationId)
@@ -114,7 +133,8 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             database.RuntimeBuildInputs.Add(new() { BuildId = member.Id, BuildTypeId = member.BuildTypeId, ProjectId = member.ProjectId,
                 RevisionId = snapshot.Revision.Id, CollectedAt = now,
                 VcsRootInstanceId = rootInstance, SourceJson = source is null ? null : JsonSerializer.Serialize(source, DefinitionValidation.Json),
-                ProtectedEnvironment = secrets.ProtectEnvironment(member.Id, isRoot ? environment : []),
+                ProtectedEnvironment = secrets.ProtectEnvironment(member.Id,
+                    preparedEnvironments.TryGetValue(configurationId, out var preparedEnvironment) ? preparedEnvironment : isRoot ? environment : []),
                 OverridesJson = JsonSerializer.Serialize(isRoot ? new SortedDictionary<string, string>(parameters, StringComparer.Ordinal) : []),
                 AdmissionJson = JsonSerializer.Serialize(new { actorId = member.ActorId, permissions, projectAndAncestors = ancestry,
                     catalogueRevisionId = snapshot.Revision.Id, permittedPoolIds = new[] { 0 }, trustClass = "operator-enrolled-physical" }) });
@@ -126,6 +146,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             collected.Add(configurationId, member); visiting.Remove(configurationId); return member;
         }
         var build = await AdmitAsync(request.ConfigurationId);
+        if (preparedEnvironments.Keys.Any(k => !collected.ContainsKey(k))) throw Invalid("A run input target is outside this dependency graph.");
         foreach (var (configurationId, member) in collected)
         {
             var config = configurations[configurationId];
@@ -143,6 +164,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             }
         }
         var definition = await database.CatalogBuildDefinitions.AsNoTracking().SingleAsync(d => d.BuildTypeId == build.BuildTypeId && d.RevisionId == snapshot.Revision.Id, token);
+        if (preparedInput is not null) runInputs.Consume(database, actor, preparedInput, build.Id, snapshot.Revision.ControlCommit);
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         return new(build.Id, build.Number, "queued", build.Status, build.StatusText, request.ConfigurationId,
             selected.Project.Control.Id, snapshot.Revision.Id, definition.PlanHash, now, null, null, null, null, null, null, false);

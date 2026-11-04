@@ -1091,6 +1091,59 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildRunInput", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long?>("AcceptedBuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("BuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("ProtectedInputs")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<Guid>("RevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RevisionId");
+
+                    b.HasIndex("BuildTypeId", "ProjectId");
+
+                    b.HasIndex("AcceptedBuildId", "BuildTypeId", "ProjectId");
+
+                    b.HasIndex("ActorId", "State", "ExpiresAt");
+
+                    b.ToTable("RuntimeBuildRunInputs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_Lifetime", "\"ExpiresAt\" > \"CreatedAt\"");
+
+                            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_State", "(\"State\" = 'PENDING' AND octet_length(\"ProtectedInputs\") > 0 AND \"AcceptedBuildId\" IS NULL) OR (\"State\" = 'CONSUMED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NOT NULL) OR (\"State\" = 'EXPIRED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceReceipt", b =>
                 {
                     b.Property<long>("BuildId")
@@ -2068,6 +2121,28 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", "BuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildRunInput", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogRevision", null)
+                        .WithMany()
+                        .HasForeignKey("RevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogBuildType", null)
+                        .WithMany()
+                        .HasForeignKey("BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("AcceptedBuildId", "BuildTypeId", "ProjectId")
+                        .HasPrincipalKey("Id", "BuildTypeId", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceReceipt", b =>

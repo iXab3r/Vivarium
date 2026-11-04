@@ -28,6 +28,19 @@ internal static class RuntimeBuildModel
         counter.HasOne<CatalogBuildType>().WithOne().HasForeignKey<RuntimeBuildCounter>(c => c.BuildTypeId).OnDelete(DeleteBehavior.Restrict);
         counter.ToTable("RuntimeBuildCounters", t => t.HasCheckConstraint("CK_RuntimeBuildCounters_Positive", "\"NextValue\" > 0"));
 
+        var runInput = model.Entity<RuntimeBuildRunInput>(); runInput.HasKey(i => i.Id);
+        runInput.HasIndex(i => new { i.ActorId, i.State, i.ExpiresAt });
+        runInput.HasOne<CatalogBuildType>().WithMany().HasForeignKey(i => new { i.BuildTypeId, i.ProjectId })
+            .HasPrincipalKey(t => new { t.Id, t.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        runInput.HasOne<CatalogRevision>().WithMany().HasForeignKey(i => i.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        runInput.HasOne<RuntimeBuild>().WithMany().HasForeignKey(i => new { i.AcceptedBuildId, i.BuildTypeId, i.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        runInput.ToTable("RuntimeBuildRunInputs", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_Lifetime", "\"ExpiresAt\" > \"CreatedAt\"");
+            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_State", "(\"State\" = 'PENDING' AND octet_length(\"ProtectedInputs\") > 0 AND \"AcceptedBuildId\" IS NULL) OR (\"State\" = 'CONSUMED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NOT NULL) OR (\"State\" = 'EXPIRED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NULL)");
+        });
+
         var input = model.Entity<RuntimeBuildInput>(); input.HasKey(i => i.BuildId);
         input.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildInput>(i => new { i.BuildId, i.BuildTypeId, i.ProjectId })
             .HasPrincipalKey<RuntimeBuild>(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
