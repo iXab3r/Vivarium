@@ -282,6 +282,7 @@ message StepStatus {
   string build_id = 1;
   int32 step_index = 2;   // -1 for build-level phases
   string phase = 3;       // FETCHING | RUNNING | COLLECTING
+  StepResult completed = 4; // optional actual step receipt; phase remains RUNNING for older readers
 }
 
 enum LogStream {

@@ -8,9 +8,13 @@ namespace Vivarium.DefinitionProof;
 internal sealed class R0AgentMessageGate : Interceptor
 {
     internal volatile bool Enabled = true;
+    internal bool GateCompletions { get; init; }
+    internal AgentMsg? CompletionMessage { get; private set; }
+    internal AgentMsg? ResultMessage { get; private set; }
     internal Barrier Acceptance { get; } = new();
     internal Barrier Step { get; } = new();
     internal Barrier Collection { get; } = new();
+    internal Barrier Completion { get; } = new();
     internal Barrier Result { get; } = new();
 
     public override Task DuplexStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream,
@@ -39,9 +43,17 @@ internal sealed class R0AgentMessageGate : Interceptor
             if (!await source.MoveNext(cancellationToken)) return false;
             if (!owner.Enabled) return true;
             if (source.Current is AgentMsg { AssignmentAccepted: not null }) await owner.Acceptance.WaitAsync(cancellationToken);
-            if (source.Current is AgentMsg { Status.Phase: "RUNNING" }) await owner.Step.WaitAsync(cancellationToken);
+            if (source.Current is AgentMsg { Status.Completed: not null } completed)
+            {
+                owner.CompletionMessage = completed.Clone();
+                if (owner.GateCompletions) await owner.Completion.WaitAsync(cancellationToken);
+            }
+            else if (source.Current is AgentMsg { Status.Phase: "RUNNING" }) await owner.Step.WaitAsync(cancellationToken);
             if (source.Current is AgentMsg { Status.Phase: "COLLECTING" }) await owner.Collection.WaitAsync(cancellationToken);
-            if (source.Current is AgentMsg { Result: not null }) await owner.Result.WaitAsync(cancellationToken);
+            if (source.Current is AgentMsg { Result: not null } result)
+            {
+                owner.ResultMessage = result.Clone(); await owner.Result.WaitAsync(cancellationToken);
+            }
             return true;
         }
     }

@@ -455,6 +455,16 @@ cancellation is `UNKNOWN`, and internal output finalization remains publicly `ru
 Current, lease-fenced Agent step/collection observations update the shared Build progress text:
 `Step i/n` during execution and `Running` during preparation/collection. Compatible reads preserve
 that observed text and any received failure outcome while output finalization remains pending.
+An optional additive `StepStatus.completed` carries the actual step result before collection. The
+Host retains bounded append-only phase/completion observations in PostgreSQL under the same Agent
+and workload fence. Identical replay has no effect; conflicting step or terminal evidence quarantines
+the Agent. These observations cannot complete a Build or replace its independently acknowledged
+terminal result/output receipts. Older readers ignore the added field and retain the existing phase.
+When a stopped or timed-out process has actually exited, its receipt retains the OS exit code;
+cancellation outcome and timeout flags remain separate facts rather than replacing that code with `-1`.
+Exact background estimates and dynamic cancellation timestamps remain a separate compatibility
+obligation (D46, #166). The current adapter retains its unknown running estimate and zero pending
+cancellation projection; those values are not claimed as full estimator conformance.
 
 `Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
@@ -1504,6 +1514,19 @@ not detection of transformed/unregistered secrets or redaction of arbitrary arti
 selected workload is trusted to use its credential for its intended external operation. Permanent
 Project secrets, rotation and user-managed secret references require their own story. Native runtime
 integration and its acceptance evidence do not establish TeamCity secure-parameter wire compatibility.
+
+### D46. US-013 acceptance preserves behavior while exact background estimation is separately owned
+
+Owner decision (2026-11-04): accept US-013 by its complete actor/process/outcome/stop/recovery/byte
+behavior, with exact background progress estimates and dynamic cancellation timestamp cadence owned
+separately by [#166](https://github.com/iXab3r/Vivarium/issues/166) under SS-RUN@R2 (#134/#135/#136).
+This explicitly refines the earlier R0 literal-transcript gate; it does not waive actual failure,
+current authorization, real process cancellation, durable identity/output recovery or exact artifacts.
+The four other selected full reference workflows remain literal R0 obligations. The full nonzero
+and running-cancel wire cases and every captured entity remain retained and unaccepted until their
+separate compatibility gate passes. R0 uses two distinct behavioral obligations for those journeys;
+their passes cannot be reported as GREEN for the deferred full wire cases. Other D36-D40 compatibility,
+ledger, independent-review and zero-debt gates retain their meaning within this revised scope.
 
 ## 5. Protocol sketch
 

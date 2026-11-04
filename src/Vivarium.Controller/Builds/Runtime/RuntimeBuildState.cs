@@ -86,6 +86,19 @@ public sealed class RuntimeBuildResult
     public DateTimeOffset ReceivedAt { get; set; }
 }
 
+// Append-only, lease-fenced process observations, separate from the final result/output receipt.
+public sealed class RuntimeBuildObservation
+{
+    public long BuildId { get; set; }
+    public int Ordinal { get; set; }
+    public required string Phase { get; set; }
+    public int StepIndex { get; set; }
+    public DateTimeOffset ReceivedAt { get; set; }
+    public int? ExitCode { get; set; }
+    public bool? TimedOut { get; set; }
+    public bool? Skipped { get; set; }
+}
+
 public sealed class RuntimeBuildPayload
 {
     public long BuildId { get; set; }

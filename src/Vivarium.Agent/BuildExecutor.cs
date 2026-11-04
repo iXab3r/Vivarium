@@ -101,6 +101,15 @@ public static class BuildExecutor
                 continue;
             }
             result.Steps.Add(execution.Result);
+            if (stop.Mode != BuildStopMode.Force)
+            {
+                try
+                {
+                    await send(new AgentMsg { Status = new StepStatus { BuildId = assignment.BuildId,
+                        StepIndex = i, Phase = "RUNNING", Completed = execution.Result.Clone() } }, stop.ForceToken);
+                }
+                catch (OperationCanceledException) when (stop.Mode == BuildStopMode.Force) { }
+            }
             if (!execution.OutputComplete && assignment.OutputContractMajor == 1) result.OutputProducerLost = true;
             if (execution.Stopped)
             {
@@ -295,7 +304,7 @@ public static class BuildExecutor
         return new StepExecution(new StepResult
         {
             StepIndex = stepIndex,
-            ExitCode = timedOut || stop.Mode != BuildStopMode.Unspecified ? -1 : process.ExitCode,
+            ExitCode = process.ExitCode,
             TimedOut = timedOut,
         }, stop.Mode != BuildStopMode.Unspecified, outputComplete);
 

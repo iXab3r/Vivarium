@@ -12,6 +12,35 @@ dotnet tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll . ledge
 
 The command prints JSON to standard output. It reads files and bounded local Git identity/tree/diff
 information only. It does not build, run tests, contact TeamCity/GitHub, repair inputs or write status.
+
+## Selected fresh-Host R0 evidence
+
+The retained P0 baseline command above keeps its original cohort and historical execution identity.
+For the current fresh Host, use the same tool's selected-scope reader:
+
+```powershell
+dotnet tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll . <candidate> --r0 <assessment.json>
+```
+
+It validates the [R0 scope](../../.workspace/workstreams/coherent-refactor/r0-contract-scope.json),
+[unique product bindings](../../.workspace/workstreams/coherent-refactor/r0-product-bindings.tsv),
+primary/contributing owners, exact TRX class/display-name rows, target boundaries, result/assembly
+hashes, required working-source/oracle/metadata bytes and explicit execution-to-candidate transfer.
+The receipt uses the existing `candidate`, `results`, source-fingerprint, retained-assembly and
+assessment conventions. Each result set additionally names its real target, command and harness
+assembly role. One execution row cannot discharge multiple obligations. Replay/component rows
+cannot stand in for a fresh-Host or ordinary browser boundary. Additional cumulative/supporting
+rows are checked for failures but are not counted as new compatibility cases.
+
+D46's owner-approved scope is four complete literal workflows plus 24 other selected obligations.
+The two distinct nonzero/running-cancel behavioral passes cannot become GREEN for the retained
+full-wire cases; #166 / SS-RUN@R2 owns their exact background estimation/cancellation-time behavior.
+All original entities remain intact. Supporting source observations are retained in
+[`progress-observations.json`](../../tests/Vivarium.Tests/TeamCity/Reference/progress-observations.json).
+This is selected R0 accounting, with no global denominator, percentage or global API-complete claim.
+`all_selected_cases_green` covers execution evidence only; independent aggregate/Security review,
+all findings, main delivery and tracker closure remain separate milestone gates. Exit zero means
+valid accounting, so callers must inspect that explicit evidence state as well.
 To save a snapshot, redirect stdout to an artifact, inspect the exit code, then replace the tracked
 [api-status.json](../../.workspace/workstreams/coherent-refactor/api-status.json) from that output.
 Exit 0 means accounting/evidence validation succeeded, even when product results are RED. Exit 1

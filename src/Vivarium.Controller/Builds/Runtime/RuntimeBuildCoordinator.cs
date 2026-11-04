@@ -293,19 +293,42 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         {
             var status = message.Status;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
-            if (status.Phase is not ("FETCHING" or "RUNNING" or "CANCELLATION_CLEANUP" or "COLLECTING")
-                || status.StepIndex < -1 || status.StepIndex >= assignment.Steps.Count
-                || (status.Phase is "RUNNING" or "CANCELLATION_CLEANUP") && status.StepIndex < 0
-                || (status.Phase is "FETCHING" or "COLLECTING") && status.StepIndex != -1)
-                throw new InvalidDataException("Execution progress is invalid.");
-            if (execution.TerminalReceivedAt is null && build.CancelRequestedAt is null)
-                build.StatusText = status.Phase == "RUNNING" ? $"Step {status.StepIndex + 1}/{assignment.Steps.Count}" : "Running";
+            var phase = RuntimeBuildProgress.Validate(status, assignment);
+            if (execution.TerminalReceivedAt is not null) return;
+            var observation = await RuntimeBuildProgress.ObserveAsync(database, build.Id, status, phase, time.GetUtcNow(), token);
+            if (observation.Conflict)
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token);
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason);
+                throw new InvalidDataException("Step evidence conflicts.");
+            }
+            if (observation.Added)
+            {
+                if (status.Completed is { } completed && (completed.ExitCode != 0 || completed.TimedOut))
+                {
+                    var partial = new BuildResult(); partial.Steps.Add(completed.Clone());
+                    var failure = await RuntimeBuildStatus.FailureAsync(database, build, partial, token);
+                    if (build.CancelRequestedAt is not null) build.StatusText = "Canceled (" + failure + ")";
+                    else if (build.Status != "FAILURE") { build.Status = "FAILURE"; build.StatusText = failure; }
+                }
+                else if (phase != "COMPLETED" && build.CancelRequestedAt is null && build.Status != "FAILURE")
+                    build.StatusText = phase == "RUNNING" ? $"Step {status.StepIndex + 1}/{assignment.Steps.Count}" : "Running";
+            }
         }
         else if (message.MsgCase == AgentMsg.MsgOneofCase.Result)
         {
             var result = message.Result;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             ValidateResult(result, assignment);
+            var steps = await database.RuntimeBuildObservations.AsNoTracking().Where(o => o.BuildId == build.Id && o.Phase == "COMPLETED").ToArrayAsync(token);
+            if (steps.Any(observed => !RuntimeBuildProgress.SameResult(observed, result.Steps.SingleOrDefault(s => s.StepIndex == observed.StepIndex))))
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token);
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason);
+                throw new InvalidDataException("Step and terminal evidence conflict.");
+            }
             var semantic = result.Clone(); semantic.SessionId = "";
             var hash = Convert.ToHexStringLower(SHA256.HashData(semantic.ToByteArray()));
             if (existing is not null && existing.SemanticHash != hash)
@@ -368,6 +391,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         }
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         if (acknowledgement is not null) registry.TrySend(connection.Handle, acknowledgement);
+    }
+
+    private async Task QuarantineProgressAsync(VivariumDbContext database, AgentRegistration agent, RuntimeBuild build,
+        string workload, CancellationToken token)
+    {
+        agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "conflicting_step_result";
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.progress.conflict", AuditOutcome.Failed,
+            "conflicting_step_result", workload, token: token);
     }
 
     private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token)
@@ -447,6 +478,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             || result.Steps.Any(s => s.StepIndex < 0 || s.StepIndex >= assignment.Steps.Count)
             || result.Steps.Select(s => s.StepIndex).Distinct().Count() != result.Steps.Count)
             throw new InvalidDataException("The terminal result is invalid.");
+        if (result.Outcome == BuildOutcome.Succeeded && result.Steps.Any(s => !s.Skipped && (s.ExitCode != 0 || s.TimedOut)))
+            throw new InvalidDataException("Successful execution conflicts with its step evidence.");
         var watermarks = result.OutputWatermarks;
         if (result.OutputProducerLost ? watermarks.Count != 0 : watermarks.Count != assignment.Steps.Count * 2)
             throw new InvalidDataException("Terminal output watermark coverage differs.");

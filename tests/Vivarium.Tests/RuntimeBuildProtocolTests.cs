@@ -7,6 +7,34 @@ namespace Vivarium.Tests;
 public sealed class RuntimeBuildProtocolTests
 {
     [Test]
+    public void Progress_keeps_legacy_wire_tags_and_rejects_unassigned_or_ambiguous_step_receipts()
+    {
+        var assignment = new BuildAssignment { BuildId = "owned" }; assignment.Steps.Add(new Step { Program = "owned-program" });
+        assignment.Steps.Add(new Step { Program = "second-owned-program" });
+        var status = new StepStatus { BuildId = "owned", StepIndex = 1, Phase = "RUNNING",
+            Completed = new StepResult { StepIndex = 1, ExitCode = 7 } };
+        Assert.That(RuntimeBuildProgress.Validate(status, assignment), Is.EqualTo("COMPLETED"));
+        Assert.That(StepStatus.Descriptor.FindFieldByNumber(1).Name, Is.EqualTo("build_id"));
+        Assert.That(StepStatus.Descriptor.FindFieldByNumber(2).Name, Is.EqualTo("step_index"));
+        Assert.That(StepStatus.Descriptor.FindFieldByNumber(3).Name, Is.EqualTo("phase"));
+        using var legacy = new CodedInputStream(status.ToByteArray());
+        var original = new Dictionary<uint, string>(); uint tag; var oldStepIndex = -1;
+        while ((tag = legacy.ReadTag()) != 0)
+        {
+            if (tag == 10) original[tag] = legacy.ReadString();
+            else if (tag == 16) oldStepIndex = legacy.ReadInt32();
+            else if (tag == 26) original[tag] = legacy.ReadString();
+            else legacy.SkipLastField();
+        }
+        Assert.That(original[10], Is.EqualTo("owned")); Assert.That(original[26], Is.EqualTo("RUNNING"));
+        Assert.That(oldStepIndex, Is.EqualTo(1));
+        var invalid = new[] { status.Clone(), status.Clone(), status.Clone(), status.Clone() };
+        invalid[0].StepIndex = 2; invalid[1].Completed.StepIndex = 0;
+        invalid[2].Phase = "COLLECTING"; invalid[3].Completed.Skipped = true;
+        foreach (var item in invalid) Assert.Throws<InvalidDataException>(() => RuntimeBuildProgress.Validate(item, assignment));
+    }
+
+    [Test]
     public void Output_rejects_ambiguous_scope_byte_counts_and_unbounded_frames()
     {
         var frame = new BuildOutput { BuildId = "owned", SessionId = "current", StepIndex = 0,
@@ -42,6 +70,9 @@ public sealed class RuntimeBuildProtocolTests
         result.OutputWatermarks.Add(new BuildOutputWatermark { StepIndex = 0, Stream = LogStream.Stdout });
         result.OutputWatermarks.Add(new BuildOutputWatermark { StepIndex = 0, Stream = LogStream.Stderr });
         Assert.DoesNotThrow(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps[0].ExitCode = 7;
+        Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps[0].ExitCode = 0;
         result.OutputWatermarks[1].Stream = LogStream.Stdout;
         Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
         result.OutputWatermarks[1].Stream = LogStream.Stderr;

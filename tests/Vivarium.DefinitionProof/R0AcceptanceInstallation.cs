@@ -242,6 +242,29 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             await File.WriteAllTextAsync(bootstrap, JsonSerializer.Serialize(new { controllerUrl = origin.AbsoluteUri.TrimEnd('/'),
                 certFingerprint = publicCertificate.GetCertHashString(HashAlgorithmName.SHA256), enrollToken = enrollment.RootElement.GetProperty("token").GetString() }));
             StartAgentProcess();
+            await CompleteEnrollmentAsync(administrator, csrf);
+        }
+
+        internal async Task StartLinuxAgentAsync(OwnedDockerAgent linux, HttpClient administrator, string csrf)
+        {
+            var settings = Services.GetRequiredService<NodeConfigurationService>();
+            var current = (await settings.GetAsync("vivarium-host")).Value!;
+            var document = current.Config.DeepClone().AsObject();
+            document["ListenUrl"] = $"https://0.0.0.0:{origin.Port}";
+            Assert.That((await settings.SaveAsync("vivarium-host", Guid.NewGuid(), true, document,
+                NodeConfigActor.System, current.SavedRevision!.Id)).StatusCode, Is.EqualTo(200));
+            await RestartAsync();
+            using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/enrollment-tokens");
+            request.Headers.Add("RequestVerificationToken", csrf);
+            using var response = await administrator.SendAsync(request);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            using var enrollment = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            await linux.StartAsync(origin, certificate, enrollment.RootElement.GetProperty("token").GetString()!);
+            await CompleteEnrollmentAsync(administrator, csrf);
+        }
+
+        private async Task CompleteEnrollmentAsync(HttpClient administrator, string csrf)
+        {
             using var bound = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             while (AgentId is null)
             {

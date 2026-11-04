@@ -28,7 +28,8 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
         if (state != "queued")
         {
             result["status"] = build.Status;
-            result["statusText"] = build.CancelRequestedAt is not null ? "Canceled"
+            result["statusText"] = build.CancelRequestedAt is not null
+                ? build.StatusText.StartsWith("Canceled (", StringComparison.Ordinal) ? build.StatusText : "Canceled"
                 : state == "running" && build.StatusText is "Preparing execution" or "Starting execution" ? "Running" : build.StatusText;
         }
         if (state == "queued")
@@ -37,6 +38,7 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
                 && (b.QueuedAt < build.QueuedAt || b.QueuedAt == build.QueuedAt && b.Id <= id), token);
             result["waitReason"] = build.StatusText;
         }
+        // Exact background estimates are separately owned by SS-RUN@R2 (#166, D46).
         if (state == "running") result["percentageComplete"] = build.CancelRequestedAt is null ? -1 : 0;
         if (build.StartedAt is { } started) result["startDate"] = TeamCityProtocol.Date(started);
         if (build.FinishedAt is { } finished) result["finishDate"] = TeamCityProtocol.Date(finished);

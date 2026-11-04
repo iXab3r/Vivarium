@@ -151,6 +151,8 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         }
         if (changed) { build.StopMode = mode; build.StopDeadline = time.GetUtcNow().AddSeconds(mode == "FORCE" ? 15 : 30); }
         build.Status = "UNKNOWN";
+        if (!build.StatusText.StartsWith("Canceled", StringComparison.Ordinal))
+            build.StatusText = build.StatusText.StartsWith("Exit code ", StringComparison.Ordinal) ? "Canceled (" + build.StatusText + ")" : "Canceled";
         if (build.State == "QUEUED")
         {
             build.Number = "N/A";

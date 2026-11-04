@@ -401,7 +401,8 @@ public static partial class Ledger
             if (process.ExitCode != 0) throw new IOException("Git identity read failed: " + error.GetAwaiter().GetResult());
             return output.GetAwaiter().GetResult().Trim();
         }
-        string[] producerRoots = ["src", "tests", "tools", "build", "Directory.Build.props", "global.json", "Vivarium.slnx"];
+        string[] producerRoots = ["src", "tests", "tools", "build", "Directory.Build.props", "Directory.Build.targets",
+            "Directory.Packages.props", "NuGet.Config", "global.json", "Vivarium.slnx"];
         var inputPaths = Git(["ls-files", "--", .. producerRoots]) + "\n" + Git(["ls-files", "--others", "--exclude-standard", "--", .. producerRoots]);
         var required = inputPaths.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(path => path.TrimEnd('\r'))
             .Where(path => !path.EndsWith(".md", StringComparison.OrdinalIgnoreCase)).Distinct().ToArray();

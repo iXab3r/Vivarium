@@ -46,6 +46,16 @@ internal static class RuntimeBuildModel
             t.HasCheckConstraint("CK_RuntimeBuildExecutions_Fences", "\"LeaseFence\" > 0 AND \"CredentialGeneration\" > 0 AND \"AssignedConnectionGeneration\" > 0 AND \"CurrentConnectionGeneration\" > 0");
             t.HasCheckConstraint("CK_RuntimeBuildExecutions_Phase", "\"Phase\" IN ('PREPARING','DISPATCHING','ACCEPTED','TERMINAL','RELEASED')");
         });
+        var observation = model.Entity<RuntimeBuildObservation>();
+        observation.HasKey(o => new { o.BuildId, o.Ordinal });
+        observation.HasIndex(o => new { o.BuildId, o.Phase, o.StepIndex }).IsUnique();
+        observation.HasOne<RuntimeBuildExecution>().WithMany().HasForeignKey(o => o.BuildId).OnDelete(DeleteBehavior.Restrict);
+        observation.ToTable("RuntimeBuildObservations", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeBuildObservations_Position", "\"Ordinal\" BETWEEN 0 AND 257 AND \"StepIndex\" BETWEEN -1 AND 127");
+            t.HasCheckConstraint("CK_RuntimeBuildObservations_Phase", "(\"Phase\" IN ('FETCHING','COLLECTING') AND \"StepIndex\" = -1) OR (\"Phase\" IN ('RUNNING','COMPLETED') AND \"StepIndex\" >= 0)");
+            t.HasCheckConstraint("CK_RuntimeBuildObservations_Result", "(\"Phase\" = 'COMPLETED' AND \"ExitCode\" IS NOT NULL AND \"TimedOut\" IS NOT NULL AND \"Skipped\" IS NOT NULL) OR (\"Phase\" <> 'COMPLETED' AND \"ExitCode\" IS NULL AND \"TimedOut\" IS NULL AND \"Skipped\" IS NULL)");
+        });
         var result = model.Entity<RuntimeBuildResult>(); result.HasKey(r => r.BuildId);
         result.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildResult>(r => r.BuildId).OnDelete(DeleteBehavior.Restrict);
         result.ToTable("RuntimeBuildResults", t => t.HasCheckConstraint("CK_RuntimeBuildResults_Hash", "\"SemanticHash\" ~ '^[a-f0-9]{64}$'"));

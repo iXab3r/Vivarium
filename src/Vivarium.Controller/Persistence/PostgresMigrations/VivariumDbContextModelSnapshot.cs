@@ -867,6 +867,48 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("RuntimeBuildInputs", (string)null);
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildObservation", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ExitCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Phase")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("Skipped")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StepIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("TimedOut")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("BuildId", "Ordinal");
+
+                    b.HasIndex("BuildId", "Phase", "StepIndex")
+                        .IsUnique();
+
+                    b.ToTable("RuntimeBuildObservations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildObservations_Phase", "(\"Phase\" IN ('FETCHING','COLLECTING') AND \"StepIndex\" = -1) OR (\"Phase\" IN ('RUNNING','COMPLETED') AND \"StepIndex\" >= 0)");
+
+                            t.HasCheckConstraint("CK_RuntimeBuildObservations_Position", "\"Ordinal\" BETWEEN 0 AND 257 AND \"StepIndex\" BETWEEN -1 AND 127");
+
+                            t.HasCheckConstraint("CK_RuntimeBuildObservations_Result", "(\"Phase\" = 'COMPLETED' AND \"ExitCode\" IS NOT NULL AND \"TimedOut\" IS NOT NULL AND \"Skipped\" IS NOT NULL) OR (\"Phase\" <> 'COMPLETED' AND \"ExitCode\" IS NULL AND \"TimedOut\" IS NULL AND \"Skipped\" IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", b =>
                 {
                     b.Property<long>("BuildId")
@@ -1734,6 +1776,15 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", "BuildId", "BuildTypeId", "ProjectId")
                         .HasPrincipalKey("Vivarium.Controller.Builds.Runtime.RuntimeBuild", "Id", "BuildTypeId", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildObservation", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildExecution", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

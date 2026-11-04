@@ -226,6 +226,11 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D45 scopes US-013 secrets to one run's Agent environment, with private per-Build encrypted recovery
   input/assignments and Agent-side exact-value output masking. No raw values in Git, collected plans,
   payload scripts, public representations or audit; permanent Project secret storage is a separate story.
+- D46 accepts US-013 by complete actor/process/outcome/stop/recovery/byte behavior. Exact background
+  progress estimates and dynamic cancellation timestamp cadence are separately owned by #166 under
+  SS-RUN@R2. Four full literal R0 workflows remain required; two distinct behavioral obligations
+  cannot discharge the retained complete nonzero/running-cancel wire cases. Other compatibility and
+  independent-review/zero-debt/main gates apply within that owner-approved scope.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.
