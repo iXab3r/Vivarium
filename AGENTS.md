@@ -21,8 +21,14 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
-The fresh D34/D35 Host is being delivered under US-013/R0. Explicit local `init`, `nodes`, `migrate`
-and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
+The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); the full
+Prepare → Windows → Release integration remains in progress under #116–#118.
+The active PILOT branch has selected real source-free Linux → Windows → Linux chain evidence through
+independent compatible REST, unchanged CLI 0.5.6 and Workbench entries, including exact selected
+artifact bytes, dependency failure/cancellation, native graph reads and same-cookie withdrawal.
+This is not PILOT/main acceptance; checkout, reuse, triggers, large artifacts and T3 publication remain due.
+
+Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
 HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real Windows Agent with
 independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
@@ -36,8 +42,9 @@ login, C#/Git discovery, successful/failed runs, queued/running cancellation and
 download. Its bounded integration fixture uses a real Windows Agent and a dedicated Linux/Docker
 Agent, plus shared native reads. Agent enablement is a journalled Git edit through the catalogue
 coordinator; source-file modification times are additive immutable artifact observations.
-Full R0 bindings, remaining output/fault, compatibility and final review gates
-remain open. Ordinary OIDC/current
+The selected R0 gate has 28 bound obligations, independent aggregate/Security PASS and verified main
+delivery; broader compatibility and full story acceptance remain open. Exact transient progress wire
+cases remain unaccepted under D46/#166. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.
 

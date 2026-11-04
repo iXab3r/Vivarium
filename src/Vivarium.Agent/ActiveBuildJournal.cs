@@ -47,7 +47,7 @@ internal sealed class ActiveBuildJournal
     public void ObserveProcess(string buildId, Process? process)
     {
         ActiveBuildJournalRecord record;
-        if (process is null)
+        if (process is null || process.HasExited)
         {
             record = new ActiveBuildJournalRecord(1, buildId, null, null);
         }
@@ -62,6 +62,14 @@ internal sealed class ActiveBuildJournal
                                                System.ComponentModel.Win32Exception or
                                                NotSupportedException)
             {
+                // A short-lived child can exit between Start and reading StartTime (notably
+                // when Linux has already reaped it). Its confirmed exit needs no PID adoption;
+                // an unobservable live child remains a containment failure.
+                if (process.HasExited)
+                {
+                    Write(new ActiveBuildJournalRecord(1, buildId, null, null));
+                    return;
+                }
                 throw new WorkloadTerminationException(
                     "could not record the started workload process identity", exception);
             }

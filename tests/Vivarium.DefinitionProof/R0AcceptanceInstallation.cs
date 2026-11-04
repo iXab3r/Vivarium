@@ -232,6 +232,7 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
         internal async Task StartWindowsAgentAsync(HttpClient administrator, string csrf)
         {
             if (agent is not null) throw new InvalidOperationException("The case already has an Agent.");
+            var existing = await AgentIdsAsync(administrator);
             using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/enrollment-tokens");
             request.Headers.Add("RequestVerificationToken", csrf);
             using var response = await administrator.SendAsync(request);
@@ -242,11 +243,12 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             await File.WriteAllTextAsync(bootstrap, JsonSerializer.Serialize(new { controllerUrl = origin.AbsoluteUri.TrimEnd('/'),
                 certFingerprint = publicCertificate.GetCertHashString(HashAlgorithmName.SHA256), enrollToken = enrollment.RootElement.GetProperty("token").GetString() }));
             StartAgentProcess();
-            await CompleteEnrollmentAsync(administrator, csrf);
+            await CompleteEnrollmentAsync(administrator, csrf, existing);
         }
 
         internal async Task StartLinuxAgentAsync(OwnedDockerAgent linux, HttpClient administrator, string csrf)
         {
+            var existing = await AgentIdsAsync(administrator);
             var settings = Services.GetRequiredService<NodeConfigurationService>();
             var current = (await settings.GetAsync("vivarium-host")).Value!;
             var document = current.Config.DeepClone().AsObject();
@@ -260,16 +262,24 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
             using var enrollment = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             await linux.StartAsync(origin, certificate, enrollment.RootElement.GetProperty("token").GetString()!);
-            await CompleteEnrollmentAsync(administrator, csrf);
+            await CompleteEnrollmentAsync(administrator, csrf, existing);
         }
 
-        private async Task CompleteEnrollmentAsync(HttpClient administrator, string csrf)
+        private static async Task<HashSet<string>> AgentIdsAsync(HttpClient administrator)
+        {
+            using var agents = JsonDocument.Parse(await administrator.GetStringAsync("/api/v1/agents"));
+            return agents.RootElement.GetProperty("items").EnumerateArray().Select(a => a.GetProperty("id").GetString()!).ToHashSet();
+        }
+
+        private async Task CompleteEnrollmentAsync(HttpClient administrator, string csrf, HashSet<string> existing)
         {
             using var bound = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            AgentId = null;
             while (AgentId is null)
             {
                 using var agents = JsonDocument.Parse(await administrator.GetStringAsync("/api/v1/agents", bound.Token));
-                var current = agents.RootElement.GetProperty("items").EnumerateArray().SingleOrDefault();
+                var current = agents.RootElement.GetProperty("items").EnumerateArray()
+                    .SingleOrDefault(a => !existing.Contains(a.GetProperty("id").GetString()!));
                 if (current.ValueKind != JsonValueKind.Undefined && current.GetProperty("connected").GetBoolean())
                 {
                     AgentId = current.GetProperty("id").GetString(); TeamCityAgentId = current.GetProperty("teamCityId").GetInt32();

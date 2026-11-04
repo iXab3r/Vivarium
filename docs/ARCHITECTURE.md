@@ -1177,6 +1177,16 @@ An infrastructure fallback/recovery result may omit completed steps: their indep
 observations remain retained. Any explicitly submitted contradictory step still quarantines the
 owner; successful results require complete non-skipped step coverage.
 
+PILOT extends that same queue with ordinary Builds linked by collected snapshot/artifact selections;
+the submitted Release remains the returned Build, without an implicit composite. The initial
+source-free chain cohort collects its definitions and selected same-chain producers atomically with
+admission. Downstream work waits on the existing queue until its selected snapshot producers finish.
+Assignment preparation records each consumed producer artifact and destination alongside authorized
+payload references to the exact private content object. Selection and consumption observations are
+immutable PostgreSQL evidence, not Git desired overrides or an independent chain scheduler. This
+cohort implements literal same-chain file transfers on fresh workspaces; source checkout, reuse and
+other selectors, propagation, full recipe runners and publication remain due before PILOT acceptance.
+
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
 adapters, a frontend runtime server, and an extra application framework are not required. Workbench

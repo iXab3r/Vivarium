@@ -65,6 +65,21 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             result["agent"] = new JsonObject { ["name"] = "N/A", ["typeId"] = 0 };
             result["startDate"] = TeamCityProtocol.Date(build.CancelRequestedAt.Value);
         }
+        var dependencies = await RuntimeBuildService.SelectionViewsAsync(database, id, token);
+        foreach (var kind in new[] { "SNAPSHOT", "ARTIFACT" })
+        {
+            var selected = dependencies.Where(d => d.Kind == kind).Select(d => d.Build).ToArray();
+            if (selected.Length == 0) continue; // Preserve ordinary R0 representations unchanged.
+            var items = new JsonArray();
+            foreach (var dependency in selected)
+            {
+                var item = new JsonObject { ["id"] = dependency.Id, ["buildTypeId"] = dependency.ConfigurationId, ["state"] = dependency.State };
+                if (dependency.State != "queued") item["status"] = dependency.Status;
+                items.Add(item);
+            }
+            result[kind == "SNAPSHOT" ? "snapshot-dependencies" : "artifact-dependencies"] =
+                new JsonObject { ["count"] = selected.Length, ["build"] = items };
+        }
         if (full)
         {
             result.Remove("failedToStart"); result.Remove("personal"); result.Remove("queuePosition");

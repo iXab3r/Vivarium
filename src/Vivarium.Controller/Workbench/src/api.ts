@@ -17,6 +17,8 @@ export class ApiError extends Error {
     constructor(public readonly status: number) {
         super(status === 401 ? "Sign in required." : status === 403 ? "Current permissions do not allow this action."
             : status === 404 ? "This item is no longer available." : status === 400 ? "Refresh and check the values."
+            : status === 409 ? "The state changed. Refresh and try again." : status === 410 ? "This output is no longer available. Read the current output page."
+            : status === 422 ? "This execution profile is not available."
             : "Service unavailable.");
     }
 }

@@ -221,13 +221,13 @@ public sealed partial class R0AcceptanceCases
         Assert.That(oldDefinition.PlanJson, Does.Contain("Local smoke").And.Not.Contain("Renamed smoke"));
     }
 
-    private static async Task<string> CommitCaseAsync(R0AcceptanceInstallation.Case host, string message)
+    internal static async Task<string> CommitCaseAsync(R0AcceptanceInstallation.Case host, string message)
     {
         await SourceCompiler.GitAsync(host.Definitions, "add", "--all");
         await SourceCompiler.GitAsync(host.Definitions, "commit", "-m", message);
         return (await SourceCompiler.GitAsync(host.Definitions, "rev-parse", "HEAD")).Trim();
     }
-    private static async Task<JsonElement> ReconcileCaseAsync(HttpClient client, string? csrf = null)
+    internal static async Task<JsonElement> ReconcileCaseAsync(HttpClient client, string? csrf = null)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/configuration-changes/reconcile");
         if (csrf is not null) request.Headers.Add("RequestVerificationToken", csrf);

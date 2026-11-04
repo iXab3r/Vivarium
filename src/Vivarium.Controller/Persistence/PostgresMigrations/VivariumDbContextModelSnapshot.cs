@@ -714,6 +714,37 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildConsumedArtifact", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DestinationPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProducerArtifactOrdinal")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("ProducerBuildId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildId", "Ordinal");
+
+                    b.HasIndex("BuildId", "DestinationPath")
+                        .IsUnique();
+
+                    b.HasIndex("ProducerBuildId", "ProducerArtifactOrdinal");
+
+                    b.ToTable("RuntimeBuildConsumedArtifacts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildConsumedArtifacts_Position", "\"Ordinal\" BETWEEN 0 AND 127 AND length(\"DestinationPath\") BETWEEN 1 AND 2048");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", b =>
                 {
                     b.Property<long>("BuildTypeId")
@@ -727,6 +758,35 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("RuntimeBuildCounters", null, t =>
                         {
                             t.HasCheckConstraint("CK_RuntimeBuildCounters_Positive", "\"NextValue\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildDependency", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Kind")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UpstreamBuildTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("SelectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpstreamBuildId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BuildId", "Kind", "UpstreamBuildTypeId");
+
+                    b.HasIndex("UpstreamBuildId", "UpstreamBuildTypeId");
+
+                    b.ToTable("RuntimeBuildDependencies", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildDependencies_Kind", "\"Kind\" IN ('SNAPSHOT','ARTIFACT')");
+
+                            t.HasCheckConstraint("CK_RuntimeBuildDependencies_NotSelf", "\"BuildId\" <> \"UpstreamBuildId\"");
                         });
                 });
 
@@ -1763,11 +1823,42 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildConsumedArtifact", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildArtifact", null)
+                        .WithMany()
+                        .HasForeignKey("ProducerBuildId", "ProducerArtifactOrdinal")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", b =>
                 {
                     b.HasOne("Vivarium.Controller.Catalog.CatalogBuildType", null)
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildCounter", "BuildTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildDependency", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("UpstreamBuildId", "UpstreamBuildTypeId")
+                        .HasPrincipalKey("Id", "BuildTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

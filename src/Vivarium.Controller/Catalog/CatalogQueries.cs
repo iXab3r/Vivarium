@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Vivarium.Controller.Identity;
@@ -9,7 +10,12 @@ using Vivarium.Definitions;
 namespace Vivarium.Controller.Catalog;
 
 public sealed record CatalogProjectView(string Id, long InternalId, string Name, string ParentId, string Description, Guid ActiveRevisionId);
-public sealed record CatalogConfigurationView(string Id, long InternalId, string Name, string ProjectId, Guid ActiveRevisionId);
+public sealed record CatalogConfigurationView(string Id, long InternalId, string Name, string ProjectId, Guid ActiveRevisionId)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public string[]? SnapshotDependencies { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public string[]? ArtifactDependencies { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public Requirement[]? Requirements { get; init; }
+}
 public sealed record CatalogSnapshot(CatalogRevision Revision, CatalogDefinition Definition,
     IReadOnlyDictionary<string, long> ProjectIds, IReadOnlyDictionary<string, long> BuildTypeIds)
 {
@@ -62,5 +68,10 @@ public sealed class CatalogQueries(VivariumDbContext database, IConfiguration co
     public static CatalogProjectView Project(CatalogSnapshot snapshot, CatalogProject project) =>
         new(project.Control.Id, snapshot.ProjectIds[project.Control.Id], project.Control.Name, project.Control.Parent, project.Control.Description, snapshot.Revision.Id);
     public static CatalogConfigurationView Configuration(CatalogSnapshot snapshot, CatalogProject project, ResolvedConfiguration config) =>
-        new(config.Id, snapshot.BuildTypeIds[config.Id], config.Name, project.Control.Id, snapshot.Revision.Id);
+        new(config.Id, snapshot.BuildTypeIds[config.Id], config.Name, project.Control.Id, snapshot.Revision.Id)
+        {
+            SnapshotDependencies = config.Snapshots.Length == 0 ? null : config.Snapshots.Select(d => d.Configuration).ToArray(),
+            ArtifactDependencies = config.Artifacts.Length == 0 ? null : config.Artifacts.Select(d => d.Configuration).Distinct(StringComparer.Ordinal).ToArray(),
+            Requirements = config.Requirements.Length == 0 ? null : config.Requirements,
+        };
 }

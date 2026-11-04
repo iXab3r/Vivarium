@@ -21,7 +21,12 @@ internal sealed record RuntimeRunRequest(string ConfigurationId, Dictionary<stri
 internal sealed record RuntimeBuildView(long Id, string? Number, string State, string Status, string StatusText,
     string ConfigurationId, string ProjectId, Guid DefinitionRevisionId, string DefinitionHash,
     DateTimeOffset QueuedAt, DateTimeOffset? StartedAt, DateTimeOffset? FinishedAt,
-    DateTimeOffset? CancelRequestedAt, string? CancelReason, string? ExecutionPhase, string? AgentId, bool FailedToStart);
+    DateTimeOffset? CancelRequestedAt, string? CancelReason, string? ExecutionPhase, string? AgentId, bool FailedToStart)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? SnapshotDependencies { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? ArtifactDependencies { get; init; }
+}
+internal sealed record RuntimeBuildSelectionView(long Id, string ConfigurationId, string State, string Status);
 
 internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> databases, IConfiguration configuration,
     AgentRegistry registry, TimeProvider time, RuntimeBuildSecrets secrets)
@@ -60,32 +65,64 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         }
         // R0 collects the selected source-free/server settings now, matching its independent queued
         // edit observation. This is not a universal VCS/settings freeze rule or a YAML payload entry.
-        if (selected.Project.Definition.Source is not null || selected.Configuration.Snapshots.Length != 0
-            || selected.Configuration.Artifacts.Length != 0 || selected.Configuration.Steps.Length > 128)
+        if (selected.Project.Definition.Source is not null || selected.Configuration.Steps.Length > 128)
         {
             StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId, AuditOutcome.Failed);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
             throw new RestApiException(422, "execution_subset_unavailable", "This execution profile is unavailable",
-                "The selected R0 runner currently accepts source-free ordinary configurations with at most 128 steps.");
+                "The current runner accepts source-free ordinary configurations with at most 128 steps.");
         }
-        var type = snapshot.BuildTypeIds[request.ConfigurationId];
         var now = time.GetUtcNow();
-        var build = new RuntimeBuild { BuildTypeId = type, ProjectId = snapshot.ProjectIds[selected.Project.Control.Id],
-            ActorId = Guid.Parse(actor.Principal.ActorId),
-            CredentialKind = actor.Principal.CredentialKind, CorrelationId = actor.CorrelationId,
-            QueuedAt = now };
-        database.RuntimeBuilds.Add(build); await database.SaveChangesAsync(token);
-        database.RuntimeBuildInputs.Add(new() { BuildId = build.Id, BuildTypeId = build.BuildTypeId, ProjectId = build.ProjectId,
-            RevisionId = snapshot.Revision.Id, CollectedAt = now, ProtectedEnvironment = secrets.ProtectEnvironment(build.Id, environment),
-            OverridesJson = JsonSerializer.Serialize(new SortedDictionary<string, string>(parameters, StringComparer.Ordinal)),
-            AdmissionJson = JsonSerializer.Serialize(new { actorId = build.ActorId, permissions, projectAndAncestors = ancestry,
-                catalogueRevisionId = snapshot.Revision.Id, permittedPoolIds = new[] { 0 }, trustClass = "operator-enrolled-physical" }) });
-        database.RuntimeBuildOutputs.Add(new() { BuildId = build.Id });
-        for (var step = 0; step < selected.Configuration.Steps.Length; step++)
-            foreach (var stream in new[] { 0, 1 }) database.RuntimeOutputStreams.Add(new() { BuildId = build.Id, StepIndex = step, Stream = stream });
-        StageAudit(database, actor, "build.submit", "build", build.Id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Succeeded,
-            snapshot.Revision.ControlCommit);
-        var definition = await database.CatalogBuildDefinitions.AsNoTracking().SingleAsync(d => d.BuildTypeId == type && d.RevisionId == snapshot.Revision.Id, token);
+        var configurations = selected.Project.Definition.Configurations.ToDictionary(c => c.Id, StringComparer.Ordinal);
+        var collected = new Dictionary<string, RuntimeBuild>(StringComparer.Ordinal);
+        var visiting = new HashSet<string>(StringComparer.Ordinal);
+        async Task<RuntimeBuild> AdmitAsync(string configurationId)
+        {
+            if (collected.TryGetValue(configurationId, out var existing)) return existing;
+            if (!visiting.Add(configurationId) || visiting.Count + collected.Count > 128)
+                throw Invalid("The Build dependency graph is cyclic or exceeds the current bound.");
+            if (!configurations.TryGetValue(configurationId, out var config) || config.Steps.Length > 128)
+                throw Invalid("A Build dependency definition is unavailable.");
+            if (config.Snapshots.Any(d => d.Failure != "CANCEL" || d.Cancel != "CANCEL"))
+                throw new RestApiException(422, "execution_subset_unavailable", "Dependency policy unavailable",
+                    "This cohort requires explicit CANCEL/CANCEL snapshot edges.");
+            foreach (var dependency in config.Snapshots) await AdmitAsync(dependency.Configuration);
+            var member = new RuntimeBuild { BuildTypeId = snapshot.BuildTypeIds[configurationId],
+                ProjectId = snapshot.ProjectIds[selected.Project.Control.Id], ActorId = Guid.Parse(actor.Principal.ActorId),
+                CredentialKind = actor.Principal.CredentialKind, CorrelationId = actor.CorrelationId, QueuedAt = now };
+            database.RuntimeBuilds.Add(member); await database.SaveChangesAsync(token);
+            var isRoot = configurationId == request.ConfigurationId;
+            database.RuntimeBuildInputs.Add(new() { BuildId = member.Id, BuildTypeId = member.BuildTypeId, ProjectId = member.ProjectId,
+                RevisionId = snapshot.Revision.Id, CollectedAt = now,
+                ProtectedEnvironment = secrets.ProtectEnvironment(member.Id, isRoot ? environment : []),
+                OverridesJson = JsonSerializer.Serialize(isRoot ? new SortedDictionary<string, string>(parameters, StringComparer.Ordinal) : []),
+                AdmissionJson = JsonSerializer.Serialize(new { actorId = member.ActorId, permissions, projectAndAncestors = ancestry,
+                    catalogueRevisionId = snapshot.Revision.Id, permittedPoolIds = new[] { 0 }, trustClass = "operator-enrolled-physical" }) });
+            database.RuntimeBuildOutputs.Add(new() { BuildId = member.Id });
+            for (var step = 0; step < config.Steps.Length; step++)
+                foreach (var stream in new[] { 0, 1 }) database.RuntimeOutputStreams.Add(new() { BuildId = member.Id, StepIndex = step, Stream = stream });
+            StageAudit(database, actor, isRoot ? "build.submit" : "build.dependency.admit", "build",
+                member.Id.ToString(CultureInfo.InvariantCulture), AuditOutcome.Succeeded, snapshot.Revision.ControlCommit);
+            collected.Add(configurationId, member); visiting.Remove(configurationId); return member;
+        }
+        var build = await AdmitAsync(request.ConfigurationId);
+        foreach (var (configurationId, member) in collected)
+        {
+            var config = configurations[configurationId];
+            foreach (var dependency in config.Snapshots)
+                database.RuntimeBuildDependencies.Add(new() { BuildId = member.Id, Kind = "SNAPSHOT",
+                    UpstreamBuildTypeId = collected[dependency.Configuration].BuildTypeId,
+                    UpstreamBuildId = collected[dependency.Configuration].Id, SelectedAt = now });
+            foreach (var dependency in config.Artifacts)
+            {
+                if (dependency.Selector != "sameChainOrLastFinished" || !collected.TryGetValue(dependency.Configuration, out var producer))
+                    throw new RestApiException(422, "execution_subset_unavailable", "Artifact selection unavailable",
+                        "This cohort requires an artifact producer selected in the same snapshot chain.");
+                database.RuntimeBuildDependencies.Add(new() { BuildId = member.Id, Kind = "ARTIFACT",
+                    UpstreamBuildTypeId = producer.BuildTypeId, UpstreamBuildId = producer.Id, SelectedAt = now });
+            }
+        }
+        var definition = await database.CatalogBuildDefinitions.AsNoTracking().SingleAsync(d => d.BuildTypeId == build.BuildTypeId && d.RevisionId == snapshot.Revision.Id, token);
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         return new(build.Id, build.Number, "queued", build.Status, build.StatusText, request.ConfigurationId,
             selected.Project.Control.Id, snapshot.Revision.Id, definition.PlanHash, now, null, null, null, null, null, null, false);
@@ -107,9 +144,25 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             "RELEASING" => "running",
             _ => build.State.ToLowerInvariant()
         };
+        var selections = await SelectionViewsAsync(database, id, token);
         return new(build.Id, build.Number, publicState, build.Status, build.StatusText, type.ExternalId,
             project.ExternalId, input.RevisionId, definition.PlanHash, build.QueuedAt, build.StartedAt, build.FinishedAt,
-            build.CancelRequestedAt, build.CancelReason, execution?.Phase.ToLowerInvariant(), execution?.AgentId, build.FailedToStart);
+            build.CancelRequestedAt, build.CancelReason, execution?.Phase.ToLowerInvariant(), execution?.AgentId, build.FailedToStart)
+        {
+            SnapshotDependencies = selections.Any(d => d.Kind == "SNAPSHOT") ? selections.Where(d => d.Kind == "SNAPSHOT").Select(d => d.Build).ToArray() : null,
+            ArtifactDependencies = selections.Any(d => d.Kind == "ARTIFACT") ? selections.Where(d => d.Kind == "ARTIFACT").Select(d => d.Build).ToArray() : null,
+        };
+    }
+
+    internal static async Task<(string Kind, RuntimeBuildSelectionView Build)[]> SelectionViewsAsync(VivariumDbContext database, long id, CancellationToken token)
+    {
+        var rows = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.BuildId == id)
+            .Join(database.RuntimeBuilds.AsNoTracking(), d => d.UpstreamBuildId, upstream => upstream.Id, (d, upstream) => new { d.Kind, Build = upstream })
+            .Join(database.CatalogBuildTypes.AsNoTracking(), d => d.Build.BuildTypeId, t => t.Id,
+                (d, t) => new { d.Kind, d.Build.Id, d.Build.State, d.Build.Status, t.ExternalId })
+            .OrderBy(d => d.Id).ToArrayAsync(token);
+        return rows.Select(d => (d.Kind, new RuntimeBuildSelectionView(d.Id, d.ExternalId,
+            d.State == "RELEASING" ? "running" : d.State.ToLowerInvariant(), d.Status))).ToArray();
     }
 
     internal async Task CancelAsync(ManagementRequestContext actor, long id, string reason, string mode, CancellationToken token)

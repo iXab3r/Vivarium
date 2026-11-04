@@ -49,6 +49,26 @@ public sealed class RuntimeBuildInput
     public byte[] ProtectedEnvironment { get; set; } = [];
 }
 
+// Actual selections between ordinary Builds; desired edges remain in the immutable Git plan.
+public sealed class RuntimeBuildDependency
+{
+    public long BuildId { get; set; }
+    public string Kind { get; set; } = "";
+    public long UpstreamBuildTypeId { get; set; }
+    public long UpstreamBuildId { get; set; }
+    public DateTimeOffset SelectedAt { get; set; }
+}
+
+// File-level consumption provenance is committed with the assignment, not inferred from latest outputs.
+public sealed class RuntimeBuildConsumedArtifact
+{
+    public long BuildId { get; set; }
+    public int Ordinal { get; set; }
+    public long ProducerBuildId { get; set; }
+    public int ProducerArtifactOrdinal { get; set; }
+    public string DestinationPath { get; set; } = "";
+}
+
 public sealed class RuntimeBuildExecution
 {
     public long BuildId { get; set; }

@@ -73,5 +73,13 @@ internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
         return text.Replace(enrollment, "[REDACTED]", StringComparison.Ordinal);
     }
 
+    internal async Task<string> ProcessStatesAsync()
+    {
+        // Process names/state/wait channels only: arguments and environments can contain secrets.
+        var result = await ProofProcess.RunAsync("docker", ["exec", name, "/bin/sh", "-c",
+            "for p in /proc/[0-9]*; do [ -r \"$p/comm\" ] || continue; printf '%s ' \"${p##*/}\"; cat \"$p/comm\"; sed -n '/^State:/p' \"$p/status\"; cat \"$p/wchan\"; echo; done"], allowFailure: true);
+        return result.Text;
+    }
+
     internal async Task ReleaseCancellationAsync() => await ProofProcess.RunAsync("docker", ["exec", "--user", "1654:1654", name, "touch", "/data/allow-cancel-exit"]);
 }

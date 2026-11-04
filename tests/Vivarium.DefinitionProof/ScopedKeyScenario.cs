@@ -44,6 +44,16 @@ internal sealed class ScopedKeyScenario : IDisposable
     private readonly ScenarioClock retentionClock = new();
     internal HttpClient BuildClient => api;
     internal Guid UserId => userId;
+    internal async Task AddBrowserSessionAsync(Microsoft.Playwright.IBrowserContext context)
+    {
+        // Prior ordinary Identity session, prepared by the real SignInManager above. This is
+        // fixture setup, not a second login mechanism or a claim to repeat the OIDC UI proof.
+        await context.AddCookiesAsync(browserCookies.GetCookies(origin).Cast<Cookie>().Select(cookie => new Microsoft.Playwright.Cookie
+        {
+            Name = cookie.Name, Value = cookie.Value, Domain = origin.Host, Path = cookie.Path,
+            Secure = cookie.Secure, HttpOnly = cookie.HttpOnly, SameSite = Microsoft.Playwright.SameSiteAttribute.Lax,
+        }));
+    }
     internal void ResetRetentionTime() => retentionClock.Reset();
 
     internal async Task CheckRunSecretAdmissionAsync(HttpClient administrator)

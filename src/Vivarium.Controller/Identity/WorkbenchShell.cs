@@ -11,6 +11,10 @@ internal static class WorkbenchShell
         app.MapGet("/", RenderAsync);
         app.MapGet("/access", RenderAsync);
         app.MapGet("/access/users/{userId:guid}", RenderAsync);
+        app.MapGet("/builds", RenderAsync);
+        app.MapGet("/builds/{buildId:long}", RenderAsync);
+        app.MapGet("/projects/{projectId}", RenderAsync);
+        app.MapGet("/build-configurations/{configurationId}", RenderAsync);
     }
 
     private static async Task<IResult> RenderAsync(HttpContext http, RuntimeIdentity identity,

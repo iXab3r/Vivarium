@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Catalog;
 using Vivarium.Definitions;
@@ -10,10 +11,12 @@ using AgentStep = Vivarium.Contracts.V1.Step;
 
 namespace Vivarium.Controller.Builds.Runtime;
 
-internal sealed record RuntimePreparedAssignment(BuildAssignment Assignment, RuntimeBuildPayload[] Payloads);
+internal sealed record RuntimePreparedAssignment(BuildAssignment Assignment, RuntimeBuildPayload[] Payloads,
+    RuntimeBuildConsumedArtifact[] ConsumedArtifacts);
 
 /// <summary>Translate the selected C#/Git process contract to the existing files-in/process Agent SDK.</summary>
-internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildSecrets secrets)
+internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildSecrets secrets,
+    IDbContextFactory<Vivarium.Controller.Persistence.VivariumDbContext> databases)
 {
     internal async Task<RuntimePreparedAssignment> PrepareAsync(RuntimeBuild build, RuntimeBuildInput input,
         CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token)
@@ -37,6 +40,39 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         var environment = secrets.ReadEnvironment(build.Id, input.ProtectedEnvironment);
         assignment.OutputSecrets.AddRange(environment.Values.Distinct(StringComparer.Ordinal).Select(Google.Protobuf.ByteString.CopyFromUtf8));
         var payloads = new List<RuntimeBuildPayload>();
+        var consumed = new List<RuntimeBuildConsumedArtifact>();
+        if (config.Artifacts.Length != 0)
+        {
+            await using var database = await databases.CreateDbContextAsync(token);
+            var destinations = new HashSet<string>(osFamily == "windows" ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+            foreach (var relation in config.Artifacts)
+            {
+                var selected = await database.RuntimeBuildDependencies.AsNoTracking()
+                    .Join(database.CatalogBuildTypes, d => d.UpstreamBuildTypeId, t => t.Id, (d, t) => new { Dependency = d, t.ExternalId })
+                    .SingleAsync(d => d.Dependency.BuildId == build.Id && d.Dependency.Kind == "ARTIFACT" && d.ExternalId == relation.Configuration, token);
+                var producer = await database.RuntimeBuilds.AsNoTracking().SingleAsync(b => b.Id == selected.Dependency.UpstreamBuildId, token);
+                if (producer.State != "FINISHED" || producer.Status != "SUCCESS")
+                    throw new InvalidDataException("The selected artifact producer is not complete.");
+                // Literal rules are the first independently captured cohort; wildcard/archive
+                // profiles remain unimplemented until their selection contract is bound.
+                var rule = relation.Rules.Split("=>", StringSplitOptions.TrimEntries);
+                if (rule.Length != 2 || rule.Any(p => p.Contains('*') || p.Contains('?') || p.Contains('!')))
+                    throw new InvalidDataException("The current artifact rule profile requires one literal file and destination.");
+                var sourcePath = RelativePath(rule[0]);
+                var destination = RelativePath(rule[1]) + "/" + sourcePath.Split('/')[^1];
+                if (destination.StartsWith(".vivarium/", StringComparison.OrdinalIgnoreCase) || !destinations.Add(destination) || consumed.Count >= 128)
+                    throw new InvalidDataException("Artifact destinations conflict or exceed the current bound.");
+                var artifact = await database.RuntimeBuildArtifacts.AsNoTracking()
+                    .SingleOrDefaultAsync(a => a.BuildId == producer.Id && a.Path == sourcePath, token)
+                    ?? throw new InvalidDataException("A required selected artifact is absent.");
+                var upload = await database.RuntimeArtifactUploads.AsNoTracking()
+                    .SingleAsync(u => u.BuildId == producer.Id && u.Sha256 == artifact.Sha256, token);
+                assignment.Payload.Add(new Blob { Sha256 = artifact.Sha256, FileName = destination });
+                payloads.Add(new() { BuildId = build.Id, Sha256 = artifact.Sha256, ObjectKey = upload.ObjectKey, Size = artifact.Size });
+                consumed.Add(new() { BuildId = build.Id, Ordinal = consumed.Count, ProducerBuildId = producer.Id,
+                    ProducerArtifactOrdinal = artifact.Ordinal, DestinationPath = destination });
+            }
+        }
         for (var index = 0; index < config.Steps.Length; index++)
         {
             var declared = config.Steps[index];
@@ -70,7 +106,16 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         }
         if (assignment.CalculateSize() > 3 * 1024 * 1024)
             throw new InvalidDataException("The prepared assignment exceeds the selected transport profile.");
-        return new(assignment, payloads.DistinctBy(p => p.Sha256).ToArray());
+        return new(assignment, payloads.DistinctBy(p => p.Sha256).ToArray(), consumed.ToArray());
+    }
+
+    private static string RelativePath(string path)
+    {
+        var value = path.Replace('\\', '/');
+        if (value.Length is 0 or > 2048 || value.Contains(':') || value.Any(char.IsControl)
+            || value.Split('/').Any(part => part is "" or "." or ".."))
+            throw new InvalidDataException("An artifact rule path is not a bounded relative path.");
+        return value;
     }
 
     private static string UnixInterpreter(string script)

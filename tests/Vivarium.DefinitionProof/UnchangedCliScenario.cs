@@ -104,6 +104,26 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         await SaveAsync();
     }
 
+    internal async Task<long> RunWholeChainAsync(string credential)
+    {
+        await RunAsync(credential, 0, "-p", "owned-r0", "permissions", "grant", "Update");
+        var result = await RunAsync(credential, 0, "-p", "owned-r0", "jobs", "run", "P_Release",
+            "--wait", "--timeout", "2m", "--interval", "1s");
+        Assert.That(result.GetProperty("accepted").GetBoolean(), Is.True);
+        Assert.That(result.GetProperty("outcome").GetString(), Is.EqualTo("succeeded"));
+        var build = result.GetProperty("build");
+        Assert.That(build.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Release"));
+        Assert.That(build.GetProperty("state").GetString(), Is.EqualTo("finished"));
+        var id = build.GetProperty("id").GetInt64();
+        var downloaded = await RunAsync(credential, 0, "-p", "owned-r0", "builds", "artifacts", "download",
+            id.ToString(CultureInfo.InvariantCulture), "release.txt", "--output", "chain-release.txt");
+        var saved = Path.GetFullPath(downloaded.GetProperty("path").GetString()!);
+        Assert.That(saved.StartsWith(Path.GetFullPath(root) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase), Is.True);
+        Assert.That(await File.ReadAllBytesAsync(saved), Is.EqualTo("coherent-reference-version\n"u8.ToArray()));
+        Assert.That(downloaded.GetProperty("sha256").GetString(), Is.EqualTo("97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8"));
+        return id;
+    }
+
     internal async Task<long> CancelQueuedAsync(string credential, HttpClient native)
     {
         var run = await RunAsync(credential, 0, "-p", "owned-r0", "jobs", "run", "P_LocalSmoke");

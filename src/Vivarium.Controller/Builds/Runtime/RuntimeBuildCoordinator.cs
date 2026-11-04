@@ -93,9 +93,29 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         {
             if (build.QueueDeadline <= time.GetUtcNow())
             {
-                await FinishUnassignedAsync(database, build, "Queue wait timeout expired", token);
+                await FinishUnassignedAsync(database, build, "Queue wait timeout expired", "build.queue.expired", "queue_deadline", token);
                 continue;
             }
+            var upstreams = await database.RuntimeBuildDependencies.Where(d => d.BuildId == build.Id && d.Kind == "SNAPSHOT")
+                .Join(database.RuntimeBuilds, d => d.UpstreamBuildId, upstream => upstream.Id, (d, upstream) => upstream)
+                .OrderBy(upstream => upstream.Id).ToArrayAsync(token);
+            var failed = upstreams.FirstOrDefault(upstream => upstream.State == "FINISHED" && upstream.Status != "SUCCESS");
+            if (failed is not null)
+            {
+                // The admitted cohort explicitly declares CANCEL/CANCEL. Root cancellation does
+                // not walk upstream; only the dependent of a terminal bad producer is canceled.
+                var canceled = failed.CancelRequestedAt is not null;
+                var upstreamType = await database.CatalogBuildTypes.AsNoTracking().SingleAsync(t => t.Id == failed.BuildTypeId, token);
+                build.CancelRequestedAt = time.GetUtcNow(); build.CancelOperationId = Guid.NewGuid();
+                build.CancelReason = canceled ? "Build was canceled because one of the builds it depends on was cancelled"
+                    : "Build was canceled because one of the builds it depends on failed";
+                await FinishUnassignedAsync(database, build,
+                    "Canceled (Snapshot dependency " + (canceled ? "canceled" : "failed") + ": ... " + upstreamType.Name + ")",
+                    "build.dependency.cancelled", canceled ? "upstream_cancelled" : "upstream_failed", token);
+                continue;
+            }
+            if (upstreams.Any(upstream => upstream.State != "FINISHED"))
+            { build.StatusText = "Build dependencies have not been built yet"; continue; }
             var input = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == build.Id, token);
             var definition = await database.CatalogBuildDefinitions.AsNoTracking()
                 .SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
@@ -233,6 +253,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 negotiatedCapabilities = JsonSerializer.Deserialize<JsonElement>(currentAgent.NegotiatedCapabilitiesJson) }, Json);
             owner.AcknowledgementDeadline = now.AddSeconds(30);
             foreach (var payload in prepared.Payloads) state.RuntimeBuildPayloads.Add(payload);
+            foreach (var consumed in prepared.ConsumedArtifacts) state.RuntimeBuildConsumedArtifacts.Add(consumed);
             currentBuild.StatusText = "Starting execution";
             await RuntimeBuildAudit.StageAsync(state, currentBuild, now, "build.assignment.dispatching", workload: owner.WorkloadId, token: token);
         }
@@ -454,13 +475,13 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         else if (sessions.TryGetCurrent(key, out var connection)) registry.Reconcile(connection!.Handle, null);
     }
 
-    private async Task FinishUnassignedAsync(VivariumDbContext database, RuntimeBuild build, string reason, CancellationToken token)
+    private async Task FinishUnassignedAsync(VivariumDbContext database, RuntimeBuild build, string statusText,
+        string action, string reason, CancellationToken token)
     {
-        build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = statusText;
         build.Number ??= "N/A";
         build.FailedToStart = true; build.FinishedAt = time.GetUtcNow();
-        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.queue.expired", AuditOutcome.Failed,
-            "queue_deadline", token: token);
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), action, AuditOutcome.Failed, reason, token: token);
         var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "COMPLETE";
         foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == build.Id).ToArrayAsync(token))
         { stream.FinalSequence = 0; stream.FinalBytes = 0; }
