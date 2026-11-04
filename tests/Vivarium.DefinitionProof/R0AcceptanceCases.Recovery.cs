@@ -148,7 +148,7 @@ public sealed partial class R0AcceptanceCases
                 provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>(), provider.GetRequiredService<RuntimeAgentSessions>(),
                 provider.GetRequiredService<AgentRegistry>(), provider.GetRequiredService<RuntimeStepCompiler>(),
                 provider.GetRequiredService<RuntimeBuildOutputStore>(), clock, provider.GetRequiredService<ILogger<RuntimeBuildCoordinator>>(),
-                provider.GetRequiredService<RuntimeBuildSecrets>()))));
+                provider.GetRequiredService<RuntimeBuildSecrets>(), provider.GetRequiredService<RuntimeBuildSources>()))));
         using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
         await host.StartWindowsAgentAsync(administrator, csrf);
         using var actor = await RestrictedActorAsync(host, administrator, csrf);

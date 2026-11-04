@@ -68,37 +68,7 @@ internal sealed class RuntimeBuildSources(IDbContextFactory<VivariumDbContext> d
         var selected = await database.RuntimeBuildSourceSelections.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == input.BuildId, token);
         if (selected is null)
         {
-            var upstream = await (from dependency in RuntimeBuildService.DependencyHandles(database, input.BuildId)
-                join producerInput in database.RuntimeBuildInputs on dependency.Id equals producerInput.BuildId
-                join selection in database.RuntimeBuildSourceSelections on dependency.Id equals selection.BuildId
-                where dependency.Kind == "SNAPSHOT" && producerInput.VcsRootInstanceId == input.VcsRootInstanceId
-                select selection.Version).Distinct().ToArrayAsync(token);
-            if (upstream.Length > 1 || upstream.Contains("N/A")) throw new InvalidDataException("Snapshot source revisions conflict.");
-            string version;
-            if (upstream.Length == 1) version = upstream[0];
-            else
-            {
-                var directory = Directory.CreateTempSubdirectory("vivarium-source-resolution-");
-                try
-                {
-                    // Empty working directory plus a discovery ceiling excludes local repository configuration.
-                    var environment = DefinitionGitReader.GitEnvironment();
-                    foreach (var key in Environment.GetEnvironmentVariables().Keys.Cast<string>().Where(k => k.EndsWith("_PROXY", StringComparison.OrdinalIgnoreCase))) environment[key] = null;
-                    environment["GIT_CEILING_DIRECTORIES"] = directory.Parent!.FullName;
-                    foreach (var key in new[] { "HOME", "USERPROFILE", "XDG_CONFIG_HOME", "CURL_HOME" }) environment[key] = directory.FullName;
-                    environment["GIT_TERMINAL_PROMPT"] = "0"; environment["GCM_INTERACTIVE"] = "never";
-                    environment["GIT_ALLOW_PROTOCOL"] = "https:http:git";
-                    var output = await new GitCommandRunner(directory.FullName).RunAsync([.. VcsCheckoutProfile.ConfigurationArguments,
-                        "ls-remote", "--exit-code", "--refs", "--", source.Url, source.Branch], environment, cancellationToken: token);
-                    var fields = output.Split('\t');
-                    if (fields.Length != 2 || fields[1] != source.Branch) throw new InvalidDataException("Git source resolution differs.");
-                    if (!System.Text.RegularExpressions.Regex.IsMatch(fields[0], "^[a-f0-9]{40}$")) throw new InvalidDataException("Git source identity is invalid.");
-                    version = fields[0];
-                }
-                catch (Exception error) when (error is ConfigurationRepositoryException or InvalidDataException)
-                { version = "N/A"; }
-                finally { directory.Delete(); }
-            }
+            var version = await ResolveVersionAsync(database, input, source, token);
             await using var transaction = await database.Database.BeginTransactionAsync(token);
             await AgentCredentials.LockAgentAsync(database, execution.AgentId, token);
             var owner = await database.RuntimeBuildExecutions.SingleAsync(e => e.BuildId == input.BuildId, token);
@@ -119,4 +89,77 @@ internal sealed class RuntimeBuildSources(IDbContextFactory<VivariumDbContext> d
         result.Revision = selected.Version;
         return result;
     }
+
+    // Anonymous source discovery owns no Agent, counter or execution. PG selection is the durable fact.
+    internal async Task CollectQueuedAsync(RuntimeBuildInput input, CancellationToken token)
+    {
+        if (input.SourceJson is null) return;
+        var source = JsonSerializer.Deserialize<Source>(input.SourceJson, DefinitionValidation.Json)
+            ?? throw new InvalidDataException("The collected workload source is invalid.");
+        Profile(source);
+        await using var database = await databases.CreateDbContextAsync(token);
+        if (await database.RuntimeBuildSourceSelections.AnyAsync(s => s.BuildId == input.BuildId, token)) return;
+        string version;
+        using (var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(2), time))
+        using (var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token))
+        {
+            try { version = await ResolveVersionAsync(database, input, source, deadline.Token); }
+            catch (OperationCanceledException) when (!token.IsCancellationRequested) { version = "N/A"; }
+        }
+        await using var transaction = await database.Database.BeginTransactionAsync(token);
+        await RuntimeBuildAccess.FenceQueueAsync(database, token);
+        var build = await database.RuntimeBuilds.SingleAsync(b => b.Id == input.BuildId, token);
+        if (build.State != "QUEUED" || await database.RuntimeBuildExecutions.AnyAsync(e => e.BuildId == input.BuildId, token)
+            || await database.RuntimeBuildResolutions.AnyAsync(r => r.RequestedBuildId == input.BuildId, token)) return;
+        var current = await UpstreamVersionsAsync(database, input, token);
+        if (current.Length > 1 || current.Length == 1 && current[0] != version) return;
+        if (!await database.RuntimeBuildSourceSelections.AnyAsync(s => s.BuildId == input.BuildId, token))
+        {
+            database.RuntimeBuildSourceSelections.Add(new() { BuildId = input.BuildId, Version = version, SelectedAt = time.GetUtcNow() });
+            await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.source.collected", details:
+                new Dictionary<string, string> { ["rootInstanceId"] = input.VcsRootInstanceId!.Value.ToString(CultureInfo.InvariantCulture), ["revision"] = version }, token: token);
+            await database.SaveChangesAsync(token);
+        }
+        await transaction.CommitAsync(token);
+    }
+
+    private static Task<string[]> UpstreamVersionsAsync(VivariumDbContext database, RuntimeBuildInput input, CancellationToken token) =>
+        (from dependency in RuntimeBuildService.DependencyHandles(database, input.BuildId)
+         join producerInput in database.RuntimeBuildInputs on dependency.Id equals producerInput.BuildId
+         join selection in database.RuntimeBuildSourceSelections on dependency.Id equals selection.BuildId
+         where dependency.Kind == "SNAPSHOT" && producerInput.VcsRootInstanceId == input.VcsRootInstanceId
+         select selection.Version).Distinct().ToArrayAsync(token);
+
+    private static async Task<string> ResolveVersionAsync(VivariumDbContext database, RuntimeBuildInput input, Source source, CancellationToken token)
+    {
+        var upstream = await UpstreamVersionsAsync(database, input, token);
+        if (upstream.Length > 1 || upstream.Contains("N/A")) throw new InvalidDataException("Snapshot source revisions conflict.");
+        string version;
+        if (upstream.Length == 1) version = upstream[0];
+        else
+        {
+            var directory = Directory.CreateTempSubdirectory("vivarium-source-resolution-");
+            try
+            {
+                // Empty working directory plus a discovery ceiling excludes local repository configuration.
+                var environment = DefinitionGitReader.GitEnvironment();
+                foreach (var key in Environment.GetEnvironmentVariables().Keys.Cast<string>().Where(k => k.EndsWith("_PROXY", StringComparison.OrdinalIgnoreCase))) environment[key] = null;
+                environment["GIT_CEILING_DIRECTORIES"] = directory.Parent!.FullName;
+                foreach (var key in new[] { "HOME", "USERPROFILE", "XDG_CONFIG_HOME", "CURL_HOME" }) environment[key] = directory.FullName;
+                environment["GIT_TERMINAL_PROMPT"] = "0"; environment["GCM_INTERACTIVE"] = "never";
+                environment["GIT_ALLOW_PROTOCOL"] = "https:http:git";
+                var output = await new GitCommandRunner(directory.FullName).RunAsync([.. VcsCheckoutProfile.ConfigurationArguments,
+                    "ls-remote", "--exit-code", "--refs", "--", source.Url, source.Branch], environment, cancellationToken: token);
+                var fields = output.Split('\t');
+                if (fields.Length != 2 || fields[1] != source.Branch) throw new InvalidDataException("Git source resolution differs.");
+                if (!System.Text.RegularExpressions.Regex.IsMatch(fields[0], "^[a-f0-9]{40}$")) throw new InvalidDataException("Git source identity is invalid.");
+                version = fields[0];
+            }
+            catch (Exception error) when (error is ConfigurationRepositoryException or InvalidDataException)
+            { version = "N/A"; }
+            finally { directory.Delete(); }
+        }
+        return version;
+    }
+
 }

@@ -118,9 +118,9 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 throw Invalid("The Build dependency graph is cyclic or exceeds the current bound.");
             if (!configurations.TryGetValue(configurationId, out var config) || config.Steps.Length > 128)
                 throw Invalid("A Build dependency definition is unavailable.");
-            if (source is not null && (config.CheckoutMode != "ON_AGENT" || config.Snapshots.Any(d => d.ReuseBuilds)))
+            if (source is not null && config.CheckoutMode != "ON_AGENT")
                 throw new RestApiException(422, "execution_subset_unavailable", "Checkout profile unavailable",
-                    "This source cohort requires explicit ON_AGENT checkout without snapshot reuse.");
+                    "This source cohort requires explicit ON_AGENT checkout.");
             if (config.Snapshots.Any(d => d.Failure != "CANCEL" || d.Cancel != "CANCEL" || d.ReuseBuilds && !d.SuccessfulOnly))
                 throw new RestApiException(422, "execution_subset_unavailable", "Dependency policy unavailable",
                     "This cohort requires CANCEL/CANCEL edges and successful-only selection when reuse is enabled.");

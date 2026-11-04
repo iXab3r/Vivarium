@@ -16,12 +16,14 @@ namespace Vivarium.Controller.Builds.Runtime;
 /// <summary>One PG-owned queue/lease lifecycle. Live sessions are delivery handles, never owners.</summary>
 internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContext> databases,
     RuntimeAgentSessions sessions, AgentRegistry registry, RuntimeStepCompiler compiler,
-    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger, RuntimeBuildSecrets secrets)
+    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger, RuntimeBuildSecrets secrets,
+    RuntimeBuildSources sources)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     // Delivery/preparation tasks are bounded coordination aids. PG intent/lease/deadlines remain
     // authoritative and startup resumes PREPARING rows; this map never grants work ownership.
     private readonly Dictionary<long, Task> preparations = [];
+    private readonly Dictionary<long, Task> sourceCollections = [];
 
     internal async Task RunAsync(CancellationToken stoppingToken)
     {
@@ -42,13 +44,17 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         }
         finally
         {
-            try { await Task.WhenAll(preparations.Values); }
+            try { await Task.WhenAll(preparations.Values.Concat(sourceCollections.Values)); }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { }
         }
     }
 
     internal async Task TickAsync(CancellationToken token)
     {
+        foreach (var completed in sourceCollections.Where(p => p.Value.IsCompleted).ToArray())
+        {
+            sourceCollections.Remove(completed.Key); await completed.Value;
+        }
         foreach (var completed in preparations.Where(p => p.Value.IsCompleted).ToArray())
         {
             preparations.Remove(completed.Key); await completed.Value;
@@ -142,6 +148,12 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 var parameters = new Dictionary<string, string>(reported, StringComparer.Ordinal);
                 foreach (var pair in custom) parameters[pair.Key] = pair.Value;
                 if (config.Requirements.Any(r => !parameters.TryGetValue(r.Name, out var value) || value != r.Value)) continue;
+                if (input.SourceJson is not null && !await database.RuntimeBuildSourceSelections.AnyAsync(s => s.BuildId == build.Id, token))
+                {
+                    if (sourceCollections.Count < 4 && !sourceCollections.ContainsKey(build.Id))
+                        sourceCollections.Add(build.Id, sources.CollectQueuedAsync(input, token));
+                    break;
+                }
                 var now = time.GetUtcNow();
                 var execution = new RuntimeBuildExecution
                 {
@@ -182,10 +194,13 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     private async Task<bool> TryResolveQueuedAsync(VivariumDbContext database, RuntimeBuild build, RuntimeBuildInput input,
         CatalogBuildDefinition definition, ResolvedConfiguration config, CancellationToken token)
     {
-        // This first source-free cohort never compares encrypted secrets or substitutes an
+        // Suitability never compares encrypted secrets or substitutes an
         // already assigned execution. Queue resolution and actual work ownership are separate.
-        if (input.SourceJson is not null || input.ProtectedEnvironment.Length != 0
+        if (input.ProtectedEnvironment.Length != 0
             || await database.RuntimeBuildExecutions.AnyAsync(e => e.BuildId == build.Id, token)) return false;
+        var sourceRevision = input.SourceJson is null ? null : await database.RuntimeBuildSourceSelections
+            .Where(s => s.BuildId == build.Id).Select(s => s.Version).SingleOrDefaultAsync(token);
+        if (input.SourceJson is not null && (sourceRevision is null or "N/A")) return false;
         var incoming = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.UpstreamBuildId == build.Id && d.Kind == "SNAPSHOT")
             .Join(database.RuntimeBuildInputs.AsNoTracking(), d => d.BuildId, i => i.BuildId, (d, i) => i)
             .Join(database.CatalogBuildDefinitions.AsNoTracking(), i => new { i.BuildTypeId, i.RevisionId }, d => new { d.BuildTypeId, d.RevisionId }, (i, d) => d)
@@ -202,6 +217,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             join otherDefinition in database.CatalogBuildDefinitions.AsNoTracking()
                 on new { otherInput.BuildTypeId, otherInput.RevisionId } equals new { otherDefinition.BuildTypeId, otherDefinition.RevisionId }
             where other.BuildTypeId == build.BuildTypeId && other.ProjectId == build.ProjectId && other.Id != build.Id
+                && otherInput.VcsRootInstanceId == input.VcsRootInstanceId && otherInput.SourceJson == input.SourceJson
+                && (sourceRevision == null || database.RuntimeBuildSourceSelections.Any(s => s.BuildId == other.Id && s.Version == sourceRevision))
                 && otherInput.ProtectedEnvironment.Length == 0 && otherInput.OverridesJson == input.OverridesJson && otherDefinition.PlanHash == definition.PlanHash
                 && (other.State == "QUEUED" && other.Id > build.Id
                     || incomingReuse && other.State == "FINISHED" && other.Status == "SUCCESS")

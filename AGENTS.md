@@ -39,8 +39,11 @@ stream verified private bytes, with exact 257 KiB transfer and missing-required-
 R0 upload/current-authority regressions. This does not accept the complete artifact API or prove
 the 2 GiB transfer ceiling. Selected real steps now read their own Git HEAD from root and nested
 directories through relative gitfiles, including long-path Windows and read-only container metadata.
-Source-aware reuse, remaining
-source fault/authority profiles, triggers, targeted CLI chain secrets and actual T3 publication remain due.
+D49 now collects a queued source selection before physical ownership and proves successful producer
+reuse on the same source SHA, three new executions after a changed SHA and Host restart durability.
+The cumulative selected story cohort passes 24/24 with root 696/0; full PILOT/main acceptance still
+requires used build-number messages, remaining fault/authority/UI profiles, triggers/single publisher
+and actual T3 build/package/publication. Targeted temporary CLI chain input has D48 evidence below.
 
 Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
@@ -253,6 +256,10 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D48 permits one-use native prepared chain input for ordinary clients: actor/root/exact-catalogue
   binding, fifteen-minute expiry, bounded encrypted input and targeted per-Build D45 environments.
   The explicit opaque run parameter is not bearer authority or a reusable Project secret reference.
+- D49 collects immutable source selections outside queue/Agent locks before physical ownership,
+  with four bounded pending discoveries and a fenced queued/unassigned commit. Successful-only
+  suitability compares effective inputs, root/checkout, source SHA and selected upstreams; it never
+  compares encrypted run secrets or replaces an assigned execution.
 - D46 accepts US-013 by complete actor/process/outcome/stop/recovery/byte behavior. Exact background
   progress estimates and dynamic cancellation timestamp cadence are separately owned by #166 under
   SS-RUN@R2. Four full literal R0 workflows remain required; two distinct behavioral obligations

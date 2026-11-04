@@ -17,6 +17,28 @@ authoring must not create a competing YAML authority. Reusable catalog queueing 
 waiting for compatible Agents even when none are currently known; the current payload-matrix
 fail-fast rule remains a named transitional API behavior.
 
+### Selected source-aware dependency suitability (D49)
+
+The fresh US-013 profile now accepts explicit successful-only reuse with anonymous single-root
+`ON_AGENT` checkout. A pinned real TeamCity capture proves that an unchanged source snapshot selects
+the two original successful producers and executes another Release, while a pushed commit executes
+all three members on the new snapshot. The actual Host/PG/Storage/Git/Agent test reproduces those
+identities and exact owned artifact bytes, including a Host restart between the first and repeated
+chain. This does not accept general branch/settings suitability or full source/queue wire timing.
+
+Source discovery runs after admission and compatible Agent availability, outside the physical lease
+and queue/Agent transaction. At most four local tasks run with the existing bounded isolated Git
+client settings; only a fenced commit while queued/unassigned creates the authoritative immutable PG
+source selection. Commit rechecks selected upstream revisions. The compiler reads that same fact,
+and the Agent independently proves its checkout. Suitability matches effective plan/ordinary
+inputs, root instance/checkout declaration, selected source SHA and upstream identities. Registered
+temporary environments are not compared as ciphertext and are not reused by this selected profile.
+Request aliases retain original admission evidence and resolve through the existing common services;
+assigned physical executions remain immutable. Interrupted discovery without a committed selection
+can retry; an existing selection survives restart. Failed source collection retains the ordinary
+numbered failed-to-start outcome. See the actual reference in
+[`source-reuse-observations.json`](../../tests/Vivarium.Tests/TeamCity/Reference/source-reuse-observations.json).
+
 ## Purpose
 
 Vivarium uses the proven TeamCity work model for reusable automation that can run on heterogeneous

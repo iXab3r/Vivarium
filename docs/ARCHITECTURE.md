@@ -1636,6 +1636,27 @@ an internal audit event. Metadata, outcomes and audit never return values. This 
 execution request for US-013, not permanent Project secret management or TeamCity secure-parameter
 wire conformance. Publication credentials target only the owned acceptance repository.
 
+### D49. Source-aware suitability uses collected revisions before physical ownership
+
+The selected successful-only single-root dependency profile reuses a finished producer only when
+its effective settings, ordinary inputs, root instance/checkout declaration, actual selected source
+revision and selected upstream identities match. A changed source revision requires new upstream
+executions. Temporary run secret inputs are never compared as ciphertext or reused by this profile.
+The pinned real TeamCity source-reuse capture establishes these selected effects; it does not freeze
+general branch/settings suitability, arbitrary queue optimization or full wire timing.
+
+Collect an anonymous workload revision after admission and compatible Agent availability, before
+allocating a physical execution/counter/lease. Discovery runs outside the queue/Agent transaction,
+with existing isolated Git settings and time/output bounds and at most four in-flight collections.
+Commit a selection through the existing PG queue fence only while that Build is still queued and
+unassigned; recheck its current selected upstream revisions. The existing immutable source-selection
+row remains the only authority. Local tasks only bound work and wake coordination; interruption
+without a committed selection retries discovery, while a committed selection survives restart.
+Downstream members inherit the selected upstream snapshot. Successful suitability may resolve a
+queued request to an existing producer; it never substitutes an assigned physical execution. The
+Agent still proves its own actual checkout independently. Source failure retains its ordinary
+numbered failed-to-start outcome rather than inventing user execution or a successful source receipt.
+
 ## 5. Protocol sketch
 
 ```proto

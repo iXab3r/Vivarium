@@ -126,11 +126,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -171,11 +171,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001",
       "product_test_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
@@ -218,11 +218,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
       "product_test_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
@@ -265,11 +265,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "display_name": "PILOT-CHAIN-ROOT-CANCEL-001",
       "product_test_name": "PILOT-CHAIN-ROOT-CANCEL-001"
@@ -327,11 +327,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -368,11 +368,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -411,11 +411,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -459,11 +459,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -507,11 +507,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -554,11 +554,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "product_test_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001"
     },
@@ -611,11 +611,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -667,11 +667,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -723,11 +723,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -787,11 +787,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -851,11 +851,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -915,11 +915,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       },
       "supporting_renewal": {
         "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
@@ -979,11 +979,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1036,11 +1036,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1093,11 +1093,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1149,11 +1149,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1205,11 +1205,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/artifact-twenty-seven-case-cohort.trx",
-        "sha256": "66f60312e7ab5d42962665265c21d95b359c8ebbae8001f99607e525f1dada07",
-        "cohort_passed": 27,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1257,11 +1257,11 @@
       ],
       "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/run-input-current-profile.trx",
-        "sha256": "2022fa9bdbe7b631a6a87de19ad9f2cd53f826d6c466a76a1161633b48cf55b2",
-        "cohort_passed": 2,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "Pre-run855 source/metadata hashes and10 producer copies, zero drift before accounting edits; root696passed/12rawNotExecuted; separate unchanged-client/D45 base2/2."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
     },
     {
@@ -1309,15 +1309,75 @@
       ],
       "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/run-input-current-profile.trx",
-        "sha256": "2022fa9bdbe7b631a6a87de19ad9f2cd53f826d6c466a76a1161633b48cf55b2",
-        "cohort_passed": 2,
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
         "cohort_failed": 0,
-        "qualification": "Pre-run855 source/metadata hashes and10 producer copies, zero drift before accounting edits; root696passed/12rawNotExecuted; separate unchanged-client/D45 base2/2."
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
       }
+    },
+    {
+      "id": "PILOT-SOURCE-REUSE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-reuse-observations.json",
+        "sha256": "a3c8e005347ca8ca861ccda7a48e033bc9bdbd9d1f374743c31c0ccc4375f136",
+        "cases": [
+          "source-reuse:first-revision",
+          "source-reuse:repeat-same-revision",
+          "source-reuse:changed-revision"
+        ],
+        "capture": "artifacts/pilot-chain/source-reuse-2fb7956935a1/receipt.json",
+        "producer_sha256": "e4afa6f5838f3fa63c71fa31d0b2c9f2631a858c8a6182a815f08c8bf2ef7694"
+      },
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Owned ON_AGENT Git chain with explicit successful-only reuse; exact same SHA, then actual pushed commit. Reference Linux Agent Git2.43.0 is a recorded derivative of the pinned minimal Agent.",
+      "entry": "Repeated ordinary compatible Release admissions; Host restart before unchanged-source product repetition.",
+      "effect": "Same-source repetition retains original two successful producer identities and creates only one Release execution; changed source creates three new physical executions with one coherent SHA and expected bytes.",
+      "completion": "Pinned real TeamCity identities/revisions/terminal states, then actual fresh Host/PG/CSharp-Git/Storage and dedicated Linux Agent processes; exact owned product artifact bytes are additional proof, not reference artifact-wire conformance.",
+      "product_binding": "Vivarium.DefinitionProof.SourceReuseAcceptanceCases.Source_reuse_preserves_same_revision_producers_and_rebuilds_after_a_real_commit",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/source-reuse-red.trx",
+        "sha256": "48902dac175c27da65b5b78000e1d2bf619299ffd6e66743eae1b0b058eb5268",
+        "effect": "Actual422 admission where the frozen reference accepts/runs; no skipped placeholder or setup failure."
+      },
+      "limits": "Explicit successful-only anonymous single-root/default-branch profile without run secrets. Reference does not cover custom parameters, arbitrary branches/settings differences, source queue optimization timing or full wire/artifact families.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/source-reuse-story-cohort.trx",
+        "sha256": "bcda480ffd71c08d26ffb8aa5b4a4aa8c4ffe6e7830ceec4af59ffc84e7bdc2b",
+        "cohort_passed": 24,
+        "cohort_failed": 0,
+        "qualification": "All24 selected story cases renewed together;858 pre-run input hashes and10 producer copies, zero drift before accounting/status edits. Separate root696passed/raw12NotExecuted. No actual T3/publication, full-family API or independent final milestone acceptance."
+      },
+      "green_effect": "Actual fresh Host/PG/Storage/anonymous Git and Linux Agent:3 executions on first SHA, only a new Release on unchanged SHA after Host restart (4 total), then3 new executions on pushed SHA (7 total); coherent revisions and exact owned artifact bytes."
     }
   ],
-  "remaining_due": "Complete #78/#116/#117/#118: source-aware reuse and remaining source/current-rights/fault variants, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential requests timed out without delivery; independent work continues. Selected native/runner/artifact cases do not close their API families.",
+  "remaining_due": "Complete #78/#116/#117/#118: used buildNumber service-message effects, remaining current-rights/fault/UI readiness/cancel/history, used triggers/quiet-period/exclusions/coexistence/single publisher, actual T3 build/package without built GUI/CLI launch and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential cards timed out; independent work continues.24 selected story cases do not close full API families.",
   "global_variant_denominator": null,
   "api_complete": false,
   "native_http_operations": [
