@@ -3,7 +3,10 @@
 ## Current state — 2026-11-04
 
 The [current PILOT checkpoint](t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure)
-is the resume authority for selected root 8 publication, exact source/definition hashes, qualified
+is the resume authority for fresh unchanged CLI 0.5.6 Prepare 1 / Windows 2 / Release root 3
+SUCCESS and version1297/release434492192, followed by corrected read-only observer PASS.
+The original post-success EF observer invocation remains raw FAIL; root8/version918 is historical.
+It records exact source/definition hashes, qualified
 receipt reuse and the compact remaining acceptance checklist. Keep retained PG/Storage/private
 workspace intact. No new runtime work, push, PR, merge or task closure is part of this checkpoint.
 Root coordinates independent review at the checkpoint commit and due milestone checks later.

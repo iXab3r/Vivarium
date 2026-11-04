@@ -21,13 +21,16 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
-D52 checkpoint (2026-11-04): selected root 8 passed actual test-repository publication with retained
-Prepare 1/Windows 2; only 1/2/3/7/8 executed. The original unchanged CLI chain failed publication;
-a later native Release-only run used a corrected versioned definition and unchanged package source.
-Controlled partial upload/resume, published repetition and remote byte hashes have selected proof.
-See the [current PILOT checkpoint and remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
-Full surface journeys, 33-story/SDK renewal, model negatives/unknowns, independent aggregate and
-Security/Adversarial review, zero-debt and main delivery remain open; no full API percentage is known.
+D52 checkpoint (2026-11-04): one fresh unchanged CLI 0.5.6 chain completed Prepare 1,
+Windows 2 and Release root 3 and published test release434492192, version1297. A post-success
+EF observer failure remains raw FAIL; corrected read-only continuation passed exact GitHub bytes
+and ordinary REST/Workbench readbacks without further execution/publication. Prior retained
+root8/version918 remains separate provenance. See the
+[current PILOT checkpoint and remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
+Portable publisher34 controls, four offline transport controls and tiny worker lifecycle pass;
+root700/11skip and prior cumulative34/34 have explicit reuse qualifications. Independent aggregate
+and Security/Adversarial review at the parent's new commit, model unknowns, zero-debt and main
+delivery remain open; no full API percentage is known.
 
 
 The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); the full

@@ -4,6 +4,53 @@
 
 ### Current checkpoint — 2026-11-04 (not milestone closure)
 
+Remediation checkpoint: one fresh unchanged published CLI 0.5.6 entry completed Prepare 1,
+Windows 2 and Release root 3 successfully, version `0.1.6-nightly.20261104.1297`, with corrected
+versioned definition `70ea3e173fb28f8bc91c15b5db971d2d3234d92a` and unchanged package source
+`3ae8f481bc7c118747c8d01f0ec14f3f18e8b6ec`. Test-only release
+[434492192](https://github.com/iXab3r/vivarium-us013-e2e/releases/tag/v0.1.6-nightly.20261104.1297)
+passed controlled partial upload, resume and published repetition. No built application was launched.
+Evidence: `artifacts/us013-t3-acceptance/runs/f7139347660a4e8cb074cac8aac3fa9b/`.
+The original acceptance invocation remains raw FAIL: after CLI success an EF observer query could
+not translate an in-memory selection. A corrected read-only continuation passed exact downloaded
+GitHub asset hashes and ordinary-actor REST/Workbench artifact/log/configuration-history checks
+against those same three builds; it admitted no builds and made no publication mutation.
+
+Publisher controls are now clean-copy/offline reproducible from a committed MIT manifest helper
+with checked SHA-256 provenance. All 34 controls pass, including complete SHA256SUMS deletion;
+four offline fake-GH transport controls pass. Created draft selection/readback/upload/publication
+uses the REST returned ID with strict existing identity/ownership/digest checks. The manually
+started recovery worker now stops with an awaited 30-second bound before evidence/disposal;
+the tiny declaration/lifecycle proof passed. Root build passed and root tests report700 PASS/11 skipped.
+Prior b7 cumulative34/34 is qualified reuse: runtime/story/SDK sources are unchanged; affected
+actual-T3 setup, publisher and observation boundaries have their own focused evidence. Fresh
+independent aggregate and Security/Adversarial review at the parent's new commit, model unknowns,
+zero-debt/main delivery and full PILOT acceptance remain open. No full API percentage is known.
+
+
+Mechanical accounting is **INVALID_ACCOUNTING**, not GREEN. The existing offline ApiLedger
+reader exits 1: `Orphan ledger case: TCREST-PILOT-EXPLICIT-SELECTION-DIRECT-001`.
+`api-ledger.tsv` links this existing case and `r0-contract-variants.tsv` records its reference
+contract gap, but `Ledger.Read` joins only `rest-first-cohort-cases.tsv` and
+`rest-local-mutation-cases.tsv`, neither of which supplies this case. Validation stops before
+candidate freshness/receipt transfer. The tracked `api-status.json` and `api-evidence.json` remain
+historical; neither authorizes current reuse. Raw output is retained in
+`artifacts/pilot-chain/remediation-20261104/accounting-before.json`. #117/#118 must reconcile
+this existing binding/input-scope mismatch, then validate source/producer/oracle seals under the
+existing assessment rules. No new case, guessed oracle, automatic RED allowance or scope move
+was made. The frozen first PILOT cohort and selected R0 28 obligations remain separate from
+global discovery/allocation and the unknown full API denominator. Actual used selection behavior
+remains due to this story; broader family completion retains its existing later owners.
+Ordinary-selection denial, missing bytes, conflicting graph and changed-HEAD reference variants
+remain unknown/unaccepted, pending reference evidence and explicit allocation; none was moved.
+
+Publisher portability/checksum/transport and worker-lifecycle P2 findings are fixed with focused
+receipts, pending independent aggregate and Security/Adversarial review at the new candidate.
+Prior static Security PASS applies only to b7d3f48. Full PILOT/main/milestone acceptance is open.
+Root summary is 700 PASS/11 skipped; raw TRX separately contains 12 NotExecuted rows.
+
+Prior retained-dependency checkpoint (preserved provenance):
+
 D52 selected retained-dependency admission and actual T3 publication are checkpoint evidence on
 `feature/us013-whole-chain`. Raw receipt: `artifacts/pilot-chain/release-recovery-20261104-203528/receipt.json`.
 Root 8 is PASS; original Prepare 1 and Windows 2 are reused, and only builds 1/2/3/7/8 executed.
@@ -32,8 +79,8 @@ Remaining acceptance uses the existing contract and tasks, without another case 
 | Remaining item / owner | Evidence and cheapest adequate boundary |
 |---|---|
 | [#117](https://github.com/iXab3r/Vivarium/issues/117) model/contract | Reconcile existing explicit-selection variants and AC-BLD-07/TCM bindings against captured literal observations. Ordinary authority, missing bytes, contradictory graph and changed-HEAD reference variants remain unknown/unaccepted; existing conservative controls are not wire GREEN. Use bounded source/reference fixtures before product assertions. Full API denominator remains unknown; no percentage. |
-| [#118](https://github.com/iXab3r/Vivarium/issues/118) cumulative small-chain proof | Renew existing 33 story/SDK cohort (D50's 29 story rows plus SDK/owner-death case, then D51's four cases), preserving raw failures and setup classifications. Confirm actual test discovery/bindings before selecting the cohort; this count does not require 33 new tests or another heavy build. Cover independent UI/REST/unchanged-CLI entries, current rights/byte denial, waiting, upstream failure/cancel, restart/ownership and trigger/quiet-period/exclusion/single-publisher behavior. Use existing shared Host/owned Agents and tiny workloads, with browser evidence only for UI entry/effects. |
-| [#78](https://github.com/iXab3r/Vivarium/issues/78) heavy journey composition | Assess the initial unchanged-CLI build/package plus corrected native Release-only recovery against the heavy-journey contract; explicitly resolve the remaining successful ordinary-entry/readback obligation. Reuse immutable producer bytes where valid. Do not infer full CLI success or rerun heavy work merely for this checkpoint. |
+| [#118](https://github.com/iXab3r/Vivarium/issues/118) cumulative small-chain proof | Review qualified b7 reuse of the already renewed 34-case cohort (33 story bindings plus SDK/owner-death), preserving raw failures and setup classifications. Confirm actual test discovery/bindings before selecting the cohort; this count does not require 33 new tests or another heavy build. Cover independent UI/REST/unchanged-CLI entries, current rights/byte denial, waiting, upstream failure/cancel, restart/ownership and trigger/quiet-period/exclusion/single-publisher behavior. Use existing shared Host/owned Agents and tiny workloads, with browser evidence only for UI entry/effects. |
+| [#78](https://github.com/iXab3r/Vivarium/issues/78) heavy journey composition | Assess the fresh successful unchanged-CLI chain and its read-only observer continuation against the heavy-journey contract. Keep the raw observer FAIL separate from product success and the continuation PASS. No second heavy run is required by this selected evidence; independent review remains due. |
 | Milestone delivery (#78/#118) | Root coordinates exact-revision evidence transfer/invalidation, due cumulative checks and mechanical ledger assessment only with current explicit source seals. Independent aggregate correctness/simplicity and Security/Adversarial review, zero due findings/debt, reviewed main delivery and task closure remain due. This checkpoint neither accepts nor merges the milestone. |
 
 Historical planning and earlier checkpoints below remain provenance; their no-implementation/current

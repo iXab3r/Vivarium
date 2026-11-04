@@ -189,6 +189,14 @@ public sealed partial class ActualT3AcceptanceCases
             Is.EquivalentTo(inputs["configurations"]!.AsArray().Select(c => c!["id"]!.GetValue<string>())));
         await using var database = await DatabaseAsync(host);
         Assert.That(await database.RuntimeBuilds.CountAsync(), Is.Zero, "Declaration setup is not execution acceptance.");
+        using var worker = new RuntimeBuildWorker(host.Services);
+        try { await worker.StartAsync(CancellationToken.None); worker.EnsureHealthy(); }
+        finally
+        {
+            using var stop = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            await worker.StopAsync(stop.Token).WaitAsync(stop.Token);
+        }
+        Assert.That(worker.ExecuteTask!.IsCompleted, Is.True, "Worker has stopped before final evidence and Host disposal.");
     }
 
     [Test, Category("US013ActualT3")]
@@ -224,6 +232,12 @@ public sealed partial class ActualT3AcceptanceCases
             linuxName = Hostname((await database.AgentRegistrations.SingleAsync(a => a.AgentId == linuxId)).ReportedParametersJson);
         }
         await ConfigureAsync(host, administrator, csrf, inputs, git.Url, linuxName, windowsName);
+        var definitionIdentity = await ProofProcess.RunAsync("git", ["rev-parse", "HEAD"], host.Definitions);
+        await File.WriteAllTextAsync(Path.Combine(output, "definition-identity.json"), JsonSerializer.Serialize(new {
+            packageSource = revision, definitionGit = definitionIdentity.Text,
+            scriptSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(await RepairedPublisherAsync()))),
+            helperSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(Path.Combine(repository, "tools/us013-acceptance/publisher/publication-state.mjs")))),
+            publisherSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(Path.Combine(repository, "tools/us013-acceptance/publisher/publish.sh")))) }));
         // Fresh installations can repeat this expensive fixture in one day without reusing a tag.
         // This is fixture runtime data, not a desired-setting or counter-management API claim.
         await using (var database = await DatabaseAsync(host))
@@ -273,10 +287,20 @@ public sealed partial class ActualT3AcceptanceCases
             cliLifetime.Cancel();
             try { await running; } catch when (running.IsFaulted || running.IsCanceled) { }
         }
+        Assert.That(result.GetRawText(), Does.Not.Contain(secret));
+        await File.WriteAllTextAsync(Path.Combine(output, "cli-result.json"), result.GetRawText());
         var root = result.GetProperty("build").GetProperty("id").GetInt64();
         Assert.That(result.GetProperty("outcome").GetString(), Is.EqualTo("succeeded"));
+        Assert.That(await runtime.RemainingAsync(), Is.Empty);
+        await InspectActualT3Async(host, actor.BuildClient, actor.AddBrowserSessionAsync, github, secret, output, revision, windowsId, linuxId, root);
+    }
+
+    private static async Task InspectActualT3Async(R0AcceptanceInstallation.Case host, HttpClient actor,
+        Func<IBrowserContext, Task> addBrowserSession, HttpClient github, string secret, string output,
+        string revision, string windowsId, string linuxId, long root)
+    {
         await SaveProgressAsync(host, output, revision);
-        using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + root));
+        using var native = JsonDocument.Parse(await actor.GetStringAsync("/api/v1/builds/" + root));
         var version = native.RootElement.GetProperty("number").GetString()!;
         var artifacts = new List<(string Path, string Sha256, long Length)>();
         await using (var database = await DatabaseAsync(host))
@@ -292,20 +316,20 @@ public sealed partial class ActualT3AcceptanceCases
             }
             foreach (var execution in await database.RuntimeBuildExecutions.ToArrayAsync())
             {
-                var type = await database.CatalogBuildTypes.SingleAsync(t => t.Id == builds.Single(b => b.Id == execution.BuildId).BuildTypeId);
+                var buildTypeId = builds.Single(b => b.Id == execution.BuildId).BuildTypeId;
+                var type = await database.CatalogBuildTypes.SingleAsync(t => t.Id == buildTypeId);
                 Assert.That(execution.AgentId, Is.EqualTo(type.ExternalId == "T3Personal_Windows" ? windowsId : linuxId));
                 Assert.That(execution.Assignment.AsSpan().IndexOf(Encoding.UTF8.GetBytes(secret)), Is.EqualTo(-1));
             }
             foreach (var artifact in await database.RuntimeBuildArtifacts.Where(a => a.BuildId == root).OrderBy(a => a.Ordinal).ToArrayAsync())
                 artifacts.Add((artifact.Path, artifact.Sha256, artifact.Size));
         }
-        Assert.That(await runtime.RemainingAsync(), Is.Empty);
-        await RetainEvidenceAsync(host, actor.BuildClient, output, secret);
+        await RetainEvidenceAsync(host, actor, output, secret);
         var files = Path.Combine(output, "published"); Directory.CreateDirectory(files);
         foreach (var artifact in artifacts.Where(a => a.Path.StartsWith("release/", StringComparison.Ordinal)))
         {
             var name = artifact.Path["release/".Length..]; Assert.That(name, Does.Not.Contain("/").And.Not.Contain("\\"));
-            using var response = await actor.BuildClient.GetAsync("/app/rest/builds/id:" + root + "/artifacts/files/" + ArtifactPath(artifact.Path), HttpCompletionOption.ResponseHeadersRead);
+            using var response = await actor.GetAsync("/app/rest/builds/id:" + root + "/artifacts/files/" + ArtifactPath(artifact.Path), HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode(); await using var stream = await response.Content.ReadAsStreamAsync();
             await using var saved = File.Create(Path.Combine(files, name)); await stream.CopyToAsync(saved); await saved.FlushAsync();
         }
@@ -327,7 +351,7 @@ public sealed partial class ActualT3AcceptanceCases
             Assert.That(Convert.ToHexStringLower(await SHA256.HashDataAsync(remoteBytes)), Is.EqualTo(asset.Sha256), "Actual GitHub downloaded bytes must match the build-owned artifact.");
         }
         var partial = artifacts.Single(a => a.Path == "publication-proof/partial.json");
-        using var partialJson = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/app/rest/builds/id:" + root + "/artifacts/files/" + ArtifactPath(partial.Path)));
+        using var partialJson = JsonDocument.Parse(await actor.GetStringAsync("/app/rest/builds/id:" + root + "/artifacts/files/" + ArtifactPath(partial.Path)));
         Assert.That(partialJson.RootElement.GetProperty("draft").GetBoolean(), Is.True);
         Assert.That(partialJson.RootElement.GetProperty("assets").GetArrayLength(), Is.EqualTo(1));
         Assert.That(partialJson.RootElement.GetProperty("id").GetInt64(), Is.EqualTo(release.RootElement.GetProperty("id").GetInt64()), "The same actual draft is resumed.");
@@ -336,13 +360,21 @@ public sealed partial class ActualT3AcceptanceCases
             Is.EqualTo(firstAsset.GetProperty("id").GetInt64()), "Recovery retains the first verified uploaded asset.");
         await host.RestartAsync();
         using var playwright = await Playwright.CreateAsync(); await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
-        await using var context = await browser.NewContextAsync(new() { IgnoreHTTPSErrors = true, AcceptDownloads = true }); await actor.AddBrowserSessionAsync(context);
+        await using var context = await browser.NewContextAsync(new() { IgnoreHTTPSErrors = true, AcceptDownloads = true }); await addBrowserSession(context);
         var page = await context.NewPageAsync(); await page.GotoAsync(host.Origin + "builds/" + root);
-        await page.GetByTestId("build-status").Filter(new() { HasText = "finished Â· SUCCESS" }).WaitForAsync();
+        await page.GetByTestId("build-status").Filter(new() { HasText = "finished \u00b7 SUCCESS" }).WaitForAsync();
         await page.GetByTestId("selected-revision").Filter(new() { HasText = revision }).WaitForAsync();
         var download = await page.RunAndWaitForDownloadAsync(() => page.GetByRole(AriaRole.Link, new() { Name = "release/manifest.json", Exact = true }).ClickAsync());
         var browserManifest = Path.Combine(output, "browser-manifest.json"); await download.SaveAsAsync(browserManifest);
         Assert.That(await File.ReadAllBytesAsync(browserManifest), Is.EqualTo(await File.ReadAllBytesAsync(Path.Combine(files, "manifest.json"))));
+        await page.GetByRole(AriaRole.Button, new() { Name = "Read logs", Exact = true }).ClickAsync();
+        await page.GetByTestId("build-log").WaitForAsync();
+        Assert.That(await page.GetByTestId("build-log").InnerTextAsync(), Does.Not.Contain(secret));
+        await page.GetByRole(AriaRole.Link, new() { Name = "Configuration history", Exact = true }).ClickAsync();
+        var history = page.GetByRole(AriaRole.Region, new() { Name = "Build history", Exact = true });
+        await history.GetByText("finished \u00b7 SUCCESS", new() { Exact = false }).WaitForAsync();
+        await history.GetByRole(AriaRole.Link).ClickAsync();
+        await page.WaitForURLAsync("**/builds/" + root);
         await File.WriteAllTextAsync(Path.Combine(output, "receipt.json"), JsonSerializer.Serialize(new
         { kind = "ACTUAL_T3_BUILD_PACKAGE_AND_TEST_PUBLICATION", rootBuildId = root, version, revision, linuxId, windowsId,
             release = release.RootElement.Clone(), partialDraft = partialJson.RootElement.Clone(), assets = expected.Select(a => new { a.Path, a.Sha256, a.Length }),
@@ -406,18 +438,33 @@ public sealed partial class ActualT3AcceptanceCases
         await host.RestartAsync();
     }
 
+    private static async Task<string> RepairedPublisherAsync()
+    {
+        var directory = Path.Combine(Repository(), "tools/us013-acceptance/publisher");
+        var helper = await File.ReadAllTextAsync(Path.Combine(directory, "publication-state.mjs"));
+        var publisher = (await File.ReadAllTextAsync(Path.Combine(directory, "publish.sh"))).Replace("\r\n", "\n", StringComparison.Ordinal);
+        var prefix = "mkdir -p .vivarium-release-repair\n" +
+            "cp scripts/personal-release/manifest.mjs .vivarium-release-repair/manifest.mjs\n" +
+            "cat > .vivarium-release-repair/publication-state.mjs <<'US013_HELPER'\n" + helper + "\nUS013_HELPER\n" +
+            "cat > .vivarium-release-repair/publish.sh <<'US013_PUBLISHER'\n" +
+            publisher.Replace("node scripts/personal-release/publication-state.mjs", "node .vivarium-release-repair/publication-state.mjs", StringComparison.Ordinal) + "\nUS013_PUBLISHER\n";
+        return Publisher.Replace("node scripts/personal-release/run.mjs stage-release", prefix + "node scripts/personal-release/run.mjs stage-release", StringComparison.Ordinal)
+            .Replace("bash scripts/personal-release/publish.sh", "bash .vivarium-release-repair/publish.sh", StringComparison.Ordinal);
+    }
+
     private static async Task ConfigureAsync(R0AcceptanceInstallation.Case host, HttpClient administrator, string csrf, JsonObject inputs,
         string sourceUrl, string linux, string windows)
     {
         static string S(string? value) => JsonSerializer.Serialize(value);
         static string A(IEnumerable<string> values) => "[" + string.Join(",", values) + "]";
         static string Text(JsonNode item, string key) => item[key]!.GetValue<string>();
+        var repairedPublisher = await RepairedPublisherAsync();
         var configurations = new List<string>();
         foreach (var item in inputs["configurations"]!.AsArray().Select(c => c!))
         {
             var id = Text(item, "id");
             var steps = item["steps"]!.AsArray().Select(step => "new(" + S(Text(step!, "id")) + "," + S(Text(step!, "name")) + "," + S(Text(step!, "runner")) + "," +
-                A(step!["properties"]!.AsArray().Select(p => "new(" + S(Text(p!, "name")) + "," + S(id.EndsWith("_Release", StringComparison.Ordinal) && Text(p!, "name") == "script.content" ? Publisher : Text(p!, "value")) + ",null)")) + ")");
+                A(step!["properties"]!.AsArray().Select(p => "new(" + S(Text(p!, "name")) + "," + S(id.EndsWith("_Release", StringComparison.Ordinal) && Text(p!, "name") == "script.content" ? repairedPublisher : Text(p!, "value")) + ",null)")) + ")");
             var requirements = A(["new(\"system.os.family\"," + S(id.EndsWith("_Windows", StringComparison.Ordinal) ? "windows" : "linux") + ")",
                 "new(\"system.hostname\"," + S(id.EndsWith("_Windows", StringComparison.Ordinal) ? windows : linux) + ")"]);
             var snapshots = A(item["snapshots"]!.AsArray().Select(d => "new(" + S(Text(d!, "configuration")) + "," + S(Text(d!, "failure")) + "," + S(Text(d!, "cancel")) + ")"));

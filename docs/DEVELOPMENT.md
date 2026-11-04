@@ -417,6 +417,15 @@ node --test tools/us013-acceptance/publication-state-tests.mjs
 dotnet test tests/Vivarium.DefinitionProof --filter TestCategory=US013ActualT3Setup
 ```
 
+The publisher controls run offline without `prepare-source.py`: the exact manifest dependency,
+MIT license and SHA-256 provenance are committed under `tools/us013-acceptance/publisher`.
+`python tools/us013-acceptance/creation-transport-tests.py` uses the installed
+`node:24-bookworm-slim` image with networking disabled to check lost creation responses,
+wrong identity/readback IDs and exact resource-ID selection before upload. The recipe adapter
+uses GitHub REST creation responses and strict ID readbacks; it never infers draft identity from
+an untagged browser URL. `SHA256SUMS` is mandatory and must equal the canonical complete payload
+inventory byte for byte. These controls do not prove actual remote publication.
+
 `US013ActualT3Setup` compiles the three real declarations through the isolated evaluator and
 checks fresh Storage configuration; it neither builds T3 nor publishes. The actual
 `US013ActualT3` case requires `VIVARIUM_US013_TOKEN_FILE` to name the private file delivered by

@@ -4,22 +4,24 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
-// Exercise the repaired adapter beside an unchanged copy of its source dependency.
-const adapterRoot = fileURLToPath(new URL("../../artifacts/us013-t3-recovery-v3/publication-controls/adapter/", import.meta.url));
-await fs.mkdir(adapterRoot, { recursive: true });
-await fs.copyFile(new URL("./publisher/publication-state.mjs", import.meta.url), path.join(adapterRoot, "publication-state.mjs"));
-await fs.copyFile(new URL("../../artifacts/us013-t3-recovery-v3/source/scripts/personal-release/manifest.mjs", import.meta.url), path.join(adapterRoot, "manifest.mjs"));
-const { inspectPublication } = await import(new URL("../../artifacts/us013-t3-recovery-v3/publication-controls/adapter/publication-state.mjs", import.meta.url));
-import { writeManifest, sha256 } from "../../artifacts/us013-t3-recovery-v3/source/scripts/personal-release/manifest.mjs";
+import os from "node:os";
+import { createHash } from "node:crypto";
+import { inspectPublication } from "./publisher/publication-state.mjs";
+import { writeManifest, sha256 } from "./publisher/manifest.mjs";
+const provenance = JSON.parse(await fs.readFile(new URL("./publisher/manifest-provenance.json", import.meta.url)));
+assert.equal(createHash("sha256").update(await fs.readFile(new URL("./publisher/manifest.mjs", import.meta.url))).digest("hex"), provenance.sha256);
 
 const revision = "a".repeat(40), target = "b".repeat(40), version = "0.0.1-nightly.20261104.1";
-const root = fileURLToPath(new URL("../../artifacts/us013-t3-recovery-v3/publication-controls/", import.meta.url));
+const root = await fs.mkdtemp(path.join(os.tmpdir(), "us013-publication-"));
+test.after(() => fs.rm(root, { recursive: true, force: true }));
 async function fixture() {
   const directory = path.join(root, randomUUID()); await fs.mkdir(directory, { recursive: true });
   await fs.writeFile(path.join(directory, "owned.zip"), "owned-publication-bytes\n");
   await writeManifest(directory, { repository: "iXab3r/vivarium-us013-e2e", version, revision });
+  const manifest = JSON.parse(await fs.readFile(path.join(directory, "manifest.json")));
+  await fs.writeFile(path.join(directory, "SHA256SUMS"), Object.keys(manifest.files).sort().map(name => `${manifest.files[name]}  ${name}\n`).join(""));
   const assets = [];
-  for (const [index, name] of ["owned.zip", "manifest.json"].entries()) assets.push({ id: index + 10, name,
+  for (const [index, name] of ["SHA256SUMS", "owned.zip", "manifest.json"].entries()) assets.push({ id: index + 10, name,
     state: "uploaded", size: (await fs.stat(path.join(directory, name))).size,
     digest: "sha256:" + await sha256(path.join(directory, name)) });
   return { directory, release: { tag_name: `v${version}`, target_commitish: target, draft: true, prerelease: true,
@@ -68,9 +70,12 @@ test("Observed release 434059301 passes exact ownership but has no publication b
   const observed = JSON.parse(await fs.readFile(new URL("./observed-release-434059301.json", import.meta.url), "utf8"));
   const source = "32610536e7097cfee83016355d4b97e45baf8d2d";
   const f = await fixture();
+  await fs.rm(path.join(f.directory, "SHA256SUMS"));
   await writeManifest(f.directory, { repository: "iXab3r/vivarium-us013-e2e", version: "0.1.6-nightly.20261104.880", revision: source });
+  await fs.writeFile(path.join(f.directory, "SHA256SUMS"), `${await sha256(path.join(f.directory, "owned.zip"))}  owned.zip\n`);
   const plan = await inspectPublication(f.directory, observed, source, observed.target_commitish);
-  assert.deepEqual(plan, { missing: ["manifest.json", "owned.zip"], incomplete: [], published: false });
+  plan.missing.sort();
+  assert.deepEqual(plan, { missing: ["SHA256SUMS", "manifest.json", "owned.zip"], incomplete: [], published: false });
   await assert.rejects(inspectPublication(f.directory, null, source, observed.target_commitish));
 });
 
@@ -81,11 +86,12 @@ test("Observed release 434059301 passes exact ownership but has no publication b
 
 async function stagedFixture() {
   const f = await fixture();
+  await fs.rm(path.join(f.directory, "SHA256SUMS"));
   for (const name of ["desktop.exe", "desktop.blockmap", "latest.yml", "cli-linux-x64.tar.gz", "desktop.AppImage", "latest-linux.yml"])
     await fs.writeFile(path.join(f.directory, name), `payload ${name}\n`);
   await writeManifest(f.directory, { repository: "iXab3r/vivarium-us013-e2e", version, revision });
   const manifest = JSON.parse(await fs.readFile(path.join(f.directory, "manifest.json")));
-  f.release.assets = f.release.assets.filter(a => a.name !== "manifest.json");
+  f.release.assets = f.release.assets.filter(a => a.name !== "manifest.json" && a.name !== "SHA256SUMS");
   f.checksums = Object.keys(manifest.files).sort().map(name => `${manifest.files[name]}  ${name}\n`).join("");
   await fs.writeFile(path.join(f.directory, "SHA256SUMS"), f.checksums);
   return f;
@@ -123,4 +129,10 @@ test("Derived metadata rejects incomplete, ambiguous and tampered inventories", 
       if (kind === "self") await writeManifest(f.directory, { repository: "iXab3r/vivarium-us013-e2e", version, revision });
       await assert.rejects(inspectPublication(f.directory, f.release, revision, target));
     });
+});
+
+test("Deleting the complete derived checksum file fails closed", async () => {
+  const f = await stagedFixture();
+  await fs.rm(path.join(f.directory, "SHA256SUMS"));
+  await assert.rejects(inspectPublication(f.directory, f.release, revision, target), /SHA256SUMS/);
 });

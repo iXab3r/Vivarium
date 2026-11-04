@@ -1,6 +1,6 @@
 # Roadmap
 
-Current delivery: [2026-11-04 D52 PILOT checkpoint](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure) records selected retained-producer test publication and the remaining acceptance boundaries. Full PILOT/main remains open. D34/D35 R0 was delivered by PR #165; the planning status below is historical.
+Current delivery: [2026-11-04 D52 PILOT checkpoint](../.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure) records fresh unchanged CLI 0.5.6 Prepare 1 / Windows 2 / Release root 3 SUCCESS, version1297/release434492192 and subsequent read-only acceptance. The original EF observer FAIL remains raw; root8/version918 remains historical provenance. Full PILOT/main remains open. D34/D35 R0 was delivered by PR #165; the planning status below is historical.
 
 Ordered so that every phase ends with something usable. Decision references (D1…D40) point into
 [`ARCHITECTURE.md`](ARCHITECTURE.md).

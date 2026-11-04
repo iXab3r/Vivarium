@@ -61,7 +61,13 @@ if [[ $(read_tag) == 0 ]]; then
   fi
   [[ $(read_tag) == 1 ]] || exit 1
 fi
+release_id=
 read_release() {
+  if [[ -n "$release_id" ]]; then
+    gh api "repos/$repo/releases/$release_id" > "$temporary/state.json"
+    node -e 'const r=JSON.parse(require("fs").readFileSync(process.argv[1]));if(String(r.id)!==process.argv[2])throw Error("Release ID changed");' "$temporary/state.json" "$release_id"
+    return
+  fi
   gh api "repos/$repo/releases?per_page=100" > "$temporary/releases.json"
   node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));const r=a.filter(x=>x.tag_name===process.argv[2]);if(r.length>1||a.length===100&&!r.length)throw Error("Release inventory ambiguous");process.stdout.write(JSON.stringify(r[0]??null));' \
     "$temporary/releases.json" "$tag" > "$temporary/state.json"
@@ -71,14 +77,18 @@ inspect_release() {
 }
 read_release
 if [[ $(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1]))===null' "$temporary/state.json") == true ]]; then
-  if ! gh release create "$tag" --repo "$repo" --target "$publication_revision" --draft --prerelease \
-    --title "T3 Personal $version" --notes "Vivarium US-013 acceptance source $revision target $publication_revision
-Personal T3 Code build/package only. Windows x64 installer, Linux x64 AppImage and matching CLI archives. No built application was launched."; then
-    echo 'Release creation response failed; checking the actual owned draft.'
-  fi
+  # POST returns the resource identity; a lost response stops before any upload.
+  gh api --method POST "repos/$repo/releases" -f "tag_name=$tag" -f "target_commitish=$publication_revision" \
+    -F draft=true -F prerelease=true -f "name=T3 Personal $version" \
+    -f "body=Vivarium US-013 acceptance source $revision target $publication_revision
+Personal T3 Code build/package only. No built application was launched." > "$temporary/state.json"
+  inspect_release
+  release_id=$(node -e 'const r=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!Number.isSafeInteger(r.id)||r.id<=0||r.draft!==true||r.assets.length)throw Error("Invalid created draft identity");process.stdout.write(String(r.id));' "$temporary/state.json")
   read_release
+
 fi
 inspect_release
+release_id=$(node -e 'const r=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!Number.isSafeInteger(r.id)||r.id<=0)throw Error("Invalid release ID");process.stdout.write(String(r.id));' "$temporary/state.json")
 mapfile -t incomplete < <(node -e 'for(const id of JSON.parse(require("fs").readFileSync(process.argv[1])).incomplete)console.log(id)' "$temporary/plan.json")
 for id in "${incomplete[@]}"; do
   gh api --method DELETE "repos/$repo/releases/assets/$id"
@@ -86,7 +96,7 @@ done
 read_release; inspect_release
 mapfile -t missing < <(node -e 'for(const name of JSON.parse(require("fs").readFileSync(process.argv[1])).missing)console.log(name)' "$temporary/plan.json")
 for name in "${missing[@]}"; do
-  if ! gh release upload "$tag" --repo "$repo" -- "ci-out/release/$name"; then
+  if ! gh api --method POST -H "Content-Type: application/octet-stream" --input "ci-out/release/$name" "https://uploads.github.com/repos/$repo/releases/$release_id/assets?name=$name" >/dev/null; then
     echo 'Upload response failed; verifying the actual stored asset before retry.'
   fi
   read_release; inspect_release
@@ -102,7 +112,7 @@ done
 read_release; inspect_release
 node -e 'const p=JSON.parse(require("fs").readFileSync(process.argv[1]));if(p.missing.length||p.incomplete.length)throw Error("Release assets incomplete");' "$temporary/plan.json"
 if [[ "$mode" == release && $(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1])).published' "$temporary/plan.json") == false ]]; then
-  if ! gh release edit "$tag" --repo "$repo" --draft=false; then
+  if ! gh api --method PATCH "repos/$repo/releases/$release_id" -F draft=false >/dev/null; then
     echo 'Publish response failed; verifying actual publication.'
   fi
   read_release; inspect_release

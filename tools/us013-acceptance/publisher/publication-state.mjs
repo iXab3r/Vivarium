@@ -29,7 +29,9 @@ export async function inspectPublication(directory, release, revision, target) {
   const payloadNames = Object.keys(manifest.files).sort();
   if (payloadNames.some(name => !/^[A-Za-z0-9][A-Za-z0-9._+-]{0,180}$/.test(name)))
     throw new Error("Invalid release payload name.");
-  if (entries.some(entry => entry.name === "SHA256SUMS")) {
+  if (!entries.some(entry => entry.name === "SHA256SUMS"))
+    throw new Error("Required derived SHA256SUMS file is absent.");
+  {
     const checksumPath = path.join(directory, "SHA256SUMS");
     const canonical = Buffer.from(payloadNames.map(name => `${manifest.files[name]}  ${name}\n`).join(""));
     if ((await fs.stat(checksumPath)).size !== canonical.length ||

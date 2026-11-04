@@ -169,17 +169,10 @@ public sealed partial class ActualT3AcceptanceCases
         {
             using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
             var helper = await File.ReadAllTextAsync(Path.Combine(repository, "tools/us013-acceptance/publisher/publication-state.mjs"));
-            var publisher = await File.ReadAllTextAsync(Path.Combine(repository, "tools/us013-acceptance/publisher/publish.sh"));
             var helperHash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(helper)));
             // Private generated step inputs own this repair. Never modify the old
             // checkout or claim that the adapter belonged to its package commit.
-            var prefix = "mkdir -p .vivarium-release-repair\n" +
-                "cp scripts/personal-release/manifest.mjs .vivarium-release-repair/manifest.mjs\n" +
-                "cat > .vivarium-release-repair/publication-state.mjs <<'US013_HELPER'\n" + helper + "\nUS013_HELPER\n" +
-                "cat > .vivarium-release-repair/publish.sh <<'US013_PUBLISHER'\n" +
-                publisher.Replace("node scripts/personal-release/publication-state.mjs", "node .vivarium-release-repair/publication-state.mjs", StringComparison.Ordinal) + "\nUS013_PUBLISHER\n";
-            var repairedScript = Publisher.Replace("node scripts/personal-release/run.mjs stage-release", prefix + "node scripts/personal-release/run.mjs stage-release", StringComparison.Ordinal)
-                .Replace("bash scripts/personal-release/publish.sh", "bash .vivarium-release-repair/publish.sh", StringComparison.Ordinal);
+            var repairedScript = await RepairedPublisherAsync();
             var definitionPath = Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs");
             var originalDefinition = await File.ReadAllTextAsync(definitionPath);
             var originalLiteral = JsonSerializer.Serialize(Publisher);
@@ -220,15 +213,23 @@ public sealed partial class ActualT3AcceptanceCases
             await host.StartLinuxAgentAsync(linux, administrator, csrf);
             // Enrollment restarts the Host; resolve the worker from that final service provider.
             using var worker = new RuntimeBuildWorker(host.Services);
-            await worker.StartAsync(CancellationToken.None);
-            using var bound = new CancellationTokenSource(TimeSpan.FromMinutes(17));
-            while (true)
+            try
             {
-                worker.EnsureHealthy();
-                using var state = JsonDocument.Parse(await actor.GetStringAsync($"/api/v1/builds/{root}", bound.Token));
-                if (state.RootElement.GetProperty("state").GetString() == "finished")
-                { Assert.That(state.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS")); break; }
-                await Task.Delay(1000, bound.Token);
+                await worker.StartAsync(CancellationToken.None);
+                using var bound = new CancellationTokenSource(TimeSpan.FromMinutes(17));
+                while (true)
+                {
+                    worker.EnsureHealthy();
+                    using var state = JsonDocument.Parse(await actor.GetStringAsync($"/api/v1/builds/{root}", bound.Token));
+                    if (state.RootElement.GetProperty("state").GetString() == "finished")
+                    { Assert.That(state.RootElement.GetProperty("status").GetString(), Is.EqualTo("SUCCESS")); break; }
+                    await Task.Delay(1000, bound.Token);
+                }
+            }
+            finally
+            {
+                using var stop = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                await worker.StopAsync(stop.Token).WaitAsync(stop.Token);
             }
             using var github = GitHub(secret);
             using var release = await JsonAsync(github, "repos/iXab3r/vivarium-us013-e2e/releases/434102890");
@@ -269,5 +270,3 @@ public sealed partial class ActualT3AcceptanceCases
         }
     }
 }
-
-
