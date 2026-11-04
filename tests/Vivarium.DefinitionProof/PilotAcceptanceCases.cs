@@ -289,6 +289,9 @@ public sealed class PilotAcceptanceCases
         Assert.That((await ReadAsync(actor.BuildClient, second)).GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
         await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
         Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.Zero);
+        using var history = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/build-configurations/P_Release/builds"));
+        Assert.That(history.RootElement.GetProperty("total").GetInt32(), Is.EqualTo(1));
+        Assert.That(history.RootElement.GetProperty("items")[0].GetProperty("id").GetInt64(), Is.EqualTo(second), "History exposes the canonical queued request once.");
     }
 
     [Test]
@@ -625,7 +628,7 @@ public sealed class PilotAcceptanceCases
         }
     }
 
-    private const string Settings = """
+    internal const string Settings = """
         using Vivarium.Definitions;
         public static class Managed {
           public static Settings Declare() => new("P", null, [], [

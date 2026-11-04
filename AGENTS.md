@@ -41,11 +41,17 @@ the 2 GiB transfer ceiling. Selected real steps now read their own Git HEAD from
 directories through relative gitfiles, including long-path Windows and read-only container metadata.
 D49 now collects a queued source selection before physical ownership and proves successful producer
 reuse on the same source SHA, three new executions after a changed SHA and Host restart durability.
-The cumulative selected story/SDK cohort now passes 30/30 (29 story rows and the seven-variant
+The last full selected story/SDK cohort at D50 passed 30/30 (29 story rows and the seven-variant
 SDK/owner-death test), with root 698/0. D50 adds negotiated literal build-number metadata, live
 projection, terminal recovery and secret masking. Full PILOT/main acceptance still requires
 remaining fault/authority/UI profiles, triggers/single publisher
-and actual T3 build/package/publication. Targeted temporary CLI chain input has D48 evidence below.
+and actual T3 build/package/publication. D51 now adds durable used VCS observations/quiet periods,
+coalescing/exclusions and completed-manual coverage through the common admission kernel, plus native
+configuration history and actual Workbench queued/running upstream cancellation/history/revocation.
+Four new selected cases have current PASS with771 pre-run hashes and15 producer/static-asset copies,
+zero drift and root700/0 (raw12 NotExecuted separate); an initial-template setup timeout remains raw
+failure evidence with an isolated successful recovery renewal. Full33-story/SDK renewal and whole
+PILOT/main acceptance remain due. Targeted temporary CLI chain input has D48 evidence below.
 
 Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object

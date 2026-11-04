@@ -77,6 +77,15 @@ internal sealed class OwnedGitSource(string root) : IAsyncDisposable
         return (await GitAsync(["-C", Work, "rev-parse", "HEAD"])).Text;
     }
 
+    internal async Task<string> MetadataChangeAsync()
+    {
+        await File.WriteAllTextAsync(Path.Combine(Work, "README.md"), Guid.NewGuid().ToString("N") + "\n");
+        await GitAsync(["-C", Work, "add", "README.md"]);
+        await GitAsync(["-C", Work, "commit", "-m", "fixture: excluded metadata"]);
+        await GitAsync(["-C", Work, "push", Bare, "main"]);
+        return (await GitAsync(["-C", Work, "rev-parse", "HEAD"])).Text;
+    }
+
     private static Task<ProofProcessResult> GitAsync(string[] args, bool allowFailure = false) => ProofProcess.RunAsync("git",
         ["-c", "core.hooksPath=NUL", "-c", "core.autocrlf=false", .. args], allowFailure: allowFailure);
 

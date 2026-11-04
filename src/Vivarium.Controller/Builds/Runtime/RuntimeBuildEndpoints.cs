@@ -8,6 +8,14 @@ internal static class RuntimeBuildEndpoints
 {
     internal static void MapRuntimeBuilds(this WebApplication app)
     {
+        app.MapGet("/api/v1/build-configurations/{id}/builds", (HttpContext http, string id, RuntimeBuildService builds) =>
+            RuntimeManagement.ExecuteAsync(http, async actor =>
+            {
+                if (!Catalog.CatalogEndpoints.Page(http, out var offset, out var limit))
+                    return RestProblems.Create(http, 400, "invalid_pagination", "Invalid pagination", "Offset must be nonnegative and limit between 1 and 200.");
+                var page = await builds.HistoryAsync(actor, id, offset, limit, http.RequestAborted);
+                return page is null ? RestProblems.NotFound(http, "build-configuration", id) : Results.Json(page);
+            }, source: "builds"));
         app.MapPost("/api/v1/build-run-inputs", (HttpContext http, RuntimeBuildRunInputs inputs) => RuntimeManagement.ExecuteAsync(http, async actor =>
         {
             if (!http.Request.HasJsonContentType()) return JsonRequired(http);

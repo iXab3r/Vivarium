@@ -7,5 +7,6 @@ internal sealed class RuntimeBuildWorker(IServiceProvider services) : Background
         services.GetRequiredService<RuntimeBuildCoordinator>().RunAsync(stoppingToken),
         services.GetRequiredService<RuntimeBuildOutputStore>().RunAsync(stoppingToken),
         services.GetRequiredService<RuntimeOutputRetention>().RunAsync(stoppingToken),
-        services.GetRequiredService<RuntimeBuildRunInputs>().RunAsync(stoppingToken));
+        services.GetRequiredService<RuntimeBuildRunInputs>().RunAsync(stoppingToken),
+        services.GetRequiredService<RuntimeVcsTriggers>().RunAsync(stoppingToken));
 }

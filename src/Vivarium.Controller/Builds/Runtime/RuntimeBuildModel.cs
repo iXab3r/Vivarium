@@ -28,6 +28,21 @@ internal static class RuntimeBuildModel
         counter.HasOne<CatalogBuildType>().WithOne().HasForeignKey<RuntimeBuildCounter>(c => c.BuildTypeId).OnDelete(DeleteBehavior.Restrict);
         counter.ToTable("RuntimeBuildCounters", t => t.HasCheckConstraint("CK_RuntimeBuildCounters_Positive", "\"NextValue\" > 0"));
 
+        var trigger = model.Entity<RuntimeVcsTriggerState>(); trigger.HasKey(t => t.BuildTypeId);
+        trigger.HasOne<CatalogBuildType>().WithOne().HasForeignKey<RuntimeVcsTriggerState>(t => t.BuildTypeId).OnDelete(DeleteBehavior.Restrict);
+        trigger.HasOne<CatalogRevision>().WithMany().HasForeignKey(t => t.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        trigger.ToTable("RuntimeVcsTriggerStates", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeVcsTriggerStates_Profile", "\"ProfileHash\" ~ '^[a-f0-9]{64}$' AND \"ObservedVersion\" ~ '^[a-f0-9]{40}$'");
+            t.HasCheckConstraint("CK_RuntimeVcsTriggerStates_Pending", "(\"PendingVersion\" IS NULL AND \"PendingId\" IS NULL AND \"DueAt\" IS NULL) OR (\"PendingVersion\" IS NOT NULL AND \"PendingVersion\" ~ '^[a-f0-9]{40}$' AND \"PendingId\" IS NOT NULL AND \"DueAt\" IS NOT NULL)");
+        });
+        var cause = model.Entity<RuntimeBuildVcsTrigger>(); cause.HasKey(t => t.BuildId);
+        cause.HasIndex(t => new { t.RootBuildId, t.BuildId }).IsUnique();
+        cause.HasIndex(t => t.EventId).IsUnique().HasFilter("\"BuildId\" = \"RootBuildId\"");
+        cause.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildVcsTrigger>(t => t.BuildId).OnDelete(DeleteBehavior.Restrict);
+        cause.HasOne<RuntimeBuild>().WithMany().HasForeignKey(t => t.RootBuildId).OnDelete(DeleteBehavior.Restrict);
+        cause.ToTable("RuntimeBuildVcsTriggers", t => t.HasCheckConstraint("CK_RuntimeBuildVcsTriggers_Version", "\"Version\" ~ '^[a-f0-9]{40}$'"));
+
         var runInput = model.Entity<RuntimeBuildRunInput>(); runInput.HasKey(i => i.Id);
         runInput.HasIndex(i => new { i.ActorId, i.State, i.ExpiresAt });
         runInput.HasOne<CatalogBuildType>().WithMany().HasForeignKey(i => new { i.BuildTypeId, i.ProjectId })

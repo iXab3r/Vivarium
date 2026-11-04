@@ -57,6 +57,7 @@ public static class VivariumRuntime
         builder.Services.AddSingleton<RuntimeBuildSecrets>();
         builder.Services.AddSingleton<RuntimeBuildRunInputs>();
         builder.Services.AddSingleton<RuntimeBuildSources>();
+        builder.Services.AddSingleton<RuntimeVcsTriggers>();
         builder.Services.AddSingleton<RuntimeStepCompiler>();
         builder.Services.AddSingleton<RuntimeBuildCoordinator>();
         builder.Services.AddSingleton<RuntimeBuildOutputStore>();

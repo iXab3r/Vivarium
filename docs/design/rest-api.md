@@ -676,6 +676,20 @@ experts before remote exec/process/software endpoints ship.
 
 ### Temporary chain run input (D48)
 
+The selected fresh Host also exposes `GET /api/v1/build-configurations/{id}/builds` for
+configuration history. It returns the existing offset-page shape `{ items, total, offset, limit }`,
+ordered by descending stable Build ID; offset is nonnegative and limit is 1–200 (default 50).
+Each item contains ID, display number, public lifecycle state/status/text and queue/start/finish
+timestamps. Queued, running and finished rows share the same PG Build authority; resolved queued
+request aliases appear once through their canonical Build. Empty pages are ordinary 200 responses.
+Unknown or currently hidden configuration history returns native 404; invalid pagination returns
+400 `invalid_pagination`. Current `view_project` permission on the retained configuration's project
+ancestry is checked in the same snapshot as the page. Revocation also applies to an existing cookie.
+This native read neither accepts `/app/rest/builds` collection conformance nor introduces a second
+history store. Automatic Build details add `triggered` with type/date/eventId/rootBuildId from D51;
+ordinary rows retain their previous detail shape. Workbench uses this public history and its
+existing Build/cancel/output/artifact resources.
+
 `POST /api/v1/build-run-inputs` accepts `{ configurationId, environments }`, where `environments`
 maps selected snapshot-graph configuration IDs to D45 secret environment dictionaries. It returns
 201, a metadata Location, and `{ reference, configurationId, definitionRevisionId, expiresAt, state,

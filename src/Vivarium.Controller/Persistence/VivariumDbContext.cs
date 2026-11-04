@@ -33,6 +33,8 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<RuntimeBuild> RuntimeBuilds => Set<RuntimeBuild>();
     public DbSet<RuntimeBuildInput> RuntimeBuildInputs => Set<RuntimeBuildInput>();
     public DbSet<RuntimeBuildRunInput> RuntimeBuildRunInputs => Set<RuntimeBuildRunInput>();
+    public DbSet<RuntimeVcsTriggerState> RuntimeVcsTriggerStates => Set<RuntimeVcsTriggerState>();
+    public DbSet<RuntimeBuildVcsTrigger> RuntimeBuildVcsTriggers => Set<RuntimeBuildVcsTrigger>();
     public DbSet<RuntimeVcsRootInstance> RuntimeVcsRootInstances => Set<RuntimeVcsRootInstance>();
     public DbSet<RuntimeBuildSourceSelection> RuntimeBuildSourceSelections => Set<RuntimeBuildSourceSelection>();
     public DbSet<RuntimeBuildSourceReceipt> RuntimeBuildSourceReceipts => Set<RuntimeBuildSourceReceipt>();

@@ -26,7 +26,11 @@ internal sealed record RuntimeBuildView(long Id, string? Number, string State, s
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? SnapshotDependencies { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? ArtifactDependencies { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSourceView? Source { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildTriggerView? Triggered { get; init; }
 }
+internal sealed record RuntimeBuildTriggerView(string Type, DateTimeOffset Date, Guid EventId, long RootBuildId);
+internal sealed record RuntimeBuildHistoryView(long Id, string? Number, string State, string Status, string StatusText,
+    DateTimeOffset QueuedAt, DateTimeOffset? StartedAt, DateTimeOffset? FinishedAt);
 internal sealed record RuntimeBuildSourceView(string RootId, long RootInstanceId, string Branch, string? SelectedRevision, string? ConsumedRevision, string? CheckoutFailure);
 internal sealed record RuntimeBuildSelectionView(long Id, string ConfigurationId, string State, string Status);
 internal sealed record RuntimeBuildDependencyHandle
@@ -39,7 +43,15 @@ internal sealed record RuntimeBuildDependencyHandle
 internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> databases, IConfiguration configuration,
     AgentRegistry registry, TimeProvider time, RuntimeBuildSecrets secrets, RuntimeBuildRunInputs runInputs)
 {
-    internal async Task<RuntimeBuildView> SubmitAsync(ManagementRequestContext actor, RuntimeRunRequest request, CancellationToken token)
+    internal async Task<RuntimeBuildView> SubmitAsync(ManagementRequestContext actor, RuntimeRunRequest request, CancellationToken token) =>
+        (await SubmitCoreAsync(actor, request, null, token))!;
+
+    internal Task<RuntimeBuildView?> SubmitVcsAsync(RuntimeVcsAdmission admission, CancellationToken token) =>
+        SubmitCoreAsync(ManagementRequestContext.System("vcs-trigger", admission.EventId.ToString()),
+            new RuntimeRunRequest("_internal"), admission, token);
+
+    private async Task<RuntimeBuildView?> SubmitCoreAsync(ManagementRequestContext actor, RuntimeRunRequest request,
+        RuntimeVcsAdmission? vcs, CancellationToken token)
     {
         try { DefinitionValidation.Identity(request.ConfigurationId); }
         catch (InvalidDataException) { throw Invalid("Supply a valid configuration identity."); }
@@ -57,19 +69,30 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         await using var transaction = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
         await RuntimeBuildAccess.FencePermissionsAsync(database, token);
         await RuntimeBuildAccess.FenceQueueAsync(database, token);
+        if (vcs is not null) await database.Database.ExecuteSqlRawAsync("LOCK TABLE \"ActiveCatalogs\" IN SHARE MODE", token);
         var queries = new CatalogQueries(database, configuration, new CurrentAccess(database, configuration));
         var snapshot = await queries.ActiveAsync(token) ?? throw new RestApiException(503, "catalogue_unavailable",
             "The catalogue is unavailable", "Activate a valid C#/Git catalogue before submitting a Build.");
+        RuntimeVcsTriggerState? triggerState = null;
+        if (vcs is not null)
+        {
+            triggerState = await database.RuntimeVcsTriggerStates.SingleOrDefaultAsync(t => t.BuildTypeId == vcs.BuildTypeId, token);
+            if (snapshot.Revision.Id != vcs.RevisionId || triggerState?.RevisionId != vcs.RevisionId
+                || triggerState.PendingId != vcs.EventId || triggerState.PendingVersion != vcs.Version || triggerState.DueAt > time.GetUtcNow()) return null;
+            var id = snapshot.BuildTypeIds.SingleOrDefault(p => p.Value == vcs.BuildTypeId).Key;
+            if (id is null) return null;
+            request = request with { ConfigurationId = id };
+        }
         var selected = snapshot.Definition.Projects.SelectMany(p => p.Definition.Configurations.Select(c => (Project: p, Configuration: c)))
             .SingleOrDefault(p => p.Configuration.Id == request.ConfigurationId);
-        if (selected.Configuration is null || !await queries.VisibleAsync(actor, snapshot, selected.Project.Control.Id, token))
+        if (selected.Configuration is null || vcs is null && !await queries.VisibleAsync(actor, snapshot, selected.Project.Control.Id, token))
         {
             StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId, AuditOutcome.Denied);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw Missing();
         }
         var ancestry = snapshot.Ancestry(selected.Project.Control.Id);
         var permissions = parameters.Count == 0 && environment.Count == 0 && runInputId is null ? new[] { "run_build" } : ["run_build", "customize_build_parameters"];
-        if (!await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, permissions, ancestry, token))
+        if (vcs is null && !await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, permissions, ancestry, token))
         {
             StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId, AuditOutcome.Denied);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token); throw new AccessPermissionException();
@@ -89,6 +112,13 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             try { RuntimeBuildSources.Profile(source); }
             catch (InvalidDataException) { throw new RestApiException(422, "execution_subset_unavailable", "Checkout profile unavailable",
                 "This source profile requires anonymous Git, a canonical branch and root checkout with literal top-level exclusions."); }
+        }
+        if (vcs is not null)
+        {
+            if (source is null || selected.Configuration.Triggers.Length != 1) return null;
+            var trigger = selected.Configuration.Triggers[0]; RuntimeVcsChanges.Rules(trigger);
+            if (triggerState!.ProfileHash != RuntimeVcsTriggers.ProfileHash(source, trigger)) return null;
+            permissions = []; // Active Git trigger authority, not an impersonated account/grant.
         }
         var now = time.GetUtcNow();
         var configurations = selected.Project.Definition.Configurations.ToDictionary(c => c.Id, StringComparer.Ordinal);
@@ -126,8 +156,8 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                     "This cohort requires CANCEL/CANCEL edges and successful-only selection when reuse is enabled.");
             foreach (var dependency in config.Snapshots) await AdmitAsync(dependency.Configuration);
             var member = new RuntimeBuild { BuildTypeId = snapshot.BuildTypeIds[configurationId],
-                ProjectId = snapshot.ProjectIds[selected.Project.Control.Id], ActorId = Guid.Parse(actor.Principal.ActorId),
-                CredentialKind = actor.Principal.CredentialKind, CorrelationId = actor.CorrelationId, QueuedAt = now };
+                ProjectId = snapshot.ProjectIds[selected.Project.Control.Id], ActorId = vcs is null ? Guid.Parse(actor.Principal.ActorId) : Guid.Empty,
+                CredentialKind = vcs is null ? actor.Principal.CredentialKind : "vcs-trigger", CorrelationId = actor.CorrelationId, QueuedAt = now };
             database.RuntimeBuilds.Add(member); await database.SaveChangesAsync(token);
             var isRoot = configurationId == request.ConfigurationId;
             database.RuntimeBuildInputs.Add(new() { BuildId = member.Id, BuildTypeId = member.BuildTypeId, ProjectId = member.ProjectId,
@@ -138,6 +168,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 OverridesJson = JsonSerializer.Serialize(isRoot ? new SortedDictionary<string, string>(parameters, StringComparer.Ordinal) : []),
                 AdmissionJson = JsonSerializer.Serialize(new { actorId = member.ActorId, permissions, projectAndAncestors = ancestry,
                     catalogueRevisionId = snapshot.Revision.Id, permittedPoolIds = new[] { 0 }, trustClass = "operator-enrolled-physical" }) });
+            if (vcs is not null) database.RuntimeBuildSourceSelections.Add(new() { BuildId = member.Id, Version = vcs.Version, SelectedAt = now });
             database.RuntimeBuildOutputs.Add(new() { BuildId = member.Id });
             for (var step = 0; step < config.Steps.Length; step++)
                 foreach (var stream in new[] { 0, 1 }) database.RuntimeOutputStreams.Add(new() { BuildId = member.Id, StepIndex = step, Stream = stream });
@@ -164,6 +195,12 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             }
         }
         var definition = await database.CatalogBuildDefinitions.AsNoTracking().SingleAsync(d => d.BuildTypeId == build.BuildTypeId && d.RevisionId == snapshot.Revision.Id, token);
+        if (vcs is not null)
+        {
+            foreach (var member in collected.Values) database.RuntimeBuildVcsTriggers.Add(new()
+                { BuildId = member.Id, RootBuildId = build.Id, EventId = vcs.EventId, Version = vcs.Version });
+            triggerState!.PendingId = null; triggerState.PendingVersion = null; triggerState.DueAt = null;
+        }
         if (preparedInput is not null) runInputs.Consume(database, actor, preparedInput, build.Id, snapshot.Revision.ControlCommit);
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         return new(build.Id, build.Number, "queued", build.Status, build.StatusText, request.ConfigurationId,
@@ -198,14 +235,34 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             sourceView = new(source.RootId, input.VcsRootInstanceId!.Value, source.Branch, selection?.Version,
                 checkout is { Succeeded: true } ? checkout.Revision : null, checkout is { Succeeded: false } ? checkout.FailureCode : null);
         }
+        var trigger = await database.RuntimeBuildVcsTriggers.AsNoTracking().SingleOrDefaultAsync(t => t.BuildId == id, token);
         return new(build.Id, build.Number, publicState, build.Status, build.StatusText, type.ExternalId,
             project.ExternalId, input.RevisionId, definition.PlanHash, build.QueuedAt, build.StartedAt, build.FinishedAt,
             build.CancelRequestedAt, build.CancelReason, execution?.Phase.ToLowerInvariant(), execution?.AgentId, build.FailedToStart)
         {
             Source = sourceView,
+            Triggered = trigger is null ? null : new(trigger.RootBuildId == id ? "vcs" : "snapshotDependency", build.QueuedAt, trigger.EventId, trigger.RootBuildId),
             SnapshotDependencies = selections.Any(d => d.Kind == "SNAPSHOT") ? selections.Where(d => d.Kind == "SNAPSHOT").Select(d => d.Build).ToArray() : null,
             ArtifactDependencies = selections.Any(d => d.Kind == "ARTIFACT") ? selections.Where(d => d.Kind == "ARTIFACT").Select(d => d.Build).ToArray() : null,
         };
+    }
+
+    internal async Task<AccessPage<RuntimeBuildHistoryView>?> HistoryAsync(ManagementRequestContext actor,
+        string configurationId, int offset, int limit, CancellationToken token)
+    {
+        if (offset < 0 || limit is < 1 or > 200) throw Invalid("Invalid history pagination.");
+        await using var database = await databases.CreateDbContextAsync(token);
+        await using var transaction = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
+        var type = await database.CatalogBuildTypes.AsNoTracking().SingleOrDefaultAsync(t => t.ExternalId == configurationId, token);
+        if (type is null || !await RuntimeBuildAccess.AllowsAsync(database, configuration, actor, ["view_project"],
+            await RuntimeBuildAccess.AncestryAsync(database, type.ProjectId, token), token)) return null;
+        var query = database.RuntimeBuilds.AsNoTracking().Where(b => b.BuildTypeId == type.Id
+            && !database.RuntimeBuildResolutions.Any(r => r.RequestedBuildId == b.Id));
+        var total = await query.CountAsync(token);
+        var rows = await query.OrderByDescending(b => b.Id).Skip(offset).Take(limit).Select(b => new RuntimeBuildHistoryView(
+            b.Id, b.Number, b.State == "RELEASING" ? "running" : b.State.ToLower(), b.Status, b.StatusText,
+            b.QueuedAt, b.StartedAt, b.FinishedAt)).ToArrayAsync(token);
+        return new(rows, total, offset, limit);
     }
 
     internal static async Task<(string Kind, RuntimeBuildSelectionView Build)[]> SelectionViewsAsync(VivariumDbContext database, long id, CancellationToken token)

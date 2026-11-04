@@ -1620,9 +1620,204 @@
         "cohort_failed": 0,
         "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
       }
+    },
+    {
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-TRG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-VCS"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-13",
+        "AC-BLD-02",
+        "AC-CFG-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Owned anonymous ON_AGENT chain; explicit default branch/custom60s quiet period and041345f2 exclusion delta.",
+      "entry": "Real Git pushes and ordinary manual compatible admission, then native/compatible readbacks.",
+      "effect": "Excluded-only changes create no Build; two relevant pushes coalesce into one coherent latest-SHA graph after60s; completed manual coverage prevents a redundant graph after Host restart.",
+      "completion": "Actual pinned TeamCity observations and fresh Host/PG/Storage/Git/Linux Agent processes.",
+      "limits": "Used default-branch profile only; failed/cancelled manual variants, force-push recovery and full VCS trigger API remain unaccepted.",
+      "id": "PILOT-VCS-QUIET-EXCLUSIONS-MANUAL-001",
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/vcs-trigger-observations.json",
+        "sha256": "78efc89e8a2d4a2eaa5625bb50756da2e81b95f68ec3c61b59453514de2f3730",
+        "cases": [
+          "trigger:metadata-excluded",
+          "trigger:quiet-period-and-coalesced-source",
+          "trigger:manual-coexistence"
+        ],
+        "capture": "artifacts/pilot-chain/trigger-3881e20b7427/receipt.json",
+        "producer_sha256": "4c892f4eaedc814ee48aa5a2de4f196fad7b17e54f33b355450a8e3b6f52fc27"
+      },
+      "product_binding": "Vivarium.DefinitionProof.VcsTriggerAcceptanceCases.Used_trigger_excludes_metadata_coalesces_revisions_and_respects_completed_manual_coverage",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/vcs-trigger-red.trx",
+        "sha256": "cfc4431e60f27eec45732d3acb78520ad44a0e1461341dfb94632de59dfa0c97",
+        "effect": "Actual manual chain succeeds; no automatic Build appears after two relevant source pushes and the bounded quiet/completion wait."
+      },
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-TRG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-VCS"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-13",
+        "AC-CFG-07",
+        "AC-UI-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Actual fresh Host/PG/Git with only its runtime background delivery worker disabled; production observer/admission with controlled time, no Agent/process substitute.",
+      "entry": "Actual Git push, production Tick/admission and native/compatible reads; HTTP current-grant withdrawal.",
+      "effect": "Pending deadline survives Host restart, no admission before exact60s, concurrent consumption admits one graph, every member pins one SHA/system cause, withdrawal prevents old dispatch; bounded history reads and existing key access withdrawal retain current authority.",
+      "completion": "Production PG/queue transactions and public HTTP boundaries with controlled time.",
+      "limits": "Native selected event/recovery/history contract; no additional TeamCity wire or real Agent execution claim in this case.",
+      "id": "PILOT-VCS-RECOVERY-AUTHORITY-001",
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d51-used-vcs-triggers-feed-the-existing-admission-kernel-through-durable-observations",
+        "sha256": "079a4aaa56ad6cf4833888b2092495fcaeaa5daf0259b767e0eb80f5e3ad4b12",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/architecture.source",
+        "sha256_basis": "capture_path; authored native recovery/authority contract"
+      },
+      "additional_sources": [
+        {
+          "path": "docs/design/rest-api.md",
+          "sha256": "5c84a8278a5e5b6c022466f10cab9bf06cf03d60bfc8535f55846c151e940bda",
+          "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/rest-api.source"
+        }
+      ],
+      "product_binding": "Vivarium.DefinitionProof.VcsTriggerRecoveryCases.Pending_deadline_survives_restart_consumes_once_and_cannot_dispatch_after_Git_withdrawal",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-recovery-alone.trx",
+        "sha256": "47c6794363cf92f8469a5fb4e89fa868bfee69cd011eb7f2ede830ae71fcde70",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-UI-01",
+        "AC-UI-02",
+        "AC-BLD-03",
+        "AC-BLD-05"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Fresh Host/PG/Git/Storage; ordinary six-permission P cookie. No eligible Agent.",
+      "entry": "Actual Workbench clicks run the complete graph, navigate upstream and cancel it; history/deep link/reload and same-cookie withdrawal.",
+      "effect": "Queued UI cancellation owns no execution; canceled dependencies and root retain one graph/history through Host restart; access withdrawal clears history.",
+      "completion": "Headless Playwright against actual served Workbench and real runtime/PG/readbacks.",
+      "limits": "Selected native UI cancellation/history flow; complete Queue/Agent/test-history UI remains outside this selected profile.",
+      "id": "PILOT-WORKBENCH-QUEUED-CANCEL-HISTORY-001",
+      "source": {
+        "path": "docs/acceptance/interface/navigation.feature",
+        "sha256": "930e3ce4ecb4f03009dddd84d53829ea5d2bb2fb1e93c52c3377e905fe3de70f",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/navigation.source",
+        "sha256_basis": "capture_path; authored UI actor-goal criteria"
+      },
+      "product_binding": "Vivarium.DefinitionProof.WorkbenchChainLifecycleCases.Operator_cancels_an_upstream_from_the_actual_UI_and_finds_the_retained_chain_history(False)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-UI-01",
+        "AC-UI-02",
+        "AC-BLD-04",
+        "AC-BLD-05"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Fresh Host/PG/Git/Storage; ordinary six-permission P cookie. Dedicated actual Linux Agent process.",
+      "entry": "Actual Workbench clicks run the complete graph, navigate upstream and cancel it; history/deep link/reload and same-cookie withdrawal.",
+      "effect": "Actual script output precedes UI cancellation; canceled dependencies and root retain one graph/history through Host restart; access withdrawal clears history.",
+      "completion": "Headless Playwright against actual served Workbench and real runtime/PG/readbacks.",
+      "limits": "Selected native UI cancellation/history flow; complete Queue/Agent/test-history UI remains outside this selected profile.",
+      "id": "PILOT-WORKBENCH-RUNNING-CANCEL-HISTORY-001",
+      "source": {
+        "path": "docs/acceptance/interface/navigation.feature",
+        "sha256": "930e3ce4ecb4f03009dddd84d53829ea5d2bb2fb1e93c52c3377e905fe3de70f",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/navigation.source",
+        "sha256_basis": "capture_path; authored UI actor-goal criteria"
+      },
+      "product_binding": "Vivarium.DefinitionProof.WorkbenchChainLifecycleCases.Operator_cancels_an_upstream_from_the_actual_UI_and_finds_the_retained_chain_history(True)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
     }
   ],
-  "remaining_due": "Complete #78/#116/#117/#118: used VCS quiet period/exclusions/coexistence and single-publisher ownership, remaining current-rights/fault/UI readiness/cancel/history profiles, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Restricted publication credential cards timed out; independent work continues.29 selected cases do not close full API families.",
+  "remaining_due": "Whole US-013 remains Open: remaining due authority/fault/readiness review, actual T3 build/package without built GUI/CLI launch, scoped test-release partial-draft recovery/single-publisher proof, cumulative33-story/SDK and R0/ledger/independent reviews/main. Prior29-row story cohort is retained at2bee9bc; four new trigger/UI rows have case-specific current PASS and root700/0 with raw12NotExecuted. Global denominator unknown; API-complete=false.",
   "global_variant_denominator": null,
   "api_complete": false,
   "native_http_operations": [
@@ -1665,6 +1860,26 @@
       ],
       "source": "docs/ARCHITECTURE.md#d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
       "state": "SELECTED_NATIVE_PROFILE_PROVEN_NOT_FULL_FAMILY_OR_GLOBAL_DENOMINATOR"
+    },
+    {
+      "id": "NATIVE:GET:/api/v1/build-configurations/{id}/builds",
+      "method": "GET",
+      "path": "/api/v1/build-configurations/{id}/builds",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-CFG",
+        "SS-IAM"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-VCS-RECOVERY-AUTHORITY-001",
+        "PILOT-WORKBENCH-QUEUED-CANCEL-HISTORY-001",
+        "PILOT-WORKBENCH-RUNNING-CANCEL-HISTORY-001"
+      ],
+      "source": "docs/design/rest-api.md",
+      "status": "SELECTED_PRODUCT_GREEN_NOT_COMPLETE_HISTORY_API"
     }
   ]
 }

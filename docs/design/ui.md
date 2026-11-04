@@ -132,3 +132,12 @@ Cover keyboard/selection, narrow-width reflow, stable navigation, empty/error/de
 CAS/draft preservation/masked secrets, same-session permission withdrawal, run/cancel, log tail/
 download, individual test history and actual artifact bytes. Fake preview approval is not runtime
 acceptance, and a platform/admin-only happy path cannot close the ordinary-user journey.
+
+### Selected US-013 configuration history
+
+The fresh Workbench configuration view provides bounded Build history through the public native
+configuration-history resource, including empty/error states, explicit refresh, pagination and stable
+Build links. Build details link back to that configuration history. Automatic source/dependency
+causes come from the same persisted D51 cause; live polling updates the display number as well as
+status/source/Agent projections. Current access withdrawal clears the protected view on reload.
+These selected flows do not imply individual test-history or complete Queue/Agent UI acceptance.

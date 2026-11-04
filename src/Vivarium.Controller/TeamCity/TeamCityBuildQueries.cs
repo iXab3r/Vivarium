@@ -96,6 +96,14 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             result[kind == "SNAPSHOT" ? "snapshot-dependencies" : "artifact-dependencies"] =
                 new JsonObject { ["count"] = selected.Length, ["build"] = items };
         }
+        var vcsTrigger = await database.RuntimeBuildVcsTriggers.AsNoTracking().SingleOrDefaultAsync(t => t.BuildId == id, token);
+        if (vcsTrigger is not null)
+        {
+            var cause = new JsonObject { ["type"] = vcsTrigger.RootBuildId == id ? "vcs" : "snapshotDependency",
+                ["date"] = TeamCityProtocol.Date(build.QueuedAt) };
+            if (vcsTrigger.RootBuildId == id) cause["details"] = "jetbrains.git";
+            result["triggered"] = cause;
+        }
         if (full)
         {
             result.Remove("failedToStart"); result.Remove("personal"); result.Remove("queuePosition");
@@ -106,7 +114,7 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             var trigger = new JsonObject { ["type"] = "user", ["date"] = TeamCityProtocol.Date(build.QueuedAt) };
             var user = await database.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == build.ActorId, token);
             if (user is not null) trigger["user"] = TeamCityEndpoints.User(user, href: true);
-            result["triggered"] = trigger;
+            if (vcsTrigger is null) result["triggered"] = trigger;
             // R0 admits source-free configurations only. These links identify the same numeric Build.
             result["changes"] = new JsonObject { ["href"] = "/app/rest/changes?locator=build:(id:" + id + ")" };
             if (sourceInput.SourceJson is null) result["revisions"] = new JsonObject { ["count"] = 0 };

@@ -10,7 +10,9 @@ interface Source { rootId: string; branch: string; selectedRevision: string | nu
     consumedRevision: string | null; checkoutFailure: string | null }
 interface Build { id: number; configurationId: string; projectId: string; number: string | null;
     state: string; status: string; statusText: string; agentId: string | null;
-    snapshotDependencies?: Selection[]; artifactDependencies?: Selection[]; source?: Source }
+    snapshotDependencies?: Selection[]; artifactDependencies?: Selection[]; source?: Source;
+    triggered?: { type: string; date: string; rootBuildId: number } }
+interface HistoricalBuild { id: number; number: string | null; state: string; status: string; statusText: string; queuedAt: string }
 interface Artifact { path: string; length: number; sha256: string; href: string }
 interface Output { items: { kind: string; reason?: string; content?: { href: string } }[];
     page: { nextCursor: string | null }; output: { state: string; resumeCursor: string } }
@@ -106,6 +108,35 @@ export function renderBuilds(host: HTMLElement): IDisposable {
                     navigate("/builds/" + build.id); return showBuild(build.id);
                 }).catch(fail).finally(() => { mutating = false; run.enabled = true; });
             });
+            const history = element(detail, "section", ""); history.setAttribute("aria-label", "Build history");
+            element(history, "h3", "Build history");
+            const rows = element(history, "div", "Loading build history…");
+            const paging = element(history, "div", ""); paging.className = "actions";
+            let offset = 0, historyRequest = 0;
+            const previous = button(paging, "Previous builds", () => { void loadHistory(Math.max(0, offset - 50)); });
+            const next = button(paging, "Next builds", () => { void loadHistory(offset + 50); });
+            button(paging, "Refresh history", () => { void loadHistory(offset); });
+            previous.enabled = next.enabled = false;
+            async function loadHistory(start: number) {
+                const fetchId = ++historyRequest;
+                previous.enabled = next.enabled = false;
+                try {
+                    const page = await api<Page<HistoricalBuild>>(`build-configurations/${encodeURIComponent(id)}/builds?offset=${start}&limit=50`, cancel.signal);
+                    if (cancel.signal.aborted || request !== generation || fetchId !== historyRequest) return;
+                    offset = start; rows.replaceChildren();
+                    if (!page.items.length) element(rows, "p", "No builds on this page.");
+                    for (const build of page.items) {
+                        const row = element(rows, "div", ""); row.className = "chain-row";
+                        const link = element(row, "a", "Build " + (build.number ?? build.id)); link.href = "/builds/" + build.id;
+                        element(row, "span", `${build.state} · ${build.status} · ${build.statusText} · ${build.queuedAt}`);
+                    }
+                    previous.enabled = offset > 0; next.enabled = offset + page.items.length < page.total;
+                } catch (error) {
+                    if (cancel.signal.aborted || request !== generation || fetchId !== historyRequest) return;
+                    rows.textContent = "Build history unavailable."; fail(error);
+                }
+            }
+            void loadHistory(0);
         } catch (error) { fail(error); }
     }
     async function artifacts(id: number, container: HTMLElement, request: number, cursor?: string) {
@@ -128,9 +159,14 @@ export function renderBuilds(host: HTMLElement): IDisposable {
         try {
             const build = await api<Build>("builds/" + id, cancel.signal);
             if (cancel.signal.aborted || request !== generation) return;
-            resetDetail(); element(detail, "h2", `${build.configurationId} #${build.number ?? build.id}`);
+            resetDetail();
+            const heading = element(detail, "h2", `${build.configurationId} #${build.number ?? build.id}`);
+            const configuration = element(detail, "a", "Configuration history");
+            configuration.href = "/build-configurations/" + encodeURIComponent(build.configurationId);
             const status = element(detail, "p", `${build.state} · ${build.status} · ${build.statusText}`); status.dataset.testid = "build-status";
             const agent = element(detail, "p", build.agentId ? "Agent: " + build.agentId : "No Agent assigned.");
+            if (build.triggered) element(detail, "p", build.triggered.type === "vcs"
+                ? "Started by a source change." : "Started by snapshot dependency of build " + build.triggered.rootBuildId + ".");
             const source = element(detail, "section", ""); source.setAttribute("aria-label", "Source revision");
             source.className = "build-source";
             element(source, "h3", "Source");
@@ -196,6 +232,7 @@ export function renderBuilds(host: HTMLElement): IDisposable {
                     const current = await api<Build>("builds/" + id, cancel.signal);
                     if (cancel.signal.aborted || request !== generation) return;
                     notice.textContent = "";
+                    heading.textContent = `${current.configurationId} #${current.number ?? current.id}`;
                     status.textContent = `${current.state} · ${current.status} · ${current.statusText}`;
                     agent.textContent = current.agentId ? "Agent: " + current.agentId : "No Agent assigned.";
                     updateSource(current.source);

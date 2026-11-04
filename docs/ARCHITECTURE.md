@@ -1683,6 +1683,35 @@ Already committed values survive Host restart. Metadata never proves a user proc
 stopped or produced correct bytes. No Bootstrap change, extra scheduler or desired-setting write
 is introduced; final whole-story Agent/REST/Security gates remain due.
 
+### D51. Used VCS triggers feed the existing admission kernel through durable observations
+
+The US-013 used profile is one anonymous default-branch Git VCS trigger per configuration.
+The established C# `vcs` type and compatible REST `vcsTrigger` spelling use the same execution
+profile: `USE_CUSTOM` quiet period and literal or directory-recursive negative path rules. Its pinned
+TeamCity 2026.1.3 capture proves metadata exclusion, a 60-second quiet period coalescing relevant
+commits, and completed successful manual coverage preventing a redundant automatic chain.
+The exclusion delta is taken explicitly from T3 commit `041345f2c201d68e718d5dbf0ba5ce9755f1704b`;
+the actual build recipe remains pinned separately. Other trigger branches, rule languages,
+failed/cancelled manual coverage, force-push recovery and the complete trigger API remain unaccepted.
+
+Git owns desired trigger/source declarations. PostgreSQL owns the observed head, pending identity,
+selected pending version and deadline. Anonymous Git I/O runs outside queue/Agent/permission fences,
+without checkout, hooks, helpers, inherited Git configuration, Host credentials or author code.
+Each command has existing time/output limits; temporary fetch storage is monitored against 128 MiB
+and 4096 files, with cancellation and removal of its unshared directory. These are observations,
+not an additional scheduler or a reusable source/secret store. An unavailable observation retains
+its previous cursor and pending event. Initial activation establishes a baseline.
+
+At dispatch the existing Build service takes the normal admission fences and a catalogue activation
+fence, revalidates the exact pending event and active Git profile, then creates the normal dependency
+graph and consumes the pending event in one transaction. The whole graph pins the observed source
+SHA before any physical ownership. Retries cannot consume an event twice; source mutation or trigger
+withdrawal cannot authorize a stale dispatch. Automatic work uses system trigger authority from
+active Git, never a fabricated user grant or Superuser request. Retained cause rows identify the
+root/event/version; native and compatible reads project that same cause and retain their current
+ordinary-user read/cancel checks. No publication credential is supplied implicitly: D45/D48 remain
+per-run input, and controlled trigger acceptance does not imply a permanent project secret vault.
+
 ## 5. Protocol sketch
 
 ```proto

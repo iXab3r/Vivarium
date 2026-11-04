@@ -35,6 +35,28 @@ public sealed class RuntimeBuildCounter
     public long NextValue { get; set; } = 1;
 }
 
+// Observation/quiet-period cursor, never desired configuration or a second work queue.
+public sealed class RuntimeVcsTriggerState
+{
+    public long BuildTypeId { get; set; }
+    public Guid RevisionId { get; set; }
+    public string ProfileHash { get; set; } = "";
+    public string ObservedVersion { get; set; } = "";
+    public string? PendingVersion { get; set; }
+    public Guid? PendingId { get; set; }
+    public DateTimeOffset? DueAt { get; set; }
+    public DateTimeOffset ObservedAt { get; set; }
+}
+
+// Immutable initiating cause for every member of an automatically admitted graph.
+public sealed class RuntimeBuildVcsTrigger
+{
+    public long BuildId { get; set; }
+    public long RootBuildId { get; set; }
+    public Guid EventId { get; set; }
+    public string Version { get; set; } = "";
+}
+
 // One encrypted execution request, not a reusable Project secret reference.
 public sealed class RuntimeBuildRunInput
 {

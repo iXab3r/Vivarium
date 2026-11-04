@@ -69,7 +69,7 @@ public sealed class SourceReuseAcceptanceCases
     private static async Task<JsonElement> ReadAsync(HttpClient api, long id, CancellationToken token = default)
     { using var value = JsonDocument.Parse(await api.GetStringAsync("/app/rest/builds/id:" + id, token)); return value.RootElement.Clone(); }
 
-    private const string Settings = """
+    internal const string Settings = """
         using Vivarium.Definitions;
         public static class Managed {
           public static Settings Declare() => new("P", new("P_Git", SOURCE_URL, "refs/heads/main", "+:.\n-:.repos"), [], [
