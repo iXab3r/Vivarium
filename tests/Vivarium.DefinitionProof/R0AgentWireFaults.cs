@@ -14,6 +14,7 @@ internal sealed class R0AgentWireFaults : Interceptor
     internal bool DropOutputData { get; set; }
     internal bool OmitPlatform { get; set; }
     internal bool DropOutputAcknowledgements { get; set; }
+    internal bool DropResultAcknowledgements { get; set; }
     internal int DroppedAcknowledgements => Volatile.Read(ref droppedAcknowledgements);
     internal int ObservedSessionCount { get { lock (sync) return observedSessions.Count; } }
     internal BuildOutput[] Observed { get { lock (sync) return observed.Select(f => f.Clone()).ToArray(); } }
@@ -56,6 +57,7 @@ internal sealed class R0AgentWireFaults : Interceptor
         public WriteOptions? WriteOptions { get => destination.WriteOptions; set => destination.WriteOptions = value; }
         public Task WriteAsync(T message)
         {
+            if (owner.DropResultAcknowledgements && message is ControllerMsg { ResultAccepted: not null }) return Task.CompletedTask;
             if (owner.DropOutputAcknowledgements && message is ControllerMsg { BuildOutputAcknowledged: not null })
             { Interlocked.Increment(ref owner.droppedAcknowledgements); return Task.CompletedTask; }
             return destination.WriteAsync(message);

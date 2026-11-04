@@ -142,7 +142,7 @@ public sealed class RuntimeOutputExpiry
     public DateTimeOffset? DeletedAt { get; set; }
 }
 
-// Pending private objects are journalled before PUT and remain until range adoption or deletion.
+// Pending private output/artifact objects remain until reference adoption or retryable deletion.
 public sealed class RuntimeOutputDeletion
 {
     public string ObjectKey { get; set; } = "";

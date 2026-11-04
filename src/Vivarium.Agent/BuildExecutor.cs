@@ -294,7 +294,7 @@ public static class BuildExecutor
         }
         catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
         {
-            await StopProcessAsync(process, stop);
+            await StopProcessAsync(process, stop, outputFailed.Task);
         }
 
         if (!process.HasExited)
@@ -345,7 +345,7 @@ public static class BuildExecutor
         }
     }
 
-    private static async Task StopProcessAsync(Process process, BuildStopController stop)
+    private static async Task StopProcessAsync(Process process, BuildStopController stop, Task outputFailed)
     {
         if (stop.Mode == BuildStopMode.Graceful && !process.HasExited)
         {
@@ -354,8 +354,12 @@ public static class BuildExecutor
             {
                 // A graceful deadline is controller evidence, not permission for a hard kill. Keep
                 // the Agent control loop alive and wait for either process exit or an explicit,
-                // authorized force command that cancels ForceToken.
-                await process.WaitForExitAsync(stop.ForceToken);
+                // authorized force command that cancels ForceToken. A broken output reader is
+                // an independent execution failure requiring containment, including during stop.
+                var exit = process.WaitForExitAsync(stop.ForceToken);
+                if (await Task.WhenAny(exit, outputFailed) == outputFailed)
+                    await ForceTerminateAsync(process);
+                await exit;
             }
             catch (OperationCanceledException) when (stop.Mode == BuildStopMode.Force)
             {

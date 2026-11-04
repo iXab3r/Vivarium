@@ -1004,7 +1004,7 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
 
                     b.ToTable("RuntimeOutputDeletions", null, t =>
                         {
-                            t.HasCheckConstraint("CK_RuntimeOutputDeletions_Key", "\"ObjectKey\" ~ '^build-output/[a-f0-9]{32}$'");
+                            t.HasCheckConstraint("CK_RuntimeOutputDeletions_Key", "\"ObjectKey\" ~ '^build-output/[a-f0-9]{32}$' OR \"ObjectKey\" ~ ('^build-artifacts/' || \"BuildId\"::text || '/[a-f0-9]{64}$')");
                         });
                 });
 

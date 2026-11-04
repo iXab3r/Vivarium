@@ -96,7 +96,8 @@ internal static class RuntimeBuildModel
         var deletion = model.Entity<RuntimeOutputDeletion>(); deletion.HasKey(d => d.ObjectKey);
         deletion.HasOne<RuntimeBuild>().WithMany().HasForeignKey(d => d.BuildId).OnDelete(DeleteBehavior.Restrict);
         deletion.HasIndex(d => d.CreatedAt);
-        deletion.ToTable("RuntimeOutputDeletions", t => t.HasCheckConstraint("CK_RuntimeOutputDeletions_Key", "\"ObjectKey\" ~ '^build-output/[a-f0-9]{32}$'"));
+        deletion.ToTable("RuntimeOutputDeletions", t => t.HasCheckConstraint("CK_RuntimeOutputDeletions_Key",
+            "\"ObjectKey\" ~ '^build-output/[a-f0-9]{32}$' OR \"ObjectKey\" ~ ('^build-artifacts/' || \"BuildId\"::text || '/[a-f0-9]{64}$')"));
         range.HasOne<RuntimeOutputStream>().WithMany().HasForeignKey(r => new { r.BuildId, r.StepIndex, r.Stream }).OnDelete(DeleteBehavior.Restrict);
         range.Property(r => r.Start).HasColumnType("numeric(20,0)"); range.Property(r => r.End).HasColumnType("numeric(20,0)");
         range.Property(r => r.ByteStart).HasColumnType("numeric(20,0)"); range.Property(r => r.ByteEnd).HasColumnType("numeric(20,0)");

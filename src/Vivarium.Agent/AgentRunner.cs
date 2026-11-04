@@ -803,6 +803,7 @@ public sealed class AgentRunner
                 SessionId = currentSessionId,
                 Outcome = BuildOutcome.InfrastructureFailed,
                 StatusText = assignment.OutputContractMajor == 1 ? "Build execution failed" : ex.Message,
+                OutputProducerLost = assignment.OutputContractMajor == 1,
             };
         }
 

@@ -483,7 +483,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             || result.Steps.Select(s => s.StepIndex).Distinct().Count() != result.Steps.Count)
             throw new InvalidDataException("The terminal result is invalid.");
         if (result.Outcome == BuildOutcome.Succeeded && (result.Steps.Count != assignment.Steps.Count
-            || result.Steps.Any(s => s.ExitCode != 0 || s.TimedOut)))
+            || result.Steps.Any(s => s.Skipped || s.ExitCode != 0 || s.TimedOut)))
             throw new InvalidDataException("Successful execution conflicts with its step evidence.");
         var watermarks = result.OutputWatermarks;
         if (result.OutputProducerLost ? watermarks.Count != 0 : watermarks.Count != assignment.Steps.Count * 2)

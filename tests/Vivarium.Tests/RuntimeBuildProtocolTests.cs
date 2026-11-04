@@ -81,6 +81,7 @@ public sealed class RuntimeBuildProtocolTests
         result.Steps[0].TimedOut = true;
         Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
         result.Steps[0].TimedOut = false;
+        Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
         result.Steps[0].Skipped = false;
         result.OutputWatermarks[1].Stream = LogStream.Stdout;
         Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));

@@ -48,22 +48,55 @@ internal static class RuntimeAgentByteEndpoints
                 || Convert.ToHexStringLower(SHA256.HashData(content)) != sha256)
                 return RestProblems.Create(http, 400, "artifact_integrity_mismatch", "Artifact integrity differs", "The declared size and SHA256 must match the exact body.");
             var key = $"build-artifacts/{scope.BuildId}/{sha256}";
-            await bytes.PutAsync(key, content, http.RequestAborted);
-            await using var database = await databases.CreateDbContextAsync(http.RequestAborted);
-            await using var transaction = await database.Database.BeginTransactionAsync(http.RequestAborted);
-            await AgentCredentials.LockAgentAsync(database, scope.AgentId, http.RequestAborted);
-            var current = await OwnerAsync(http, credentials, databases, time, http.RequestAborted);
+            // Reserve bounded ownership before PUT. A terminal/racing request may never allocate
+            // an unjournalled private object, and failed/rejected uploads remain cleanup work.
+            await using (var reserve = await databases.CreateDbContextAsync(deadline.Token))
+            await using (var reservation = await reserve.Database.BeginTransactionAsync(deadline.Token))
+            {
+                await AgentCredentials.LockAgentAsync(reserve, scope.AgentId, deadline.Token);
+                if ((await OwnerAsync(http, credentials, databases, time, deadline.Token))?.BuildId != scope.BuildId) return Denied(http);
+                var known = await reserve.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == scope.BuildId && u.Sha256 == sha256, deadline.Token);
+                if (known is not null) return Results.NoContent();
+                if (await reserve.RuntimeBuildResults.AnyAsync(r => r.BuildId == scope.BuildId, deadline.Token)) return Closed(http);
+                var pending = await reserve.RuntimeOutputDeletions.AnyAsync(d => d.ObjectKey == key, deadline.Token);
+                if (!pending)
+                {
+                    var stagedCount = await reserve.RuntimeOutputDeletions.CountAsync(d => d.BuildId == scope.BuildId && d.ObjectKey.StartsWith("build-artifacts/"), deadline.Token);
+                    if (stagedCount + await reserve.RuntimeArtifactUploads.CountAsync(u => u.BuildId == scope.BuildId, deadline.Token) >= 128) return Closed(http);
+                    await reserve.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(83371856)", deadline.Token);
+                    if (await reserve.RuntimeOutputDeletions.CountAsync(deadline.Token) >= 1024) return Busy(http);
+                    reserve.RuntimeOutputDeletions.Add(new() { BuildId = scope.BuildId, ObjectKey = key, CreatedAt = time.GetUtcNow() });
+                    await reserve.SaveChangesAsync(deadline.Token);
+                }
+                await reservation.CommitAsync(deadline.Token);
+            }
+            await using var database = await databases.CreateDbContextAsync(deadline.Token);
+            await using var transaction = await database.Database.BeginTransactionAsync(deadline.Token);
+            var staged = await database.RuntimeOutputDeletions.FromSqlInterpolated($"""
+                SELECT * FROM "RuntimeOutputDeletions" WHERE "ObjectKey" = {key} FOR UPDATE
+                """).SingleOrDefaultAsync(deadline.Token);
+            if (staged is null)
+            {
+                if ((await OwnerAsync(http, credentials, databases, time, deadline.Token))?.BuildId != scope.BuildId) return Denied(http);
+                return await database.RuntimeArtifactUploads.AnyAsync(u => u.BuildId == scope.BuildId && u.Sha256 == sha256, deadline.Token)
+                    ? Results.NoContent() : Busy(http);
+            }
+            // Cleanup skips the object row; Agent/queue coordination remains free during I/O.
+            await bytes.PutAsync(key, content, deadline.Token);
+            await AgentCredentials.LockAgentAsync(database, scope.AgentId, deadline.Token);
+            var current = await OwnerAsync(http, credentials, databases, time, deadline.Token);
             if (current?.BuildId != scope.BuildId) return Denied(http);
-            var existing = await database.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == scope.BuildId && u.Sha256 == sha256, http.RequestAborted);
+            var existing = await database.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == scope.BuildId && u.Sha256 == sha256, deadline.Token);
             if (existing is null)
             {
-                if (await database.RuntimeBuildResults.AnyAsync(r => r.BuildId == scope.BuildId, http.RequestAborted)
-                    || await database.RuntimeArtifactUploads.CountAsync(u => u.BuildId == scope.BuildId, http.RequestAborted) >= 128)
-                    return RestProblems.Create(http, 409, "artifact_owner_closed", "The artifact owner is closed", "No new content may be added to this manifest.");
+                if (await database.RuntimeBuildResults.AnyAsync(r => r.BuildId == scope.BuildId, deadline.Token)
+                    || await database.RuntimeArtifactUploads.CountAsync(u => u.BuildId == scope.BuildId, deadline.Token) >= 128)
+                    return Closed(http);
                 database.RuntimeArtifactUploads.Add(new() { BuildId = scope.BuildId, Sha256 = sha256, ObjectKey = key, Size = declared, CreatedAt = time.GetUtcNow() });
-                await database.SaveChangesAsync(http.RequestAborted);
             }
-            await transaction.CommitAsync(http.RequestAborted); return Results.NoContent();
+            database.RuntimeOutputDeletions.Remove(staged);
+            await database.SaveChangesAsync(deadline.Token);
+            await transaction.CommitAsync(deadline.Token); return Results.NoContent();
             }
             catch (OperationCanceledException) when (!http.RequestAborted.IsCancellationRequested)
             { return RestProblems.Create(http, 408, "artifact_upload_timeout", "Artifact upload timed out", "Retry the upload within its transfer bound.", retryable: true); }
@@ -86,6 +119,11 @@ internal static class RuntimeAgentByteEndpoints
             return current?.BuildId == scope.BuildId ? Results.Bytes(content, "application/octet-stream") : Denied(http);
         });
     }
+
+    private static IResult Closed(HttpContext http) => RestProblems.Create(http, 409, "artifact_owner_closed",
+        "The artifact owner is closed", "No new content may be added to this manifest.");
+    private static IResult Busy(HttpContext http) => RestProblems.Create(http, 429, "artifact_upload_busy",
+        "Artifact upload is busy", "Retry this bounded upload.", retryable: true);
 
     private static IResult Denied(HttpContext http)
     {
