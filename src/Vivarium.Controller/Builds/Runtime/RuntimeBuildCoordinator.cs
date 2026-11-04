@@ -275,7 +275,12 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         if (!retainedReplay && (message.MsgCase is AgentMsg.MsgOneofCase.AssignmentAccepted or AgentMsg.MsgOneofCase.Result))
         {
             if (execution.AcceptedAt is null)
+            {
+                // Claim time is a provisional public start while delivery is pending. The
+                // selected reference refines it once the Agent acknowledges actual execution.
+                build.StartedAt = time.GetUtcNow();
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.assignment.accepted", workload: workload, token: token);
+            }
             execution.AcceptedAt ??= time.GetUtcNow();
             if (execution.Phase == "DISPATCHING") execution.Phase = "ACCEPTED";
             var input = await database.RuntimeBuildInputs.SingleAsync(i => i.BuildId == build.Id, token);
@@ -284,7 +289,19 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             if (minutes > 0) execution.ExecutionDeadline ??= execution.AcceptedAt.Value.AddMinutes(minutes);
         }
         ControllerMsg? acknowledgement = null;
-        if (message.MsgCase == AgentMsg.MsgOneofCase.Result)
+        if (message.MsgCase == AgentMsg.MsgOneofCase.Status)
+        {
+            var status = message.Status;
+            var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
+            if (status.Phase is not ("FETCHING" or "RUNNING" or "CANCELLATION_CLEANUP" or "COLLECTING")
+                || status.StepIndex < -1 || status.StepIndex >= assignment.Steps.Count
+                || (status.Phase is "RUNNING" or "CANCELLATION_CLEANUP") && status.StepIndex < 0
+                || (status.Phase is "FETCHING" or "COLLECTING") && status.StepIndex != -1)
+                throw new InvalidDataException("Execution progress is invalid.");
+            if (execution.TerminalReceivedAt is null && build.CancelRequestedAt is null)
+                build.StatusText = status.Phase == "RUNNING" ? $"Step {status.StepIndex + 1}/{assignment.Steps.Count}" : "Running";
+        }
+        else if (message.MsgCase == AgentMsg.MsgOneofCase.Result)
         {
             var result = message.Result;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);

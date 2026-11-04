@@ -28,7 +28,8 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
         if (state != "queued")
         {
             result["status"] = build.Status;
-            result["statusText"] = build.CancelRequestedAt is not null ? "Canceled" : state == "running" ? "Running" : build.StatusText;
+            result["statusText"] = build.CancelRequestedAt is not null ? "Canceled"
+                : state == "running" && build.StatusText is "Preparing execution" or "Starting execution" ? "Running" : build.StatusText;
         }
         if (state == "queued")
         {

@@ -181,6 +181,8 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
         internal string Definitions => Path.Combine(root, "definitions");
         internal string? AgentId { get; private set; }
         internal int? TeamCityAgentId { get; private set; }
+        internal JsonElement PendingRegistration { get; private set; }
+        internal JsonElement AuthorizedRegistration { get; private set; }
 
         internal async Task RestartAsync(Func<Task>? afterStop = null)
         {
@@ -215,6 +217,18 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             agent.Dispose(); agent = null;
         }
 
+        internal async Task RestartOwnedAgentAsync()
+        {
+            await StopOwnedAgentAsync(); StartAgentProcess();
+        }
+
+        private void StartAgentProcess()
+        {
+            if (agent is not null) throw new InvalidOperationException("The case already has an Agent process.");
+            agent = RuntimeHostPhysicalTests.StartAgent(Path.Combine(root, "agent-bootstrap.json"), Path.Combine(root, "agent-data"));
+            agentOutput = agent.StandardOutput.ReadToEndAsync(); agentError = agent.StandardError.ReadToEndAsync();
+        }
+
         internal async Task StartWindowsAgentAsync(HttpClient administrator, string csrf)
         {
             if (agent is not null) throw new InvalidOperationException("The case already has an Agent.");
@@ -227,8 +241,7 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
             var bootstrap = Path.Combine(root, "agent-bootstrap.json");
             await File.WriteAllTextAsync(bootstrap, JsonSerializer.Serialize(new { controllerUrl = origin.AbsoluteUri.TrimEnd('/'),
                 certFingerprint = publicCertificate.GetCertHashString(HashAlgorithmName.SHA256), enrollToken = enrollment.RootElement.GetProperty("token").GetString() }));
-            agent = RuntimeHostPhysicalTests.StartAgent(bootstrap, Path.Combine(root, "agent-data"));
-            agentOutput = agent.StandardOutput.ReadToEndAsync(); agentError = agent.StandardError.ReadToEndAsync();
+            StartAgentProcess();
             using var bound = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             while (AgentId is null)
             {
@@ -237,10 +250,19 @@ internal sealed class R0AcceptanceInstallation : IAsyncDisposable
                 if (current.ValueKind != JsonValueKind.Undefined && current.GetProperty("connected").GetBoolean())
                 {
                     AgentId = current.GetProperty("id").GetString(); TeamCityAgentId = current.GetProperty("teamCityId").GetInt32();
+                    PendingRegistration = current.Clone();
                 }
                 else await Task.Delay(100, bound.Token);
             }
             await MutateAsync(administrator, csrf, HttpMethod.Put, "/api/v1/agents/" + AgentId + "/authorization", "{\"authorized\":true}", HttpStatusCode.NoContent);
+            while (true)
+            {
+                using var proven = JsonDocument.Parse(await administrator.GetStringAsync("/api/v1/agents/" + AgentId, bound.Token));
+                var state = proven.RootElement;
+                if (state.GetProperty("authorized").GetBoolean() && state.GetProperty("connected").GetBoolean() && state.GetProperty("reconciled").GetBoolean())
+                { AuthorizedRegistration = state.Clone(); break; }
+                await Task.Delay(50, bound.Token);
+            }
             administrator.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             await MutateAsync(administrator, csrf, HttpMethod.Put, $"/app/rest/agents/id:{TeamCityAgentId}/enabledInfo",
                 "{\"status\":true,\"comment\":{\"text\":\"Owned R0 reference fixture\"}}", HttpStatusCode.OK);

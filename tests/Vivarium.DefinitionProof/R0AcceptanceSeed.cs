@@ -13,7 +13,7 @@ internal static class R0AcceptanceSeed
         [Console]::Out.Flush()
         [Console]::Error.Write("owned-log-stderr`n")
         [Console]::Error.Flush()
-        [IO.File]::WriteAllText([IO.Path]::Combine($env:CASE_DIR,'entered'),'entered')
+        [IO.File]::AppendAllText([IO.Path]::Combine($env:CASE_DIR,'entered'),([Diagnostics.Process]::GetCurrentProcess().Id.ToString()+"`n"))
         $end=[DateTime]::UtcNow.AddSeconds(60)
         while (!(Test-Path -LiteralPath ([IO.Path]::Combine($env:CASE_DIR,'release')))) {
           if ([DateTime]::UtcNow -gt $end) { exit 91 }

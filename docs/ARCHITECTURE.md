@@ -446,10 +446,15 @@ account disablement or pool-policy changes.
 The selected source-free lifecycle allocates no number/counter merely on queue admission. An
 unassigned queued cancellation finishes with number `N/A` without consuming a counter. A suitable
 Agent claim allocates the number once and exposes `running`, `startDate` and current `SUCCESS`
-before assignment acceptance; acceptance and process execution remain distinct receipts. The
+before assignment acceptance; that provisional start is refined once on the first authenticated
+Agent acceptance, while the immutable claim/preparation receipt remains separate. The literal
+R0 success observation retains both start values; acceptance and process execution remain distinct receipts. The
 [paused owned-Agent observation](../tests/Vivarium.Tests/TeamCity/Reference/claimed-counter-observations.json)
 proves that distinction. A later observed step failure changes the current outcome to `FAILURE`;
 cancellation is `UNKNOWN`, and internal output finalization remains publicly `running` until finished.
+Current, lease-fenced Agent step/collection observations update the shared Build progress text:
+`Step i/n` during execution and `Running` during preparation/collection. Compatible reads preserve
+that observed text and any received failure outcome while output finalization remains pending.
 
 `Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario

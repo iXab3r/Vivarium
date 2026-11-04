@@ -88,12 +88,12 @@ internal sealed class ScopedKeyScenario : IDisposable
         browser = Create(cookies: true); api = Create(cookies: false);
     }
 
-    internal async Task InitializeUserAsync(IServiceProvider services, string name = "owned-scoped-user")
+    internal async Task InitializeUserAsync(IServiceProvider services, string name = "owned-scoped-user", string? displayName = "Owned scoped actor")
     {
         await using (var scope = services.CreateAsyncScope())
         {
             var users = scope.ServiceProvider.GetRequiredService<UserManager<VivariumUser>>();
-            var user = new VivariumUser { Id = Guid.NewGuid(), UserName = name, DisplayName = "Owned scoped actor" };
+            var user = new VivariumUser { Id = Guid.NewGuid(), UserName = name, DisplayName = displayName };
             Assert.That((await users.CreateAsync(user)).Succeeded, Is.True);
             userId = user.Id;
             // Prior state: an eligible ordinary Identity session. OrdinaryIdentityTests owns the
