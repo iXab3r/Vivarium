@@ -4,6 +4,16 @@
 
 ### Current checkpoint — 2026-11-04 (not milestone closure)
 
+Offline accounting now has a focused `--pilot` assessment mode in the existing
+ApiLedger tool. Raw evidence is 33 business rows plus the required SDK PASS; this
+does not renew five stale legacy SQLite probes or materialize seven declared wire
+variants. Candidate-specific source/producer impact and heavy composed asset/actor/
+readback support remain due. Raw observer FAIL and read-only continuation PASS
+stay separate. Individual gaps are in the external
+`artifacts/pilot-chain/remediation-20261104/pilot-current.json` report.
+Global API denominator remains unknown and API-complete false.
+
+
 Remediation checkpoint: one fresh unchanged published CLI 0.5.6 entry completed Prepare 1,
 Windows 2 and Release root 3 successfully, version `0.1.6-nightly.20261104.1297`, with corrected
 versioned definition `70ea3e173fb28f8bc91c15b5db971d2d3234d92a` and unchanged package source

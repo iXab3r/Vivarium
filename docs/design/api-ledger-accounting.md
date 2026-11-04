@@ -196,3 +196,20 @@ materialized, executed or GREEN wire cases. R0 retains its original inventory an
 An invalidation assessment retains original receipts; new required metadata absent from those
 receipts remains an explicit stale-evidence error, even after the registry itself is repaired.
 Source-disposition hashes observe current source bytes only and do not renew replacement proof.
+
+
+The existing offline reader also accepts `--pilot <assessment-file>`. It joins the
+normative `pilot-contract-scope.json` business IDs to exact discovered test names and
+raw TRX class/name/outcome rows, with hash-bound cohort receipt, binding table,
+discovery log and seal. These are business/SDK evidence, never additional literal
+TCREST cases. Seven declared variants remain declarations in the global join.
+The external assessment binds `candidate_id`, `receipt`, `seal`, `bindings`,
+`discovery` (each path/sha256), and `trx`. Optional `heavy_results` use the existing
+raw-result descriptor (artifact/sha256/counters/exit_code) plus a role. Original
+observer failure and subsequent read-only continuation have separate outcomes.
+Input and producer drift is reported individually. Missing candidate reuse decisions
+or input-specific impact support withholds current GREEN while preserving raw
+outcomes. This focused mode currently reports heavy composition support as a gap:
+raw test outcomes alone do not validate all asset/actor/readback boolean receipts.
+Legacy SQLite baseline currency, selected Chiral/PG evidence, unknown reference
+variants and review/debt/main acceptance remain separate. No runtime is executed.
