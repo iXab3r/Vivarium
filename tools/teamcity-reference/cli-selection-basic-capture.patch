@@ -1,0 +1,31 @@
+--- a/src/client.ts
++++ b/src/client.ts
+@@ -3998,14 +3998,20 @@
+   public async captureSelectionAuthorityLab() {
+     if(this.#baseUrl.replace(/\/$/, "") !== "http://127.0.0.1:18111") throw Error("Lab only");
+     const { captureAuthority } = await import("./selection-lab.js");
+-    return captureAuthority(this, async(id: string, name: string, fetch: typeof globalThis.fetch) => {
+-      const path = `/app/rest/users/${idPath(id,"user")}/tokens`;
+-      const response = await this.#response("POST",path,{}, {name});
+-      if(!response.ok) throw Error(JSON.stringify({request:{method:"POST",path,body:{name}},response:{status:response.status,body:await response.text()}}));
+-      const raw = await response.json() as {value:string};
+-      return new TeamCityClient({baseUrl:this.#baseUrl, token:raw.value, fetch});
+-    });
+-  }
++    const {execFileSync}=await import("node:child_process");
++    const meta=JSON.parse(execFileSync("docker",["inspect","vivarium-p0-rest-teamcity-2026-1-3"],{encoding:"utf8",windowsHide:true}))[0];
++    if(meta.Config.Labels["vivarium.owner"]!=="p0-rest-first-teamcity-lab"||meta.Id!=="a98f4443f2a5cddbe614fb442e4e8d644ce5a92ebc7bf085c40df51f1cb89cce"||(await this.getServerStatus()).buildNumber!=="222742")throw Error("Pinned lab required before mutation");
++    const initial:any=await this.#requestJson("GET","/app/rest/server/authSettings");
++    await this.#requestJson("PUT","/app/rest/server/authSettings",{}, {...initial,perProjectPermissions:true});
++    try { return await captureAuthority(this, async(username: string, password: string, recording: typeof globalThis.fetch) => {
++      await this.#requestJson("POST", "/app/rest/users", {fields:"id,username"}, {username,password});
++      return new TeamCityClient({baseUrl:this.#baseUrl, token:"owned-basic-placeholder", fetch:async(input,init)=> {
++        const headers=new Headers(init?.headers);headers.set("Authorization","Basic "+Buffer.from(username+":"+password).toString("base64"));
++        return recording(input,{...init,headers});
++      }});
++    }); } finally { await this.#requestJson("PUT","/app/rest/server/authSettings",{},initial); }
++  }
++
+   public async captureSelectionLab() {
+     if (this.#baseUrl.replace(/\/$/, "") !== "http://127.0.0.1:18111") throw Error("Lab only");
+     const { captureSelectionLab } = await import("./selection-lab.js");

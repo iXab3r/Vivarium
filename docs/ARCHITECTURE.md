@@ -1726,7 +1726,9 @@ mismatched `buildTypeId`. Direct B retains its immutable A edge; consistent B+A 
 execution. Existing artifact handles and source selections remain authoritative.
 
 The bounded implementation requires current graph/configuration membership, unchanged effective
-settings/source declarations, successful finished selections and consistent transitive identities.
+settings/source declarations, successful finished selections and consistent transitive identities. Contradictory retained identities return HTTP400.
+A new consumer collects current HEAD independently from explicitly retained producers; its immutable
+admission records those explicit edges, preserving ordinary same-chain source pinning and restart behavior.
 Unsupported profiles fail explicitly; their negative HTTP behavior is not accepted compatibility.
 Never mutate retained producer inputs, decrypt environments or reassign them. D49 automatic
 secret-candidate exclusion remains unchanged. D48 input cannot target an explicitly retained
@@ -1735,10 +1737,11 @@ producer: reject rather than silently discard or propagate that named environmen
 See [literal observations](../tests/Vivarium.Tests/TeamCity/Reference/explicit-selection-observations.json)
 and [acquisition report](../artifacts/pilot-chain/selection-reference-report-20261104.md),
 AC-BLD-07, [#117](https://github.com/iXab3r/Vivarium/issues/117) and
-[#118](https://github.com/iXab3r/Vivarium/issues/118). Tiny unchanged-HEAD ON_SERVER source receipts
-prove selected SHA, not changed-HEAD pinning. Missing bytes, contradictory graph, ordinary selection
-denial, changed settings/branches, multiple-direct graphs and absent-field variants remain
-unaccepted. Token issuance HTTP403 is not a selection-denial oracle. No complete API-family GREEN.
+[#118](https://github.com/iXab3r/Vivarium/issues/118). The bounded follow-up captures ordinary project-viewer selection HTTP403, contradictory graph HTTP400,
+required filename absence admitted HTTP200 then failed-to-start, and advanced root HEAD with old
+producer identities/bytes retained. Filename absence does not prove physical deleted-byte behavior.
+Changed settings/branches, multiple-direct graphs and absent-field variants remain unaccepted.
+Token issuance HTTP403 remains a separate prerequisite failure. No complete API-family GREEN.
 
 ## 5. Protocol sketch
 

@@ -2,6 +2,12 @@
 
 ## Current story delivery plan
 
+Bounded 2026-11-05 implementation checkpoint: the four selected reference gaps have literal outcomes,
+and source/conflict/failed-artifact projection alignment passes the focused real-PG fixture. Required
+solution build passes; solution tests report722 PASS/11 skipped. See [evidence and review boundary](selection-boundaries-20261105.md).
+Prior33-story/SDK evidence is not rerun; exact-candidate --pilot transfer retains a runtime-producer
+renewal gate because Controller IL changed. Aggregate/Security review, zero due debt and main remain due.
+
 ### Current checkpoint — 2026-11-04 (not milestone closure)
 
 Offline accounting now has a focused `--pilot` assessment mode in the existing
@@ -38,7 +44,7 @@ independent aggregate and Security/Adversarial review at the parent's new commit
 zero-debt/main delivery and full PILOT acceptance remain open. No full API percentage is known.
 
 
-Mechanical accounting is **INVALID_ACCOUNTING**, not GREEN. The existing offline ApiLedger
+Historical pre-remediation mechanical accounting was **INVALID_ACCOUNTING**, not GREEN. The existing offline ApiLedger
 reader exits 1: `Orphan ledger case: TCREST-PILOT-EXPLICIT-SELECTION-DIRECT-001`.
 `api-ledger.tsv` links this existing case and `r0-contract-variants.tsv` records its reference
 contract gap, but `Ledger.Read` joins only `rest-first-cohort-cases.tsv` and
@@ -51,8 +57,12 @@ existing assessment rules. No new case, guessed oracle, automatic RED allowance 
 was made. The frozen first PILOT cohort and selected R0 28 obligations remain separate from
 global discovery/allocation and the unknown full API denominator. Actual used selection behavior
 remains due to this story; broader family completion retains its existing later owners.
-Ordinary-selection denial, missing bytes, conflicting graph and changed-HEAD reference variants
-remain unknown/unaccepted, pending reference evidence and explicit allocation; none was moved.
+The four bounded reference gaps now have literal evidence: ordinary project-viewer selection HTTP403;
+required filename-rule absence HTTP200 then failed-to-start FAILURE; contradictory B/A HTTP400;
+advanced root HEAD with retained old producers and bytes. See [bounded acquisition and alignment](selection-boundaries-20261105.md).
+Physical deleted-byte, changed settings/branches and broader field/graph profiles remain unaccepted.
+The seven declarations remain outside materialized wire GREEN; product validation and exact-candidate
+accounting are reported separately.
 
 Publisher portability/checksum/transport and worker-lifecycle P2 findings are fixed with focused
 receipts, pending independent aggregate and Security/Adversarial review at the new candidate.

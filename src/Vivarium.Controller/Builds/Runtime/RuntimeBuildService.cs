@@ -160,7 +160,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 throw SelectionUnavailable("Only successful finished members of this snapshot graph are supported.");
             if (selectedMembers.TryGetValue(type.ExternalId, out var previous))
             {
-                if (previous.Id != retained.Id) throw SelectionUnavailable("Selected snapshot identities conflict.");
+                if (previous.Id != retained.Id) throw Invalid("Selected snapshot identities conflict.");
                 return;
             }
             var retainedInput = await database.RuntimeBuildInputs.SingleAsync(i => i.BuildId == retained.Id, token);
@@ -221,6 +221,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                     preparedEnvironments.TryGetValue(configurationId, out var preparedEnvironment) ? preparedEnvironment : isRoot ? environment : []),
                 OverridesJson = JsonSerializer.Serialize(isRoot ? new SortedDictionary<string, string>(parameters, StringComparer.Ordinal) : []),
                 AdmissionJson = JsonSerializer.Serialize(new { actorId = member.ActorId, permissions, projectAndAncestors = ancestry,
+                    explicitSnapshotBuildIds = config.Snapshots.Where(d => selectedMembers.ContainsKey(d.Configuration)).Select(d => selectedMembers[d.Configuration].Id).ToArray(),
                     catalogueRevisionId = snapshot.Revision.Id, permittedPoolIds = new[] { 0 }, trustClass = "operator-enrolled-physical" }) });
             if (vcs is not null) database.RuntimeBuildSourceSelections.Add(new() { BuildId = member.Id, Version = vcs.Version, SelectedAt = now });
             database.RuntimeBuildOutputs.Add(new() { BuildId = member.Id });

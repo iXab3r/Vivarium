@@ -48,6 +48,8 @@ public sealed class ExplicitSelectionAcceptanceCases
         await R0AcceptanceCases.CommitCaseAsync(host, "fixture: versioned Release-only definition repair");
         Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
         await host.RestartAsync();
+        var advancedRevision = await git.MetadataChangeAsync();
+        Assert.That(advancedRevision, Is.Not.EqualTo(firstRevision));
         foreach(var native in new[] { false, true })
         {
             var dependencies = new[] { new { id = middleId, buildTypeId = "P_Windows" }, new { id = prepareId, buildTypeId = "P_Prepare" } };
@@ -60,11 +62,54 @@ public sealed class ExplicitSelectionAcceptanceCases
             var release = await FinishedAsync(actor.BuildClient, accepted.RootElement.GetProperty("id").GetInt64());
             Assert.That(release.GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
             Assert.That(release.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64(), Is.EqualTo(middleId));
-            Assert.That(release.GetProperty("revisions").GetProperty("revision")[0].GetProperty("version").GetString(), Is.EqualTo(firstRevision));
+            Assert.That(release.GetProperty("revisions").GetProperty("revision")[0].GetProperty("version").GetString(), Is.EqualTo(advancedRevision));
             var bytes = await actor.BuildClient.GetByteArrayAsync("/app/rest/builds/id:" + release.GetProperty("id").GetInt64() + "/artifacts/files/release.txt");
             Assert.That(bytes, Is.EqualTo(Encoding.UTF8.GetBytes("coherent-reference-version\n")));
             await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
             Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.EqualTo(native ? 4 : 3));
+        }
+        var missing = repaired.Replace("middle.txt => ci-input/middle", "required-absent.txt => ci-input/middle", StringComparison.Ordinal);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), missing);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: required artifact filename absent");
+        await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf);
+        foreach (var native in new[] { false, true })
+        {
+            await using var missingDatabase = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+            var beforeMissing = await missingDatabase.RuntimeBuilds.CountAsync();
+            using var missingRequest = native
+                ? await actor.BuildClient.PostAsJsonAsync("/api/v1/builds", new { configurationId = "P_Release", selectedDependencies = new[] { new { id = middleId } } })
+                : await actor.BuildClient.PostAsJsonAsync("/app/rest/buildQueue", new Dictionary<string,object> {
+                ["buildType"] = new { id = "P_Release" }, ["snapshot-dependencies"] = new { build = new[] { new { id = middleId } } } });
+            Assert.That(missingRequest.StatusCode, Is.EqualTo(native ? HttpStatusCode.Accepted : HttpStatusCode.OK));
+            using var missingBody = JsonDocument.Parse(await missingRequest.Content.ReadAsStringAsync());
+            var missingResult = await FinishedAsync(actor.BuildClient, missingBody.RootElement.GetProperty("id").GetInt64());
+            Assert.That(missingResult.GetProperty("status").GetString(), Is.EqualTo("FAILURE"));
+            Assert.That(await missingDatabase.RuntimeBuilds.CountAsync(), Is.EqualTo(beforeMissing + 1));
+            Assert.That(missingResult.GetProperty("failedToStart").GetBoolean(), Is.True);
+            Assert.That(missingResult.GetProperty("artifact-dependencies").GetProperty("count").GetInt32(), Is.Zero);
+            Assert.That(missingResult.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64(), Is.EqualTo(middleId));
+        }
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), repaired);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: restore required artifact rule");
+        await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf);
+        using var viewer = await R0AcceptanceCases.ProjectActorAsync(host, administrator, csrf,
+            "OWNED_SELECTION_VIEW", ["view_project", "view_build_configuration_settings"]);
+        using var deniedSelection = await viewer.BuildClient.PostAsJsonAsync("/app/rest/buildQueue", new Dictionary<string,object> {
+            ["buildType"] = new { id = "P_Release" }, ["snapshot-dependencies"] = new { build = new[] { new { id = middleId } } } });
+        Assert.That(deniedSelection.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        using var freshPrepareRequest = await actor.BuildClient.PostAsJsonAsync("/api/v1/builds", new {
+            configurationId = "P_Prepare", secretEnvironment = new Dictionary<string,string> { ["DUMMY_INPUT"] = "new-customized-producer" } });
+        freshPrepareRequest.EnsureSuccessStatusCode();
+        using var freshPrepareBody = JsonDocument.Parse(await freshPrepareRequest.Content.ReadAsStringAsync());
+        var freshPrepare = await FinishedAsync(actor.BuildClient, freshPrepareBody.RootElement.GetProperty("id").GetInt64());
+        var conflicts = new[] { new { id = middleId }, new { id = freshPrepare.GetProperty("id").GetInt64() } };
+        foreach (var native in new[] { false, true })
+        {
+            using var conflict = native
+                ? await actor.BuildClient.PostAsJsonAsync("/api/v1/builds", new { configurationId = "P_Release", selectedDependencies = conflicts })
+                : await actor.BuildClient.PostAsJsonAsync("/app/rest/buildQueue", new Dictionary<string,object> {
+                    ["buildType"] = new { id = "P_Release" }, ["snapshot-dependencies"] = new { build = conflicts } });
+            Assert.That(conflict.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest), await conflict.Content.ReadAsStringAsync());
         }
         await linux.DisposeAsync();
         using var queued = await actor.BuildClient.PostAsJsonAsync("/api/v1/builds", new {

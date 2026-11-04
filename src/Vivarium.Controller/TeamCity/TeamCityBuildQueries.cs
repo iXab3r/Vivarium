@@ -84,6 +84,11 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
         }
         foreach (var kind in new[] { "SNAPSHOT", "ARTIFACT" })
         {
+            if (kind == "ARTIFACT" && build.FailedToStart && build.StatusText == "Failed to resolve artifact dependency")
+            {
+                result["artifact-dependencies"] = new JsonObject { ["count"] = 0, ["build"] = new JsonArray() };
+                continue;
+            }
             var selected = dependencies.Where(d => d.Kind == kind).Select(d => d.Build).ToArray();
             if (selected.Length == 0) continue; // Preserve ordinary R0 representations unchanged.
             var items = new JsonArray();

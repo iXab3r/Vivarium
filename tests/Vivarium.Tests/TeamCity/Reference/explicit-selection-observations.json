@@ -166,5 +166,621 @@
   "cleanup": [
     "project deleted"
   ],
-  "limits": "ON_SERVER tiny source; unchanged HEAD only, no changed-source pinning, restart or ordinary selection-denial oracle"
+  "limits": "ON_SERVER tiny source; unchanged HEAD only, no changed-source pinning, restart or ordinary selection-denial oracle",
+  "bounded20261105": {
+    "scope": "Four bounded reference variants; no full operation API acceptance; required filename absence is not deleted-byte proof",
+    "receipts": [
+      {
+        "path": "artifacts\\pilot-chain\\selection-literal-1793833014354\\receipt.json",
+        "sha256": "888f66108534c1e2a67b8aa0ad30af590887abf3888ab7d0a6100c6c97c7faed"
+      },
+      {
+        "path": "artifacts\\pilot-chain\\selection-authority-1793833176884\\receipt.json",
+        "sha256": "ec4e25376238731ddd30d94e31b95d65405953092e4115b94d4fb10e79548368"
+      }
+    ],
+    "source": {
+      "sha": "92398ea23eab5ef9afe0958d0ea263e329422b0d",
+      "url": "git://explicit-selection-1793833014354-git:9418/source.git"
+    },
+    "advancedSha": "76d980bba9f3d6c1e3db41041cd7b36b5c674167",
+    "cases": [
+      {
+        "label": "direct-B",
+        "done": {
+          "id": 328,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "SUCCESS",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "92398ea23eab5ef9afe0958d0ea263e329422b0d"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          }
+        },
+        "artifact": {
+          "bytes": 18,
+          "sha256": "7a47990c4ba6f7a9fa185dfc296c982adea592945d38c502bb9cbb6c2d33294b",
+          "text": "A-323\nB-325\nC-328\n"
+        },
+        "newBuilds": 1
+      },
+      {
+        "label": "consistent-indirect-A",
+        "done": {
+          "id": 331,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "SUCCESS",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "92398ea23eab5ef9afe0958d0ea263e329422b0d"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          }
+        },
+        "artifact": {
+          "bytes": 18,
+          "sha256": "d28c3ffa7528ddd1bb5d0ee7bfd7d0a22fa500b69393f37d13a11c2e616680f9",
+          "text": "A-323\nB-325\nC-331\n"
+        },
+        "newBuilds": 1
+      },
+      {
+        "label": "contradictory-old-B-new-A",
+        "error": "HttpError: TeamCity request failed with HTTP 400.",
+        "newBuilds": null
+      },
+      {
+        "label": "mismatch-new-A-as-B",
+        "done": {
+          "id": 335,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "SUCCESS",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "92398ea23eab5ef9afe0958d0ea263e329422b0d"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 334,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [
+              {
+                "id": 334,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          }
+        },
+        "artifact": {
+          "bytes": 18,
+          "sha256": "2d5d160867b8a00b1f9ccdd1fa48d83ea436486ef5736dbb400004ce837a18d0",
+          "text": "A-332\nB-334\nC-335\n"
+        },
+        "newBuilds": 2
+      },
+      {
+        "label": "control-new-A",
+        "done": {
+          "id": 338,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "SUCCESS",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "92398ea23eab5ef9afe0958d0ea263e329422b0d"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 334,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [
+              {
+                "id": 334,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          }
+        },
+        "artifact": {
+          "bytes": 18,
+          "sha256": "6511e34ea1200f30b4d7ec64d16e8572971c6eba2047e37715c9b0c7a3cfaead",
+          "text": "A-332\nB-334\nC-338\n"
+        },
+        "newBuilds": 1
+      },
+      {
+        "label": "changed-head-old-B-A",
+        "done": {
+          "id": 341,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "SUCCESS",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "76d980bba9f3d6c1e3db41041cd7b36b5c674167"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          }
+        },
+        "artifact": {
+          "bytes": 18,
+          "sha256": "bdca3fc17eea8a1cc2a46f77ec5785fa9008b0bb32d6ed6055d3c8bc442ca372",
+          "text": "A-323\nB-325\nC-341\n"
+        },
+        "newBuilds": 1
+      },
+      {
+        "label": "missing-required-rule",
+        "done": {
+          "id": 344,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "status": "FAILURE",
+          "state": "finished",
+          "triggered": {
+            "user": {
+              "username": "vivarium-lab-admin",
+              "id": 1
+            }
+          },
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "76d980bba9f3d6c1e3db41041cd7b36b5c674167"
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [
+              {
+                "id": 325,
+                "buildTypeId": "VivSelection_1793833014354_B",
+                "status": "SUCCESS",
+                "state": "finished"
+              }
+            ],
+            "count": 1
+          },
+          "artifact-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        "newBuilds": 1,
+        "artifactDownloadStatus": 404,
+        "listing": {
+          "id": 344,
+          "buildTypeId": "VivSelection_1793833014354_C",
+          "number": "6",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivSelection_1793833014354_C/344",
+          "statusText": "Failed to resolve artifact dependency",
+          "queuedDate": "20261104T225924+0000",
+          "startDate": "20261104T225925+0000",
+          "finishDate": "20261104T225935+0000",
+          "agent": {
+            "id": 52,
+            "name": "VivSelection_1793833014354_Agent"
+          }
+        }
+      }
+    ],
+    "authority": {
+      "current": {
+        "username": "vivselectiondenial_1793833176885_user",
+        "id": 62
+      },
+      "roles": [
+        {
+          "roleId": "PROJECT_VIEWER",
+          "scope": "p:VivSelectionDenial_1793833176885"
+        }
+      ],
+      "readConfiguration": "VivSelectionDenial_1793833176885_C",
+      "seed": {
+        "id": 345,
+        "buildTypeId": "VivSelectionDenial_1793833176885_A",
+        "status": "SUCCESS",
+        "state": "finished",
+        "triggered": {
+          "user": {
+            "username": "vivarium-lab-admin",
+            "id": 1
+          }
+        },
+        "revisions": {
+          "count": 0,
+          "revision": []
+        },
+        "snapshot-dependencies": {
+          "build": [],
+          "count": 0
+        },
+        "artifact-dependencies": {
+          "build": [],
+          "count": 0
+        }
+      },
+      "exchanges": [
+        {
+          "principal": "owned-basic-user",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/users/current",
+            "query": "?fields=id%2Cusername%2Cname%2Cemail",
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "body": "{\"username\":\"vivselectiondenial_1793833176885_user\",\"id\":62}"
+          }
+        },
+        {
+          "principal": "owned-basic-user",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/users/current",
+            "query": "?fields=id%2Cusername%2Cname%2Cemail",
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "body": "{\"username\":\"vivselectiondenial_1793833176885_user\",\"id\":62}"
+          }
+        },
+        {
+          "principal": "owned-basic-user",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivSelectionDenial_1793833176885_C",
+            "query": "?fields=id%2Cname%2CprojectId%2CprojectName%2Cpaused%2Cdescription%2CwebUrl",
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "body": "{\"id\":\"VivSelectionDenial_1793833176885_C\",\"name\":\"No execution\",\"paused\":false,\"projectName\":\"Owned denial probe\",\"projectId\":\"VivSelectionDenial_1793833176885\",\"webUrl\":\"http://127.0.0.1:18111/buildConfiguration/VivSelectionDenial_1793833176885_C?mode=builds\"}"
+          }
+        },
+        {
+          "principal": "owned-basic-user",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+            "body": "{\"buildType\":{\"id\":\"VivSelectionDenial_1793833176885_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":345,\"buildTypeId\":\"VivSelectionDenial_1793833176885_A\"}]}}"
+          },
+          "response": {
+            "status": 403,
+            "body": "{\"errors\":[{\"additionalMessage\":\"jetbrains.buildServer.serverSide.auth.AccessDeniedException: You do not have \\\"Run build\\\" permission in project with internal id: project144.\",\"statusText\":\"Responding with error, status code: 403 (Forbidden).\",\"stackTrace\":null,\"message\":\"You do not have \\\"Run build\\\" permission in project with internal id: project144\"}]}"
+          }
+        }
+      ],
+      "restoredGroups": [
+        {
+          "key": "ALL_USERS_GROUP",
+          "before": [
+            {
+              "roleId": "PROJECT_DEVELOPER",
+              "scope": "g"
+            }
+          ],
+          "after": [
+            {
+              "roleId": "PROJECT_DEVELOPER",
+              "scope": "g"
+            }
+          ]
+        }
+      ],
+      "userDeleted": true,
+      "projectDeleted": true
+    },
+    "restoration": {
+      "auth": {
+        "allowGuest": false,
+        "collapseLoginForm": false,
+        "perProjectPermissions": false,
+        "emailVerification": false,
+        "buildAuthenticationMode": "strict",
+        "modules": [
+          {
+            "name": "Default"
+          },
+          {
+            "name": "Token-Auth"
+          },
+          {
+            "name": "HTTP-Basic"
+          }
+        ]
+      },
+      "gates": [
+        {
+          "name": "ReadOnly",
+          "enabled": true,
+          "description": "Read remote state without changing it"
+        },
+        {
+          "name": "Update",
+          "enabled": false,
+          "description": "Perform operations that may change remote state"
+        },
+        {
+          "name": "Admin",
+          "enabled": false,
+          "description": "Change remote accounts, access policy and server administration"
+        },
+        {
+          "name": "Credentials",
+          "enabled": false,
+          "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+        }
+      ],
+      "queue": {
+        "count": 0,
+        "items": [],
+        "hasMore": false,
+        "nextStart": null
+      },
+      "agents": {
+        "count": 0,
+        "items": [],
+        "hasMore": false,
+        "nextStart": null
+      }
+    },
+    "queuePosts": [
+      {
+        "exchangeIndex": 93,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":325,\"buildTypeId\":\"VivSelection_1793833014354_B\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzI4LCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozMjgiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzMyOCIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU3NDYrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU3NDYrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozMjgpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzI4KSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjMyOC9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNSwiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6MzI1Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2U2VsZWN0aW9uXzE3OTM4MzMwMTQzNTRfQi8zMjUiLCJmaW5pc2hPbkFnZW50RGF0ZSI6IjIwMjYxMTA0VDIyNTc0NSswMDAwIiwiY3VzdG9taXplZCI6dHJ1ZX1dLCJjb3VudCI6MX0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ=="
+        }
+      },
+      {
+        "exchangeIndex": 111,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":325,\"buildTypeId\":\"VivSelection_1793833014354_B\"},{\"id\":323,\"buildTypeId\":\"VivSelection_1793833014354_A\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzMxLCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozMzEiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzMzMSIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU4MDArMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU4MDArMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozMzEpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzMxKSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjMzMS9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNSwiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6MzI1Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2U2VsZWN0aW9uXzE3OTM4MzMwMTQzNTRfQi8zMjUiLCJmaW5pc2hPbkFnZW50RGF0ZSI6IjIwMjYxMTA0VDIyNTc0NSswMDAwIiwiY3VzdG9taXplZCI6dHJ1ZX1dLCJjb3VudCI6MX0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ=="
+        }
+      },
+      {
+        "exchangeIndex": 144,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":325,\"buildTypeId\":\"VivSelection_1793833014354_B\"},{\"id\":332,\"buildTypeId\":\"VivSelection_1793833014354_A\"}]}}"
+        },
+        "response": {
+          "status": 400,
+          "contentType": "application/json",
+          "bodyBase64": "eyJlcnJvcnMiOlt7ImFkZGl0aW9uYWxNZXNzYWdlIjoiamV0YnJhaW5zLmJ1aWxkU2VydmVyLnNlcnZlci5yZXN0LmVycm9ycy5CYWRSZXF1ZXN0RXhjZXB0aW9uOiBFcnJvciB0cnlpbmcgdG8gdXNlIHNwZWNpZmllZCBzbmFwc2hvdCBkZXBlbmRlbmNpZXM6Q3VzdG9taXplZCBzbmFwc2hvdCBkZXBlbmRlbmNpZXMgZm9ybSBhIGJ1aWxkIGNoYWluIHdoZXJlIHRoZSBzYW1lIGJ1aWxkIGNvbmZpZ3VyYXRpb24gaGFzIGRpZmZlcmVudCBidWlsZHM6XG5idWlsZCBjb25maWd1cmF0aW9uOiBPd25lZCBleHBsaWNpdCBzZWxlY3Rpb24gcmVmZXJlbmNlIC8gQSwgaWQ6IFZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0FcbmJ1aWxkczogIzEsIGlkOiAzMjMgYW5kICMyLCBpZDogMzMyLiIsInN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDAgKEJhZCBSZXF1ZXN0KS4iLCJzdGFja1RyYWNlIjpudWxsLCJtZXNzYWdlIjoiRXJyb3IgdHJ5aW5nIHRvIHVzZSBzcGVjaWZpZWQgc25hcHNob3QgZGVwZW5kZW5jaWVzOkN1c3RvbWl6ZWQgc25hcHNob3QgZGVwZW5kZW5jaWVzIGZvcm0gYSBidWlsZCBjaGFpbiB3aGVyZSB0aGUgc2FtZSBidWlsZCBjb25maWd1cmF0aW9uIGhhcyBkaWZmZXJlbnQgYnVpbGRzOlxuYnVpbGQgY29uZmlndXJhdGlvbjogT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSAvIEEsIGlkOiBWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9BXG5idWlsZHM6ICMxLCBpZDogMzIzIGFuZCAjMiwgaWQ6IDMzMiJ9XX0="
+        }
+      },
+      {
+        "exchangeIndex": 146,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":332,\"buildTypeId\":\"VivSelection_1793833014354_B\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzM1LCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozMzUiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzMzNSIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU4MjcrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU4MjcrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozMzUpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzM1KSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjMzNS9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMzNCwiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwic3RhdGUiOiJxdWV1ZWQiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkUXVldWUvaWQ6MzM0Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZC8zMzQifV0sImNvdW50IjoxfSwidmNzTGFiZWxzIjpbXSwiY3VzdG9taXphdGlvbiI6e319"
+        }
+      },
+      {
+        "exchangeIndex": 176,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":332,\"buildTypeId\":\"VivSelection_1793833014354_A\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzM4LCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozMzgiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzMzOCIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU4NTIrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU4NTIrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozMzgpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzM4KSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjMzOC9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMzNywiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwic3RhdGUiOiJxdWV1ZWQiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkUXVldWUvaWQ6MzM3Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZC8zMzcifV0sImNvdW50IjoxfSwidmNzTGFiZWxzIjpbXSwiY3VzdG9taXphdGlvbiI6e319"
+        }
+      },
+      {
+        "exchangeIndex": 194,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":325,\"buildTypeId\":\"VivSelection_1793833014354_B\"},{\"id\":323,\"buildTypeId\":\"VivSelection_1793833014354_A\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzQxLCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozNDEiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzM0MSIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU5MDkrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU5MDkrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozNDEpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzQxKSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjM0MS9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNSwiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6MzI1Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2U2VsZWN0aW9uXzE3OTM4MzMwMTQzNTRfQi8zMjUiLCJmaW5pc2hPbkFnZW50RGF0ZSI6IjIwMjYxMTA0VDIyNTc0NSswMDAwIiwiY3VzdG9taXplZCI6dHJ1ZX1dLCJjb3VudCI6MX0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ=="
+        }
+      },
+      {
+        "exchangeIndex": 216,
+        "principal": "lab-admin",
+        "request": {
+          "method": "POST",
+          "path": "/app/rest/buildQueue",
+          "query": "?fields=id%2CbuildTypeId%2Cnumber%2Cstate%2Cstatus%2CstatusText%2CbranchName%2CdefaultBranch%2Cpersonal%2CfailedToStart%2CcanceledInfo%28timestamp%29%2CqueuedDate%2CstartDate%2CfinishDate%2CpercentageComplete%2CqueuePosition%2CwaitReason%2CwebUrl%2Cagent%28id%2Cname%29",
+          "body": "{\"buildType\":{\"id\":\"VivSelection_1793833014354_C\"},\"snapshot-dependencies\":{\"build\":[{\"id\":325,\"buildTypeId\":\"VivSelection_1793833014354_B\"}]}}"
+        },
+        "response": {
+          "status": 200,
+          "contentType": "application/json",
+          "bodyBase64": "eyJpZCI6MzQ0LCJidWlsZFR5cGVJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJzdGF0ZSI6InF1ZXVlZCIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRRdWV1ZS9pZDozNDQiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzM0NCIsImJ1aWxkVHlwZSI6eyJpZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJuYW1lIjoiQyIsInByb2plY3ROYW1lIjoiT3duZWQgZXhwbGljaXQgc2VsZWN0aW9uIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlNlbGVjdGlvbl8xNzkzODMzMDE0MzU0X0MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9DP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJDaGVja2luZyBmb3IgY2hhbmdlcyBpcyBpbiBwcm9ncmVzcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQyMjU5MjQrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQyMjU5MjQrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDozNDQpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MzQ0KSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjM0NC9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W3siaWQiOjMyNSwiYnVpbGRUeXBlSWQiOiJWaXZTZWxlY3Rpb25fMTc5MzgzMzAxNDM1NF9CIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZHMvaWQ6MzI1Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2U2VsZWN0aW9uXzE3OTM4MzMwMTQzNTRfQi8zMjUiLCJmaW5pc2hPbkFnZW50RGF0ZSI6IjIwMjYxMTA0VDIyNTc0NSswMDAwIiwiY3VzdG9taXplZCI6dHJ1ZX1dLCJjb3VudCI6MX0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ=="
+        }
+      }
+    ],
+    "fixtureCredentialRedactions": {
+      "exchangeIndices": [
+        255
+      ],
+      "originalReceiptSha256": "e35bbfb4fe1f6ecb183b8aec29aa44b7369815ec707e6e32fb1574047bc36867",
+      "scope": "Only owned fixture user-create password; selected queue wire remains literal"
+    }
+  }
 }

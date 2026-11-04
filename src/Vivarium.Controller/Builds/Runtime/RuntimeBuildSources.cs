@@ -123,12 +123,19 @@ internal sealed class RuntimeBuildSources(IDbContextFactory<VivariumDbContext> d
         await transaction.CommitAsync(token);
     }
 
-    private static Task<string[]> UpstreamVersionsAsync(VivariumDbContext database, RuntimeBuildInput input, CancellationToken token) =>
-        (from dependency in RuntimeBuildService.DependencyHandles(database, input.BuildId)
+    private static Task<string[]> UpstreamVersionsAsync(VivariumDbContext database, RuntimeBuildInput input, CancellationToken token)
+    {
+        // Explicit finished selections retain their own revision; they do not pin this new checkout.
+        // Keep this immutable request fact with admission so restart uses the same processing.
+        using var admission = JsonDocument.Parse(input.AdmissionJson);
+        var retained = admission.RootElement.TryGetProperty("explicitSnapshotBuildIds", out var ids)
+            ? ids.EnumerateArray().Select(id => id.GetInt64()).ToArray() : [];
+        return (from dependency in RuntimeBuildService.DependencyHandles(database, input.BuildId)
          join producerInput in database.RuntimeBuildInputs on dependency.Id equals producerInput.BuildId
          join selection in database.RuntimeBuildSourceSelections on dependency.Id equals selection.BuildId
-         where dependency.Kind == "SNAPSHOT" && producerInput.VcsRootInstanceId == input.VcsRootInstanceId
+         where dependency.Kind == "SNAPSHOT" && producerInput.VcsRootInstanceId == input.VcsRootInstanceId && !retained.Contains(dependency.Id)
          select selection.Version).Distinct().ToArrayAsync(token);
+    }
 
     private static async Task<string> ResolveVersionAsync(VivariumDbContext database, RuntimeBuildInput input, Source source, CancellationToken token)
     {
