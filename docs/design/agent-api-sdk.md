@@ -321,6 +321,15 @@ the source tree, without changing legacy source-free assignment paths. Archives 
 script inputs. Windows uses a relative private Git directory and per-command long-path support;
 global Git settings remain untouched.
 
+After checkout, an ordinary relative `.git` file links the worktree to its own private Git
+directory, with a non-bare repository view. Windows enables long paths only in that repository.
+This supports author `git rev-parse HEAD` from root and nested directories without a long absolute
+GIT_DIR, which installed Git2.32 rejects before long-path handling. A container receives a read-only
+gitfile override and its own read-only metadata mount; its exact `/workspace` safe-directory setting
+handles a differing runner UID, and optional index refresh locks are disabled. No wildcard trust,
+Host Git configuration, runtime credential directory or unrelated Build metadata is mounted.
+This proves selected metadata reads, not arbitrary writable Git operations in containers.
+
 `StepStatus.vcs_checkout` (tag 5, FETCHING/-1) independently commits the bounded checkout receipt
 before user-step progress; `BuildResult.vcs_checkout` (tag 9) repeats it. The Host validates the actual
 revision/outcome against the protected assignment and retains one immutable receipt under the

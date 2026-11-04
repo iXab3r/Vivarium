@@ -30,6 +30,8 @@ public static partial class BuildExecutor
             await GitAsync([.. prefix, "checkout", "--force", "--detach", source.Revision]);
             var actual = await GitAsync([.. prefix, "rev-parse", "--verify", "HEAD^{commit}"]);
             if (actual != source.Revision) return new() { FailureCode = "revision_mismatch" };
+            await GitAsync([.. prefix, "config", "core.bare", "false"]);
+            if (OperatingSystem.IsWindows()) await GitAsync([.. prefix, "config", "core.longpaths", "true"]);
             foreach (var excluded in source.ExcludedDirectories)
             {
                 var path = ResolveUnder(workdir, excluded);
@@ -37,6 +39,12 @@ public static partial class BuildExecutor
                 if (directory.Exists) directory.Delete(recursive: directory.LinkTarget is null);
                 else if (File.Exists(path) || new FileInfo(path).LinkTarget is not null) File.Delete(path);
             }
+            // A relative gitfile supports ordinary Git from nested directories, including Git
+            // 2.32 on Windows where a long absolute GIT_DIR fails before long-path handling.
+            await using (var pointer = new FileStream(Path.Combine(workdir, ".git"), FileMode.CreateNew, FileAccess.Write))
+                await pointer.WriteAsync(Encoding.UTF8.GetBytes("gitdir: " + Path.GetRelativePath(workdir, gitDirectory).Replace('\\', '/') + "\n"));
+            await File.WriteAllTextAsync(ResolveUnder(PrivateInputs(workRoot, buildId), "container.git"),
+                "gitdir: /vivarium-inputs/git\n", new UTF8Encoding(false));
             return new() { Succeeded = true, Revision = actual };
         }
         catch (System.ComponentModel.Win32Exception) { return new() { FailureCode = "git_unavailable" }; }

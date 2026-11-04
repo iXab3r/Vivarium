@@ -386,7 +386,9 @@ public sealed class PilotAcceptanceCases
         var settings = (reuse ? ReuseSettings : Settings).ReplaceLineEndings("\n");
         if (source) settings = settings.Replace("new(\"P\", null, [], [", "new(\"P\", new(\"P_Git\", " + JsonSerializer.Serialize(git.Url) + ", \"refs/heads/main\", \"+:.\\n-:.repos\"), [], [", StringComparison.Ordinal)
             .Replace("2, [])", "2, [], \"ON_AGENT\")", StringComparison.Ordinal)
-            .Replace("""printf 'coherent-reference-version\\n' > prepare.txt""", """test ! -e .repos/omitted.txt\ncat selected.txt > prepare.txt""", StringComparison.Ordinal);
+            .Replace("""printf 'coherent-reference-version\\n' > prepare.txt""", """test ! -e .repos/omitted.txt\ncat selected.txt > prepare.txt""", StringComparison.Ordinal)
+            .Replace("#!/bin/sh\\nset -eu\\n", "#!/bin/sh\\nset -eu\\ngit rev-parse HEAD\\n(mkdir -p git-child && cd git-child && git rev-parse HEAD)\\n", StringComparison.Ordinal)
+            .Replace("copy /b ci-input", "git rev-parse HEAD\\nif errorlevel 1 exit /b 75\\nmkdir git-child\\npushd git-child\\ngit rev-parse HEAD\\nif errorlevel 1 exit /b 76\\npopd\\ncopy /b ci-input", StringComparison.Ordinal);
         if (powershell)
         {
             var start = settings.IndexOf("new(\"windows\", \"Windows\", \"simpleRunner\"", StringComparison.Ordinal);
@@ -520,6 +522,14 @@ public sealed class PilotAcceptanceCases
             {
                 Assert.That(native.RootElement.GetProperty("source").GetProperty("selectedRevision").GetString(), Is.EqualTo(selectedRevision));
                 Assert.That(native.RootElement.GetProperty("source").GetProperty("consumedRevision").GetString(), Is.EqualTo(selectedRevision));
+                using var output = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + build + "/output"));
+                var text = new StringBuilder();
+                foreach (var item in output.RootElement.GetProperty("items").EnumerateArray().Where(e => e.GetProperty("kind").GetString() == "data"))
+                    text.Append(await actor.BuildClient.GetStringAsync(item.GetProperty("content").GetProperty("href").GetString()));
+                Assert.That(text.ToString(), Does.Contain(selectedRevision), "The author's ordinary Git command must read the selected HEAD inside the actual step.");
+                var heads = System.Text.RegularExpressions.Regex.Matches(text.ToString(), "(?m)^[a-f0-9]{40}\\r?$")
+                    .Select(m => m.Value.TrimEnd('\r')).ToArray();
+                Assert.That(heads, Is.EqualTo(new[] { selectedRevision, selectedRevision }), "Root and nested-directory Git discovery retain the same selected revision.");
                 var compatible = await ReadAsync(actor.BuildClient, build);
                 Assert.That(compatible.GetProperty("revisions").GetProperty("revision")[0].GetProperty("version").GetString(), Is.EqualTo(selectedRevision));
             }

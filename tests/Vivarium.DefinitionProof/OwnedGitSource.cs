@@ -30,6 +30,14 @@ internal sealed class OwnedGitSource(string root) : IAsyncDisposable
             $ErrorActionPreference = 'Stop'
             if ([Environment]::Is64BitProcess -ne $true) { exit 72 }
             if ($PSVersionTable.PSEdition -ne 'Desktop') { exit 73 }
+            & git rev-parse HEAD
+            if ($LASTEXITCODE -ne 0) { exit 75 }
+            New-Item -ItemType Directory -Force git-child | Out-Null
+            Push-Location git-child
+            & git rev-parse HEAD
+            $gitExit = $LASTEXITCODE
+            Pop-Location
+            if ($gitExit -ne 0) { exit 76 }
             $source = [IO.File]::ReadAllBytes('selected.txt')
             $selected = [IO.File]::ReadAllBytes('ci-input/prepare/prepare.txt')
             if ([Convert]::ToBase64String($source) -ne [Convert]::ToBase64String($selected)) { exit 74 }

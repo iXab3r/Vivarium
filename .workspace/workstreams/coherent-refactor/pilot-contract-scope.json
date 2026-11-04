@@ -728,6 +728,13 @@
         "cohort_passed": 27,
         "cohort_failed": 0,
         "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
       }
     },
     {
@@ -785,6 +792,13 @@
         "cohort_passed": 27,
         "cohort_failed": 0,
         "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
       }
     },
     {
@@ -842,6 +856,13 @@
         "cohort_passed": 27,
         "cohort_failed": 0,
         "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
       }
     },
     {
@@ -899,6 +920,13 @@
         "cohort_passed": 27,
         "cohort_failed": 0,
         "qualification": "21 selected story rows, one seven-variant SDK/owner-death test and five R0 artifact/current-authority regressions. Pre-run sources and producer copies are sealed in artifact-pre-cohort/inputs.json. This checkpoint is not final full-story milestone acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
       }
     },
     {
@@ -1185,7 +1213,7 @@
       }
     }
   ],
-  "remaining_due": "Complete #78/#116/#117/#118: ordinary Git metadata inside actual recipe steps, targeted temporary CLI chain inputs, source-aware reuse and remaining source/current-rights/fault variants, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Current selected artifact/runner rows do not close their full API families.",
+  "remaining_due": "Complete #78/#116/#117/#118: targeted temporary CLI chain inputs, source-aware reuse and remaining source/current-rights/fault variants, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package without launching built GUI/CLI and test-repository publication/recovery, cumulative R0/final ledger/reviews/main. Current selected artifact/runner rows do not close their full API families.",
   "global_variant_denominator": null,
   "api_complete": false
 }

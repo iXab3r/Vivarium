@@ -40,9 +40,12 @@ internal static class DockerWorkload
         }
 
         var mounts = new List<object> { new { Type = "bind", Source = workdir, Target = "/workspace" } };
-        if (step.ScriptInput.Length != 0)
+        if (assignment.VcsCheckout is not null || step.ScriptInput.Length != 0)
             mounts.Add(new { Type = "bind", Source = BuildExecutor.PrivateInputsForContainer(workdir, assignment.BuildId),
                 Target = "/vivarium-inputs", ReadOnly = true });
+        if (assignment.VcsCheckout is not null)
+            mounts.Add(new { Type = "bind", Source = Path.Combine(BuildExecutor.PrivateInputsForContainer(workdir, assignment.BuildId), "container.git"),
+                Target = "/workspace/.git", ReadOnly = true });
         foreach (var cache in spec.Caches)
         {
             var volume = "vivarium-" + options.Scope + '-' + cache.Name;
@@ -91,6 +94,15 @@ internal static class DockerWorkload
             var cwd = step.Cwd.Length == 0 ? "/workspace" : "/workspace/" + CheckedRelative(step.Cwd);
             var environment = new Dictionary<string, string>(StringComparer.Ordinal) {
                 ["VIVARIUM_BUILD_ID"] = assignment.BuildId, ["VIVARIUM_WORKDIR"] = "/workspace", ["VIVARIUM_RESULTS_DIR"] = "/workspace/results" };
+            if (assignment.VcsCheckout is not null)
+            {
+                environment["GIT_OPTIONAL_LOCKS"] = "0";
+                // The installed runner may use a different UID from the checkout owner. Trust
+                // only this lease's mounted worktree, never a global or wildcard safe-directory.
+                environment["GIT_CONFIG_COUNT"] = "1";
+                environment["GIT_CONFIG_KEY_0"] = "safe.directory";
+                environment["GIT_CONFIG_VALUE_0"] = "/workspace";
+            }
             foreach (var (key, value) in assignment.Parameters) environment["VIVARIUM_PARAM_" + key.ToUpperInvariant()] = value;
             if (assignment.Parameters.TryGetValue("cell", out var cell)) environment["VIVARIUM_CELL"] = cell;
             foreach (var (key, value) in step.Env) environment[key] = value;
