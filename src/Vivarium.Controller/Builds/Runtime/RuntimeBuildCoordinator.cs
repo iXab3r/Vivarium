@@ -326,7 +326,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             ValidateResult(result, assignment);
             var steps = await database.RuntimeBuildObservations.AsNoTracking().Where(o => o.BuildId == build.Id && o.Phase == "COMPLETED").ToArrayAsync(token);
-            if (steps.Any(observed => !RuntimeBuildProgress.SameResult(observed, result.Steps.SingleOrDefault(s => s.StepIndex == observed.StepIndex))))
+            if (steps.Any(observed =>
+                {
+                    var submitted = result.Steps.SingleOrDefault(s => s.StepIndex == observed.StepIndex);
+                    // Infrastructure fallback/recovery is partial: an omission never retracts
+                    // independently committed step evidence. Submitted contradictions still fail.
+                    return submitted is null ? result.Outcome != BuildOutcome.InfrastructureFailed
+                        : !RuntimeBuildProgress.SameResult(observed, submitted);
+                }))
             {
                 await QuarantineProgressAsync(database, agent, build, workload, token);
                 await database.SaveChangesAsync(token); await transaction.CommitAsync(token);

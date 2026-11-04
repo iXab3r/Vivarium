@@ -175,6 +175,7 @@ public sealed partial class R0AcceptanceCases
 
     [TestCase("step")]
     [TestCase("terminal")]
+    [TestCase("infrastructure-terminal")]
     public async Task Conflicting_actual_step_receipts_quarantine_the_owner_and_cannot_rewrite_observed_failure(string conflict)
     {
         var clock = new FakeTimeProvider(ReferenceDate("20261102T124127+0000"));
@@ -195,10 +196,11 @@ public sealed partial class R0AcceptanceCases
             wire.Acceptance.Release(); wire.Step.Release(); await wire.Collection.Arrived.WaitAsync(TimeSpan.FromSeconds(20));
             var before = await ReadBuildAsync(actor.BuildClient, id);
             var changed = wire.CompletionMessage!.Clone(); changed.Status.Completed.ExitCode = 8;
-            if (conflict == "terminal")
+            if (conflict != "step")
             {
                 wire.Collection.Release(); await wire.Result.Arrived.WaitAsync(TimeSpan.FromSeconds(20));
                 changed = wire.ResultMessage!.Clone(); changed.Result.Steps.Single(s => s.StepIndex == 0).ExitCode = 8;
+                if (conflict == "infrastructure-terminal") changed.Result.Outcome = Vivarium.Contracts.V1.BuildOutcome.InfrastructureFailed;
             }
             Assert.That(host.Services.GetRequiredService<RuntimeAgentSessions>().TryGetCurrent(host.AgentId!, out var connection), Is.True);
             Assert.ThrowsAsync<InvalidDataException>(() => coordinator.ReceiveAsync(connection!, changed, CancellationToken.None));

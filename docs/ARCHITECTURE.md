@@ -1173,6 +1173,9 @@ Artifact reservations and accepted objects share the 128-object per-Build bound;
 cannot reserve new hashes. A result/ownership race after PUT leaves retryable private deletion intent.
 An output-reader failure contains the process even during graceful stopping, and infrastructure
 fallback records a lost producer instead of treating its captured prefix as a final watermark.
+An infrastructure fallback/recovery result may omit completed steps: their independent immutable
+observations remain retained. Any explicitly submitted contradictory step still quarantines the
+owner; successful results require complete non-skipped step coverage.
 
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router

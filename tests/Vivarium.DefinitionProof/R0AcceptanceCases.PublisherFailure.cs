@@ -36,7 +36,10 @@ public sealed partial class R0AcceptanceCases
                     """, StringComparison.Ordinal);
                 return "powershell -NoProfile -InputFormat Text -OutputFormat Text -EncodedCommand " + Convert.ToBase64String(Encoding.Unicode.GetBytes(script));
             });
-        Assert.That(replaced, Is.EqualTo(1)); await File.WriteAllTextAsync(path, settings);
+        Assert.That(replaced, Is.EqualTo(1));
+        var twoSteps = settings.Replace("new(\"P_Log\", \"Literal logs\", [], [new(",
+            "new(\"P_Log\", \"Literal logs\", [], [new(\"before\", \"Completed before output fault\", \"simpleRunner\", [new(\"script.content\", \"exit /b 0\", null)]), new(", StringComparison.Ordinal);
+        Assert.That(twoSteps, Is.Not.EqualTo(settings)); await File.WriteAllTextAsync(path, twoSteps);
         await CommitCaseAsync(host, "fixture: malformed publisher with a live output flood");
         Assert.That((await ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
         await host.StartWindowsAgentAsync(administrator, csrf);
@@ -56,6 +59,9 @@ public sealed partial class R0AcceptanceCases
             var evidence = BuildResult.Parser.ParseFrom((await database.RuntimeBuildResults.SingleAsync(r => r.BuildId == id)).Evidence);
             Assert.That(evidence.Outcome, Is.EqualTo(BuildOutcome.InfrastructureFailed));
             Assert.That(evidence.OutputProducerLost, Is.True); Assert.That(evidence.OutputWatermarks, Is.Empty);
+            Assert.That(evidence.Steps, Is.Empty, "The actual partial infrastructure receipt does not invent completed-step evidence.");
+            var completed = await database.RuntimeBuildObservations.SingleAsync(o => o.BuildId == id && o.Phase == "COMPLETED");
+            Assert.That(completed.StepIndex, Is.Zero); Assert.That(completed.ExitCode, Is.Zero);
         }
         clock.Advance(TimeSpan.FromSeconds(31));
         Assert.That((await WaitBuildStateAsync(actor.BuildClient, id, "finished")).GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
@@ -70,6 +76,10 @@ public sealed partial class R0AcceptanceCases
             Assert.That(gap.GetProperty("reason").GetString(), Is.EqualTo("producer-lost"));
             Assert.That(gap.GetProperty("sourceSequenceEndExclusive").ValueKind, Is.EqualTo(JsonValueKind.Null));
         }
-        Assert.That(items.Length, Is.EqualTo(prefixCount + 2));
+        Assert.That(items.Length, Is.EqualTo(prefixCount + 4), "Both streams of both assigned steps retain explicit unknown final watermarks.");
+        await WaitAsync(async () => (await AgentAsync(administrator, host)).GetProperty("ready").GetBoolean());
+        Assert.That((await AgentAsync(administrator, host)).GetProperty("quarantined").GetBoolean(), Is.False);
+        var next = await SubmitAsync(actor.BuildClient, "P_Empty"); await FinishedAsync(actor.BuildClient, next);
+        Assert.That((await ReadBuildAsync(actor.BuildClient, next)).GetProperty("agentId").GetString(), Is.EqualTo(host.AgentId));
     }
 }
