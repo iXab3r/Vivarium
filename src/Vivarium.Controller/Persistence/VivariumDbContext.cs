@@ -32,6 +32,16 @@ public sealed class VivariumDbContext(DbContextOptions<VivariumDbContext> option
     public DbSet<AgentEnrollment> AgentEnrollments => Set<AgentEnrollment>();
     public DbSet<RuntimeBuild> RuntimeBuilds => Set<RuntimeBuild>();
     public DbSet<RuntimeBuildInput> RuntimeBuildInputs => Set<RuntimeBuildInput>();
+    public DbSet<RuntimeBuildRunInput> RuntimeBuildRunInputs => Set<RuntimeBuildRunInput>();
+    public DbSet<RuntimeVcsTriggerState> RuntimeVcsTriggerStates => Set<RuntimeVcsTriggerState>();
+    public DbSet<RuntimeBuildVcsTrigger> RuntimeBuildVcsTriggers => Set<RuntimeBuildVcsTrigger>();
+    public DbSet<RuntimeVcsRootInstance> RuntimeVcsRootInstances => Set<RuntimeVcsRootInstance>();
+    public DbSet<RuntimeBuildSourceSelection> RuntimeBuildSourceSelections => Set<RuntimeBuildSourceSelection>();
+    public DbSet<RuntimeBuildSourceReceipt> RuntimeBuildSourceReceipts => Set<RuntimeBuildSourceReceipt>();
+    public DbSet<RuntimeBuildNumberObservation> RuntimeBuildNumberObservations => Set<RuntimeBuildNumberObservation>();
+    public DbSet<RuntimeBuildDependency> RuntimeBuildDependencies => Set<RuntimeBuildDependency>();
+    public DbSet<RuntimeBuildResolution> RuntimeBuildResolutions => Set<RuntimeBuildResolution>();
+    public DbSet<RuntimeBuildConsumedArtifact> RuntimeBuildConsumedArtifacts => Set<RuntimeBuildConsumedArtifact>();
     public DbSet<RuntimeBuildCounter> RuntimeBuildCounters => Set<RuntimeBuildCounter>();
     public DbSet<RuntimeBuildExecution> RuntimeBuildExecutions => Set<RuntimeBuildExecution>();
     public DbSet<RuntimeBuildObservation> RuntimeBuildObservations => Set<RuntimeBuildObservation>();

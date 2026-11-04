@@ -18,7 +18,8 @@ message AgentMsg {
     BuildResult result = 4;
     Heartbeat heartbeat = 5;
     AssignmentAccepted assignment_accepted = 6; // ownership accepted by this exact session (D4/D14)
-    UpgradeHealthConfirmed upgrade_health_confirmed = 8; // tag 7 remains reserved for TeamCity service messages (D14)
+    BuildNumberChanged build_number_changed = 7; // negotiated literal service-message metadata (D14/D50)
+    UpgradeHealthConfirmed upgrade_health_confirmed = 8;
     UpgradeCommitConfirmed upgrade_commit_confirmed = 9; // durable launcher commit marker written (D30)
     UpgradeFinalizationConfirmed upgrade_finalization_confirmed = 10; // server-recorded marker persisted locally (D30)
     BuildStopAcknowledged build_stop_acknowledged = 11; // exact fenced graceful/force intent entered Agent control loop (D31)
@@ -154,6 +155,7 @@ message Blob {
   string file_name = 2;  // target path relative to the build workdir (forward slashes)
   bool archive = 3;      // zip; extracted under unpack_to
   string unpack_to = 4;  // extraction root relative to workdir; empty = workdir
+  bool private_input = 5; // negotiated VCS checkout: generated inputs live outside the source tree
 }
 
 enum StepPolicy {
@@ -170,6 +172,32 @@ message Step {
   int32 timeout_sec = 5;   // 0 = no per-step timeout
   StepPolicy policy = 6;
   bool expected_reboot = 7;  // provisioning: suppress lost-heartbeat INFRA (D6/D9)
+  string script_input = 8; // private generated script path, not a source-tree file
+  int32 script_argument_index = 9; // replace this exact matching argument with the private input path
+  ContainerStep container = 10; // requires negotiated teamcity.container-runner.v1
+}
+
+message ContainerStep {
+  string image = 1; // immutable repository@sha256 digest
+  string platform = 2; // selected implementation: linux/amd64
+  string user = 3; // numeric container UID, never the Agent's identity
+  bool init = 4;
+  repeated ContainerCache caches = 5;
+}
+
+message ContainerCache {
+  string name = 1; // logical name; installed runtime scope owns the effective volume
+  string target = 2; // absolute path inside the workload
+}
+
+message ContainerStepReceipt {
+  string engine_id = 1;
+  string container_id = 2;
+  string image_id = 3;
+  string exec_id = 4;
+  optional int32 process_exit_code = 5; // absent when no user process was started
+  bool removed = 6; // confirmed stopped and absent on the same installed Engine
+  string failure_code = 7; // typed, bounded; no remote diagnostics or environment values
 }
 
 enum OnFail {
@@ -187,7 +215,28 @@ message BuildAssignment {
   map<string, string> parameters = 6;  // resolved scenario params -> env VIVARIUM_PARAM_* (D18)
   uint32 output_contract_major = 7; // 1 requires negotiated teamcity.build-output.v1
   repeated bytes output_secrets = 8; // ephemeral exact-value masks; never desired Git data or ordinary logs
-  uint32 artifact_publication_contract_major = 9; // 1: negotiated teamcity.artifact-publisher.literal.v1
+  uint32 artifact_publication_contract_major = 9; // 1: literal.v1; 2: negotiated teamcity.artifact-publisher.rules.v1
+  VcsCheckout vcs_checkout = 10; // requires negotiated teamcity.vcs-checkout.v1
+  uint32 number_reporting_contract_major = 11; // 1: negotiated teamcity.build-number.literal.v1
+}
+
+message BuildNumberChanged {
+  string build_id = 1;
+  uint32 sequence = 2;
+  string value = 3;
+}
+
+message VcsCheckout {
+  string url = 1; // credential-free anonymous Git transport; no Host credential inheritance
+  string branch = 2; // canonical refs/heads/*
+  string revision = 3; // coordinator-selected immutable Git SHA-1
+  repeated string excluded_directories = 4; // selected root checkout rules, validated relative paths
+}
+
+message VcsCheckoutReceipt {
+  string revision = 1; // actual HEAD, present only after successful checkout
+  bool succeeded = 2;
+  string failure_code = 3; // bounded typed code, never Git diagnostics or remote data
 }
 
 message AssignmentAccepted {
@@ -283,6 +332,7 @@ message StepStatus {
   int32 step_index = 2;   // -1 for build-level phases
   string phase = 3;       // FETCHING | RUNNING | COLLECTING
   StepResult completed = 4; // optional actual step receipt; phase remains RUNNING for older readers
+  VcsCheckoutReceipt vcs_checkout = 5; // independent pre-step observation; phase FETCHING, step -1
 }
 
 enum LogStream {
@@ -334,6 +384,7 @@ message StepResult {
   int32 exit_code = 2;
   bool timed_out = 3;
   bool skipped = 4;
+  ContainerStepReceipt container = 5;
 }
 
 message Artifact {
@@ -352,6 +403,8 @@ message BuildResult {
   string status_text = 6;
   repeated BuildOutputWatermark output_watermarks = 7;
   bool output_producer_lost = 8; // no final watermark can be asserted (crash or incomplete pipe drain)
+  VcsCheckoutReceipt vcs_checkout = 9;
+  repeated BuildNumberChanged number_changes = 10; // bounded terminal recovery; independent of outcome/counter
 }
 
 message BuildResultAccepted {

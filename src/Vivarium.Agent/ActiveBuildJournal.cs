@@ -7,7 +7,10 @@ internal sealed record ActiveBuildJournalRecord(
     int SchemaVersion,
     string BuildId,
     int? ProcessId,
-    long? ProcessStartUtcTicks);
+    long? ProcessStartUtcTicks,
+    ContainerJournalRecord? Container = null);
+
+internal sealed record ContainerJournalRecord(string Scope, string EngineId, string Name, string? Id, string Phase);
 
 /// <summary>
 /// Durable local evidence that an accepted Build may still own host processes. It is deliberately
@@ -47,7 +50,7 @@ internal sealed class ActiveBuildJournal
     public void ObserveProcess(string buildId, Process? process)
     {
         ActiveBuildJournalRecord record;
-        if (process is null)
+        if (process is null || process.HasExited)
         {
             record = new ActiveBuildJournalRecord(1, buildId, null, null);
         }
@@ -62,6 +65,14 @@ internal sealed class ActiveBuildJournal
                                                System.ComponentModel.Win32Exception or
                                                NotSupportedException)
             {
+                // A short-lived child can exit between Start and reading StartTime (notably
+                // when Linux has already reaped it). Its confirmed exit needs no PID adoption;
+                // an unobservable live child remains a containment failure.
+                if (process.HasExited)
+                {
+                    Write(new ActiveBuildJournalRecord(1, buildId, null, null));
+                    return;
+                }
                 throw new WorkloadTerminationException(
                     "could not record the started workload process identity", exception);
             }
@@ -69,6 +80,9 @@ internal sealed class ActiveBuildJournal
         }
         Write(record);
     }
+
+    public void ObserveContainer(string buildId, ContainerJournalRecord container) =>
+        Write(new ActiveBuildJournalRecord(2, buildId, null, null, container));
 
     public void Complete(string buildId)
     {
@@ -102,7 +116,7 @@ internal sealed class ActiveBuildJournal
         {
             var record = JsonSerializer.Deserialize<ActiveBuildJournalRecord>(
                 File.ReadAllText(path), JsonOptions);
-            if (record is null || record.SchemaVersion != 1 ||
+            if (record is null || record.SchemaVersion is not (1 or 2) ||
                 record.BuildId.Length is < 1 or > 256 ||
                 record.BuildId.Any(character => character is '\r' or '\n' or '\0') ||
                 (record.ProcessId is null) != (record.ProcessStartUtcTicks is null) ||
@@ -110,6 +124,14 @@ internal sealed class ActiveBuildJournal
             {
                 throw new InvalidDataException("active Build journal is malformed");
             }
+            if (record.Container is { } container && (record.SchemaVersion != 2 || record.ProcessId is not null
+                || !System.Text.RegularExpressions.Regex.IsMatch(container.Scope, "^[a-z0-9][a-z0-9-]{0,63}$")
+                || container.EngineId.Length is < 1 or > 128 || container.EngineId.Any(char.IsControl)
+                || !System.Text.RegularExpressions.Regex.IsMatch(container.Name, "^vivarium-[a-z0-9-]{1,160}$")
+                || container.Id is not null && !System.Text.RegularExpressions.Regex.IsMatch(container.Id, "^[0-9a-f]{64}$")
+                || container.Phase is not ("PREPARING" or "CREATING" or "CREATED" or "REMOVED")
+                || (container.Phase is "CREATED" or "REMOVED") && container.Id is null))
+                throw new InvalidDataException("active container journal is malformed");
             return record;
         }
         catch (JsonException exception)

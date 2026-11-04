@@ -8,7 +8,7 @@ internal sealed class OwnedPostgres : IAsyncDisposable
 {
     private const string Owner = "us013-p0-definition-proof";
     private const string Image = "postgres@sha256:0af65001d05296a2ead57ac4a6412433d8913d1bb5d0c88435a7d1e1ee5cb04b";
-    private readonly string name = "vivarium-us013-proof-" + Guid.NewGuid().ToString("N")[..12];
+    private string name = "vivarium-us013-proof-" + Guid.NewGuid().ToString("N")[..12];
     private bool containerCreated;
     private bool volumeCreated;
     private bool networkCreated;
@@ -18,6 +18,30 @@ internal sealed class OwnedPostgres : IAsyncDisposable
     public string PooledConnectionString => new NpgsqlConnectionStringBuilder(ConnectionString)
         { Pooling = true, MaxPoolSize = 16 }.ConnectionString;
     public string ServerVersion { get; private set; } = "";
+
+    internal bool Retain { get; set; }
+    internal object RecoveryState => new { name, ConnectionString };
+    internal static async Task<OwnedPostgres> ReopenAsync(JsonElement state)
+    {
+        var value = new OwnedPostgres { name = state.GetProperty("name").GetString()!,
+            ConnectionString = state.GetProperty("ConnectionString").GetString()!, Retain = true };
+        if (!System.Text.RegularExpressions.Regex.IsMatch(value.name, "^vivarium-us013-proof-[a-f0-9]{12}$"))
+            throw new InvalidDataException("Recovery resource name differs.");
+        foreach (var resource in new[] { ("container", value.name), ("volume", value.Volume), ("network", value.Network) })
+            if (!await VerifyAsync(resource.Item1, resource.Item2)) throw new InvalidDataException("Recovery resource absent.");
+        value.containerCreated = value.volumeCreated = value.networkCreated = true;
+        var mounts = await DockerAsync("inspect", "--format", "{{json .Mounts}}", value.name);
+        using (var mounted = JsonDocument.Parse(mounts))
+            if (!mounted.RootElement.EnumerateArray().Any(m => m.GetProperty("Type").GetString() == "volume" &&
+                m.GetProperty("Name").GetString() == value.Volume && m.GetProperty("Destination").GetString() == "/var/lib/postgresql/data"))
+                throw new InvalidDataException("Recovery database volume differs.");
+        var original = new NpgsqlConnectionStringBuilder(value.ConnectionString);
+        if (original.Host != "127.0.0.1") throw new InvalidDataException("Recovery database host differs.");
+        value.ConnectionString = new NpgsqlConnectionStringBuilder(value.ConnectionString) { Port = await value.ReadPortAsync() }.ConnectionString;
+        await using var connection = new NpgsqlConnection(value.ConnectionString);
+        await connection.OpenAsync();
+        return value;
+    }
 
     public async Task StartAsync()
     {
@@ -116,6 +140,7 @@ internal sealed class OwnedPostgres : IAsyncDisposable
     {
         if (ConnectionString.Length > 0)
             using (var pool = new NpgsqlConnection(PooledConnectionString)) NpgsqlConnection.ClearPool(pool);
+        if (Retain) return;
         if (containerCreated)
         {
             if (await VerifyAsync("container", name)) await DockerAsync("rm", "--force", name);

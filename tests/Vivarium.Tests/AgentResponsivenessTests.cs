@@ -96,6 +96,29 @@ public sealed class AgentResponsivenessTests
     }
 
     [Test]
+    public async Task Already_exited_workload_does_not_require_a_live_process_identity()
+    {
+        var info = new System.Diagnostics.ProcessStartInfo(OperatingSystem.IsWindows() ? "cmd.exe" : "/bin/sh")
+        { UseShellExecute = false, CreateNoWindow = true };
+        foreach (var argument in OperatingSystem.IsWindows() ? new[] { "/d", "/c", "exit 0" } : new[] { "-c", "exit 0" })
+            info.ArgumentList.Add(argument);
+        using var process = System.Diagnostics.Process.Start(info)!;
+        await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+        var journal = new ActiveBuildJournal(rootDir);
+        journal.Accept("short-build");
+        using var live = System.Diagnostics.Process.GetCurrentProcess();
+        journal.ObserveProcess("short-build", live);
+        Assert.That(new ActiveBuildJournal(rootDir).Current?.ProcessId, Is.EqualTo(live.Id));
+        Assert.That(new ActiveBuildJournal(rootDir).Current?.ProcessStartUtcTicks, Is.EqualTo(live.StartTime.ToUniversalTime().Ticks));
+
+        Assert.That(() => journal.ObserveProcess("short-build", process), Throws.Nothing);
+        var retained = new ActiveBuildJournal(rootDir).Current;
+        Assert.That(retained?.BuildId, Is.EqualTo("short-build"));
+        Assert.That(retained?.ProcessId, Is.Null, "An exited child needs no PID adoption after restart.");
+        Assert.That(retained?.ProcessStartUtcTicks, Is.Null);
+    }
+
+    [Test]
     public async Task Session_writer_prioritizes_control_over_queued_logs()
     {
         var stream = new GatedAgentStreamWriter();

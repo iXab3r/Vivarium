@@ -3,6 +3,7 @@ import { WorkbenchButton } from "@eyeauras/workbench/controls";
 import "@vscode/codicons/dist/codicon.css";
 import "./style.css";
 import { api, ApiError, session, type User, type Role, type Grant, type Page } from "./api";
+import { renderBuilds } from "./builds";
 
 const app = document.querySelector<HTMLElement>("#app")!;
 app.innerHTML = '<header class="app-header"><a class="brand" href="/">Vivarium</a><div class="account"></div></header><div id="workspace"></div>';
@@ -29,10 +30,14 @@ const workbench = createWorkbench(app.querySelector<HTMLElement>("#workspace")!,
     showEditorSplitActions: false, railDensity: "regular",
 });
 workbench.registerPage({ id: "access", title: "Access", render: renderAccess });
-workbench.registerToggle({ id: "access", title: "Access", icon: "shield", rail: "sidebar", isActive: () => true,
-    run() { history.pushState(null, "", "/access"); workbench.showPage("access"); } });
-workbench.showPage("access");
-window.addEventListener("pagehide", () => workbench.dispose(), { once: true });
+workbench.registerPage({ id: "builds", title: "Builds", render: renderBuilds });
+const isBuilds = () => /^\/(builds|projects|build-configurations)(\/|$)/.test(location.pathname);
+workbench.registerToggle({ id: "builds", title: "Builds", icon: "tools", rail: "sidebar", isActive: isBuilds,
+    run() { location.assign("/builds"); } });
+workbench.registerToggle({ id: "access", title: "Access", icon: "shield", rail: "sidebar", isActive: () => !isBuilds(),
+    run() { location.assign("/access"); } });
+workbench.showPage(isBuilds() ? "builds" : "access");
+window.addEventListener("pagehide", event => { if (!event.persisted) workbench.dispose(); });
 
 function renderAccess(host: HTMLElement): IDisposable {
     host.classList.add("access-page");

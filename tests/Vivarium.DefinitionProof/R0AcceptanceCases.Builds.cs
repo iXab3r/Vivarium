@@ -305,11 +305,11 @@ public sealed partial class R0AcceptanceCases
         Assert.That(await actor.BuildClient.GetByteArrayAsync(links[2]), Is.EqualTo("owned-r0-smoke\n"u8.ToArray()));
     }
 
-    private static Task<ScopedKeyScenario> RestrictedActorAsync(R0AcceptanceInstallation.Case host, HttpClient administrator, string csrf)
+    internal static Task<ScopedKeyScenario> RestrictedActorAsync(R0AcceptanceInstallation.Case host, HttpClient administrator, string csrf)
         => ProjectActorAsync(host, administrator, csrf, "OWNED_SIX",
             ["view_project", "run_build", "view_file_content", "view_build_runtime_data", "customize_build_parameters", "cancel_build"]);
 
-    private static async Task<ScopedKeyScenario> ProjectActorAsync(R0AcceptanceInstallation.Case host, HttpClient administrator,
+    internal static async Task<ScopedKeyScenario> ProjectActorAsync(R0AcceptanceInstallation.Case host, HttpClient administrator,
         string csrf, string role, string[] permissions)
     {
         var actor = new ScopedKeyScenario(host.Origin, host.Thumbprint, host.Root, host.Certificate);

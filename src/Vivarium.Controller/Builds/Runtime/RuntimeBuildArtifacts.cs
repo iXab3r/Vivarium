@@ -13,7 +13,7 @@ internal sealed class RuntimeBuildArtifacts(IDbContextFactory<VivariumDbContext>
     {
         await using var database = await databases.CreateDbContextAsync(token);
         await using var snapshot = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
-        if (await builds.VisibleAsync(database, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
+        id = (await builds.VisibleAsync(database, actor, id, token, discloseDenied) ?? throw RuntimeBuildService.Missing()).Id;
         // Manifest admission has a hard 128-file bound; pagination belongs to each public contract.
         return await database.RuntimeBuildArtifacts.AsNoTracking().Where(a => a.BuildId == id).OrderBy(a => a.Ordinal).Take(128).ToArrayAsync(token);
     }
@@ -21,19 +21,31 @@ internal sealed class RuntimeBuildArtifacts(IDbContextFactory<VivariumDbContext>
     internal async Task<byte[]> ReadAsync(ManagementRequestContext actor, long id, int? ordinal, string? path, CancellationToken token,
         bool discloseDenied = false)
     {
+        await using var stream = await OpenAsync(actor, id, ordinal, path, token, discloseDenied);
+        if (stream.Length > 64 * 1024) throw new InvalidDataException("Inline artifact bytes exceed their bound.");
+        using var content = new MemoryStream(); await stream.CopyToAsync(content, token); return content.ToArray();
+    }
+
+    internal async Task<FileStream> OpenAsync(ManagementRequestContext actor, long id, int? ordinal, string? path, CancellationToken token,
+        bool discloseDenied = false)
+    {
         RuntimeArtifactUpload upload;
         await using (var database = await databases.CreateDbContextAsync(token))
         {
             await using var snapshot = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
-            if (await builds.VisibleAsync(database, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
+            id = (await builds.VisibleAsync(database, actor, id, token, discloseDenied) ?? throw RuntimeBuildService.Missing()).Id;
             var artifact = await database.RuntimeBuildArtifacts.AsNoTracking().SingleOrDefaultAsync(a => a.BuildId == id
                 && (ordinal != null ? a.Ordinal == ordinal : a.Path == path), token);
             if (artifact is null) throw new RestApiException(404, "resource_not_found", "Artifact not found", "The artifact is not found");
             upload = await database.RuntimeArtifactUploads.AsNoTracking().SingleAsync(u => u.BuildId == id && u.Sha256 == artifact.Sha256, token);
         }
-        var content = await bytes.ReadAsync(upload.ObjectKey, upload.Size, upload.Sha256, token);
-        await using var current = await databases.CreateDbContextAsync(token);
-        if (await builds.VisibleAsync(current, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
-        return content;
+        var content = await bytes.OpenAsync(upload.ObjectKey, upload.Size, upload.Sha256, token);
+        try
+        {
+            await using var current = await databases.CreateDbContextAsync(token);
+            if (await builds.VisibleAsync(current, actor, id, token, discloseDenied) is null) throw RuntimeBuildService.Missing();
+            return content;
+        }
+        catch { await content.DisposeAsync(); throw; }
     }
 }

@@ -1,0 +1,1894 @@
+{
+  "schema_version": 1,
+  "scope": "FIRST_EXECUTABLE_WHOLE_CHAIN_COHORT_NOT_COMPLETE_PILOT_OR_API_DENOMINATOR",
+  "story_issue": 78,
+  "implementation_issue": 116,
+  "contract_issue": 117,
+  "acceptance_issue": 118,
+  "predecessor": {
+    "pr": 165,
+    "main": "2f053e608637e04628334c797ad33609a9c29e61",
+    "selected_r0": "28/28; independent review/main delivered; full compatibility remains open"
+  },
+  "source": {
+    "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+    "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+    "profile": "vivarium-teamcity-lab-202613",
+    "server": "TeamCity2026.1.3/build222742",
+    "cases": [
+      {
+        "id": "chain:three-configurations-and-relations",
+        "exchange_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ]
+      },
+      {
+        "id": "chain:ordinary-release-entry-and-selected-bytes",
+        "exchange_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ]
+      }
+    ],
+    "release_download": {
+      "bytes": 27,
+      "sha256": "97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8",
+      "mediaType": "text/plain",
+      "bodyBase64": "Y29oZXJlbnQtcmVmZXJlbmNlLXZlcnNpb24K"
+    }
+  },
+  "cases": [
+    {
+      "id": "PILOT-CHAIN-FIRST-BYTES-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01",
+        "AC-ART-03",
+        "AC-CFG-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-07",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "principal": "Ordinary finite framework key with current six P permissions; source admin-positive semantics and separate R0 current-scope authority evidence, never an administrator substitute in product",
+      "seed": "Fresh cloned Host/PG/Git/Storage installation; C#/Git prepares three source-free configurations with explicit CANCEL edges/artifact selectors/clean destinations and physical OS requirements; no existing builds or Agents",
+      "entry": {
+        "surface": "direct-compatible-rest",
+        "method": "POST",
+        "path": "/app/rest/buildQueue",
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "body": {
+          "buildType": {
+            "id": "P_Release"
+          }
+        },
+        "status": 200,
+        "state": "queued",
+        "build_type": "P_Release"
+      },
+      "effect": "Returned root is the ordinary Release, not a composite. Real Linux Prepare, Windows step, Linux Release run in dependency order; Windows directly selects Prepare, Release directly selects Windows and artifacts from both. Producer IDs are distinct; source artifact bytes are transferred, compared by actual commands and independently downloaded with the exact captured27-byte hash.",
+      "completion": "All three finish SUCCESS with the independently expected physical Agent ownership and exact artifact bytes; immutable original result/output/selection provenance remains attributable.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Release_entry_runs_all_three_configurations_on_Windows_and_Linux_with_exact_selected_bytes",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-UPSTREAM-FAILURE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-EXEC",
+        "SS-AGT",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/chain-lifecycle-observations.json",
+        "sha256": "ff8b3fc90e08525500cb80bbd97888a286f03f34c60fbbfe00a645255157e9e4",
+        "case": "chain:failure-explicit-cancel-edges",
+        "exchanges": 80
+      },
+      "principal": "Ordinary finite six-permission P key; reference admin-positive lifecycle effect only, current authority remains shared native services.",
+      "seed": "Fresh source-free three-configuration chain; explicit CANCEL/CANCEL; no prior builds. failure uses real Linux Prepare exit7; cancellations enter with no Agents.",
+      "entry": "Ordinary Release POST /app/rest/buildQueue, then actual producer exit7 or explicit queued upstream/root cancellation.",
+      "effect": "Dependency failure/cancellation finishes only downstream dependents as failed-to-start UNKNOWN with exact captured cancellation reasons; canceling root leaves its upstream work queued.",
+      "completion": "Captured state/status/failedToStart and automatic reason/number agree; no dependent Agent execution; root-only cancel retains queued upstream identities.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001",
+      "product_test_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
+    },
+    {
+      "id": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-EXEC",
+        "SS-AGT",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/chain-lifecycle-observations.json",
+        "sha256": "ff8b3fc90e08525500cb80bbd97888a286f03f34c60fbbfe00a645255157e9e4",
+        "case": "chain:cancel-upstream-explicit-cancel-edges",
+        "exchanges": 15
+      },
+      "principal": "Ordinary finite six-permission P key; reference admin-positive lifecycle effect only, current authority remains shared native services.",
+      "seed": "Fresh source-free three-configuration chain; explicit CANCEL/CANCEL; no prior builds. failure uses real Linux Prepare exit7; cancellations enter with no Agents.",
+      "entry": "Ordinary Release POST /app/rest/buildQueue, then actual producer exit7 or explicit queued upstream/root cancellation.",
+      "effect": "Dependency failure/cancellation finishes only downstream dependents as failed-to-start UNKNOWN with exact captured cancellation reasons; canceling root leaves its upstream work queued.",
+      "completion": "Captured state/status/failedToStart and automatic reason/number agree; no dependent Agent execution; root-only cancel retains queued upstream identities.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
+      "product_test_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
+    },
+    {
+      "id": "PILOT-CHAIN-ROOT-CANCEL-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-EXEC",
+        "SS-AGT",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/chain-lifecycle-observations.json",
+        "sha256": "ff8b3fc90e08525500cb80bbd97888a286f03f34c60fbbfe00a645255157e9e4",
+        "case": "chain:cancel-root-explicit-cancel-edges",
+        "exchanges": 9
+      },
+      "principal": "Ordinary finite six-permission P key; reference admin-positive lifecycle effect only, current authority remains shared native services.",
+      "seed": "Fresh source-free three-configuration chain; explicit CANCEL/CANCEL; no prior builds. failure uses real Linux Prepare exit7; cancellations enter with no Agents.",
+      "entry": "Ordinary Release POST /app/rest/buildQueue, then actual producer exit7 or explicit queued upstream/root cancellation.",
+      "effect": "Dependency failure/cancellation finishes only downstream dependents as failed-to-start UNKNOWN with exact captured cancellation reasons; canceling root leaves its upstream work queued.",
+      "completion": "Captured state/status/failedToStart and automatic reason/number agree; no dependent Agent execution; root-only cancel retains queued upstream identities.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "display_name": "PILOT-CHAIN-ROOT-CANCEL-001",
+      "product_test_name": "PILOT-CHAIN-ROOT-CANCEL-001"
+    },
+    {
+      "id": "PILOT-CHAIN-UNCHANGED-CLI-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01",
+        "AC-ART-03",
+        "AC-CFG-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-07",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "principal": "Ordinary finite framework key with current six P permissions; source admin-positive semantics and separate R0 current-scope authority evidence, never an administrator substitute in product",
+      "seed": "Fresh cloned Host/PG/Git/Storage installation; C#/Git prepares three source-free configurations with explicit CANCEL edges/artifact selectors/clean destinations and physical OS requirements; no existing builds or Agents",
+      "entry": {
+        "surface": "unchanged-published-cli",
+        "package": "@eyeauras/teamcity-cli@0.5.6",
+        "commands": [
+          "profile create",
+          "auth login",
+          "permissions grant Update",
+          "jobs run P_Release --wait --timeout 2m --interval 1s",
+          "builds artifacts download <returned-root-id> release.txt --output chain-release.txt"
+        ],
+        "source": "Same pinned ordinary Release entry/selected-byte source. Published client/factory file identities and its existing auth/command evidence producer are verified; no client/fetch substitutions."
+      },
+      "effect": "Returned root is the ordinary Release, not a composite. Real Linux Prepare, Windows step, Linux Release run in dependency order; Windows directly selects Prepare, Release directly selects Windows and artifacts from both. Producer IDs are distinct; source artifact bytes are transferred, compared by actual commands and independently downloaded with the exact captured27-byte hash.",
+      "completion": "All three finish SUCCESS with the independently expected physical Agent ownership and exact artifact bytes; immutable original result/output/selection provenance remains attributable.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Unchanged_published_CLI_enters_its_own_complete_chain_and_downloads_the_exact_release",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-NATIVE-INSPECTION-001",
+      "kind": "native-contract-and-business-journey",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-BLOB"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-BLD-02",
+        "AC-ART-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": "D35 native Workbench/API contract, existing business AC and independently retained first small-chain effect/bytes; literal C#/Git fixture expectations. Not a TeamCity wire oracle.",
+      "principal": "Ordinary finite six-permission P Identity cookie/key; OIDC sign-in already independently covered in R0. No installation-user substitution for asserted actions.",
+      "entry": "GET native Release configuration, POST native Release run, GET same numeric Build",
+      "effect": "Authorized current active catalogue exposes literal snapshot edges/requirements; Build exposes actual selected upstream numeric IDs/states and artifact producer IDs. Ordinary edge-free R0 shapes remain unchanged.",
+      "completion": "Meaningful actual native/browser assertions at this boundary; no checkbox from feature parsing or a screenshot alone.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Native_chain_inspection_exposes_active_edges_requirements_and_actual_selected_Builds",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-WORKBENCH-001",
+      "kind": "native-contract-and-business-journey",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-BLOB"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-BLD-02",
+        "AC-ART-01",
+        "AC-UI-01",
+        "AC-UI-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": "D35 native Workbench/API contract, existing business AC and independently retained first small-chain effect/bytes; literal C#/Git fixture expectations. Not a TeamCity wire oracle.",
+      "principal": "Ordinary finite six-permission P Identity cookie/key; OIDC sign-in already independently covered in R0. No installation-user substitution for asserted actions.",
+      "entry": "Prior ordinary Identity cookie; open Workbench Builds, inspect P Release requirements/chain, click Run, follow actual upstreams, click logs and download release.txt",
+      "effect": "UI makes its own native API run; real Linux/Windows/Linux execution. Stable Build deep link and navigation, truthful queued/running/completed status, actual output text and exact downloaded bytes. UI never reads facade, EF, filesystem or a browser bearer.",
+      "completion": "Actual UI run/log/download, same Build deep-link reload without another admission, 390px reflow and same-cookie Build hiding after current P-grant withdrawal.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Workbench_operator_runs_inspects_logs_and_downloads_its_own_complete_chain",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-REPEAT-REUSE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "case": "chain:repeat-release-and-reuse-selection",
+        "exchanges": 17
+      },
+      "principal": "Ordinary finite six-permission P account; reference admin-positive effects. Shared current actor/scope authority remains mandatory.",
+      "seed": "Fresh three source-free C#/Git configurations, explicit CANCEL/CANCEL plus reuse=true and successful-only=true. Repeat executes on owned Windows/Linux; queued resolution has no Agent.",
+      "entry": "Ordinary unkeyed compatible Release admission(s), later reads/cancel; native cross-read and restart are native durability additions.",
+      "effect": "A new ordinary Release runs, selecting the original finished successful Prepare/Windows producers and exact bytes; only four actual executions exist after two Release entries.",
+      "completion": "Captured selected physical identity/bytes and old-locator effects with preserved admission intent; no fabricated new executions or transport body-hash dedupe.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Repeated_Release_reuses_the_successful_producers_selected_by_explicit_snapshot_policy",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-QUEUED-RESOLUTION-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "case": "chain:unkeyed-queued-repetition-and-old-locators",
+        "exchanges": 12
+      },
+      "principal": "Ordinary finite six-permission P account; reference admin-positive effects. Shared current actor/scope authority remains mandatory.",
+      "seed": "Fresh three source-free C#/Git configurations, explicit CANCEL/CANCEL plus reuse=true and successful-only=true. Repeat executes on owned Windows/Linux; queued resolution has no Agent.",
+      "entry": "Ordinary unkeyed compatible Release admission(s), later reads/cancel; native cross-read and restart are native durability additions.",
+      "effect": "Two unkeyed admissions return different request IDs. With no available Agent, old locator resolves to the second queued root; cancellation through that locator acts on the resolved Build. Native cross-read and cold Host restart retain this relation.",
+      "completion": "Captured selected physical identity/bytes and old-locator effects with preserved admission intent; no fabricated new executions or transport body-hash dedupe.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Unkeyed_queued_repetition_resolves_old_locators_to_the_new_request_across_restart_and_cancel",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001",
+      "display_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001",
+      "kind": "documented-model-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06"
+      ],
+      "source": {
+        "primary": "https://www.jetbrains.com/help/teamcity/2026.1/snapshot-dependencies.html",
+        "section": "Only use successful builds / Suitable Builds",
+        "supporting": "tests/Vivarium.Tests/TeamCity/Reference/chain-lifecycle-observations.json; literal exit7 and downstream cancellation source",
+        "interpretation": "Documented successful-only suitability requires rerunning the failed producer. No invented complete HTTP transcript or claim about every reuse option."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Same real Linux exit7 chain, explicit CANCEL/CANCEL and reuse=true/successful-only=true; no prior success.",
+      "entry": "Two ordinary compatible Release admissions separated by the first terminal failure.",
+      "effect": "The second chain obtains distinct required producers and actually reruns Prepare; downstream never executes or publishes after either failure.",
+      "completion": "Two actual Prepare execution owners, no Windows/Release execution, second root UNKNOWN with new producer identities.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Chain_terminal_effects_preserve_the_pinned_upstream_and_root_cancellation_distinction",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "product_test_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001"
+    },
+    {
+      "id": "PILOT-SOURCE-COLLECTION-FAILURE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-collection-failure-observations.json",
+        "sha256": "ff31d721f36deb15c59c8b7130d19fe2e7de003b8b739494173fee362b7f37d0",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Source declaration exists, branch collection fails before dispatch.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "The ordinary run retains number1/counter2, FAILURE/failedToStart, explicit N/A workload revision and no fabricated Agent result.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Source_collection_failure_retains_the_number_and_an_explicit_unavailable_revision",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-AGENT-GIT-UNAVAILABLE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-checkout-observations.json",
+        "sha256": "824274bfdf572b9bd1fe034571afcba285d4bb280294b6e03f9601a5e4297592",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Server resolves the immutable commit; the pinned runtime Agent has no Git executable.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "The selected revision remains readable, checkout fails before any user step, counter advances, no artifact is published and the Agent remains healthy.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.A_missing_Agent_Git_tool_preserves_the_selected_revision_and_does_not_run_user_steps",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-CHAIN-PINNING-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Queued whole chain uses anonymous owned Git. Branch advances before Prepare and again after Prepare, before Windows. Source includes a colliding generated-script path and an excluded .repos directory.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "Actual Linux and Windows checkout the first executing producer revision; selected/consumed facts and exact outputs survive Host restart, excluded content is absent and source files cannot replace private generated scripts.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Workload_source_is_collected_after_admission_and_pinned_through_both_real_Agents",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
+      }
+    },
+    {
+      "id": "PILOT-POWERSHELL-FILE-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/powershell-profile-observations.json",
+        "sha256": "b5813d36dbbc409be113149b1acb03dac4ae97bc5d91916175dcff65ee9c0a70",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual vendor default edition/arguments plus product Windows execution, exact source artifacts and Workbench source reads after restart.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.The_recipe_PowerShell_FILE_PS1_x64_profile_runs_the_checked_out_script_on_Windows",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
+      }
+    },
+    {
+      "id": "PILOT-POWERSHELL-NONZERO-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/powershell-profile-observations.json",
+        "sha256": "b5813d36dbbc409be113149b1acb03dac4ae97bc5d91916175dcff65ee9c0a70",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual Desktop PowerShell exits7; dependent Release never executes; selected revision remains intact.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.A_real_PowerShell_nonzero_exit_is_retained_and_prevents_the_dependent_Release",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-POWERSHELL-SOURCE-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual immutable-image Docker Prepare/Release, shared scoped cache, Windows PowerShell, independent immutable container receipts, exact bytes and source reads after restart.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.The_complete_source_chain_uses_real_Docker_PowerShell_and_owned_cache_with_exact_bytes",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/source-runtime-git-six-renewal.trx",
+        "sha256": "1d52c498cbe50a2168b0dc7db613fe44238e368f87761b7a33c4acb5ea3df569",
+        "cohort_passed": 6,
+        "cohort_failed": 0,
+        "qualification": "After actual Git root/nested-directory checks and private gitfile implementation. See source-runtime-checkpoint/receipt.json; selected renewal does not replace final full-story gates."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-EXIT7-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual exit7 through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"exit7\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-MISSING_IMAGE-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual missing-image through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"missing-image\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-CANCEL-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual cancel through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"cancel\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-ARTIFACT-RULES-STREAMING-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-BLOB",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-ART-01",
+        "AC-ART-03",
+        "AC-BLD-07",
+        "AC-RUN-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/artifact-rules-observations.json",
+        "sha256": "1f8718f76745dbbc5a32f7f5c00c69d056aa31661e68de294cdc01179c60e6ca",
+        "interpretation": "Pinned actual TeamCity publication/dependency and exact nested/binary response bytes; selected model fields only, no full artifact API wire GREEN."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh Host/PG/Storage/CSharp-Git and real dedicated Linux Agent. Literal, leaf wildcard, recursive mappings and a263168byte binary.",
+      "entry": "Ordinary finite six-permission P operator enters compatible Release and reads shared native/compatible artifacts.",
+      "effect": "Exact mapped publication and recursive dependency paths preserve all five source artifacts including263168binary bytes, with exact downstream inspection and current authorized downloads.",
+      "completion": "Real file/process, production transfer/storage services, immutable manifest/provenance and current-authority downloads.",
+      "product_binding": "Vivarium.DefinitionProof.ArtifactRuleAcceptanceCases.Recipe_publication_and_dependency_rules_keep_exact_nested_binary_bytes_and_missing_input_failure(False)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Captured literal/leaf wildcard/recursive directory profile; 257KiB exact transfer is not a2GiB execution proof. Archive/exclude/optional/general rules, resumable transfer, wider quotas and full API remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-ARTIFACT-REQUIRED-MISSING-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-BLOB",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-ART-01",
+        "AC-ART-03",
+        "AC-BLD-07",
+        "AC-RUN-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/artifact-rules-observations.json",
+        "sha256": "1f8718f76745dbbc5a32f7f5c00c69d056aa31661e68de294cdc01179c60e6ca",
+        "interpretation": "Pinned actual TeamCity publication/dependency and exact nested/binary response bytes; selected model fields only, no full artifact API wire GREEN."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh Host/PG/Storage/CSharp-Git and real dedicated Linux Agent. Literal, leaf wildcard, recursive mappings and a263168byte binary.",
+      "entry": "Ordinary finite six-permission P operator enters compatible Release and reads shared native/compatible artifacts.",
+      "effect": "Missing required wildcard input fails before user execution with FAILURE/failedToStart=true, matching the pinned reference and retaining producer artifacts.",
+      "completion": "Real file/process, production transfer/storage services, immutable manifest/provenance and current-authority downloads.",
+      "product_binding": "Vivarium.DefinitionProof.ArtifactRuleAcceptanceCases.Recipe_publication_and_dependency_rules_keep_exact_nested_binary_bytes_and_missing_input_failure(True)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Captured literal/leaf wildcard/recursive directory profile; 257KiB exact transfer is not a2GiB execution proof. Archive/exclude/optional/general rules, resumable transfer, wider quotas and full API remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-RUN-INPUT-CLI-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+        "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d48-architecture.source",
+        "revision": "d3126765d452ae16a0a183a0fcb97084222ff134",
+        "working_tree_eol": "CRLF",
+        "sha256_basis": "capture_path; exact original recorded bytes verified by reconstructing the committed document with its recorded CRLF checkout"
+      },
+      "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
+      "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
+      "entry": "Native POST/GET /api/v1/build-run-inputs; explicit native opt-in ordinary parameter through unchanged CLI and shared Build admission.",
+      "effect": "Actual unchanged publishedCLI0.5.6 enters a three-member chain with only an opaque parameter; two named members receive/mask the synthetic environment while the intermediate member gets none. Pending/consumed input and assignment recovery survive Host restarts; duplicate submission conflicts and metadata retains accepted identity.",
+      "completion": "Actual HTTP/application transactions and private recovery state; positive CLI/process/output/exact-artifact proof.",
+      "product_binding": "Vivarium.DefinitionProof.RunInputAcceptanceCases.Unchanged_CLI_consumes_one_private_chain_input_with_targeted_masks_and_restart_recovery",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "D45 per-run environments and D48 one-use requests only; no permanent Project secret store, genuine prior-product RED, publication credential, actual T3 build or full secure-parameter API proof.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07"
+      ],
+      "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-RUN-INPUT-ACCESS-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+        "sha256": "59fbf02919c209cba763d6c028254f3bedb7a8d10003673c064a875d1db5604b",
+        "interpretation": "Authored native D48 contract, no TeamCity wire equivalence asserted.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d48-architecture.source",
+        "revision": "d3126765d452ae16a0a183a0fcb97084222ff134",
+        "working_tree_eol": "CRLF",
+        "sha256_basis": "capture_path; exact original recorded bytes verified by reconstructing the committed document with its recorded CRLF checkout"
+      },
+      "principal": "Ordinary six-permission P user/key, separately current/foreign actor and withdrawn Project grant.",
+      "seed": "Fresh actual Host/PostgreSQL/Chiral private Storage/CSharp-Git installation. A dedicated physical Linux Agent runs the positive private-input chain; the negative clock controls only the owned fresh fixture.",
+      "entry": "Native POST/GET /api/v1/build-run-inputs; explicit native opt-in ordinary parameter through unchanged CLI and shared Build admission.",
+      "effect": "Foreign actor, wrong root, graph mismatch, stale catalogue, expiry and current-rights withdrawal admit no Builds. Expiry erases pending ciphertext. Sixteen pending inputs bound an actor; two concurrent submissions consume once and create exactly one three-member graph.",
+      "completion": "Actual HTTP/application transactions and private recovery state; positive CLI/process/output/exact-artifact proof.",
+      "product_binding": "Vivarium.DefinitionProof.RunInputAcceptanceCases.Foreign_wrong_root_stale_expired_and_withdrawn_inputs_cannot_admit_builds",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "D45 per-run environments and D48 one-use requests only; no permanent Project secret store, genuine prior-product RED, publication credential, actual T3 build or full secure-parameter API proof.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07"
+      ],
+      "wire_qualification": "Explicit native extension only;2 old unchanged-client/native-secret regressions are independently renewed, no full-wire GREEN.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-REUSE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-CHAIN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-02",
+        "AC-BLD-07",
+        "AC-ART-01",
+        "AC-RUN-03"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-06",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-reuse-observations.json",
+        "sha256": "a3c8e005347ca8ca861ccda7a48e033bc9bdbd9d1f374743c31c0ccc4375f136",
+        "cases": [
+          "source-reuse:first-revision",
+          "source-reuse:repeat-same-revision",
+          "source-reuse:changed-revision"
+        ],
+        "capture": "artifacts/pilot-chain/source-reuse-2fb7956935a1/receipt.json",
+        "producer_sha256": "e4afa6f5838f3fa63c71fa31d0b2c9f2631a858c8a6182a815f08c8bf2ef7694"
+      },
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Owned ON_AGENT Git chain with explicit successful-only reuse; exact same SHA, then actual pushed commit. Reference Linux Agent Git2.43.0 is a recorded derivative of the pinned minimal Agent.",
+      "entry": "Repeated ordinary compatible Release admissions; Host restart before unchanged-source product repetition.",
+      "effect": "Same-source repetition retains original two successful producer identities and creates only one Release execution; changed source creates three new physical executions with one coherent SHA and expected bytes.",
+      "completion": "Pinned real TeamCity identities/revisions/terminal states, then actual fresh Host/PG/CSharp-Git/Storage and dedicated Linux Agent processes; exact owned product artifact bytes are additional proof, not reference artifact-wire conformance.",
+      "product_binding": "Vivarium.DefinitionProof.SourceReuseAcceptanceCases.Source_reuse_preserves_same_revision_producers_and_rebuilds_after_a_real_commit",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/source-reuse-red.trx",
+        "sha256": "48902dac175c27da65b5b78000e1d2bf619299ffd6e66743eae1b0b058eb5268",
+        "effect": "Actual422 admission where the frozen reference accepts/runs; no skipped placeholder or setup failure."
+      },
+      "limits": "Explicit successful-only anonymous single-root/default-branch profile without run secrets. Reference does not cover custom parameters, arbitrary branches/settings differences, source queue optimization timing or full wire/artifact families.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      },
+      "green_effect": "Actual fresh Host/PG/Storage/anonymous Git and Linux Agent:3 executions on first SHA, only a new Release on unchanged SHA after Host restart (4 total), then3 new executions on pushed SHA (7 total); coherent revisions and exact owned artifact bytes."
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SEMVER-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:semver",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(0)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SUCCESS-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:success",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(1)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-FAILURE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-07",
+        "AC-RUN-02"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/build-number-observations.json",
+        "sha256": "e846811fb127f135be997e5d811c6670ca769203c432460107b8135af32d5254",
+        "case": "build-number:failure",
+        "capture": "artifacts/pilot-chain/build-number-8022604b9507/receipt.json",
+        "producer_sha256": "e4f7f8b03fea525e9ca802da82684be0819ded9dd0ba8157a397d82554099e3f"
+      },
+      "principal": "Reference administrative positive; product ordinary finite six-permission P key.",
+      "seed": "Owned source-free Linux process emits one literal semver or escaped quoted number, then exits0/7.",
+      "entry": "Compatible ordinary Build admission and native/compatible reads of the same Build.",
+      "effect": "Observed service-message number replaces the display number without rewriting the independent counter or actual terminal outcome; it survives Host restart.",
+      "completion": "Actual pinned TeamCity live/terminal observations and independent real Host/Agent process, result and persistent reads.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Actual_stdout_number_messages_retain_the_reference_value_and_independent_result(2)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-red.trx",
+        "sha256": "91c508825cf0283e26e3b2bf7ede56a5d42d8da85d2d689751a25a35836f60e5",
+        "effect": "Actual terminal number remains counter1 instead of the reference literal/decoded number; three genuine product failures."
+      },
+      "limits": "Used literal single-attribute stdout buildNumber profile. No generic service-message, template/parameter substitution or complete build-number API/wire acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-RESULT-RECOVERY-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d50-used-inline-build-numbers-are-typed-metadata-with-terminal-recovery",
+        "sha256": "3db20e60709a6bea5ce7c03d8dc298edceb197890354bf885a0ae778800a415a",
+        "interpretation": "Authored native SDK D45/D50 recovery/secrecy contract, not TeamCity secret-parameter wire conformance.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d50-architecture.source",
+        "sha256_basis": "capture_path; exact authored native contract bytes at this checkpoint"
+      },
+      "principal": "Ordinary six-permission P key.",
+      "seed": "Fresh Host/PG/Git/Storage with a dedicated real Linux Agent; a bounded transport interceptor drops only the owned metadata frame in the recovery case.",
+      "entry": "Ordinary build admission, real AgentHub and native/compatible Build/output reads.",
+      "effect": "A real Agent emits one number frame; the bounded server interceptor drops that frame and records the actual terminal metadata. The complete retained result repairs the display number and Host restart retains it, without changing the numeric counter.",
+      "completion": "Actual user process, independently retained result and sequenced PG metadata; exact replay/contradiction/retraction/infrastructure-omission controls run production validation.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Terminal_metadata_recovers_a_lost_live_number_frame",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Selected literal metadata and native recovery/secret extension, not generic service messages, parameter/template substitution or full wire/API acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "id": "PILOT-BUILD-NUMBER-SECRET-MASK-001",
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-LOG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-AGT",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-CFG-07",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d50-used-inline-build-numbers-are-typed-metadata-with-terminal-recovery",
+        "sha256": "3db20e60709a6bea5ce7c03d8dc298edceb197890354bf885a0ae778800a415a",
+        "interpretation": "Authored native SDK D45/D50 recovery/secrecy contract, not TeamCity secret-parameter wire conformance.",
+        "capture_path": "artifacts/pilot-chain/build-number-native-sources/d50-architecture.source",
+        "sha256_basis": "capture_path; exact authored native contract bytes at this checkpoint"
+      },
+      "principal": "Ordinary six-permission P key.",
+      "seed": "Fresh Host/PG/Git/Storage with a dedicated real Linux Agent; a bounded transport interceptor drops only the owned metadata frame in the recovery case.",
+      "entry": "Ordinary build admission, real AgentHub and native/compatible Build/output reads.",
+      "effect": "An ordinary native run supplies a synthetic registered secret used by the actual stdout number command. Metadata/output/result and public reads retain only REDACTED; the Host also rejects a raw registered value without changing the accepted observation.",
+      "completion": "Actual user process, independently retained result and sequenced PG metadata; exact replay/contradiction/retraction/infrastructure-omission controls run production validation.",
+      "product_binding": "Vivarium.DefinitionProof.BuildNumberAcceptanceCases.Registered_run_secrets_are_masked_in_number_metadata_and_output",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Selected literal metadata and native recovery/secret extension, not generic service messages, parameter/template substitution or full wire/API acceptance.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/build-number-story-and-sdk-cohort.trx",
+        "sha256": "11fb26e6a5eab77047b2afce6d6d0092d6b35a3fec5fe446213d65bc415d1902",
+        "cohort_passed": 30,
+        "cohort_failed": 0,
+        "qualification": "29 selected story rows plus one seven-variant SDK/actual owner-death test. Original867 inputs/10producer copies are retained. After the cohort only one root descriptor-expectation test and root NUnit DLL/PDB changed; all8 runtime/physical-case producer copies remain byte-identical. Renewed root698passed/raw12NotExecuted. Not final story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-TRG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-VCS"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-13",
+        "AC-BLD-02",
+        "AC-CFG-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Owned anonymous ON_AGENT chain; explicit default branch/custom60s quiet period and041345f2 exclusion delta.",
+      "entry": "Real Git pushes and ordinary manual compatible admission, then native/compatible readbacks.",
+      "effect": "Excluded-only changes create no Build; two relevant pushes coalesce into one coherent latest-SHA graph after60s; completed manual coverage prevents a redundant graph after Host restart.",
+      "completion": "Actual pinned TeamCity observations and fresh Host/PG/Storage/Git/Linux Agent processes.",
+      "limits": "Used default-branch profile only; failed/cancelled manual variants, force-push recovery and full VCS trigger API remain unaccepted.",
+      "id": "PILOT-VCS-QUIET-EXCLUSIONS-MANUAL-001",
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/vcs-trigger-observations.json",
+        "sha256": "78efc89e8a2d4a2eaa5625bb50756da2e81b95f68ec3c61b59453514de2f3730",
+        "cases": [
+          "trigger:metadata-excluded",
+          "trigger:quiet-period-and-coalesced-source",
+          "trigger:manual-coexistence"
+        ],
+        "capture": "artifacts/pilot-chain/trigger-3881e20b7427/receipt.json",
+        "producer_sha256": "4c892f4eaedc814ee48aa5a2de4f196fad7b17e54f33b355450a8e3b6f52fc27"
+      },
+      "product_binding": "Vivarium.DefinitionProof.VcsTriggerAcceptanceCases.Used_trigger_excludes_metadata_coalesces_revisions_and_respects_completed_manual_coverage",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "red_evidence": {
+        "path": "artifacts/pilot-chain/vcs-trigger-red.trx",
+        "sha256": "cfc4431e60f27eec45732d3acb78520ad44a0e1461341dfb94632de59dfa0c97",
+        "effect": "Actual manual chain succeeds; no automatic Build appears after two relevant source pushes and the bounded quiet/completion wait."
+      },
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-TRG",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CFG",
+        "SS-IAM",
+        "SS-LOG",
+        "SS-VCS"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-13",
+        "AC-CFG-07",
+        "AC-UI-01"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Actual fresh Host/PG/Git with only its runtime background delivery worker disabled; production observer/admission with controlled time, no Agent/process substitute.",
+      "entry": "Actual Git push, production Tick/admission and native/compatible reads; HTTP current-grant withdrawal.",
+      "effect": "Pending deadline survives Host restart, no admission before exact60s, concurrent consumption admits one graph, every member pins one SHA/system cause, withdrawal prevents old dispatch; bounded history reads and existing key access withdrawal retain current authority.",
+      "completion": "Production PG/queue transactions and public HTTP boundaries with controlled time.",
+      "limits": "Native selected event/recovery/history contract; no additional TeamCity wire or real Agent execution claim in this case.",
+      "id": "PILOT-VCS-RECOVERY-AUTHORITY-001",
+      "source": {
+        "path": "docs/ARCHITECTURE.md",
+        "anchor": "d51-used-vcs-triggers-feed-the-existing-admission-kernel-through-durable-observations",
+        "sha256": "079a4aaa56ad6cf4833888b2092495fcaeaa5daf0259b767e0eb80f5e3ad4b12",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/architecture.source",
+        "sha256_basis": "capture_path; authored native recovery/authority contract"
+      },
+      "additional_sources": [
+        {
+          "path": "docs/design/rest-api.md",
+          "sha256": "5c84a8278a5e5b6c022466f10cab9bf06cf03d60bfc8535f55846c151e940bda",
+          "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/rest-api.source"
+        }
+      ],
+      "product_binding": "Vivarium.DefinitionProof.VcsTriggerRecoveryCases.Pending_deadline_survives_restart_consumes_once_and_cannot_dispatch_after_Git_withdrawal",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-recovery-alone.trx",
+        "sha256": "47c6794363cf92f8469a5fb4e89fa868bfee69cd011eb7f2ede830ae71fcde70",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-UI-01",
+        "AC-UI-02",
+        "AC-BLD-03",
+        "AC-BLD-05"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Fresh Host/PG/Git/Storage; ordinary six-permission P cookie. No eligible Agent.",
+      "entry": "Actual Workbench clicks run the complete graph, navigate upstream and cancel it; history/deep link/reload and same-cookie withdrawal.",
+      "effect": "Queued UI cancellation owns no execution; canceled dependencies and root retain one graph/history through Host restart; access withdrawal clears history.",
+      "completion": "Headless Playwright against actual served Workbench and real runtime/PG/readbacks.",
+      "limits": "Selected native UI cancellation/history flow; complete Queue/Agent/test-history UI remains outside this selected profile.",
+      "id": "PILOT-WORKBENCH-QUEUED-CANCEL-HISTORY-001",
+      "source": {
+        "path": "docs/acceptance/interface/navigation.feature",
+        "sha256": "930e3ce4ecb4f03009dddd84d53829ea5d2bb2fb1e93c52c3377e905fe3de70f",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/navigation.source",
+        "sha256_basis": "capture_path; authored UI actor-goal criteria"
+      },
+      "product_binding": "Vivarium.DefinitionProof.WorkbenchChainLifecycleCases.Operator_cancels_an_upstream_from_the_actual_UI_and_finds_the_retained_chain_history(False)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    },
+    {
+      "kind": "native-extension-behavior",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-UI-01",
+        "AC-UI-02",
+        "AC-BLD-04",
+        "AC-BLD-05"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-04",
+        "TCM-05",
+        "TCM-10"
+      ],
+      "principal": "Actual reference administrative positive; product ordinary finite six-permission P user/key.",
+      "seed": "Fresh Host/PG/Git/Storage; ordinary six-permission P cookie. Dedicated actual Linux Agent process.",
+      "entry": "Actual Workbench clicks run the complete graph, navigate upstream and cancel it; history/deep link/reload and same-cookie withdrawal.",
+      "effect": "Actual script output precedes UI cancellation; canceled dependencies and root retain one graph/history through Host restart; access withdrawal clears history.",
+      "completion": "Headless Playwright against actual served Workbench and real runtime/PG/readbacks.",
+      "limits": "Selected native UI cancellation/history flow; complete Queue/Agent/test-history UI remains outside this selected profile.",
+      "id": "PILOT-WORKBENCH-RUNNING-CANCEL-HISTORY-001",
+      "source": {
+        "path": "docs/acceptance/interface/navigation.feature",
+        "sha256": "930e3ce4ecb4f03009dddd84d53829ea5d2bb2fb1e93c52c3377e905fe3de70f",
+        "capture_path": "artifacts/pilot-chain/trigger-ui-native-sources/navigation.source",
+        "sha256_basis": "capture_path; authored UI actor-goal criteria"
+      },
+      "product_binding": "Vivarium.DefinitionProof.WorkbenchChainLifecycleCases.Operator_cancels_an_upstream_from_the_actual_UI_and_finds_the_retained_chain_history(True)",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "evidence": {
+        "path": "artifacts/pilot-chain/trigger-ui-renewal-focused.trx",
+        "sha256": "ae904842bbba32eb7cfaa828e0d75435bff3f4e30a1175fd692862e590021513",
+        "qualification": "Case-specific PASS with771 pre-run source/metadata hashes and15 producer/static-asset copies; zero post-run drift. Other raw failures are retained and classified in trigger-ui-checkpoint/receipt.json. Not full cohort/story/API/main acceptance."
+      }
+    }
+  ],
+  "remaining_due": "Selected PILOT evidence and independent aggregate/Security PASS at 6b8cc40; zero unresolved due implementation/review debt, pending parent exact-main delivery and task closure. See pilot-final-delivery-20261105.md. Seven declared wire variants remain unmaterialized; broader profiles allocated to SS-RUN R2 owners, not full API GREEN. Global denominator unknown/API-complete false.",
+  "global_variant_denominator": null,
+  "api_complete": false,
+  "native_http_operations": [
+    {
+      "id": "NATIVE:POST:/api/v1/build-run-inputs",
+      "method": "POST",
+      "path": "/api/v1/build-run-inputs",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-LOG",
+        "SS-CHAIN"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-RUN-INPUT-CLI-001",
+        "PILOT-RUN-INPUT-ACCESS-001"
+      ],
+      "source": "docs/ARCHITECTURE.md#d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+      "state": "SELECTED_NATIVE_PROFILE_PROVEN_NOT_FULL_FAMILY_OR_GLOBAL_DENOMINATOR"
+    },
+    {
+      "id": "NATIVE:GET:/api/v1/build-run-inputs/{id}",
+      "method": "GET",
+      "path": "/api/v1/build-run-inputs/{id}",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-IAM",
+        "SS-LOG",
+        "SS-CHAIN"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-RUN-INPUT-CLI-001",
+        "PILOT-RUN-INPUT-ACCESS-001"
+      ],
+      "source": "docs/ARCHITECTURE.md#d48-prepared-run-input-carries-one-chains-temporary-secrets-through-ordinary-clients",
+      "state": "SELECTED_NATIVE_PROFILE_PROVEN_NOT_FULL_FAMILY_OR_GLOBAL_DENOMINATOR"
+    },
+    {
+      "id": "NATIVE:GET:/api/v1/build-configurations/{id}/builds",
+      "method": "GET",
+      "path": "/api/v1/build-configurations/{id}/builds",
+      "primary_subsystem": "SS-RUN",
+      "related_subsystems": [
+        "SS-CFG",
+        "SS-IAM"
+      ],
+      "implementation_issue": 116,
+      "contract_issue": 117,
+      "acceptance_issue": 118,
+      "case_ids": [
+        "PILOT-VCS-RECOVERY-AUTHORITY-001",
+        "PILOT-WORKBENCH-QUEUED-CANCEL-HISTORY-001",
+        "PILOT-WORKBENCH-RUNNING-CANCEL-HISTORY-001"
+      ],
+      "source": "docs/design/rest-api.md",
+      "status": "SELECTED_PRODUCT_GREEN_NOT_COMPLETE_HISTORY_API"
+    }
+  ],
+  "declared_variant_ids": [
+    "TCREST-PILOT-EXPLICIT-SELECTION-DIRECT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-INDIRECT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-PASSWORD-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-MISSING-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-CONFLICT-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-AUTHORITY-001",
+    "TCREST-PILOT-EXPLICIT-SELECTION-SOURCE-001"
+  ]
+}

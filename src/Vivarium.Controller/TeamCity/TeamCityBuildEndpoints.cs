@@ -23,7 +23,8 @@ internal static class TeamCityBuildEndpoints
             try
             {
                 accepted = await builds.SubmitAsync(actor, new RuntimeRunRequest(id,
-                    properties.ToDictionary(p => p.Name!, p => p.Value!, StringComparer.Ordinal)), http.RequestAborted);
+                    properties.ToDictionary(p => p.Name!, p => p.Value!, StringComparer.Ordinal),
+                    SelectedDependencies: input.SnapshotDependencies?.Build), http.RequestAborted);
             }
             catch (RestApiException error) when (error.Status == 404)
             {
@@ -68,7 +69,9 @@ internal static class TeamCityBuildEndpoints
     }
     private static RestApiException Invalid(string detail) => new(400, "invalid_request", "Invalid request", detail);
     [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-    private sealed record RunInput(TypeInput? BuildType, PropertiesInput? Properties = null);
+    private sealed record RunInput(TypeInput? BuildType, PropertiesInput? Properties = null,
+        [property: JsonPropertyName("snapshot-dependencies")] SelectionInput? SnapshotDependencies = null);
+    private sealed record SelectionInput(RuntimeSelectedDependency[]? Build);
     [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
     private sealed record TypeInput(string? Id);
     [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]

@@ -1177,6 +1177,37 @@ An infrastructure fallback/recovery result may omit completed steps: their indep
 observations remain retained. Any explicitly submitted contradictory step still quarantines the
 owner; successful results require complete non-skipped step coverage.
 
+PILOT extends that same queue with ordinary Builds linked by collected snapshot/artifact selections;
+the submitted Release remains the returned Build, without an implicit composite. The initial
+source-free chain cohort collects its definitions and selected same-chain producers atomically with
+admission. Downstream work waits on the existing queue until its selected snapshot producers finish.
+Assignment preparation records each consumed producer artifact and destination alongside authorized
+payload references to the exact private content object. Admission retains immutable requested
+dependency handles. Queue optimization has a separately audited PostgreSQL resolution projection,
+flattened atomically under the existing queue fence; both HTTP surfaces resolve old locators through
+that same projection. A resolution cannot cross a Project/BuildType or replace an assigned/finished
+physical execution. Successful snapshot reuse requires explicit reuse/success-only declarations and
+matching collected plans, ordinary parameters and selected producers; encrypted run-secret inputs
+are not compared for this cohort. Actual assignment/consumed producer/file/destination evidence
+remains immutable. This is runtime resolution, not a Git desired override or an independent chain
+scheduler. Literal same-chain transfers and selected CANCEL/CANCEL propagation exist.
+
+The selected workload-source extension retains the Git-owned Source declaration in immutable Build
+input, with a PostgreSQL identity for the effective VCS-root properties. That identity excludes
+attachment checkout rules and is distinct from the catalogue/settings revision. The coordinator
+collects the workload branch revision when an eligible Agent is claimed, or uses its same-root
+snapshot producer's selected revision; later branch movement cannot change that chain's checkout.
+Selection and the Agent's actual checked-out HEAD are separate immutable facts. Anonymous Git
+collection inherits no Host home, Git configuration or credentials. The negotiated Windows/Linux
+`teamcity.vcs-checkout.v1` seam performs checkout before user steps and stores generated script
+inputs outside the source tree. A fenced early receipt and matching final receipt prove actual HEAD;
+process success alone cannot supply that proof. Native reads expose selected/consumed revisions,
+while the compatible `revisions` projection reports the same workload identity. A collection failure
+retains `N/A`; a checkout failure retains the selected commit and runs no user steps. Private-source
+credentials, source-aware reuse, other checkout/selector/policy profiles, full recipe runners,
+remaining fault variants and publication remain due before affected PILOT acceptance. This selected
+implementation neither changes D43 evaluator isolation nor claims full VCS resource compatibility.
+
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
 adapters, a frontend runtime server, and an extra application framework are not required. Workbench
@@ -1526,7 +1557,8 @@ The Agent masks registered exact values across stdout/stderr chunk boundaries be
 output spool and transport; Host logs, errors and public output retain only masked bytes. This is
 not detection of transformed/unregistered secrets or redaction of arbitrary artifact files. The
 selected workload is trusted to use its credential for its intended external operation. Permanent
-Project secrets, rotation and user-managed secret references require their own story. Native runtime
+Project secrets, rotation and reusable user-managed secret references require their own story. D48
+adds one-use prepared execution input without a reusable secret store. Native runtime
 integration and its acceptance evidence do not establish TeamCity secure-parameter wire compatibility.
 
 ### D46. US-013 acceptance preserves behavior while exact background estimation is separately owned
@@ -1541,6 +1573,175 @@ and running-cancel wire cases and every captured entity remain retained and unac
 separate compatibility gate passes. R0 uses two distinct behavioral obligations for those journeys;
 their passes cannot be reported as GREEN for the deferred full wire cases. Other D36-D40 compatibility,
 ledger, independent-review and zero-debt gates retain their meaning within this revised scope.
+
+### D47. Container steps retain remote workload ownership independently of a local process
+
+US-013's Docker-wrapped recipe needs a negotiated Agent execution seam, not a shell command whose
+exit is mistaken for container termination. `teamcity.container-runner.v1` owns one exclusive step
+inside the existing Build/Agent lease. It does not add a scheduler, fleet provider or Bootstrap work.
+The initial platform is Linux x64 with an operator-provisioned Docker Engine connection; other
+platforms and unproved runner variants are not advertised as supported.
+
+The trusted installation supplies the runtime endpoint, private mutual-TLS material and stable
+ownership scope outside project definitions. A project cannot choose that connection or receive its
+credentials. Source/Git owns image/command/environment and selected named-cache declarations;
+runtime connection settings do not become editable project configuration or a second Git desired
+authority. Use a dedicated engine for this story's repeatable tests and final build; do not mount the
+working machine's Docker socket or Agent credentials into a workload. The engine is a trusted
+administrative component, not a VM-grade boundary against kernel/daemon compromise.
+
+The selected checkout's freshly fetched, per-Build Git metadata is writable inside its container,
+including ordinary local configuration updates that create `config.lock`. The source repository is
+never mounted into the workload. Keep generated script inputs and the container gitfile read-only;
+the narrow Git-directory mount does not grant write access to their private parent directory.
+
+Durably record container creation intent before dispatch, then its immutable actual ID and ownership
+labels before starting user work. Container IDs, image identity, actual exit and verified removal
+remain distinct from local PIDs, stream connections and Build outcome. Graceful cancellation sends
+TERM and waits; hard kill needs the existing force/timeout/containment authority. Never free capacity
+because a client disconnected or exited. Reconcile an interrupted owned container before reporting
+the Agent ready; uncertain creation/ownership/stop remains quarantined. Never stop an object whose
+identity/scope does not match the durable intent.
+
+Transfer environment values through the private runtime request, never command arguments, Git,
+public representations or ordinary diagnostics; retain D45 protected assignments and output masking.
+The trusted Engine installation keeps OCI/Exec runtime state and temporary process specifications
+on memory-backed runtime directories, with request-body/debug logging disabled. Secrets must not
+enter the persistent Engine graph; an in-memory application map alone is not sufficient evidence.
+Stream actual stdout/stderr through the existing bounded output producer and final-watermark/gap
+contract. An independently committed step/container receipt must agree with the terminal result.
+Partial output or lost runtime authority cannot manufacture a successful/clean-host receipt.
+Append protocol fields and gate their delivery on negotiated support. This is an execution contract,
+not acceptance of all Docker parameters, compatible error strings or publication behavior; freeze
+and bind the used TeamCity profiles before public integration and retain the D39/PILOT final gates.
+
+### D48. Prepared run input carries one chain's temporary secrets through ordinary clients
+
+The unchanged TeamCity CLI transports only ordinary parameter arguments. Never put a publication
+credential in those arguments. Native `POST /api/v1/build-run-inputs` accepts bounded per-configuration
+secret environments for one root configuration's snapshot graph; `GET /api/v1/build-run-inputs/{id}`
+returns metadata only. The input belongs to its authenticated user, root configuration and exact
+active catalogue revision, expires after fifteen minutes, and requires current project visibility,
+`run_build` and `customize_build_parameters`. The identifier is not bearer authorization.
+
+An explicit native opt-in ordinary parameter, `vivarium.run-input=vri_<uuid>`, consumes that input
+under the existing permission/queue fences in the same transaction as admission of the whole graph.
+Remove this marker from ordinary collected parameters. Deliver each supplied environment only to its
+named graph member, encrypted with the existing per-Build D45 recovery purpose; never implicitly
+propagate root secrets to dependencies. Direct native run secrets remain root-only. Without this
+opt-in, compatible submissions and intentional repeated unkeyed runs keep their existing behavior.
+
+The private input uses a separate per-input Data Protection purpose. Limit it to sixteen graph
+targets, each within D45 environment bounds, 256 KiB total, sixteen live pending inputs per actor,
+and a 2 MiB HTTP request. Consume once, clear the pending ciphertext and retain accepted Build
+identity. A duplicate receives conflict; after a lost submit response, metadata reads recover the
+accepted identity without queuing again. Reject stale catalogue, expired, foreign-actor and wrong-root
+inputs before committing any Build. Bounded background expiry clears pending ciphertext and records
+an internal audit event. Metadata, outcomes and audit never return values. This is a temporary sealed
+execution request for US-013, not permanent Project secret management or TeamCity secure-parameter
+wire conformance. Publication credentials target only the owned acceptance repository.
+
+### D49. Source-aware suitability uses collected revisions before physical ownership
+
+The selected successful-only single-root dependency profile reuses a finished producer only when
+its effective settings, ordinary inputs, root instance/checkout declaration, actual selected source
+revision and selected upstream identities match. A changed source revision requires new upstream
+executions. Temporary run secret inputs are never compared as ciphertext or reused by this profile.
+The pinned real TeamCity source-reuse capture establishes these selected effects; it does not freeze
+general branch/settings suitability, arbitrary queue optimization or full wire timing.
+
+Collect an anonymous workload revision after admission and compatible Agent availability, before
+allocating a physical execution/counter/lease. Discovery runs outside the queue/Agent transaction,
+with existing isolated Git settings and time/output bounds and at most four in-flight collections.
+Commit a selection through the existing PG queue fence only while that Build is still queued and
+unassigned; recheck its current selected upstream revisions. The existing immutable source-selection
+row remains the only authority. Local tasks only bound work and wake coordination; interruption
+without a committed selection retries discovery, while a committed selection survives restart.
+Downstream members inherit the selected upstream snapshot. Successful suitability may resolve a
+queued request to an existing producer; it never substitutes an assigned physical execution. The
+Agent still proves its own actual checkout independently. Source failure retains its ordinary
+numbered failed-to-start outcome rather than inventing user execution or a successful source receipt.
+
+### D50. Used inline Build numbers are typed metadata with terminal recovery
+
+US-013's recipe emits literal `buildNumber` service messages. The pinned TeamCity capture proves
+semver and escaped quoted values during execution and after success/exit7. Change the ordinary
+Build display number while preserving its numeric configuration counter, identity, selected inputs
+and independently determined process outcome. Native and compatible reads project the same value.
+
+Negotiate `teamcity.build-number.literal.v1` and an additive assignment contract before parsing the
+selected single-attribute stdout profile. Use the D14-planned AgentMsg tag7 for a typed sequenced
+number change, not a generic command, arbitrary JSON or authority to change machine/build outcome.
+Legacy assignments remain unchanged. Bound a value to 4096 UTF-8 bytes and a Build to 128 observations,
+with bounded split-read/line parsing. Decode TeamCity escapes and mask registered exact secret values
+before transport; the Host independently rejects raw registered values. This selected SDK profile
+does not accept template substitution, generic service messages or the complete number API family.
+
+The Host authenticates the exact workload/session/Agent lease, retains immutable sequenced
+observations and updates the display projection/audit in one PG transaction. Repeated identical
+observations are harmless; contradictory values or terminal snapshots quarantine the owner rather
+than overwrite evidence. The retained terminal result includes the complete bounded observation
+list, allowing recovery after a lost live frame or Host reconnect; it cannot retract previously
+committed observations. An infrastructure fallback may omit observations, preserving prior committed
+metadata; submitted contradictions still fail. Existing private terminal-result recovery and acknowledgements apply.
+Already committed values survive Host restart. Metadata never proves a user process succeeded,
+stopped or produced correct bytes. No Bootstrap change, extra scheduler or desired-setting write
+is introduced; final whole-story Agent/REST/Security gates remain due.
+
+### D51. Used VCS triggers feed the existing admission kernel through durable observations
+
+The US-013 used profile is one anonymous default-branch Git VCS trigger per configuration.
+The established C# `vcs` type and compatible REST `vcsTrigger` spelling use the same execution
+profile: `USE_CUSTOM` quiet period and literal or directory-recursive negative path rules. Its pinned
+TeamCity 2026.1.3 capture proves metadata exclusion, a 60-second quiet period coalescing relevant
+commits, and completed successful manual coverage preventing a redundant automatic chain.
+The exclusion delta is taken explicitly from T3 commit `041345f2c201d68e718d5dbf0ba5ce9755f1704b`;
+the actual build recipe remains pinned separately. Other trigger branches, rule languages,
+failed/cancelled manual coverage, force-push recovery and the complete trigger API remain unaccepted.
+
+Git owns desired trigger/source declarations. PostgreSQL owns the observed head, pending identity,
+selected pending version and deadline. Anonymous Git I/O runs outside queue/Agent/permission fences,
+without checkout, hooks, helpers, inherited Git configuration, Host credentials or author code.
+Each command has existing time/output limits; temporary fetch storage is monitored against 128 MiB
+and 4096 files, with cancellation and removal of its unshared directory. These are observations,
+not an additional scheduler or a reusable source/secret store. An unavailable observation retains
+its previous cursor and pending event. Initial activation establishes a baseline.
+
+At dispatch the existing Build service takes the normal admission fences and a catalogue activation
+fence, revalidates the exact pending event and active Git profile, then creates the normal dependency
+graph and consumes the pending event in one transaction. The whole graph pins the observed source
+SHA before any physical ownership. Retries cannot consume an event twice; source mutation or trigger
+withdrawal cannot authorize a stale dispatch. Automatic work uses system trigger authority from
+active Git, never a fabricated user grant or Superuser request. Retained cause rows identify the
+root/event/version; native and compatible reads project that same cause and retain their current
+ordinary-user read/cancel checks. No publication credential is supplied implicitly: D45/D48 remain
+per-run input, and controlled trigger acceptance does not imply a permanent project secret vault.
+
+### D52. Explicit finished dependency selection shares admission authority
+
+US-013 can retain successful finished upstream identities per request. Native `selectedDependencies`
+and compatible `snapshot-dependencies.build` enter common admission under current permission/queue
+fences. The captured profile resolves by Build ID using its actual configuration, including a
+mismatched `buildTypeId`. Direct B retains its immutable A edge; consistent B+A adds no upstream
+execution. Existing artifact handles and source selections remain authoritative.
+
+The bounded implementation requires current graph/configuration membership, unchanged effective
+settings/source declarations, successful finished selections and consistent transitive identities. Contradictory retained identities return HTTP400.
+A new consumer collects current HEAD independently from explicitly retained producers; its immutable
+admission records those explicit edges, preserving ordinary same-chain source pinning and restart behavior.
+Unsupported profiles fail explicitly; their negative HTTP behavior is not accepted compatibility.
+Never mutate retained producer inputs, decrypt environments or reassign them. D49 automatic
+secret-candidate exclusion remains unchanged. D48 input cannot target an explicitly retained
+producer: reject rather than silently discard or propagate that named environment.
+
+See [literal observations](../tests/Vivarium.Tests/TeamCity/Reference/explicit-selection-observations.json)
+and [acquisition report](../artifacts/pilot-chain/selection-reference-report-20261104.md),
+AC-BLD-07, [#117](https://github.com/iXab3r/Vivarium/issues/117) and
+[#118](https://github.com/iXab3r/Vivarium/issues/118). The bounded follow-up captures ordinary project-viewer selection HTTP403, contradictory graph HTTP400,
+required filename absence admitted HTTP200 then failed-to-start, and advanced root HEAD with old
+producer identities/bytes retained. Filename absence does not prove physical deleted-byte behavior.
+Changed settings/branches, multiple-direct graphs and absent-field variants remain unaccepted.
+Token issuance HTTP403 remains a separate prerequisite failure. No complete API-family GREEN.
 
 ## 5. Protocol sketch
 

@@ -11,6 +11,7 @@ internal static class RuntimeBuildModel
         var build = model.Entity<RuntimeBuild>();
         build.HasKey(b => b.Id); build.Property(b => b.Id).UseIdentityAlwaysColumn();
         build.HasAlternateKey(b => new { b.Id, b.BuildTypeId, b.ProjectId });
+        build.HasAlternateKey(b => new { b.Id, b.BuildTypeId });
         build.HasIndex(b => new { b.BuildTypeId, b.Counter }).IsUnique();
         build.HasOne<CatalogBuildType>().WithMany().HasForeignKey(b => new { b.BuildTypeId, b.ProjectId })
             .HasPrincipalKey(t => new { t.Id, t.ProjectId }).OnDelete(DeleteBehavior.Restrict);
@@ -27,12 +28,88 @@ internal static class RuntimeBuildModel
         counter.HasOne<CatalogBuildType>().WithOne().HasForeignKey<RuntimeBuildCounter>(c => c.BuildTypeId).OnDelete(DeleteBehavior.Restrict);
         counter.ToTable("RuntimeBuildCounters", t => t.HasCheckConstraint("CK_RuntimeBuildCounters_Positive", "\"NextValue\" > 0"));
 
+        var trigger = model.Entity<RuntimeVcsTriggerState>(); trigger.HasKey(t => t.BuildTypeId);
+        trigger.HasOne<CatalogBuildType>().WithOne().HasForeignKey<RuntimeVcsTriggerState>(t => t.BuildTypeId).OnDelete(DeleteBehavior.Restrict);
+        trigger.HasOne<CatalogRevision>().WithMany().HasForeignKey(t => t.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        trigger.ToTable("RuntimeVcsTriggerStates", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeVcsTriggerStates_Profile", "\"ProfileHash\" ~ '^[a-f0-9]{64}$' AND \"ObservedVersion\" ~ '^[a-f0-9]{40}$'");
+            t.HasCheckConstraint("CK_RuntimeVcsTriggerStates_Pending", "(\"PendingVersion\" IS NULL AND \"PendingId\" IS NULL AND \"DueAt\" IS NULL) OR (\"PendingVersion\" IS NOT NULL AND \"PendingVersion\" ~ '^[a-f0-9]{40}$' AND \"PendingId\" IS NOT NULL AND \"DueAt\" IS NOT NULL)");
+        });
+        var cause = model.Entity<RuntimeBuildVcsTrigger>(); cause.HasKey(t => t.BuildId);
+        cause.HasIndex(t => new { t.RootBuildId, t.BuildId }).IsUnique();
+        cause.HasIndex(t => t.EventId).IsUnique().HasFilter("\"BuildId\" = \"RootBuildId\"");
+        cause.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildVcsTrigger>(t => t.BuildId).OnDelete(DeleteBehavior.Restrict);
+        cause.HasOne<RuntimeBuild>().WithMany().HasForeignKey(t => t.RootBuildId).OnDelete(DeleteBehavior.Restrict);
+        cause.ToTable("RuntimeBuildVcsTriggers", t => t.HasCheckConstraint("CK_RuntimeBuildVcsTriggers_Version", "\"Version\" ~ '^[a-f0-9]{40}$'"));
+
+        var runInput = model.Entity<RuntimeBuildRunInput>(); runInput.HasKey(i => i.Id);
+        runInput.HasIndex(i => new { i.ActorId, i.State, i.ExpiresAt });
+        runInput.HasOne<CatalogBuildType>().WithMany().HasForeignKey(i => new { i.BuildTypeId, i.ProjectId })
+            .HasPrincipalKey(t => new { t.Id, t.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        runInput.HasOne<CatalogRevision>().WithMany().HasForeignKey(i => i.RevisionId).OnDelete(DeleteBehavior.Restrict);
+        runInput.HasOne<RuntimeBuild>().WithMany().HasForeignKey(i => new { i.AcceptedBuildId, i.BuildTypeId, i.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        runInput.ToTable("RuntimeBuildRunInputs", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_Lifetime", "\"ExpiresAt\" > \"CreatedAt\"");
+            t.HasCheckConstraint("CK_RuntimeBuildRunInputs_State", "(\"State\" = 'PENDING' AND octet_length(\"ProtectedInputs\") > 0 AND \"AcceptedBuildId\" IS NULL) OR (\"State\" = 'CONSUMED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NOT NULL) OR (\"State\" = 'EXPIRED' AND octet_length(\"ProtectedInputs\") = 0 AND \"AcceptedBuildId\" IS NULL)");
+        });
+
         var input = model.Entity<RuntimeBuildInput>(); input.HasKey(i => i.BuildId);
         input.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildInput>(i => new { i.BuildId, i.BuildTypeId, i.ProjectId })
             .HasPrincipalKey<RuntimeBuild>(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
         input.HasOne<CatalogBuildDefinition>().WithMany().HasForeignKey(i => new { i.BuildTypeId, i.RevisionId }).OnDelete(DeleteBehavior.Restrict);
         input.Property(i => i.OverridesJson).HasColumnType("jsonb"); input.Property(i => i.AdmissionJson).HasColumnType("jsonb");
-        input.ToTable("RuntimeBuildInputs");
+        input.Property(i => i.SourceJson).HasColumnType("jsonb");
+        input.HasOne<RuntimeVcsRootInstance>().WithMany().HasForeignKey(i => new { i.VcsRootInstanceId, i.ProjectId })
+            .HasPrincipalKey(r => new { r.Id, r.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        input.ToTable("RuntimeBuildInputs", t => t.HasCheckConstraint("CK_RuntimeBuildInputs_Source",
+            "(\"VcsRootInstanceId\" IS NULL) = (\"SourceJson\" IS NULL)"));
+
+        var root = model.Entity<RuntimeVcsRootInstance>();
+        root.HasKey(r => r.Id); root.Property(r => r.Id).UseIdentityAlwaysColumn();
+        root.HasAlternateKey(r => new { r.Id, r.ProjectId });
+        root.HasIndex(r => new { r.ProjectId, r.RootId, r.PropertiesHash }).IsUnique();
+        root.HasOne<CatalogProjectIdentity>().WithMany().HasForeignKey(r => r.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        root.Property(r => r.PropertiesJson).HasColumnType("jsonb");
+        root.ToTable("RuntimeVcsRootInstances", t => t.HasCheckConstraint("CK_RuntimeVcsRootInstances_Identity",
+            "\"Id\" > 0 AND length(\"RootId\") BETWEEN 1 AND 256 AND \"PropertiesHash\" ~ '^[a-f0-9]{64}$'"));
+        var selection = model.Entity<RuntimeBuildSourceSelection>(); selection.HasKey(s => s.BuildId);
+        selection.HasOne<RuntimeBuildInput>().WithOne().HasForeignKey<RuntimeBuildSourceSelection>(s => s.BuildId).OnDelete(DeleteBehavior.Restrict);
+        selection.ToTable("RuntimeBuildSourceSelections", t => t.HasCheckConstraint("CK_RuntimeBuildSourceSelections_Version",
+            "\"Version\" = 'N/A' OR \"Version\" ~ '^[a-f0-9]{40}$'"));
+        var receipt = model.Entity<RuntimeBuildSourceReceipt>(); receipt.HasKey(s => s.BuildId);
+        receipt.HasOne<RuntimeBuildExecution>().WithOne().HasForeignKey<RuntimeBuildSourceReceipt>(s => s.BuildId).OnDelete(DeleteBehavior.Restrict);
+        receipt.ToTable("RuntimeBuildSourceReceipts");
+
+        var resolution = model.Entity<RuntimeBuildResolution>();
+        resolution.HasKey(r => r.RequestedBuildId); resolution.Property(r => r.RequestedBuildId).ValueGeneratedNever();
+        resolution.HasOne<RuntimeBuild>().WithMany().HasForeignKey(r => new { r.RequestedBuildId, r.BuildTypeId, r.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        resolution.HasOne<RuntimeBuild>().WithMany().HasForeignKey(r => new { r.ResolvedBuildId, r.BuildTypeId, r.ProjectId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        resolution.ToTable("RuntimeBuildResolutions", t => t.HasCheckConstraint("CK_RuntimeBuildResolutions_NotSelf",
+            "\"RequestedBuildId\" <> \"ResolvedBuildId\" AND \"UpdatedAt\" >= \"CreatedAt\""));
+
+        var dependency = model.Entity<RuntimeBuildDependency>();
+        dependency.HasKey(d => new { d.BuildId, d.Kind, d.UpstreamBuildTypeId });
+        dependency.HasOne<RuntimeBuild>().WithMany().HasForeignKey(d => d.BuildId).OnDelete(DeleteBehavior.Restrict);
+        dependency.HasOne<RuntimeBuild>().WithMany().HasForeignKey(d => new { d.UpstreamBuildId, d.UpstreamBuildTypeId })
+            .HasPrincipalKey(b => new { b.Id, b.BuildTypeId }).OnDelete(DeleteBehavior.Restrict);
+        dependency.ToTable("RuntimeBuildDependencies", t =>
+        {
+            t.HasCheckConstraint("CK_RuntimeBuildDependencies_Kind", "\"Kind\" IN ('SNAPSHOT','ARTIFACT')");
+            t.HasCheckConstraint("CK_RuntimeBuildDependencies_NotSelf", "\"BuildId\" <> \"UpstreamBuildId\"");
+        });
+        var consumed = model.Entity<RuntimeBuildConsumedArtifact>();
+        consumed.HasKey(c => new { c.BuildId, c.Ordinal });
+        consumed.HasIndex(c => new { c.BuildId, c.DestinationPath }).IsUnique();
+        consumed.HasOne<RuntimeBuild>().WithMany().HasForeignKey(c => c.BuildId).OnDelete(DeleteBehavior.Restrict);
+        consumed.HasOne<RuntimeBuildArtifact>().WithMany().HasForeignKey(c => new { c.ProducerBuildId, c.ProducerArtifactOrdinal })
+            .HasPrincipalKey(a => new { a.BuildId, a.Ordinal }).OnDelete(DeleteBehavior.Restrict);
+        consumed.ToTable("RuntimeBuildConsumedArtifacts", t =>
+            t.HasCheckConstraint("CK_RuntimeBuildConsumedArtifacts_Position", "\"Ordinal\" BETWEEN 0 AND 127 AND length(\"DestinationPath\") BETWEEN 1 AND 2048"));
 
         var execution = model.Entity<RuntimeBuildExecution>(); execution.HasKey(e => e.BuildId);
         execution.HasOne<RuntimeBuild>().WithOne().HasForeignKey<RuntimeBuildExecution>(e => e.BuildId).OnDelete(DeleteBehavior.Restrict);
@@ -47,6 +124,11 @@ internal static class RuntimeBuildModel
             t.HasCheckConstraint("CK_RuntimeBuildExecutions_Phase", "\"Phase\" IN ('PREPARING','DISPATCHING','ACCEPTED','TERMINAL','RELEASED')");
         });
         var observation = model.Entity<RuntimeBuildObservation>();
+        var number = model.Entity<RuntimeBuildNumberObservation>();
+        number.HasKey(n => new { n.BuildId, n.Sequence });
+        number.HasOne<RuntimeBuild>().WithMany().HasForeignKey(n => n.BuildId).OnDelete(DeleteBehavior.Restrict);
+        number.ToTable("RuntimeBuildNumberObservations", t => t.HasCheckConstraint("CK_RuntimeBuildNumberObservations_Bounds",
+            "\"Sequence\" BETWEEN 1 AND 128 AND octet_length(\"Value\") BETWEEN 1 AND 4096"));
         observation.HasKey(o => new { o.BuildId, o.Ordinal });
         observation.HasIndex(o => new { o.BuildId, o.Phase, o.StepIndex }).IsUnique();
         observation.HasOne<RuntimeBuildExecution>().WithMany().HasForeignKey(o => o.BuildId).OnDelete(DeleteBehavior.Restrict);

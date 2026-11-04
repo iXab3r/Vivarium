@@ -1,0 +1,112 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+
+namespace Vivarium.DefinitionProof;
+
+/// <summary>Read-only disposable anonymous source bytes; never mounts Host configuration or credentials.</summary>
+internal sealed class OwnedGitSource(string root, string? existingSource = null, string? retainedUrl = null) : IAsyncDisposable
+{
+    private const string Owner = "us013-pilot-source-proof";
+    private const string Image = "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317";
+    private readonly string name = "vivarium-pilot-source-" + Guid.NewGuid().ToString("N")[..12];
+    private string Work => Path.Combine(root, "source-work");
+    private string Bare => Path.Combine(root, "source.git");
+    private bool created;
+    internal string Url { get; private set; } = "";
+
+    internal async Task<string> StartAsync(bool powershellFailure = false)
+    {
+        if (retainedUrl is not null)
+        {
+            if (!Directory.Exists(Bare)) throw new DirectoryNotFoundException("Retained bare source is absent.");
+        }
+        else if (existingSource is not null)
+            await GitAsync(["clone", "--bare", "--no-hardlinks", "--branch", "main", existingSource, Bare]);
+        else
+        {
+            Directory.CreateDirectory(Work);
+            await GitAsync(["init", "--initial-branch=main", Work]);
+            await GitAsync(["-C", Work, "config", "user.name", "Owned source proof"]);
+            await GitAsync(["-C", Work, "config", "user.email", "fixture@example.invalid"]);
+            await File.WriteAllTextAsync(Path.Combine(Work, "selected.txt"), "old-queued-source\n", new UTF8Encoding(false));
+            Directory.CreateDirectory(Path.Combine(Work, ".vivarium/steps"));
+            await File.WriteAllTextAsync(Path.Combine(Work, ".vivarium/steps/0.sh"), "exit 83\n");
+            Directory.CreateDirectory(Path.Combine(Work, ".repos"));
+            await File.WriteAllTextAsync(Path.Combine(Work, ".repos/omitted.txt"), "excluded source\n");
+            await File.WriteAllTextAsync(Path.Combine(Work, "windows.ps1"), (powershellFailure ? "exit 7\n" : "") + """
+                $ErrorActionPreference = 'Stop'
+                if ([Environment]::Is64BitProcess -ne $true) { exit 72 }
+                if ($PSVersionTable.PSEdition -ne 'Desktop') { exit 73 }
+                & git rev-parse HEAD
+                if ($LASTEXITCODE -ne 0) { exit 75 }
+                New-Item -ItemType Directory -Force git-child | Out-Null
+                Push-Location git-child
+                & git rev-parse HEAD
+                $gitExit = $LASTEXITCODE
+                Pop-Location
+                if ($gitExit -ne 0) { exit 76 }
+                $source = [IO.File]::ReadAllBytes('selected.txt')
+                $selected = [IO.File]::ReadAllBytes('ci-input/prepare/prepare.txt')
+                if ([Convert]::ToBase64String($source) -ne [Convert]::ToBase64String($selected)) { exit 74 }
+                [IO.File]::WriteAllBytes('windows.txt', $selected)
+                Write-Output "##teamcity[publishArtifacts 'windows.txt']"
+                """, new UTF8Encoding(false));
+            await GitAsync(["-C", Work, "add", "."]);
+            await GitAsync(["-C", Work, "commit", "-m", "fixture: initial workload source"]);
+            await GitAsync(["clone", "--bare", Work, Bare]);
+        }
+        var listener = new TcpListener(IPAddress.Any, retainedUrl is null ? 0 : new Uri(retainedUrl).Port); listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port; listener.Stop();
+        Url = "git://host.docker.internal:" + port + "/source.git";
+        if (retainedUrl is not null && Url != retainedUrl) throw new InvalidDataException("Retained source URL differs.");
+        created = true;
+        await ProofProcess.RunAsync("docker", ["run", "-d", "--name", name, "--label", "vivarium.owner=" + Owner,
+            "--publish", port + ":9418", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+            "--user", "1654:1654", "--memory", existingSource is null ? "128m" : "1g", "--cpus", existingSource is null ? "0.5" : "2", "--pids-limit", existingSource is null ? "64" : "128",
+            "--mount", "type=bind,source=" + Bare + ",target=/sources/source.git,readonly", Image,
+            "git", "-c", "safe.directory=*", "daemon", "--reuseaddr", "--export-all", "--strict-paths", "--port=9418", "--base-path=/sources", "/sources/source.git"]);
+        var revision = (await GitAsync(["--git-dir", Bare, "rev-parse", "HEAD"])).Text;
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        while (true)
+        {
+            var check = await GitAsync(["ls-remote", Url, "refs/heads/main"], allowFailure: true);
+            if (check.ExitCode == 0 && check.Text.StartsWith(revision + "\t", StringComparison.Ordinal)) break;
+            await Task.Delay(100, deadline.Token);
+        }
+        return revision;
+    }
+
+    internal async Task<string> ChangeAsync(string content = "coherent-reference-version\n")
+    {
+        await File.WriteAllTextAsync(Path.Combine(Work, "selected.txt"), content, new UTF8Encoding(false));
+        await GitAsync(["-C", Work, "add", "selected.txt"]);
+        await GitAsync(["-C", Work, "commit", "-m", "fixture: source changes while queued"]);
+        // The only write is local to this owned fixture; no remote push or user Git configuration.
+        await GitAsync(["-C", Work, "push", Bare, "main"]);
+        return (await GitAsync(["-C", Work, "rev-parse", "HEAD"])).Text;
+    }
+
+    internal async Task<string> MetadataChangeAsync()
+    {
+        await File.WriteAllTextAsync(Path.Combine(Work, "README.md"), Guid.NewGuid().ToString("N") + "\n");
+        await GitAsync(["-C", Work, "add", "README.md"]);
+        await GitAsync(["-C", Work, "commit", "-m", "fixture: excluded metadata"]);
+        await GitAsync(["-C", Work, "push", Bare, "main"]);
+        return (await GitAsync(["-C", Work, "rev-parse", "HEAD"])).Text;
+    }
+
+    private static Task<ProofProcessResult> GitAsync(string[] args, bool allowFailure = false) => ProofProcess.RunAsync("git",
+        ["-c", "core.hooksPath=NUL", "-c", "core.autocrlf=false", .. args], allowFailure: allowFailure);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!created) return;
+        var metadata = await ProofProcess.RunAsync("docker", ["inspect", "--format", "{{index .Config.Labels \"vivarium.owner\"}}", name], allowFailure: true);
+        if (metadata.ExitCode == 0)
+        {
+            if (metadata.Text != Owner) throw new InvalidDataException("Source fixture ownership differs.");
+            await ProofProcess.RunAsync("docker", ["rm", "--force", name]);
+        }
+    }
+}

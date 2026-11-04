@@ -16,12 +16,14 @@ namespace Vivarium.Controller.Builds.Runtime;
 /// <summary>One PG-owned queue/lease lifecycle. Live sessions are delivery handles, never owners.</summary>
 internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContext> databases,
     RuntimeAgentSessions sessions, AgentRegistry registry, RuntimeStepCompiler compiler,
-    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger, RuntimeBuildSecrets secrets)
+    RuntimeBuildOutputStore output, TimeProvider time, ILogger<RuntimeBuildCoordinator> logger, RuntimeBuildSecrets secrets,
+    RuntimeBuildSources sources)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     // Delivery/preparation tasks are bounded coordination aids. PG intent/lease/deadlines remain
     // authoritative and startup resumes PREPARING rows; this map never grants work ownership.
     private readonly Dictionary<long, Task> preparations = [];
+    private readonly Dictionary<long, Task> sourceCollections = [];
 
     internal async Task RunAsync(CancellationToken stoppingToken)
     {
@@ -42,13 +44,17 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         }
         finally
         {
-            try { await Task.WhenAll(preparations.Values); }
+            try { await Task.WhenAll(preparations.Values.Concat(sourceCollections.Values)); }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { }
         }
     }
 
     internal async Task TickAsync(CancellationToken token)
     {
+        foreach (var completed in sourceCollections.Where(p => p.Value.IsCompleted).ToArray())
+        {
+            sourceCollections.Remove(completed.Key); await completed.Value;
+        }
         foreach (var completed in preparations.Where(p => p.Value.IsCompleted).ToArray())
         {
             preparations.Remove(completed.Key); await completed.Value;
@@ -91,15 +97,36 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             .OrderBy(b => b.QueuedAt).ThenBy(b => b.Id).ToArrayAsync(token);
         foreach (var build in queued)
         {
-            if (build.QueueDeadline <= time.GetUtcNow())
-            {
-                await FinishUnassignedAsync(database, build, "Queue wait timeout expired", token);
-                continue;
-            }
             var input = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == build.Id, token);
             var definition = await database.CatalogBuildDefinitions.AsNoTracking()
                 .SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
             var config = ReadDefinition(definition);
+            if (build.QueueDeadline <= time.GetUtcNow())
+            {
+                await FinishUnassignedAsync(database, build, "Queue wait timeout expired", "build.queue.expired", "queue_deadline", token);
+                continue;
+            }
+            if (await TryResolveQueuedAsync(database, build, input, definition, config, token)) continue;
+            var upstreams = await RuntimeBuildService.DependencyHandles(database, build.Id).Where(d => d.Kind == "SNAPSHOT")
+                .Join(database.RuntimeBuilds, d => d.Id, upstream => upstream.Id, (d, upstream) => upstream)
+                .OrderBy(upstream => upstream.Id).ToArrayAsync(token);
+            var failed = upstreams.FirstOrDefault(upstream => upstream.State == "FINISHED" && upstream.Status != "SUCCESS");
+            if (failed is not null)
+            {
+                // The admitted cohort explicitly declares CANCEL/CANCEL. Root cancellation does
+                // not walk upstream; only the dependent of a terminal bad producer is canceled.
+                var canceled = failed.CancelRequestedAt is not null;
+                var upstreamType = await database.CatalogBuildTypes.AsNoTracking().SingleAsync(t => t.Id == failed.BuildTypeId, token);
+                build.CancelRequestedAt = time.GetUtcNow(); build.CancelOperationId = Guid.NewGuid();
+                build.CancelReason = canceled ? "Build was canceled because one of the builds it depends on was cancelled"
+                    : "Build was canceled because one of the builds it depends on failed";
+                await FinishUnassignedAsync(database, build,
+                    "Canceled (Snapshot dependency " + (canceled ? "canceled" : "failed") + ": ... " + upstreamType.Name + ")",
+                    "build.dependency.cancelled", canceled ? "upstream_cancelled" : "upstream_failed", token);
+                continue;
+            }
+            if (upstreams.Any(upstream => upstream.State != "FINISHED"))
+            { build.StatusText = "Build dependencies have not been built yet"; continue; }
             var candidates = await database.AgentRegistrations.AsNoTracking().Where(a => a.DeletedAt == null && a.Authorized
                 && a.DesiredEnabled && a.DesiredRevision != null && a.Reconciled && !a.Quarantined
                 && !a.MaintenanceDrain && a.CurrentWorkloadId == null && a.SessionAuthenticated)
@@ -111,12 +138,22 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 if (!Eligible(agent) || !sessions.TryGetCurrent(id, out var connection)
                     || !Current(agent, connection!) || !connection!.Protocol.SupportsDurableBuildOutput
                     || !connection.Protocol.SupportsLiteralArtifactPublisher) continue;
+                if (input.SourceJson is not null && !connection.Protocol.SupportsVcsCheckout) continue;
+                if (RuntimeStepCompiler.RequiresContainer(config) && !connection.Protocol.SupportsContainerRunner) continue;
+                if (RuntimeStepCompiler.RequiresArtifactRules(config) && !connection.Protocol.SupportsArtifactRules) continue;
                 var reported = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.ReportedParametersJson, Json)!;
+                if (!RuntimeStepCompiler.MatchesRunnerPlatform(config, reported, agent.StaticObservationJson)) continue;
                 if (!reported.TryGetValue("system.os.family", out var platform) || platform is not ("windows" or "linux" or "macos")) continue;
                 var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.CustomParametersJson, Json)!;
                 var parameters = new Dictionary<string, string>(reported, StringComparer.Ordinal);
                 foreach (var pair in custom) parameters[pair.Key] = pair.Value;
                 if (config.Requirements.Any(r => !parameters.TryGetValue(r.Name, out var value) || value != r.Value)) continue;
+                if (input.SourceJson is not null && !await database.RuntimeBuildSourceSelections.AnyAsync(s => s.BuildId == build.Id, token))
+                {
+                    if (sourceCollections.Count < 4 && !sourceCollections.ContainsKey(build.Id))
+                        sourceCollections.Add(build.Id, sources.CollectQueuedAsync(input, token));
+                    break;
+                }
                 var now = time.GetUtcNow();
                 var execution = new RuntimeBuildExecution
                 {
@@ -129,6 +166,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                         agent.ReportedName, agent.DesiredName, reportedParameters = reported, customParameters = custom,
                         agent.CredentialGeneration, agent.ConnectionGeneration, agent.CurrentSessionId,
                         negotiatedCapabilities = JsonSerializer.Deserialize<JsonElement>(agent.NegotiatedCapabilitiesJson),
+                        staticObservation = agent.StaticObservationJson is null ? (JsonElement?)null : JsonSerializer.Deserialize<JsonElement>(agent.StaticObservationJson),
                         agent.DesiredRevision, poolId = 0, trustClass = "operator-enrolled-physical",
                         cleanPolicy = "clean-workdir", input.RevisionId, definition.PlanHash }, Json),
                 };
@@ -153,6 +191,77 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         return null;
     }
 
+    private async Task<bool> TryResolveQueuedAsync(VivariumDbContext database, RuntimeBuild build, RuntimeBuildInput input,
+        CatalogBuildDefinition definition, ResolvedConfiguration config, CancellationToken token)
+    {
+        // Suitability never compares encrypted secrets or substitutes an
+        // already assigned execution. Queue resolution and actual work ownership are separate.
+        if (input.ProtectedEnvironment.Length != 0
+            || await database.RuntimeBuildExecutions.AnyAsync(e => e.BuildId == build.Id, token)) return false;
+        var sourceRevision = input.SourceJson is null ? null : await database.RuntimeBuildSourceSelections
+            .Where(s => s.BuildId == build.Id).Select(s => s.Version).SingleOrDefaultAsync(token);
+        if (input.SourceJson is not null && (sourceRevision is null or "N/A")) return false;
+        var incoming = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.UpstreamBuildId == build.Id && d.Kind == "SNAPSHOT")
+            .Join(database.RuntimeBuildInputs.AsNoTracking(), d => d.BuildId, i => i.BuildId, (d, i) => i)
+            .Join(database.CatalogBuildDefinitions.AsNoTracking(), i => new { i.BuildTypeId, i.RevisionId }, d => new { d.BuildTypeId, d.RevisionId }, (i, d) => d)
+            .ToArrayAsync(token);
+        var incomingReuse = incoming.Length != 0 && incoming.All(d => ReadDefinition(d).Snapshots
+            .Any(s => s.Configuration == config.Id && s.ReuseBuilds && s.SuccessfulOnly));
+        var queuedRootReuse = incoming.Length == 0 && config.Snapshots.Length != 0 && config.Snapshots.All(s => s.ReuseBuilds && s.SuccessfulOnly);
+        if (!incomingReuse && !queuedRootReuse) return false;
+        if (incomingReuse && JsonSerializer.Deserialize<Dictionary<string, string>>(input.OverridesJson) is not { Count: 0 }) return false;
+        var requiresArtifacts = await database.RuntimeBuildDependencies.AnyAsync(d => d.UpstreamBuildId == build.Id && d.Kind == "ARTIFACT", token);
+        var expected = await RuntimeBuildService.DependencyHandles(database, build.Id).ToArrayAsync(token);
+        var candidates = from other in database.RuntimeBuilds
+            join otherInput in database.RuntimeBuildInputs.AsNoTracking() on other.Id equals otherInput.BuildId
+            join otherDefinition in database.CatalogBuildDefinitions.AsNoTracking()
+                on new { otherInput.BuildTypeId, otherInput.RevisionId } equals new { otherDefinition.BuildTypeId, otherDefinition.RevisionId }
+            where other.BuildTypeId == build.BuildTypeId && other.ProjectId == build.ProjectId && other.Id != build.Id
+                && otherInput.VcsRootInstanceId == input.VcsRootInstanceId && otherInput.SourceJson == input.SourceJson
+                && (sourceRevision == null || database.RuntimeBuildSourceSelections.Any(s => s.BuildId == other.Id && s.Version == sourceRevision))
+                && otherInput.ProtectedEnvironment.Length == 0 && otherInput.OverridesJson == input.OverridesJson && otherDefinition.PlanHash == definition.PlanHash
+                && (other.State == "QUEUED" && other.Id > build.Id
+                    || incomingReuse && other.State == "FINISHED" && other.Status == "SUCCESS")
+                && !database.RuntimeBuildResolutions.Any(r => r.RequestedBuildId == other.Id)
+                && (!requiresArtifacts || other.State == "QUEUED" || database.RuntimeBuildArtifacts.Any(a => a.BuildId == other.Id))
+            where database.RuntimeBuildDependencies.Count(d => d.BuildId == other.Id) == expected.Length
+            select other;
+        foreach (var handle in expected)
+        {
+            var kind = handle.Kind; var type = handle.BuildTypeId; var id = handle.Id;
+            candidates = candidates.Where(other => (from dependency in database.RuntimeBuildDependencies
+                join resolution in database.RuntimeBuildResolutions on dependency.UpstreamBuildId equals resolution.RequestedBuildId into matches
+                from resolution in matches.DefaultIfEmpty()
+                where dependency.BuildId == other.Id && dependency.Kind == kind && dependency.UpstreamBuildTypeId == type
+                    && (resolution == null ? dependency.UpstreamBuildId : resolution.ResolvedBuildId) == id
+                select dependency.BuildId).Any());
+        }
+        // Filter matching input/provenance in SQL; do not materialize unbounded Build history.
+        var candidate = await candidates.OrderByDescending(other => other.Id).FirstOrDefaultAsync(token);
+        if (candidate is not null)
+        {
+            var now = time.GetUtcNow();
+            // Flatten existing handles in the same transaction before adding this replacement.
+            // The append-only audit preserves each original transition; reads need one lookup
+            // even after thousands of intentional queued requests.
+            await database.RuntimeBuildResolutions.Where(r => r.ResolvedBuildId == build.Id)
+                .ExecuteUpdateAsync(set => set.SetProperty(r => r.ResolvedBuildId, candidate.Id).SetProperty(r => r.UpdatedAt, now), token);
+            database.RuntimeBuildResolutions.Add(new() { RequestedBuildId = build.Id, ResolvedBuildId = candidate.Id,
+                BuildTypeId = build.BuildTypeId, ProjectId = build.ProjectId, CreatedAt = now, UpdatedAt = now });
+            build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = "Resolved to Build " + candidate.Id;
+            build.FinishedAt = now;
+            var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "COMPLETE";
+            foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == build.Id).ToArrayAsync(token))
+            { stream.FinalSequence = 0; stream.FinalBytes = 0; }
+            await RuntimeBuildAudit.StageAsync(database, build, now, "build.queue.resolved", details:
+                new Dictionary<string, string> { ["resolvedBuildId"] = candidate.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    ["kind"] = candidate.State == "QUEUED" ? "queued-replacement" : "successful-snapshot-reuse" }, token: token);
+            await database.SaveChangesAsync(token);
+            return true;
+        }
+        return false;
+    }
+
     private async Task AdvanceAsync(long id, CancellationToken token, bool prepare = false)
     {
         RuntimeBuildExecution snapshot;
@@ -160,6 +269,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         RuntimeBuildInput input;
         CatalogBuildDefinition definition;
         string os;
+        bool artifactRules;
+        bool buildNumbers;
         await using (var database = await databases.CreateDbContextAsync(token))
         {
             snapshot = await database.RuntimeBuildExecutions.AsNoTracking().SingleAsync(e => e.BuildId == id, token);
@@ -171,6 +282,12 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             using var selection = JsonDocument.Parse(snapshot.SelectionSnapshotJson);
             os = selection.RootElement.GetProperty("reportedParameters").TryGetProperty("system.os.family", out var platform)
                 && platform.ValueKind == JsonValueKind.String ? platform.GetString()! : "";
+            artifactRules = selection.RootElement.GetProperty("negotiatedCapabilities").EnumerateArray().Any(c =>
+                c.GetProperty("capabilityId").GetString() == Vivarium.Contracts.ArtifactRuleProfile.CapabilityId
+                && c.GetProperty("contractMajor").GetInt32() == 1);
+            buildNumbers = selection.RootElement.GetProperty("negotiatedCapabilities").EnumerateArray().Any(c =>
+                c.GetProperty("capabilityId").GetString() == Vivarium.Contracts.BuildNumberProfile.CapabilityId
+                && c.GetProperty("contractMajor").GetInt32() == 1);
         }
         if (os is not ("windows" or "linux" or "macos"))
         { await FailAsync(id, "Execution platform is unavailable", safeUnsent: snapshot.SentAt is null, token); return; }
@@ -180,7 +297,11 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var remaining = snapshot.PreparationDeadline - time.GetUtcNow();
             using var timeout = new CancellationTokenSource(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, time);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
-            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token); }
+            try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token, artifactRules, buildNumbers); }
+            catch (RuntimeArtifactResolutionException)
+            { await FailAsync(id, "Failed to resolve artifact dependency", safeUnsent: true, token, artifactFailure: true); return; }
+            catch (RuntimeSourceCollectionException)
+            { await FailAsync(id, "Unable to collect changes", safeUnsent: true, token, sourceFailure: true); return; }
             catch (Exception error) when (error is InvalidDataException or HttpRequestException or IOException or TimeoutException
                 || error is OperationCanceledException && !token.IsCancellationRequested)
             { await FailAsync(id, "Execution preparation failed", safeUnsent: true, token); return; }
@@ -219,7 +340,10 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(currentAgent.CustomParametersJson, Json)!;
             var effective = new Dictionary<string, string>(reported, StringComparer.Ordinal);
             foreach (var pair in custom) effective[pair.Key] = pair.Value;
-            if (reported.GetValueOrDefault("system.os.family") != os || ReadDefinition(definition).Requirements
+            if (prepared.Assignment.ArtifactPublicationContractMajor == 2 && !connection!.Protocol.SupportsArtifactRules
+                || prepared.Assignment.NumberReportingContractMajor == 1 && !connection!.Protocol.SupportsBuildNumbers
+                || RuntimeStepCompiler.RequiresContainer(ReadDefinition(definition)) && !connection!.Protocol.SupportsContainerRunner
+                || reported.GetValueOrDefault("system.os.family") != os || !RuntimeStepCompiler.MatchesRunnerPlatform(ReadDefinition(definition), reported, currentAgent.StaticObservationJson) || ReadDefinition(definition).Requirements
                 .Any(r => !effective.TryGetValue(r.Name, out var value) || value != r.Value))
             {
                 await transaction.RollbackAsync(token);
@@ -230,17 +354,25 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 currentAgent.AgentId, currentAgent.TeamCityId, currentAgent.ReportedName, currentAgent.DesiredName,
                 reportedParameters = reported, customParameters = custom, currentAgent.CredentialGeneration,
                 currentAgent.CurrentSessionId, currentAgent.ConnectionGeneration, currentAgent.DesiredRevision,
+                staticObservation = currentAgent.StaticObservationJson is null ? (JsonElement?)null : JsonSerializer.Deserialize<JsonElement>(currentAgent.StaticObservationJson),
                 negotiatedCapabilities = JsonSerializer.Deserialize<JsonElement>(currentAgent.NegotiatedCapabilitiesJson) }, Json);
             owner.AcknowledgementDeadline = now.AddSeconds(30);
             foreach (var payload in prepared.Payloads) state.RuntimeBuildPayloads.Add(payload);
+            foreach (var consumed in prepared.ConsumedArtifacts) state.RuntimeBuildConsumedArtifacts.Add(consumed);
             currentBuild.StatusText = "Starting execution";
             await RuntimeBuildAudit.StageAsync(state, currentBuild, now, "build.assignment.dispatching", workload: owner.WorkloadId, token: token);
         }
         ControllerMsg? message = null;
         if (connected && owner.Phase == "DISPATCHING" && EligibleForDelivery(currentAgent))
         {
+            var delivery = secrets.ReadAssignment(id, owner.Assignment, owner.AssignmentProtectionVersion);
+            if (delivery.NumberReportingContractMajor == 1 && !connection!.Protocol.SupportsBuildNumbers)
+            {
+                await transaction.RollbackAsync(token);
+                await FailAsync(id, "Execution target changed before delivery", owner.SentAt is null, token); return;
+            }
             owner.SentAt ??= now;
-            message = new() { Build = secrets.ReadAssignment(id, owner.Assignment, owner.AssignmentProtectionVersion) };
+            message = new() { Build = delivery };
         }
         else if (connected && currentBuild.CancelRequestedAt is not null && owner.TerminalReceivedAt is null)
             message = RuntimeBuildService.CancelMessage(currentBuild, owner);
@@ -256,6 +388,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             AgentMsg.MsgOneofCase.Result => (message.Result.BuildId, message.Result.SessionId),
             AgentMsg.MsgOneofCase.BuildStopAcknowledged => (message.BuildStopAcknowledged.BuildId, message.BuildStopAcknowledged.SessionId),
             AgentMsg.MsgOneofCase.Status => (message.Status.BuildId, connection.Handle.SessionId),
+            AgentMsg.MsgOneofCase.BuildNumberChanged => (message.BuildNumberChanged.BuildId, connection.Handle.SessionId),
             _ => throw new InvalidDataException("Unexpected workload message."),
         };
         if (session != connection.Handle.SessionId || workload.Length == 0) throw new InvalidDataException("Workload session differs.");
@@ -266,7 +399,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         var execution = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == workload, token);
         if (execution is null || execution.SentAt is null)
             throw new InvalidDataException("Workload ownership differs.");
-        var existing = message.MsgCase == AgentMsg.MsgOneofCase.Result
+        var existing = message.MsgCase is AgentMsg.MsgOneofCase.Result or AgentMsg.MsgOneofCase.BuildNumberChanged
             ? await database.RuntimeBuildResults.SingleOrDefaultAsync(r => r.BuildId == execution.BuildId, token) : null;
         // A result send can already be queued when its ACK releases the Agent's local ownership.
         // Authenticate a late retained receipt without adopting its old lease or changing newer work.
@@ -293,12 +426,40 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             if (minutes > 0) execution.ExecutionDeadline ??= execution.AcceptedAt.Value.AddMinutes(minutes);
         }
         ControllerMsg? acknowledgement = null;
-        if (message.MsgCase == AgentMsg.MsgOneofCase.Status)
+        if (message.MsgCase == AgentMsg.MsgOneofCase.BuildNumberChanged)
+        {
+            var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
+            if (!connection.Protocol.SupportsBuildNumbers || !await RuntimeBuildNumbers.ApplyAsync(database, build, assignment,
+                [message.BuildNumberChanged], complete: false, closed: execution.TerminalReceivedAt is not null, time.GetUtcNow(), token))
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_number_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("Build number evidence conflicts.");
+            }
+        }
+        else if (message.MsgCase == AgentMsg.MsgOneofCase.Status)
         {
             var status = message.Status;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             var phase = RuntimeBuildProgress.Validate(status, assignment);
             if (execution.TerminalReceivedAt is not null) return;
+            if (status.VcsCheckout is { } checkout)
+            {
+                if (status.Phase != "FETCHING" || status.StepIndex != -1 || status.Completed is not null)
+                    throw new InvalidDataException("VCS checkout observation phase differs.");
+                if (!await RuntimeBuildSources.ObserveAsync(database, build.Id, checkout, assignment, time.GetUtcNow(), token))
+                {
+                    await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_source_receipt");
+                    await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                    registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("VCS checkout evidence conflicts.");
+                }
+            }
+            if (assignment.VcsCheckout is not null && phase is "RUNNING" or "COMPLETED" or "COLLECTING")
+            {
+                var receipt = await database.RuntimeBuildSourceReceipts.AsNoTracking().SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
+                if (receipt is null || !VcsCheckoutReceipt.Parser.ParseFrom(receipt.Evidence).Succeeded)
+                    throw new InvalidDataException("User-step progress precedes successful checkout evidence.");
+            }
             var observation = await RuntimeBuildProgress.ObserveAsync(database, build.Id, status, phase, time.GetUtcNow(), token);
             if (observation.Conflict)
             {
@@ -325,6 +486,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var result = message.Result;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             ValidateResult(result, assignment);
+            var sourceReceipt = await database.RuntimeBuildSourceReceipts.AsNoTracking().SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
+            if (result.VcsCheckout is { } checkout && !await RuntimeBuildSources.ObserveAsync(database, build.Id, checkout, assignment, time.GetUtcNow(), token)
+                || result.VcsCheckout is null && sourceReceipt is not null && result.Outcome != BuildOutcome.InfrastructureFailed)
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_source_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("VCS checkout evidence conflicts.");
+            }
             var steps = await database.RuntimeBuildObservations.AsNoTracking().Where(o => o.BuildId == build.Id && o.Phase == "COMPLETED").ToArrayAsync(token);
             if (steps.Any(observed =>
                 {
@@ -352,6 +521,13 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 registry.Quarantine(agent.AgentId, agent.HealthReason);
                 throw new InvalidDataException("Terminal evidence conflicts.");
             }
+            if (!await RuntimeBuildNumbers.ApplyAsync(database, build, assignment, result.NumberChanges,
+                complete: result.Outcome != BuildOutcome.InfrastructureFailed, closed: execution.TerminalReceivedAt is not null, time.GetUtcNow(), token))
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_number_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("Build number evidence conflicts.");
+            }
             if (existing is null)
             {
                 if (result.Artifacts.Count > 128 || result.Artifacts.Select(a => a.Path).Distinct(StringComparer.OrdinalIgnoreCase).Count() != result.Artifacts.Count)
@@ -359,7 +535,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 for (var ordinal = 0; ordinal < result.Artifacts.Count; ordinal++)
                 {
                     var artifact = result.Artifacts[ordinal]; LiteralArtifactPath.Validate(artifact.Path);
-                    if (!System.Text.RegularExpressions.Regex.IsMatch(artifact.Sha256, "^[a-f0-9]{64}$") || artifact.Size is < 0 or > 65536)
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(artifact.Sha256, "^[a-f0-9]{64}$") || artifact.Size is < 0 or > VerifiedArtifactFile.MaximumBytes)
                         throw new InvalidDataException("Artifact content metadata is invalid.");
                     var upload = await database.RuntimeArtifactUploads.SingleOrDefaultAsync(u => u.BuildId == build.Id && u.Sha256 == artifact.Sha256, token);
                     if (upload is null || artifact.Size != upload.Size) throw new InvalidDataException("Artifact content is not owned/verified.");
@@ -376,7 +552,10 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                     OriginalOutcome = result.Outcome.ToString(), ReceivedAt = time.GetUtcNow() });
                 build.Status = result.Outcome switch { BuildOutcome.Succeeded => "SUCCESS", BuildOutcome.Failed => "FAILURE", _ => "UNKNOWN" };
                 if (result.Outcome == BuildOutcome.Failed)
-                    build.StatusText = await RuntimeBuildStatus.FailureAsync(database, build, result, token);
+                {
+                    build.FailedToStart = result.VcsCheckout is { Succeeded: false };
+                    build.StatusText = build.FailedToStart ? "Error while applying patch" : await RuntimeBuildStatus.FailureAsync(database, build, result, token);
+                }
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.accepted", workload: workload, token: token);
                 execution.Phase = "TERMINAL"; execution.TerminalReceivedAt = time.GetUtcNow();
                 execution.OutputDeadline = time.GetUtcNow().AddSeconds(30); build.State = "RELEASING";
@@ -405,14 +584,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     }
 
     private async Task QuarantineProgressAsync(VivariumDbContext database, AgentRegistration agent, RuntimeBuild build,
-        string workload, CancellationToken token)
+        string workload, CancellationToken token, string reason = "conflicting_step_result")
     {
-        agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "conflicting_step_result";
+        agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = reason;
         await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.progress.conflict", AuditOutcome.Failed,
-            "conflicting_step_result", workload, token: token);
+            reason, workload, token: token);
     }
 
-    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token)
+    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token, bool sourceFailure = false, bool artifactFailure = false)
     {
         await using var database = await databases.CreateDbContextAsync(token);
         var key = await database.RuntimeBuildExecutions.AsNoTracking().Where(e => e.BuildId == id).Select(e => e.AgentId).SingleAsync(token);
@@ -425,6 +604,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         // A durable send intent always wins over a caller's earlier unsent observation.
         safeUnsent &= execution.SentAt is null;
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        if ((sourceFailure || artifactFailure) && build.CancelRequestedAt is null) build.Status = "FAILURE";
         build.Number ??= "N/A";
         build.FailedToStart = build.CancelRequestedAt is null && execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow();
@@ -454,13 +634,13 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         else if (sessions.TryGetCurrent(key, out var connection)) registry.Reconcile(connection!.Handle, null);
     }
 
-    private async Task FinishUnassignedAsync(VivariumDbContext database, RuntimeBuild build, string reason, CancellationToken token)
+    private async Task FinishUnassignedAsync(VivariumDbContext database, RuntimeBuild build, string statusText,
+        string action, string reason, CancellationToken token)
     {
-        build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = statusText;
         build.Number ??= "N/A";
         build.FailedToStart = true; build.FinishedAt = time.GetUtcNow();
-        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.queue.expired", AuditOutcome.Failed,
-            "queue_deadline", token: token);
+        await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), action, AuditOutcome.Failed, reason, token: token);
         var output = await database.RuntimeBuildOutputs.SingleAsync(o => o.BuildId == build.Id, token); output.State = "COMPLETE";
         foreach (var stream in await database.RuntimeOutputStreams.Where(s => s.BuildId == build.Id).ToArrayAsync(token))
         { stream.FinalSequence = 0; stream.FinalBytes = 0; }
@@ -484,11 +664,17 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
 
     internal static void ValidateResult(BuildResult result, BuildAssignment assignment)
     {
+        if (result.VcsCheckout is { } checkout) RuntimeBuildSources.ValidateReceipt(checkout, assignment);
+        if (assignment.VcsCheckout is not null && result.Outcome is BuildOutcome.Succeeded or BuildOutcome.Failed && result.VcsCheckout is null
+            || assignment.VcsCheckout is not null && result.Outcome == BuildOutcome.Succeeded && result.VcsCheckout is not { Succeeded: true }
+            || result.VcsCheckout is { Succeeded: false } && (result.Outcome is not (BuildOutcome.Failed or BuildOutcome.Cancelled) || result.Steps.Any(s => !s.Skipped) || result.Artifacts.Count != 0))
+            throw new InvalidDataException("Terminal execution contradicts its checkout evidence.");
         if (result.Outcome is not (BuildOutcome.Succeeded or BuildOutcome.Failed or BuildOutcome.Cancelled or BuildOutcome.InfrastructureFailed)
             || result.StatusText.Length > 1024 || result.Steps.Count > assignment.Steps.Count
             || result.Steps.Any(s => s.StepIndex < 0 || s.StepIndex >= assignment.Steps.Count)
             || result.Steps.Select(s => s.StepIndex).Distinct().Count() != result.Steps.Count)
             throw new InvalidDataException("The terminal result is invalid.");
+        foreach (var step in result.Steps) RuntimeContainerReceipt.Validate(step, assignment.Steps[step.StepIndex]);
         if (result.Outcome == BuildOutcome.Succeeded && (result.Steps.Count != assignment.Steps.Count
             || result.Steps.Any(s => s.Skipped || s.ExitCode != 0 || s.TimedOut)))
             throw new InvalidDataException("Successful execution conflicts with its step evidence.");

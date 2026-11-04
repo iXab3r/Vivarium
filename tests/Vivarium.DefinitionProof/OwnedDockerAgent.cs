@@ -6,10 +6,11 @@ using System.Text;
 namespace Vivarium.DefinitionProof;
 
 /// <summary>One dedicated Linux process, with only its own data and bootstrap plus read-only Agent binaries.</summary>
-internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
+internal sealed class OwnedDockerAgent(string root, bool gitTools = false, OwnedContainerRuntime? runtime = null, bool actualT3 = false, string? hostname = null) : IAsyncDisposable
 {
     private const string Owner = "us013-r0-runtime-proof";
-    private const string Image = "mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3";
+    private string Image => gitTools ? "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
+        : "mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3";
     private readonly string name = "vivarium-r0-agent-" + Guid.NewGuid().ToString("N")[..12];
     private bool created;
     private bool volumeCreated;
@@ -26,6 +27,7 @@ internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
         {
             controllerUrl = $"https://host.docker.internal:{origin.Port}",
             certFingerprint = certificate.GetCertHashString(HashAlgorithmName.SHA256), enrollToken = enrollment,
+            dockerRuntime = runtime is null ? null : new Vivarium.Agent.DockerRuntimeOptions("https://docker:2376", "/cert-client", runtime.Scope),
         }));
         volumeCreated = true;
         await ProofProcess.RunAsync("docker", ["volume", "create", "--label", "vivarium.owner=" + Owner, Volume]);
@@ -34,11 +36,12 @@ internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
             "--user", "0:0", Image, "chown", "1654:1654", "/data"]);
         created = true;
         await ProofProcess.RunAsync("docker", ["run", "-d", "--name", name, "--label", "vivarium.owner=" + Owner,
-            "--restart", "no", "--memory", "256m", "--cpus", "1", "--pids-limit", "128", "--cap-drop", "ALL",
+            .. (hostname is null ? Array.Empty<string>() : new[] { "--hostname", hostname }),
+            "--restart", "no", "--memory", actualT3 ? "1g" : "256m", "--cpus", actualT3 ? "2" : "1", "--pids-limit", "128", "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges", "--read-only", "--tmpfs", "/tmp:rw,nosuid,size=16m", "--user", "1654:1654",
             "--mount", $"type=bind,source={binaries},target=/app,readonly",
             "--mount", $"type=bind,source={bootstrap},target=/bootstrap.json,readonly",
-            "--mount", $"type=volume,source={Volume},target=/data", Image,
+            "--mount", $"type=volume,source={Volume},target=/data", .. (runtime?.MountArguments ?? []), Image,
             "dotnet", "/app/Vivarium.Agent.dll", "--config", "/bootstrap.json", "--data", "/data"]);
     }
 
@@ -71,6 +74,14 @@ internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
         var result = await ProofProcess.RunAsync("docker", ["logs", "--tail", "20", name], allowFailure: true);
         var text = Encoding.UTF8.GetString(result.Output) + Encoding.UTF8.GetString(result.Error);
         return text.Replace(enrollment, "[REDACTED]", StringComparison.Ordinal);
+    }
+
+    internal async Task<string> ProcessStatesAsync()
+    {
+        // Process names/state/wait channels only: arguments and environments can contain secrets.
+        var result = await ProofProcess.RunAsync("docker", ["exec", name, "/bin/sh", "-c",
+            "for p in /proc/[0-9]*; do [ -r \"$p/comm\" ] || continue; printf '%s ' \"${p##*/}\"; cat \"$p/comm\"; sed -n '/^State:/p' \"$p/status\"; cat \"$p/wchan\"; echo; done"], allowFailure: true);
+        return result.Text;
     }
 
     internal async Task ReleaseCancellationAsync() => await ProofProcess.RunAsync("docker", ["exec", "--user", "1654:1654", name, "touch", "/data/allow-cancel-exit"]);

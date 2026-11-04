@@ -102,7 +102,7 @@ internal static class CatalogEndpoints
         Guid.TryParse(actor.Principal.ActorId, out var id)
         && await access.AllowsAllAsync(id, ["edit_project", "create_sub_project"], cancellationToken: token);
     private static IResult Unavailable(HttpContext http) => RestProblems.Create(http, 503, "catalogue_unavailable", "Catalogue is unavailable", "Configure and activate a valid Git definition revision.");
-    private static bool Page(HttpContext http, out int offset, out int limit)
+    internal static bool Page(HttpContext http, out int offset, out int limit)
     {
         offset = 0; limit = 50;
         return (!http.Request.Query.ContainsKey("offset") || int.TryParse(http.Request.Query["offset"], out offset))

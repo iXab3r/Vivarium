@@ -77,8 +77,7 @@ public sealed class AgentProtocolCompatibilityTests
             AssertField(Welcome.Descriptor, 4, "selected_protocol_version");
             AssertField(Welcome.Descriptor, 10, "connection_generation");
 
-            Assert.That(AgentMsg.Descriptor.FindFieldByNumber(7), Is.Null,
-                "AgentMsg tag 7 stays reserved for TeamCity service messages (D14)");
+            AssertField(AgentMsg.Descriptor, 7, "build_number_changed"); // D50 uses the previously unallocated D14 slot.
             AssertField(AgentMsg.Descriptor, 8, "upgrade_health_confirmed");
             AssertField(AgentMsg.Descriptor, 9, "upgrade_commit_confirmed");
             AssertField(AgentMsg.Descriptor, 10, "upgrade_finalization_confirmed");
@@ -92,8 +91,10 @@ public sealed class AgentProtocolCompatibilityTests
             AssertField(BuildAssignment.Descriptor, 7, "output_contract_major");
             AssertField(BuildAssignment.Descriptor, 8, "output_secrets");
             AssertField(BuildAssignment.Descriptor, 9, "artifact_publication_contract_major");
+            AssertField(BuildAssignment.Descriptor, 11, "number_reporting_contract_major");
             AssertField(BuildResult.Descriptor, 7, "output_watermarks");
             AssertField(BuildResult.Descriptor, 8, "output_producer_lost");
+            AssertField(BuildResult.Descriptor, 10, "number_changes");
         });
     }
 

@@ -23,7 +23,8 @@ internal sealed class RuntimeAgentSessions(IDbContextFactory<VivariumDbContext> 
     {
         AgentSessionIdentity.Validate(hello);
         var protocol = AgentProtocolCompatibility.Negotiate(hello, enableDurableBuildOutput: true,
-            enableLiteralArtifactPublisher: true); // Reject before any enrollment side effect.
+            enableLiteralArtifactPublisher: true, enableVcsCheckout: true, enableContainerRunner: true, enableArtifactRules: true,
+            enableBuildNumbers: true); // Reject before any enrollment side effect.
         await using var lease = await lifecycle.AcquireAsync(hello.AgentId, token);
         var credential = await credentials.AdmitAsync(hello, token);
         if (credential is null) return null;

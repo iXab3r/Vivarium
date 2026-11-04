@@ -7,6 +7,32 @@ namespace Vivarium.Tests;
 public sealed class RuntimeBuildProtocolTests
 {
     [Test]
+    public void Container_receipts_cannot_invent_a_user_exit_or_retract_independent_removal_evidence()
+    {
+        var assignment = new Step { Container = new() };
+        var result = new StepResult { StepIndex = 0, ExitCode = 7, Container = new() {
+            EngineId = "owned-engine", ContainerId = new string('a', 64), ImageId = "sha256:" + new string('b', 64),
+            ExecId = new string('c', 64), ProcessExitCode = 7, Removed = true } };
+        Assert.DoesNotThrow(() => RuntimeContainerReceipt.Validate(result, assignment));
+        var observation = new RuntimeBuildObservation { BuildId = 1, Phase = "COMPLETED", StepIndex = 0,
+            ExitCode = 7, TimedOut = false, Skipped = false, ContainerEvidence = result.Container.ToByteArray() };
+        Assert.That(RuntimeBuildProgress.SameResult(observation, result), Is.True);
+        foreach (var mutate in new Action<StepResult>[] { r => r.Container.Removed = false,
+            r => r.Container.ClearProcessExitCode(), r => r.Container.ProcessExitCode = 0,
+            r => r.Container.ContainerId = "guessed", r => r.Container.FailureCode = "secret remote diagnostic" })
+        {
+            var changed = result.Clone(); mutate(changed);
+            Assert.Throws<InvalidDataException>(() => RuntimeContainerReceipt.Validate(changed, assignment));
+            Assert.That(RuntimeBuildProgress.SameResult(observation, changed), Is.False);
+        }
+        var preparation = new StepResult { ExitCode = 1, Container = new() { EngineId = "owned-engine", FailureCode = "image_unavailable" } };
+        Assert.DoesNotThrow(() => RuntimeContainerReceipt.Validate(preparation, assignment));
+        preparation.Container.ProcessExitCode = 1;
+        Assert.Throws<InvalidDataException>(() => RuntimeContainerReceipt.Validate(preparation, assignment));
+        Assert.Throws<InvalidDataException>(() => RuntimeContainerReceipt.Validate(result, new Step()));
+    }
+
+    [Test]
     public void Progress_keeps_legacy_wire_tags_and_rejects_unassigned_or_ambiguous_step_receipts()
     {
         var assignment = new BuildAssignment { BuildId = "owned" }; assignment.Steps.Add(new Step { Program = "owned-program" });

@@ -4,7 +4,7 @@ using Vivarium.Contracts;
 namespace Vivarium.Agent;
 
 /// <summary>The selected literal-file publishArtifacts profile; output remains byte-for-byte intact.</summary>
-internal sealed class LiteralArtifactPublisher
+internal sealed class LiteralArtifactPublisher(bool allowRules = false)
 {
     private const string Prefix = "##teamcity[publishArtifacts '";
     private readonly Decoder decoder = Encoding.UTF8.GetDecoder();
@@ -55,14 +55,27 @@ internal sealed class LiteralArtifactPublisher
                 _ => throw new InvalidDataException("Artifact publication escape is not supported."),
             });
         }
-        var path = decoded.ToString().Replace('\\', '/');
-        LiteralArtifactPath.Validate(path);
-        if (paths.Count >= 128 && !paths.Contains(path)) throw new InvalidDataException("Artifact publication exceeds its file bound.");
-        paths.Add(path);
+        if (!allowRules)
+        {
+            var literal = decoded.ToString().Replace('\\', '/');
+            LiteralArtifactPath.Validate(literal);
+            if (paths.Count >= 128 && !paths.Contains(literal)) throw new InvalidDataException("Artifact publication exceeds its file bound.");
+            paths.Add(literal);
+            return;
+        }
+        if (decoded.Length == 0) throw new InvalidDataException("Artifact publication is empty.");
+        foreach (var ruleText in decoded.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var path = ruleText.Replace('\\', '/');
+            _ = ArtifactRuleProfile.Parse(path);
+            if (paths.Count >= 128 && !paths.Contains(path)) throw new InvalidDataException("Artifact publication exceeds its rule bound.");
+            paths.Add(path);
+        }
     }
 
     internal string[] Files(string workdir)
     {
+        if (allowRules) return PublishedFiles(workdir).Select(f => f.Source).Distinct(StringComparer.Ordinal).ToArray();
         var result = new List<string>();
         foreach (var path in paths.Order(StringComparer.Ordinal))
         {
@@ -78,6 +91,66 @@ internal sealed class LiteralArtifactPublisher
             if (File.Exists(current)) result.Add(path);
         }
         return result.ToArray();
+    }
+
+    internal (string Source, string Path)[] PublishedFiles(string workdir, CancellationToken token = default)
+    {
+        if (!allowRules) return Files(workdir).Select(p => (p, p)).ToArray();
+        var published = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var visited = 0;
+        foreach (var text in paths.Order(StringComparer.Ordinal))
+        {
+            var rule = ArtifactRuleProfile.Parse(text);
+            var slash = rule.Pattern.LastIndexOf('/');
+            var prefix = slash < 0 ? "" : rule.Pattern[..(slash + 1)];
+            var directory = Path.Combine(workdir, prefix.Replace('/', Path.DirectorySeparatorChar));
+            var current = workdir;
+            foreach (var part in prefix.Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                current = Path.Combine(current, part);
+                if (!Directory.Exists(current)) break;
+                RejectLink(current);
+            }
+            if (!Directory.Exists(directory)) continue;
+            foreach (var source in Visit(directory, prefix, rule.Pattern.EndsWith("**", StringComparison.Ordinal), 0))
+            {
+                var target = rule.Map(source, OperatingSystem.IsWindows());
+                if (target is null) continue;
+                RejectLink(Path.Combine(workdir, source));
+                if (published.TryGetValue(target, out var prior) && prior != source)
+                    throw new InvalidDataException("Artifact publication paths conflict.");
+                if (published.Count >= 128 && !published.ContainsKey(target)) throw new InvalidDataException("Artifact publication exceeds its file bound.");
+                published[target] = source;
+            }
+        }
+        return published.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (p.Value, p.Key)).ToArray();
+
+        IEnumerable<string> Visit(string directory, string relative, bool recursive, int depth)
+        {
+            if (depth > 64) throw new InvalidDataException("Artifact discovery exceeds its directory bound.");
+            foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+            {
+                token.ThrowIfCancellationRequested();
+                if (++visited > 100000) throw new InvalidDataException("Artifact discovery exceeds its entry bound.");
+                var attributes = File.GetAttributes(entry);
+                var path = relative + Path.GetFileName(entry);
+                if ((attributes & FileAttributes.Directory) != 0)
+                {
+                    if (!recursive) continue;
+                    RejectLink(entry);
+                    foreach (var nested in Visit(entry, path + '/', recursive, depth + 1)) yield return nested;
+                }
+                else
+                {
+                    yield return path;
+                }
+            }
+        }
+        static void RejectLink(string path)
+        {
+            if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidDataException("Artifact publication cannot follow links.");
+        }
     }
 
 }

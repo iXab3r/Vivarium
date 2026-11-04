@@ -1,0 +1,2892 @@
+{
+  "kind": "PINNED_SOURCE_LIFECYCLE_REFERENCE_NOT_PRODUCT_ACCEPTANCE",
+  "target": "http://127.0.0.1:18111",
+  "profile": "vivarium-teamcity-lab-202613",
+  "image": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a",
+  "project": "VivUs013SourceLifecycle_ebf118987456",
+  "sourceSha256": "58092d8df5d3ce945b0f6b3724ea3223afda05a3e699aad907334e8d5e5bc942",
+  "agentImage": "jetbrains/teamcity-minimal-agent@sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765",
+  "cases": [
+    {
+      "id": "source:resolved-revision-agent-git-unavailable",
+      "exchanges": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {},
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfUHJlcGFyZSJ9fQ==",
+            "bodyBytes": 67,
+            "bodySha256": "4e515aea58a5290b09de91a0295ce68fdb5465c15ca28ca512946ae86fd7d867"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwic3RhdGUiOiJxdWV1ZWQiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkUXVldWUvaWQ6MTU1Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZC8xNTUiLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfUHJlcGFyZSIsIm5hbWUiOiJPbi1BZ2VudCBzb3VyY2UgZmFpbHVyZSIsInByb2plY3ROYW1lIjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRUeXBlcy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfUHJlcGFyZSIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJCdWlsZCBzZXR0aW5ncyBoYXZlIG5vdCBiZWVuIGZpbmFsaXplZCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDoxNTUpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MTU1KSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjE1NS9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ==",
+            "bodyBytes": 1045,
+            "bodySha256": "038382ea969d26bc6a45c4f9cb2da1ef8bc4d35303310dfb59dbfb6c513158f7"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwic3RhdGUiOiJxdWV1ZWQiLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJxdWV1ZWREYXRlIjoiMjAyNjExMDRUMDQyOTI0KzAwMDAiLCJyZXZpc2lvbnMiOnsiY291bnQiOjAsInJldmlzaW9uIjpbXX0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W10sImNvdW50IjowfX0=",
+            "bodyBytes": 248,
+            "bodySha256": "c9faf6579b71513a7bfc44709aedc4929039b3390d64f049c1fedc591be51028"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjowLCJyZXZpc2lvbiI6W119LCJhZ2VudCI6eyJpZCI6Mjl9LCJzbmFwc2hvdC1kZXBlbmRlbmNpZXMiOnsiYnVpbGQiOltdLCJjb3VudCI6MH19",
+            "bodyBytes": 357,
+            "bodySha256": "10b79be84b4513b869d1ed7dfa9dfa236beab7b036d73f9cb280ac2d7911b2e3"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 595,
+            "bodySha256": "de1f0a87d0b81a97cad4136dd3bcc37fc81f182dc9603b87d1a45dad80704603"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 595,
+            "bodySha256": "de1f0a87d0b81a97cad4136dd3bcc37fc81f182dc9603b87d1a45dad80704603"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0Ijp0cnVlLCJwZXJzb25hbCI6ZmFsc2UsInN0YXR1c1RleHQiOiJFcnJvciB3aGlsZSBhcHBseWluZyBwYXRjaCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI5MjQrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjkyNSswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6ImVjMjE1YTViMzE1NjBmMTQ4ZWUxODBlMjRhYWNhZGFmY2I5M2Y5NjciLCJpbnRlcm5hbFZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwidmNzQnJhbmNoTmFtZSI6InJlZnMvaGVhZHMvbWFpbiIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzUiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI5fSwicHJvYmxlbU9jY3VycmVuY2VzIjp7ImNvdW50IjoxLCJwcm9ibGVtT2NjdXJyZW5jZSI6W3sidHlwZSI6IlVQREFURV9TT1VSQ0VTIiwiaWRlbnRpdHkiOiItMzkxNDY2NDMxIiwiZGV0YWlscyI6IkZhaWxlZCB0byBwZXJmb3JtIGNoZWNrb3V0IG9uIGFnZW50LCBsaWtlbHkgY2F1c2U6IENvcnJ1cHRlZCBmaWxlc3lzdGVtIHBlcm1pc3Npb25zXG5GdWxsIGVycm9yOiBVbmFibGUgdG8gcnVuIEdpdCBhdCBwYXRoIGdpdDogZ2l0IHZlcnNpb24gY29tbWFuZCBmYWlsZWQuXG5leGl0IGNvZGU6IC0xXG5leGNlcHRpb246IGNvbS5pbnRlbGxpai5leGVjdXRpb24ucHJvY2Vzcy5Qcm9jZXNzTm90Q3JlYXRlZEV4Y2VwdGlvbjogQ2Fubm90IHJ1biBwcm9ncmFtIFwiZ2l0XCIgKGluIGRpcmVjdG9yeSBcIi5cIik6IEV4ZWMgZmFpbGVkLCBlcnJvcjogMiAoTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSkgIn1dfSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 1072,
+            "bodySha256": "098ca6f0a3f89e32b2ce757a1b4e526658a1bf8789996213db3dc4de1216487c"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6dHJ1ZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiRXJyb3Igd2hpbGUgYXBwbHlpbmcgcGF0Y2giLCJxdWV1ZWREYXRlIjoiMjAyNjExMDRUMDQyOTI0KzAwMDAiLCJzdGFydERhdGUiOiIyMDI2MTEwNFQwNDI5MjUrMDAwMCIsImZpbmlzaERhdGUiOiIyMDI2MTEwNFQwNDI5MzYrMDAwMCIsInJldmlzaW9ucyI6eyJjb3VudCI6MSwicmV2aXNpb24iOlt7InZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwiaW50ZXJuYWxWZXJzaW9uIjoiZWMyMTVhNWIzMTU2MGYxNDhlZTE4MGUyNGFhY2FkYWZjYjkzZjk2NyIsInZjc0JyYW5jaE5hbWUiOiJyZWZzL2hlYWRzL21haW4iLCJ2Y3Mtcm9vdC1pbnN0YW5jZSI6eyJpZCI6IjM1IiwidmNzLXJvb3QtaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfR2l0In19XX0sImFnZW50Ijp7ImlkIjoyOX0sInByb2JsZW1PY2N1cnJlbmNlcyI6eyJjb3VudCI6MSwicHJvYmxlbU9jY3VycmVuY2UiOlt7InR5cGUiOiJVUERBVEVfU09VUkNFUyIsImlkZW50aXR5IjoiLTM5MTQ2NjQzMSIsImRldGFpbHMiOiJGYWlsZWQgdG8gcGVyZm9ybSBjaGVja291dCBvbiBhZ2VudCwgbGlrZWx5IGNhdXNlOiBDb3JydXB0ZWQgZmlsZXN5c3RlbSBwZXJtaXNzaW9uc1xuRnVsbCBlcnJvcjogVW5hYmxlIHRvIHJ1biBHaXQgYXQgcGF0aCBnaXQ6IGdpdCB2ZXJzaW9uIGNvbW1hbmQgZmFpbGVkLlxuZXhpdCBjb2RlOiAtMVxuZXhjZXB0aW9uOiBjb20uaW50ZWxsaWouZXhlY3V0aW9uLnByb2Nlc3MuUHJvY2Vzc05vdENyZWF0ZWRFeGNlcHRpb246IENhbm5vdCBydW4gcHJvZ3JhbSBcImdpdFwiIChpbiBkaXJlY3RvcnkgXCIuXCIpOiBFeGVjIGZhaWxlZCwgZXJyb3I6IDIgKE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkpICJ9XX0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W10sImNvdW50IjowfX0=",
+            "bodyBytes": 1109,
+            "bodySha256": "4444876a5c02ab9d2c7134d8f5ee16f661d263ccafd56cea94d3846d229fdd64"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/settings/buildNumberCounter",
+            "query": {},
+            "headers": {
+              "accept": "text/plain"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain"
+            },
+            "bodyBase64": "Mg==",
+            "bodyBytes": 1,
+            "bodySha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:155/artifacts/children/",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjb3VudCI6MCwiZmlsZSI6W119",
+            "bodyBytes": 21,
+            "bodySha256": "c9b1285c40ac2c05767b4c5c0ae8278e12d84a2ac688493f0e51d7b88ddc8f1b"
+          }
+        }
+      ],
+      "observations": [
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "queuedDate": "20261104T042924+0000",
+          "revisions": {
+            "count": 0,
+            "revision": []
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "SUCCESS",
+          "state": "running",
+          "failedToStart": false,
+          "personal": false,
+          "statusText": "Running",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 0,
+            "revision": []
+          },
+          "agent": {
+            "id": 29
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "SUCCESS",
+          "state": "running",
+          "failedToStart": false,
+          "personal": false,
+          "statusText": "Running",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "SUCCESS",
+          "state": "running",
+          "failedToStart": false,
+          "personal": false,
+          "statusText": "Running",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "running",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 155,
+          "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Error while applying patch",
+          "queuedDate": "20261104T042924+0000",
+          "startDate": "20261104T042925+0000",
+          "finishDate": "20261104T042936+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+                "vcsBranchName": "refs/heads/main",
+                "vcs-root-instance": {
+                  "id": "35",
+                  "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 29
+          },
+          "problemOccurrences": {
+            "count": 1,
+            "problemOccurrence": [
+              {
+                "type": "UPDATE_SOURCES",
+                "identity": "-391466431",
+                "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+              }
+            ]
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        }
+      ],
+      "terminalObservation": {
+        "id": 155,
+        "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+        "number": "1",
+        "status": "FAILURE",
+        "state": "finished",
+        "failedToStart": true,
+        "personal": false,
+        "statusText": "Error while applying patch",
+        "queuedDate": "20261104T042924+0000",
+        "startDate": "20261104T042925+0000",
+        "finishDate": "20261104T042936+0000",
+        "revisions": {
+          "count": 1,
+          "revision": [
+            {
+              "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+              "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+              "vcsBranchName": "refs/heads/main",
+              "vcs-root-instance": {
+                "id": "35",
+                "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+              }
+            }
+          ]
+        },
+        "agent": {
+          "id": 29
+        },
+        "problemOccurrences": {
+          "count": 1,
+          "problemOccurrence": [
+            {
+              "type": "UPDATE_SOURCES",
+              "identity": "-391466431",
+              "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+            }
+          ]
+        },
+        "snapshot-dependencies": {
+          "build": [],
+          "count": 0
+        }
+      },
+      "lastObservation": {
+        "id": 155,
+        "buildTypeId": "VivUs013SourceLifecycle_ebf118987456_Prepare",
+        "number": "1",
+        "status": "FAILURE",
+        "state": "finished",
+        "failedToStart": true,
+        "personal": false,
+        "statusText": "Error while applying patch",
+        "queuedDate": "20261104T042924+0000",
+        "startDate": "20261104T042925+0000",
+        "finishDate": "20261104T042936+0000",
+        "revisions": {
+          "count": 1,
+          "revision": [
+            {
+              "version": "ec215a5b31560f148ee180e24aacadafcb93f967",
+              "internalVersion": "ec215a5b31560f148ee180e24aacadafcb93f967",
+              "vcsBranchName": "refs/heads/main",
+              "vcs-root-instance": {
+                "id": "35",
+                "vcs-root-id": "VivUs013SourceLifecycle_ebf118987456_Git"
+              }
+            }
+          ]
+        },
+        "agent": {
+          "id": 29
+        },
+        "problemOccurrences": {
+          "count": 1,
+          "problemOccurrence": [
+            {
+              "type": "UPDATE_SOURCES",
+              "identity": "-391466431",
+              "details": "Failed to perform checkout on agent, likely cause: Corrupted filesystem permissions\nFull error: Unable to run Git at path git: git version command failed.\nexit code: -1\nexception: com.intellij.execution.process.ProcessNotCreatedException: Cannot run program \"git\" (in directory \".\"): Exec failed, error: 2 (No such file or directory) "
+            }
+          ]
+        },
+        "snapshot-dependencies": {
+          "build": [],
+          "count": 0
+        }
+      },
+      "terminalProven": true
+    }
+  ],
+  "setup": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/server",
+        "query": {
+          "fields": "version,versionMajor,versionMinor,buildNumber,startTime,currentTime,role,webUrl"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2ZXJzaW9uIjoiMjAyNi4xLjMgKGJ1aWxkIDIyMjc0MikiLCJ2ZXJzaW9uTWFqb3IiOjIwMjYsInZlcnNpb25NaW5vciI6MSwic3RhcnRUaW1lIjoiMjAyNjExMDJUMTkyMzM4KzAwMDAiLCJjdXJyZW50VGltZSI6IjIwMjYxMTA0VDA0MjkwNiswMDAwIiwiYnVpbGROdW1iZXIiOiIyMjI3NDIiLCJyb2xlIjoibWFpbl9ub2RlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMSJ9",
+        "bodyBytes": 222,
+        "bodySha256": "cfd8d247159e019ce5fef4bb2766756b593f5e078ab129a37e9cb17ed52c5990"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildQueue",
+        "query": {
+          "locator": "start:0,count:2",
+          "fields": "nextHref,build(id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJidWlsZCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "13a6714001c1328c0e492df00630b17dc9d8c27d29a7a479ee1d7130d4bd6807"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/projects",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiIsIm5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290In19",
+        "bodyBytes": 111,
+        "bodySha256": "fd6ca2e17c260ed4d6bca5718f3cb88d3a0c9167ed1bf91c27ac90d023c7d0e0"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiIsIm5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicGFyZW50UHJvamVjdElkIjoiX1Jvb3QiLCJ2aXJ0dWFsIjpmYWxzZSwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL3Byb2plY3QuaHRtbD9wcm9qZWN0SWQ9Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2IiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiZGVzY3JpcHRpb24iOiJDb250YWlucyBhbGwgb3RoZXIgcHJvamVjdHMiLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOl9Sb290Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPV9Sb290In0sImJ1aWxkVHlwZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJkZXBsb3ltZW50RGFzaGJvYXJkcyI6eyJjb3VudCI6MH0sInBhcmFtZXRlcnMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2L3BhcmFtZXRlcnMiLCJwcm9wZXJ0eSI6W119LCJ2Y3NSb290cyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC92Y3Mtcm9vdHM/bG9jYXRvcj1wcm9qZWN0OihpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYpIn0sInByb2plY3RGZWF0dXJlcyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYvcHJvamVjdEZlYXR1cmVzIn0sInByb2plY3RzIjp7ImNvdW50IjowfX0=",
+        "bodyBytes": 962,
+        "bodySha256": "8f1cb3b45e9a36fa47bcc557db863f119e721c1903e21636262fd565748e151d"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W3siaWQiOjI5LCJuYW1lIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X0FnZW50IiwiY29ubmVjdGVkIjp0cnVlLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpemVkIjpmYWxzZSwidXB0b2RhdGUiOmZhbHNlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2FnZW50RGV0YWlscy5odG1sP2lkPTI5JmFnZW50VHlwZUlkPTI5JnJlYWxBZ2VudE5hbWU9Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X0FnZW50In1dfQ==",
+        "bodyBytes": 271,
+        "bodySha256": "2e10eddd0e0c4372d4479a67c506a526b36a58960aade3f10869f5a59f45f56c"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:29/enabledInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRleHQiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIn19",
+        "bodyBytes": 63,
+        "bodySha256": "d88a564cd7606e1316f4dc0a8227311aa7a54afc8204f3d0ddc54ae2225c6122"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRpbWVzdGFtcCI6IjIwMjYxMTA0VDA0MjkyMyswMDAwIiwidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 98,
+        "bodySha256": "8c50deba5d3f40539b1f4d2f193ab97b70dcf5b296fb4d2f634d202246e0c956"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:29/authorizedInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 62,
+        "bodySha256": "b334b6543efdd899b405429b2e2d5ec3514c2c26fee5c91eb5aa81dfc720867c"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDRUMDQyOTIzKzAwMDAiLCJ0ZXh0IjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fQ==",
+        "bodyBytes": 97,
+        "bodySha256": "056e15e6cf6070bb6cd70ab733d77f1d5450e00a14d66f1ba99977d1d7bd48dd"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibmFtZSI6Ik9uLUFnZW50IHNvdXJjZSBmYWlsdXJlIiwicHJvamVjdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiJ9fQ==",
+        "bodyBytes": 142,
+        "bodySha256": "af080146a8f511ae04d6fd2bd32ac9cd1d1687bcde5fd7881de70891e866fdc6"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibmFtZSI6Ik9uLUFnZW50IHNvdXJjZSBmYWlsdXJlIiwicHJvamVjdE5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicHJvamVjdElkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2IiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X1ByZXBhcmU/bW9kZT1idWlsZHMiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2IiwibmFtZSI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiJ9LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ2Y3Mtcm9vdC1lbnRyaWVzIjp7ImNvdW50IjowLCJ2Y3Mtcm9vdC1lbnRyeSI6W119LCJzZXR0aW5ncyI6eyJjb3VudCI6MSwicHJvcGVydHkiOlt7Im5hbWUiOiJidWlsZE51bWJlckNvdW50ZXIiLCJ2YWx1ZSI6IjEifV19LCJwYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X1ByZXBhcmUvcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sIm91dHB1dC1wYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X1ByZXBhcmUvb3V0cHV0LXBhcmFtZXRlcnMiLCJwcm9wZXJ0eSI6W119LCJzdGVwcyI6eyJjb3VudCI6MH0sImZlYXR1cmVzIjp7ImNvdW50IjowfSwidHJpZ2dlcnMiOnsiY291bnQiOjB9LCJzbmFwc2hvdC1kZXBlbmRlbmNpZXMiOnsiY291bnQiOjB9LCJhcnRpZmFjdC1kZXBlbmRlbmNpZXMiOnsiY291bnQiOjB9LCJhZ2VudC1yZXF1aXJlbWVudHMiOnsiY291bnQiOjB9LCJidWlsZHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlL2J1aWxkcy8ifSwiaW52ZXN0aWdhdGlvbnMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9pbnZlc3RpZ2F0aW9ucz9sb2NhdG9yPWJ1aWxkVHlwZTooaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2X1ByZXBhcmUpIn0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZFR5cGU6KGlkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlKSkifSwiY29tcGF0aWJsZUNsb3VkSW1hZ2VzIjp7fX0=",
+        "bodyBytes": 1628,
+        "bodySha256": "59b78d067ae91cc0279f5fac8a6569d179a5c1fa213d619214e4d42c52a415fb"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/steps",
+        "query": {
+          "fields": "step(id,name,type,disabled,inherited,properties(property(name,value,inherited,type(rawValue))))"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGVwIjpbeyJuYW1lIjoiTXVzdCBub3QgcnVuIGFmdGVyIGZhaWxlZCBjaGVja291dCIsInR5cGUiOiJzaW1wbGVSdW5uZXIiLCJwcm9wZXJ0aWVzIjp7InByb3BlcnR5IjpbeyJuYW1lIjoic2NyaXB0LmNvbnRlbnQiLCJ2YWx1ZSI6IiMhL2Jpbi9zaFxuZWNobyBzb3VyY2UtY2hlY2tvdXQtc2hvdWxkLW5vdC1ydW5cbiJ9LHsibmFtZSI6InVzZS5jdXN0b20uc2NyaXB0IiwidmFsdWUiOiJ0cnVlIn1dfX1dfQ==",
+        "bodyBytes": 235,
+        "bodySha256": "73feadb6170029bc183a5d8f5a9e55ee1b65c8c573eb8c24eea46854f95783ed"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGVwIjpbeyJpZCI6IlJVTk5FUl8zNyIsIm5hbWUiOiJNdXN0IG5vdCBydW4gYWZ0ZXIgZmFpbGVkIGNoZWNrb3V0IiwidHlwZSI6InNpbXBsZVJ1bm5lciIsImRpc2FibGVkIjpmYWxzZSwiaW5oZXJpdGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6InNjcmlwdC5jb250ZW50IiwidmFsdWUiOiIjIS9iaW4vc2hcbmVjaG8gc291cmNlLWNoZWNrb3V0LXNob3VsZC1ub3QtcnVuXG4ifSx7Im5hbWUiOiJ1c2UuY3VzdG9tLnNjcmlwdCIsInZhbHVlIjoidHJ1ZSJ9XX19XX0=",
+        "bodyBytes": 287,
+        "bodySha256": "a8aee415d3101150179e42eecda082e678149201ecadd745655921fd7f7e0e9e"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/vcs-roots",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsInByb2plY3QiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYifSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6ImF1dGhNZXRob2QiLCJ2YWx1ZSI6IkFOT05ZTU9VUyJ9LHsibmFtZSI6ImJyYW5jaCIsInZhbHVlIjoicmVmcy9oZWFkcy9tYWluIn0seyJuYW1lIjoidXJsIiwidmFsdWUiOiJnaXQ6Ly8xMjcuMC4wLjE6NDI0MDEvc291cmNlLmdpdCJ9XX19",
+        "bodyBytes": 339,
+        "bodySha256": "620054d467661afb26e3320570eea8c372d68207298e63a2d2a4115ef62d6f5f"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsImhyZWYiOiIvYXBwL3Jlc3QvdmNzLXJvb3RzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2IiwibmFtZSI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NiJ9LCJwcm9wZXJ0aWVzIjp7ImNvdW50IjozLCJwcm9wZXJ0eSI6W3sibmFtZSI6ImF1dGhNZXRob2QiLCJ2YWx1ZSI6IkFOT05ZTU9VUyJ9LHsibmFtZSI6ImJyYW5jaCIsInZhbHVlIjoicmVmcy9oZWFkcy9tYWluIn0seyJuYW1lIjoidXJsIiwidmFsdWUiOiJnaXQ6Ly8xMjcuMC4wLjE6NDI0MDEvc291cmNlLmdpdCJ9XX0sInZjc1Jvb3RJbnN0YW5jZXMiOnsiaHJlZiI6Ii9hcHAvcmVzdC92Y3Mtcm9vdC1pbnN0YW5jZXM/bG9jYXRvcj12Y3NSb290OihpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfR2l0KSJ9fQ==",
+        "bodyBytes": 766,
+        "bodySha256": "43908dd6f050a2d6f9e59d8089f3b74ec35841ce280faa7a8d69909781802b9f"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/vcs-root-entries",
+        "query": {
+          "fields": "vcs-root(id,name,vcsName,project(id,name)),checkout-rules"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2Y3Mtcm9vdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQifSwiY2hlY2tvdXQtcnVsZXMiOiIifQ==",
+        "bodyBytes": 82,
+        "bodySha256": "6f15c62b5b557bf639c7b511b34267bc8368cda9deff6d5d2afded3e3d99270d"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2Y3Mtcm9vdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsInByb2plY3QiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYiLCJuYW1lIjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fSwiY2hlY2tvdXQtcnVsZXMiOiIifQ==",
+        "bodyBytes": 235,
+        "bodySha256": "2a816e398b5a164bd4b5c7d31feda92d2aebaa8cb1a7df47db6e75162918878a"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/settings/checkoutMode",
+        "query": {},
+        "headers": {
+          "accept": "text/plain",
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/settings/checkoutMode",
+        "query": {},
+        "headers": {
+          "accept": "text/plain"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_ebf118987456_Prepare/settings/buildNumberCounter",
+        "query": {},
+        "headers": {
+          "accept": "text/plain"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "MQ==",
+        "bodyBytes": 1,
+        "bodySha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:29/enabledInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 62,
+        "bodySha256": "b334b6543efdd899b405429b2e2d5ec3514c2c26fee5c91eb5aa81dfc720867c"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDRUMDQyOTI0KzAwMDAiLCJ0ZXh0IjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fQ==",
+        "bodyBytes": 97,
+        "bodySha256": "582ae7ad73fdbd09efe7f44abfc83b12e649ac78d1bbd7cbaa0740b5ee33f66e"
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/builds/id:155",
+        "query": {
+          "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),problemOccurrences(count,problemOccurrence(type,identity,details)),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6MTU1LCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6dHJ1ZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiRXJyb3Igd2hpbGUgYXBwbHlpbmcgcGF0Y2giLCJxdWV1ZWREYXRlIjoiMjAyNjExMDRUMDQyOTI0KzAwMDAiLCJzdGFydERhdGUiOiIyMDI2MTEwNFQwNDI5MjUrMDAwMCIsImZpbmlzaERhdGUiOiIyMDI2MTEwNFQwNDI5MzYrMDAwMCIsInJldmlzaW9ucyI6eyJjb3VudCI6MSwicmV2aXNpb24iOlt7InZlcnNpb24iOiJlYzIxNWE1YjMxNTYwZjE0OGVlMTgwZTI0YWFjYWRhZmNiOTNmOTY3IiwiaW50ZXJuYWxWZXJzaW9uIjoiZWMyMTVhNWIzMTU2MGYxNDhlZTE4MGUyNGFhY2FkYWZjYjkzZjk2NyIsInZjc0JyYW5jaE5hbWUiOiJyZWZzL2hlYWRzL21haW4iLCJ2Y3Mtcm9vdC1pbnN0YW5jZSI6eyJpZCI6IjM1IiwidmNzLXJvb3QtaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfR2l0In19XX0sImFnZW50Ijp7ImlkIjoyOX0sInByb2JsZW1PY2N1cnJlbmNlcyI6eyJjb3VudCI6MSwicHJvYmxlbU9jY3VycmVuY2UiOlt7InR5cGUiOiJVUERBVEVfU09VUkNFUyIsImlkZW50aXR5IjoiLTM5MTQ2NjQzMSIsImRldGFpbHMiOiJGYWlsZWQgdG8gcGVyZm9ybSBjaGVja291dCBvbiBhZ2VudCwgbGlrZWx5IGNhdXNlOiBDb3JydXB0ZWQgZmlsZXN5c3RlbSBwZXJtaXNzaW9uc1xuRnVsbCBlcnJvcjogVW5hYmxlIHRvIHJ1biBHaXQgYXQgcGF0aCBnaXQ6IGdpdCB2ZXJzaW9uIGNvbW1hbmQgZmFpbGVkLlxuZXhpdCBjb2RlOiAtMVxuZXhjZXB0aW9uOiBjb20uaW50ZWxsaWouZXhlY3V0aW9uLnByb2Nlc3MuUHJvY2Vzc05vdENyZWF0ZWRFeGNlcHRpb246IENhbm5vdCBydW4gcHJvZ3JhbSBcImdpdFwiIChpbiBkaXJlY3RvcnkgXCIuXCIpOiBFeGVjIGZhaWxlZCwgZXJyb3I6IDIgKE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkpICJ9XX0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W10sImNvdW50IjowfX0=",
+        "bodyBytes": 1109,
+        "bodySha256": "4444876a5c02ab9d2c7134d8f5ee16f661d263ccafd56cea94d3846d229fdd64"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/app/rest/projects/id:VivUs013SourceLifecycle_ebf118987456",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/projects/id:VivUs013SourceLifecycle_ebf118987456",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2Jy4gUHJvamVjdCBjYW5ub3QgYmUgZm91bmQgYnkgZXh0ZXJuYWwgaWQgJ1ZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1NicuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6Ik5vIHByb2plY3QgZm91bmQgYnkgbG9jYXRvciAnY291bnQ6MSxpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTYnLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfZWJmMTE4OTg3NDU2Jy4ifV19",
+        "bodyBytes": 510,
+        "bodySha256": "9a4a033867dd9ac3706decf512dac75fd98cc7de10a01d2d90c89e3acf2b893f"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents/id:29",
+        "query": {
+          "fields": "id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status)"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6MjksIm5hbWUiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV9lYmYxMTg5ODc0NTZfQWdlbnQiLCJjb25uZWN0ZWQiOmZhbHNlLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpemVkIjp0cnVlLCJ1cHRvZGF0ZSI6dHJ1ZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9hZ2VudERldGFpbHMuaHRtbD9pZD0yOSZhZ2VudFR5cGVJZD0yOSZyZWFsQWdlbnROYW1lPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlX2ViZjExODk4NzQ1Nl9BZ2VudCJ9",
+        "bodyBytes": 258,
+        "bodySha256": "3a133383c7d5e91ed1b1cc211788160a71f97e3b965132af4a2158fb1758d2f8"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/app/rest/agents/id:29",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "complete": true,
+  "limits": "One owned ON_AGENT Git checkout with the pinned minimal Agent image, which has no Git executable. A separate trusted Git client proves the immutable source revision is readable in the server network namespace before admission. Observe actual source checkout failure/state/counter; no generic checkout failure inference. Up to80s observation; an unfinished result is not a terminal oracle. No Windows/ordinary-actor or generic VCS completeness claim.",
+  "sourceFixture": {
+    "sourceImage": "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317",
+    "sourceContainer": "vivarium-source-git-ebf118987456",
+    "sourceUrl": "git://127.0.0.1:42401/source.git",
+    "sourceCommit": "ec215a5b31560f148ee180e24aacadafcb93f967",
+    "work": "D:\\Work\\Vivarium\\artifacts\\pilot-chain\\source-lifecycle-ebf118987456\\source-work",
+    "bare": "D:\\Work\\Vivarium\\artifacts\\pilot-chain\\source-lifecycle-ebf118987456\\source.git",
+    "namespace": "Pinned reference server network; loopback-only Git is intentionally unreachable from the separate Agent.",
+    "serverNamespaceLsRemote": "ec215a5b31560f148ee180e24aacadafcb93f967\trefs/heads/main",
+    "daemonLog": ""
+  },
+  "checkoutMode": {
+    "status": 200,
+    "value": "ON_AGENT"
+  },
+  "counterBefore": "1",
+  "buildId": 155,
+  "counterAfter": "2",
+  "ownedProjectRemoved": true,
+  "ownedResourcesRemoved": true,
+  "permissionsRestored": true
+}

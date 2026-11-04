@@ -9,6 +9,8 @@ internal sealed class R0AgentMessageGate : Interceptor
 {
     internal volatile bool Enabled = true;
     internal bool GateCompletions { get; init; }
+    internal bool DropBuildNumbers { get; init; }
+    internal int DroppedBuildNumbers { get; private set; }
     internal AgentMsg? CompletionMessage { get; private set; }
     internal AgentMsg? ResultMessage { get; private set; }
     internal Barrier Acceptance { get; } = new();
@@ -40,7 +42,12 @@ internal sealed class R0AgentMessageGate : Interceptor
         public T Current => source.Current;
         public async Task<bool> MoveNext(CancellationToken cancellationToken)
         {
-            if (!await source.MoveNext(cancellationToken)) return false;
+            while (true)
+            {
+                if (!await source.MoveNext(cancellationToken)) return false;
+                if (!owner.DropBuildNumbers || source.Current is not AgentMsg { BuildNumberChanged: not null }) break;
+                owner.DroppedBuildNumbers++;
+            }
             if (!owner.Enabled) return true;
             if (source.Current is AgentMsg { AssignmentAccepted: not null }) await owner.Acceptance.WaitAsync(cancellationToken);
             if (source.Current is AgentMsg { Status.Completed: not null } completed)

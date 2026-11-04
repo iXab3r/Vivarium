@@ -1,5 +1,8 @@
 # Vivarium Project Notes
 
+Current delivery — 2026-11-05: selected PILOT gates are reviewed and ready for parent delivery. See the [canonical final delivery record](.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+
+
 Vivarium is an OSS TeamCity-style CI build server and test farm plus AgentExplorer fleet manager. One cross-platform agent runs
 jobs and safe remote operations on user-provided physical machines first and on snapshot-managed VMs
 later, producing centralized test × scenario results across Windows, Linux, and macOS.
@@ -21,8 +24,51 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
-The fresh D34/D35 Host is being delivered under US-013/R0. Explicit local `init`, `nodes`, `migrate`
-and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
+D52 checkpoint (2026-11-04): one fresh unchanged CLI 0.5.6 chain completed Prepare 1,
+Windows 2 and Release root 3 and published test release434492192, version1297. A post-success
+EF observer failure remains raw FAIL; corrected read-only continuation passed exact GitHub bytes
+and ordinary REST/Workbench readbacks without further execution/publication. Prior retained
+root8/version918 remains separate provenance. See the
+[current PILOT checkpoint and remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
+Portable publisher34 controls, four offline transport controls and tiny worker lifecycle pass;
+root700/11skip and prior cumulative34/34 have explicit reuse qualifications. Independent aggregate
+and Security/Adversarial review at the parent's new commit, model unknowns, zero-debt and main
+delivery remain open; no full API percentage is known.
+
+
+The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); the full
+Prepare → Windows → Release integration remains in progress under #116–#118.
+The active PILOT branch has selected real source-free Linux → Windows → Linux chain evidence through
+independent compatible REST, unchanged CLI 0.5.6 and Workbench entries, including exact selected
+artifact bytes, dependency failure/cancellation, native graph reads and same-cookie withdrawal.
+Explicit successful snapshot reuse and durable queued-request resolution also have selected evidence.
+The branch now adds anonymous ON_AGENT Git checkout on Windows/Linux, separate immutable selected
+and consumed workload revisions, same-chain revision pinning, private generated script inputs and
+source-collection/missing-Git failure evidence. These are selected cohorts, not PILOT/main acceptance;
+the selected recipe now also runs actual Docker Prepare/Release and Windows Desktop PowerShell
+FILE/PS1/x64, with immutable step/container receipts, scoped cache and exact bytes. D47 adds private
+Engine ownership and conservative restart recovery; selected actual owner-death and live synthetic
+secret metadata/output checks have evidence. These runner cohorts do not accept their complete API
+families. The selected recipe artifact rules now map literal/leaf wildcard/recursive paths and
+stream verified private bytes, with exact 257 KiB transfer and missing-required-input evidence plus
+R0 upload/current-authority regressions. This does not accept the complete artifact API or prove
+the 2 GiB transfer ceiling. Selected real steps now read their own Git HEAD from root and nested
+directories through relative gitfiles, including long-path Windows and read-only container metadata.
+D49 now collects a queued source selection before physical ownership and proves successful producer
+reuse on the same source SHA, three new executions after a changed SHA and Host restart durability.
+The last full selected story/SDK cohort at D50 passed 30/30 (29 story rows and the seven-variant
+SDK/owner-death test), with root 698/0. D50 adds negotiated literal build-number metadata, live
+projection, terminal recovery and secret masking. Full PILOT/main acceptance still requires
+remaining fault/authority/UI profiles, triggers/single publisher
+and actual T3 build/package/publication. D51 now adds durable used VCS observations/quiet periods,
+coalescing/exclusions and completed-manual coverage through the common admission kernel, plus native
+configuration history and actual Workbench queued/running upstream cancellation/history/revocation.
+Four new selected cases have current PASS with771 pre-run hashes and15 producer/static-asset copies,
+zero drift and root700/0 (raw12 NotExecuted separate); an initial-template setup timeout remains raw
+failure evidence with an isolated successful recovery renewal. Full33-story/SDK renewal and whole
+PILOT/main acceptance remain due. Targeted temporary CLI chain input has D48 evidence below.
+
+Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
 HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real Windows Agent with
 independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
@@ -31,13 +77,17 @@ now has selected native P/Q isolation, project delegation, grant/eligibility/rev
 queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
 evidence now survives a cold Host restart. D45 adds native per-run secret environments with encrypted
 input/assignment recovery and existing Agent output masking; permanent Project secret storage is deferred.
+D48 adds actor/root/catalogue-bound one-use encrypted chain input, letting ordinary clients carry
+only an opaque parameter while each named Build receives its own D45 environment. Selected real
+CLI/process/masking, restart, expiry, quota, current-rights and concurrent-consumption evidence exists.
 The selected fresh `/app/rest` adapter now runs the published unchanged CLI 0.5.6 through ordinary
 login, C#/Git discovery, successful/failed runs, queued/running cancellation and exact artifact
 download. Its bounded integration fixture uses a real Windows Agent and a dedicated Linux/Docker
 Agent, plus shared native reads. Agent enablement is a journalled Git edit through the catalogue
 coordinator; source-file modification times are additive immutable artifact observations.
-Full R0 bindings, remaining output/fault, compatibility and final review gates
-remain open. Ordinary OIDC/current
+The selected R0 gate has 28 bound obligations, independent aggregate/Security PASS and verified main
+delivery; broader compatibility and full story acceptance remain open. Exact transient progress wire
+cases remain unaccepted under D46/#166. Ordinary OIDC/current
 TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
 controller below remains available until its actual replacement gates pass.
 
@@ -226,6 +276,16 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 - D45 scopes US-013 secrets to one run's Agent environment, with private per-Build encrypted recovery
   input/assignments and Agent-side exact-value output masking. No raw values in Git, collected plans,
   payload scripts, public representations or audit; permanent Project secret storage is a separate story.
+- D48 permits one-use native prepared chain input for ordinary clients: actor/root/exact-catalogue
+  binding, fifteen-minute expiry, bounded encrypted input and targeted per-Build D45 environments.
+  The explicit opaque run parameter is not bearer authority or a reusable Project secret reference.
+- D49 collects immutable source selections outside queue/Agent locks before physical ownership,
+  with four bounded pending discoveries and a fenced queued/unassigned commit. Successful-only
+  suitability compares effective inputs, root/checkout, source SHA and selected upstreams; it never
+  compares encrypted run secrets or replaces an assigned execution.
+- D50 negotiates literal stdout Build-number metadata at the D14-planned AgentMsg tag 7, preserving
+  numeric counters/outcomes and legacy assignments. Mask before metadata transport; retain immutable
+  sequenced PG observations and complete terminal recovery, rejecting conflicts and raw secrets.
 - D46 accepts US-013 by complete actor/process/outcome/stop/recovery/byte behavior. Exact background
   progress estimates and dynamic cancellation timestamp cadence are separately owned by #166 under
   SS-RUN@R2. Four full literal R0 workflows remain required; two distinct behavioral obligations

@@ -16,6 +16,7 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
         await using var database = await databases.CreateDbContextAsync(token);
         await using var transaction = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, token);
         var build = await builds.VisibleAsync(database, actor, id, token, discloseDenied: true) ?? throw RuntimeBuildService.Missing();
+        id = build.Id;
         var type = await database.CatalogBuildTypes.AsNoTracking().SingleAsync(t => t.Id == build.BuildTypeId, token);
         var project = await database.CatalogProjects.AsNoTracking().SingleAsync(p => p.Id == build.ProjectId, token);
         var execution = await database.RuntimeBuildExecutions.AsNoTracking().SingleOrDefaultAsync(e => e.BuildId == id, token);
@@ -65,6 +66,49 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             result["agent"] = new JsonObject { ["name"] = "N/A", ["typeId"] = 0 };
             result["startDate"] = TeamCityProtocol.Date(build.CancelRequestedAt.Value);
         }
+        var dependencies = await RuntimeBuildService.SelectionViewsAsync(database, id, token);
+        var sourceInput = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == id, token);
+        if (sourceInput.SourceJson is not null)
+        {
+            var source = JsonSerializer.Deserialize<Vivarium.Definitions.Source>(sourceInput.SourceJson, Catalog.DefinitionValidation.Json)!;
+            var selected = await database.RuntimeBuildSourceSelections.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == id, token);
+            var revisions = new JsonArray();
+            if (selected is not null)
+            {
+                var revision = new JsonObject { ["version"] = selected.Version, ["internalVersion"] = selected.Version,
+                    ["vcs-root-instance"] = new JsonObject { ["id"] = sourceInput.VcsRootInstanceId!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), ["vcs-root-id"] = source.RootId } };
+                if (selected.Version != "N/A") revision["vcsBranchName"] = source.Branch;
+                revisions.Add(revision);
+            }
+            result["revisions"] = new JsonObject { ["count"] = revisions.Count, ["revision"] = revisions };
+        }
+        foreach (var kind in new[] { "SNAPSHOT", "ARTIFACT" })
+        {
+            if (kind == "ARTIFACT" && build.FailedToStart && build.StatusText == "Failed to resolve artifact dependency")
+            {
+                result["artifact-dependencies"] = new JsonObject { ["count"] = 0, ["build"] = new JsonArray() };
+                continue;
+            }
+            var selected = dependencies.Where(d => d.Kind == kind).Select(d => d.Build).ToArray();
+            if (selected.Length == 0) continue; // Preserve ordinary R0 representations unchanged.
+            var items = new JsonArray();
+            foreach (var dependency in selected)
+            {
+                var item = new JsonObject { ["id"] = dependency.Id, ["buildTypeId"] = dependency.ConfigurationId, ["state"] = dependency.State };
+                if (dependency.State != "queued") item["status"] = dependency.Status;
+                items.Add(item);
+            }
+            result[kind == "SNAPSHOT" ? "snapshot-dependencies" : "artifact-dependencies"] =
+                new JsonObject { ["count"] = selected.Length, ["build"] = items };
+        }
+        var vcsTrigger = await database.RuntimeBuildVcsTriggers.AsNoTracking().SingleOrDefaultAsync(t => t.BuildId == id, token);
+        if (vcsTrigger is not null)
+        {
+            var cause = new JsonObject { ["type"] = vcsTrigger.RootBuildId == id ? "vcs" : "snapshotDependency",
+                ["date"] = TeamCityProtocol.Date(build.QueuedAt) };
+            if (vcsTrigger.RootBuildId == id) cause["details"] = "jetbrains.git";
+            result["triggered"] = cause;
+        }
         if (full)
         {
             result.Remove("failedToStart"); result.Remove("personal"); result.Remove("queuePosition");
@@ -75,10 +119,10 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             var trigger = new JsonObject { ["type"] = "user", ["date"] = TeamCityProtocol.Date(build.QueuedAt) };
             var user = await database.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == build.ActorId, token);
             if (user is not null) trigger["user"] = TeamCityEndpoints.User(user, href: true);
-            result["triggered"] = trigger;
+            if (vcsTrigger is null) result["triggered"] = trigger;
             // R0 admits source-free configurations only. These links identify the same numeric Build.
             result["changes"] = new JsonObject { ["href"] = "/app/rest/changes?locator=build:(id:" + id + ")" };
-            result["revisions"] = new JsonObject { ["count"] = 0 };
+            if (sourceInput.SourceJson is null) result["revisions"] = new JsonObject { ["count"] = 0 };
             if (state == "queued") result["compatibleAgents"] = new JsonObject { ["href"] = "/app/rest/agents?locator=compatible:(build:(id:" + id + "))" };
             result["artifacts"] = new JsonObject { ["href"] = "/app/rest/builds/id:" + id + "/artifacts/children/" };
             result["vcsLabels"] = new JsonArray(); result["customization"] = new JsonObject();

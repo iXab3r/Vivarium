@@ -40,6 +40,35 @@ public sealed class RuntimeBuildSecretTests
     }
 
     [Test]
+    public void Prepared_input_encryption_is_bound_to_its_identity_and_separate_from_build_recovery()
+    {
+        var codec = new RuntimeBuildSecrets(new EphemeralDataProtectionProvider());
+        var id = Guid.NewGuid();
+        var value = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        var input = new Dictionary<string, Dictionary<string, string>> { ["P_Release"] = new() { ["OWNED_SECRET"] = value } };
+        var encrypted = codec.ProtectRunInput(id, input);
+        Assert.That(encrypted.AsSpan().IndexOf(Encoding.UTF8.GetBytes(value)), Is.EqualTo(-1));
+        Assert.That(codec.ReadRunInput(id, encrypted)["P_Release"], Is.EqualTo(input["P_Release"]));
+        Assert.Throws<InvalidDataException>(() => codec.ReadRunInput(Guid.NewGuid(), encrypted));
+        Assert.Throws<InvalidDataException>(() => codec.ReadEnvironment(42, encrypted));
+        encrypted[^1] ^= 1;
+        Assert.Throws<InvalidDataException>(() => codec.ReadRunInput(id, encrypted));
+    }
+
+    [Test]
+    public void Prepared_input_marker_is_explicit_and_never_changes_unrelated_ordinary_parameters()
+    {
+        var ordinary = new Dictionary<string, string> { ["vivarium.run-input"] = "ordinary", ["env.A"] = "value" };
+        Assert.That(RuntimeBuildRunInputs.Extract(ordinary), Is.Null);
+        Assert.That(ordinary.Count, Is.EqualTo(2));
+        var id = Guid.NewGuid(); ordinary[RuntimeBuildRunInputs.Parameter] = "vri_" + id.ToString("N");
+        Assert.That(RuntimeBuildRunInputs.Extract(ordinary), Is.EqualTo(id));
+        Assert.That(ordinary.Keys, Is.EqualTo(new[] { "env.A" }));
+        ordinary[RuntimeBuildRunInputs.Parameter] = "vri_invalid";
+        Assert.Throws<Vivarium.Controller.Rest.Common.RestApiException>(() => RuntimeBuildRunInputs.Extract(ordinary));
+    }
+
+    [Test]
     public void Run_secret_input_rejects_environment_aliases_invalid_names_values_and_excessive_material()
     {
         Dictionary<string, string>[] invalid = [

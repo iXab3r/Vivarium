@@ -220,6 +220,32 @@ supplies these barriers.
 
 ### V1 artifact rules, limits, and precedence
 
+The US-013 PILOT currently implements a smaller TeamCity recipe profile, not the complete typed
+rule model below. Its pinned `artifact-rules-observations.json` captures literal publication,
+leaf wildcards, recursive `directory/**`, directory mappings, exact nested/binary bytes and a
+missing required dependency. Publication with no matches succeeds; a required dependency with no
+matches fails before user execution with `failedToStart=true`. Fixed prefixes are stripped while
+recursive tails are preserved. Archive targets, excludes, optional rules and arbitrary patterns
+remain unaccepted.
+
+The additive `teamcity.artifact-publisher.rules.v1` capability selects assignment publication
+contract 2; literal-only Agents retain contract 1. Advanced dependencies require the new capability
+at selection and it is rechecked before delivery. Service-message rules are execution observations,
+not a second desired configuration store. Source files stay in place; each manifest entry carries
+the mapped logical path, original bytes and observed source-file time. Paths remain portable,
+aliases conflict, links are not followed, discovery is cancellation-aware with depth 64 / 100,000
+visited-entry bounds, and the selected manifest still has at most 128 files.
+
+The selected transfer profile stages at most 2 GiB per file in private transient files with 64 KiB
+buffers, verifies exact length/SHA256 before Storage publication or a public response, and keeps
+the existing PostgreSQL upload reservation/deletion journal and current-authority rechecks.
+Transfers have a 15-minute ceiling and upload concurrency remains 4. Unix staging names are unlinked
+while descriptors remain open; Windows uses kernel delete-on-close. Storage retains its own active
+Chiral size policy and owns durable bytes; transient staging creates no second object catalogue or
+settings authority. Existing inline output remains bounded to64 KiB and 15 seconds. These are selected
+implementation limits, not claimed TeamCity defaults, configured quota support, resumable transfer
+or complete artifact API acceptance. Product acceptance is still being bound under #116–#118.
+
 Artifact rules are an ordered, Git-versioned list evaluated against normalized forward-slash paths
 relative to the build work directory. A v1 rule has only:
 

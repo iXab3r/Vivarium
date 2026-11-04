@@ -1,0 +1,333 @@
+{
+  "kind": "PINNED_REFERENCE_DEPENDENCY_DEFAULTS_NOT_PRODUCT_ACCEPTANCE",
+  "target": "http://127.0.0.1:18111",
+  "profile": "vivarium-teamcity-lab-202613",
+  "image": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a",
+  "project": "VivUs013Dependency_080e302e634b",
+  "upstream": "VivUs013Dependency_080e302e634b_Upstream",
+  "downstream": "VivUs013Dependency_080e302e634b_Downstream",
+  "producerSha256": "3d9fd9320232ae7d9b0fea3a0cec95998b44aff4cea6cb5d3b3e8c6200ccc2f6",
+  "exchanges": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/server",
+        "query": {
+          "fields": "version,versionMajor,versionMinor,buildNumber,startTime,currentTime,role,webUrl"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2ZXJzaW9uIjoiMjAyNi4xLjMgKGJ1aWxkIDIyMjc0MikiLCJ2ZXJzaW9uTWFqb3IiOjIwMjYsInZlcnNpb25NaW5vciI6MSwic3RhcnRUaW1lIjoiMjAyNjExMDJUMTkyMzM4KzAwMDAiLCJjdXJyZW50VGltZSI6IjIwMjYxMTA0VDAyNDExMiswMDAwIiwiYnVpbGROdW1iZXIiOiIyMjI3NDIiLCJyb2xlIjoibWFpbl9ub2RlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMSJ9",
+        "bodyBytes": 222,
+        "bodySha256": "c45f5cd527f48f10c6229a8c4a7a2e1bb83f8d6ddbd587d49a84cf4a0273a637"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/projects",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIiLCJuYW1lIjoiT3duZWQgZGVwZW5kZW5jeSBkZWZhdWx0cyIsInBhcmVudFByb2plY3QiOnsiaWQiOiJfUm9vdCJ9fQ==",
+        "bodySha256": "f5675859669168c415ddc221ac0699bcf43cdb10c02f9164c0c32091c2f4757c"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIiLCJuYW1lIjoiT3duZWQgZGVwZW5kZW5jeSBkZWZhdWx0cyIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwidmlydHVhbCI6ZmFsc2UsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1WaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiIiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiZGVzY3JpcHRpb24iOiJDb250YWlucyBhbGwgb3RoZXIgcHJvamVjdHMiLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOl9Sb290Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPV9Sb290In0sImJ1aWxkVHlwZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJkZXBsb3ltZW50RGFzaGJvYXJkcyI6eyJjb3VudCI6MH0sInBhcmFtZXRlcnMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yi9wYXJhbWV0ZXJzIiwicHJvcGVydHkiOltdfSwidmNzUm9vdHMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvdmNzLXJvb3RzP2xvY2F0b3I9cHJvamVjdDooaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YikifSwicHJvamVjdEZlYXR1cmVzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIvcHJvamVjdEZlYXR1cmVzIn0sInByb2plY3RzIjp7ImNvdW50IjowfX0=",
+        "bodyBytes": 932,
+        "bodySha256": "3abb8722ee0ff5d0aae4388307b56db7a2818e63dda9c767bb94ddf049384d69"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJuYW1lIjoiVXBzdHJlYW0iLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiJ9fQ==",
+        "bodySha256": "bd295523fd833c0a0c17b3f2ff4102c5b07e12133d66a5087a00c8f2b68d2283"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJuYW1lIjoiVXBzdHJlYW0iLCJwcm9qZWN0TmFtZSI6Ik93bmVkIGRlcGVuZGVuY3kgZGVmYXVsdHMiLCJwcm9qZWN0SWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtP21vZGU9YnVpbGRzIiwicHJvamVjdCI6eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIiLCJuYW1lIjoiT3duZWQgZGVwZW5kZW5jeSBkZWZhdWx0cyIsInBhcmVudFByb2plY3RJZCI6Il9Sb290IiwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIifSwidGVtcGxhdGVzIjp7ImNvdW50IjowLCJidWlsZFR5cGUiOltdfSwidmNzLXJvb3QtZW50cmllcyI6eyJjb3VudCI6MCwidmNzLXJvb3QtZW50cnkiOltdfSwic2V0dGluZ3MiOnsiY291bnQiOjEsInByb3BlcnR5IjpbeyJuYW1lIjoiYnVpbGROdW1iZXJDb3VudGVyIiwidmFsdWUiOiIxIn1dfSwicGFyYW1ldGVycyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0vcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sIm91dHB1dC1wYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9VcHN0cmVhbS9vdXRwdXQtcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sInN0ZXBzIjp7ImNvdW50IjowfSwiZmVhdHVyZXMiOnsiY291bnQiOjB9LCJ0cmlnZ2VycyI6eyJjb3VudCI6MH0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJjb3VudCI6MH0sImFydGlmYWN0LWRlcGVuZGVuY2llcyI6eyJjb3VudCI6MH0sImFnZW50LXJlcXVpcmVtZW50cyI6eyJjb3VudCI6MH0sImJ1aWxkcyI6eyJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9VcHN0cmVhbS9idWlsZHMvIn0sImludmVzdGlnYXRpb25zIjp7ImhyZWYiOiIvYXBwL3Jlc3QvaW52ZXN0aWdhdGlvbnM/bG9jYXRvcj1idWlsZFR5cGU6KGlkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0pIn0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZFR5cGU6KGlkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0pKSJ9LCJjb21wYXRpYmxlQ2xvdWRJbWFnZXMiOnt9fQ==",
+        "bodyBytes": 1561,
+        "bodySha256": "56cd1094f8fc9d1ed0677616c35dc4252828c810de0ee1aff47c69c3982dd58c"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfRG93bnN0cmVhbSIsIm5hbWUiOiJEb3duc3RyZWFtIiwicHJvamVjdCI6eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIifX0=",
+        "bodySha256": "e3b302377872d88e2b4acc2d4679032d400b4001d777402f909ae2ae60272933"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfRG93bnN0cmVhbSIsIm5hbWUiOiJEb3duc3RyZWFtIiwicHJvamVjdE5hbWUiOiJPd25lZCBkZXBlbmRlbmN5IGRlZmF1bHRzIiwicHJvamVjdElkIjoiVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRUeXBlcy9pZDpWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX0Rvd25zdHJlYW0iLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX0Rvd25zdHJlYW0/bW9kZT1idWlsZHMiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiIsIm5hbWUiOiJPd25lZCBkZXBlbmRlbmN5IGRlZmF1bHRzIiwicGFyZW50UHJvamVjdElkIjoiX1Jvb3QiLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGIiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL3Byb2plY3QuaHRtbD9wcm9qZWN0SWQ9Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiJ9LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ2Y3Mtcm9vdC1lbnRyaWVzIjp7ImNvdW50IjowLCJ2Y3Mtcm9vdC1lbnRyeSI6W119LCJzZXR0aW5ncyI6eyJjb3VudCI6MSwicHJvcGVydHkiOlt7Im5hbWUiOiJidWlsZE51bWJlckNvdW50ZXIiLCJ2YWx1ZSI6IjEifV19LCJwYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9Eb3duc3RyZWFtL3BhcmFtZXRlcnMiLCJwcm9wZXJ0eSI6W119LCJvdXRwdXQtcGFyYW1ldGVycyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfRG93bnN0cmVhbS9vdXRwdXQtcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sInN0ZXBzIjp7ImNvdW50IjowfSwiZmVhdHVyZXMiOnsiY291bnQiOjB9LCJ0cmlnZ2VycyI6eyJjb3VudCI6MH0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJjb3VudCI6MH0sImFydGlmYWN0LWRlcGVuZGVuY2llcyI6eyJjb3VudCI6MH0sImFnZW50LXJlcXVpcmVtZW50cyI6eyJjb3VudCI6MH0sImJ1aWxkcyI6eyJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9Eb3duc3RyZWFtL2J1aWxkcy8ifSwiaW52ZXN0aWdhdGlvbnMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9pbnZlc3RpZ2F0aW9ucz9sb2NhdG9yPWJ1aWxkVHlwZTooaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9Eb3duc3RyZWFtKSJ9LCJjb21wYXRpYmxlQWdlbnRzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYWdlbnRzP2xvY2F0b3I9Y29tcGF0aWJsZTooYnVpbGRUeXBlOihpZDpWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX0Rvd25zdHJlYW0pKSJ9LCJjb21wYXRpYmxlQ2xvdWRJbWFnZXMiOnt9fQ==",
+        "bodyBytes": 1579,
+        "bodySha256": "f809f202d67b59121dee4d880601936ad0f92e58a84d715c0109fd50153b0484"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Downstream/snapshot-dependencies",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ0eXBlIjoic25hcHNob3RfZGVwZW5kZW5jeSIsInNvdXJjZS1idWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtIn19",
+        "bodySha256": "d671537a5e6a704a3cf7e9b10bc2049489a49ad6d242cdc20ae1a51ba533c688"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJ0eXBlIjoic25hcHNob3RfZGVwZW5kZW5jeSIsInByb3BlcnRpZXMiOnsiY291bnQiOjYsInByb3BlcnR5IjpbeyJuYW1lIjoicnVuLWJ1aWxkLWlmLWRlcGVuZGVuY3ktZmFpbGVkIiwidmFsdWUiOiJNQUtFX0ZBSUxFRF9UT19TVEFSVCJ9LHsibmFtZSI6InJ1bi1idWlsZC1pZi1kZXBlbmRlbmN5LWZhaWxlZC10by1zdGFydCIsInZhbHVlIjoiTUFLRV9GQUlMRURfVE9fU1RBUlQifSx7Im5hbWUiOiJydW4tYnVpbGQtb24tdGhlLXNhbWUtYWdlbnQiLCJ2YWx1ZSI6ImZhbHNlIn0seyJuYW1lIjoic3luYy1yZXZpc2lvbnMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJ0YWtlLXN0YXJ0ZWQtYnVpbGQtd2l0aC1zYW1lLXJldmlzaW9ucyIsInZhbHVlIjoiZmFsc2UifSx7Im5hbWUiOiJ0YWtlLXN1Y2Nlc3NmdWwtYnVpbGRzLW9ubHkiLCJ2YWx1ZSI6ImZhbHNlIn1dfSwic291cmNlLWJ1aWxkVHlwZSI6eyJpZCI6IlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJuYW1lIjoiVXBzdHJlYW0iLCJwcm9qZWN0TmFtZSI6Ik93bmVkIGRlcGVuZGVuY3kgZGVmYXVsdHMiLCJwcm9qZWN0SWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGJfVXBzdHJlYW0iLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtP21vZGU9YnVpbGRzIn19",
+        "bodyBytes": 843,
+        "bodySha256": "cf6ad98efbb4177bbf6569e9831c878945f8cbc8718ea10cf938f80fc5a8242f"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Downstream/snapshot-dependencies",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJjb3VudCI6MSwic25hcHNob3QtZGVwZW5kZW5jeSI6W3siaWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtIiwidHlwZSI6InNuYXBzaG90X2RlcGVuZGVuY3kiLCJwcm9wZXJ0aWVzIjp7ImNvdW50Ijo2LCJwcm9wZXJ0eSI6W3sibmFtZSI6InJ1bi1idWlsZC1pZi1kZXBlbmRlbmN5LWZhaWxlZCIsInZhbHVlIjoiTUFLRV9GQUlMRURfVE9fU1RBUlQifSx7Im5hbWUiOiJydW4tYnVpbGQtaWYtZGVwZW5kZW5jeS1mYWlsZWQtdG8tc3RhcnQiLCJ2YWx1ZSI6Ik1BS0VfRkFJTEVEX1RPX1NUQVJUIn0seyJuYW1lIjoicnVuLWJ1aWxkLW9uLXRoZS1zYW1lLWFnZW50IiwidmFsdWUiOiJmYWxzZSJ9LHsibmFtZSI6InN5bmMtcmV2aXNpb25zIiwidmFsdWUiOiJ0cnVlIn0seyJuYW1lIjoidGFrZS1zdGFydGVkLWJ1aWxkLXdpdGgtc2FtZS1yZXZpc2lvbnMiLCJ2YWx1ZSI6ImZhbHNlIn0seyJuYW1lIjoidGFrZS1zdWNjZXNzZnVsLWJ1aWxkcy1vbmx5IiwidmFsdWUiOiJmYWxzZSJ9XX0sInNvdXJjZS1idWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtIiwibmFtZSI6IlVwc3RyZWFtIiwicHJvamVjdE5hbWUiOiJPd25lZCBkZXBlbmRlbmN5IGRlZmF1bHRzIiwicHJvamVjdElkIjoiVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YiIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRUeXBlcy9pZDpWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0Yl9VcHN0cmVhbT9tb2RlPWJ1aWxkcyJ9fV19",
+        "bodyBytes": 879,
+        "bodySha256": "831015e1ec64b387b05a7048c8af4ea7cc9125556b442998efeb556000fec7b9"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Downstream/artifact-dependencies",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ0eXBlIjoiYXJ0aWZhY3RfZGVwZW5kZW5jeSIsInNvdXJjZS1idWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiX1Vwc3RyZWFtIn0sInByb3BlcnRpZXMiOnsicHJvcGVydHkiOlt7Im5hbWUiOiJwYXRoUnVsZXMiLCJ2YWx1ZSI6InByb29mLnR4dCA9PiBpbnB1dHMifV19fQ==",
+        "bodySha256": "a5eb94f18be1b49f0499e2be8378301c6dc1c170cb29e99f897103d732966946"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDAgKEJhZCBSZXF1ZXN0KS4iLCJhZGRpdGlvbmFsTWVzc2FnZSI6ImpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXIucmVzdC5lcnJvcnMuQmFkUmVxdWVzdEV4Y2VwdGlvbjogRXJyb3IgYWRkaW5nIGFydGlmYWN0IGRlcGVuZGVuY3k6IGpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXIucmVzdC5lcnJvcnMuQmFkUmVxdWVzdEV4Y2VwdGlvbjogTWlzc2luZyBvciBlbXB0eSBhcnRpZmFjdCBkZXBlbmRlbmN5IHByb3BlcnR5ICdyZXZpc2lvbk5hbWUnLiBTaG91bGQgY29udGFpbiBvbmUgb2Ygc3VwcG9ydGVkIHZhbHVlcy4iLCJzdGFja1RyYWNlIjpudWxsLCJtZXNzYWdlIjoiRXJyb3IgYWRkaW5nIGFydGlmYWN0IGRlcGVuZGVuY3k6IGpldGJyYWlucy5idWlsZFNlcnZlci5zZXJ2ZXIucmVzdC5lcnJvcnMuQmFkUmVxdWVzdEV4Y2VwdGlvbjogTWlzc2luZyBvciBlbXB0eSBhcnRpZmFjdCBkZXBlbmRlbmN5IHByb3BlcnR5ICdyZXZpc2lvbk5hbWUnLiBTaG91bGQgY29udGFpbiBvbmUgb2Ygc3VwcG9ydGVkIHZhbHVlcy4ifV19",
+        "bodyBytes": 594,
+        "bodySha256": "c8745a4119b4a638fd2b3e5b515d83a4b549d1f96a5b5858353005daf0b83a00"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Downstream/artifact-dependencies",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJjb3VudCI6MH0=",
+        "bodyBytes": 11,
+        "bodySha256": "618de7d9f46f3f697d827a1b6d84974760d5deda62e4e592adaa3c646602a94c"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/app/rest/projects/id:VivUs013Dependency_080e302e634b",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/projects/id:VivUs013Dependency_080e302e634b",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YicuIFByb2plY3QgY2Fubm90IGJlIGZvdW5kIGJ5IGV4dGVybmFsIGlkICdWaXZVczAxM0RlcGVuZGVuY3lfMDgwZTMwMmU2MzRiJy4iLCJzdGFja1RyYWNlIjpudWxsLCJtZXNzYWdlIjoiTm8gcHJvamVjdCBmb3VuZCBieSBsb2NhdG9yICdjb3VudDoxLGlkOlZpdlVzMDEzRGVwZW5kZW5jeV8wODBlMzAyZTYzNGInLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2VXMwMTNEZXBlbmRlbmN5XzA4MGUzMDJlNjM0YicuIn1dfQ==",
+        "bodyBytes": 490,
+        "bodySha256": "9c587d6ae3c82ee7952eda370b166f97911778a38a28352d005eb7d264c48c7e"
+      }
+    }
+  ],
+  "complete": true,
+  "limits": "One owned project, two empty configurations, no Agent/build/global server changes. Observes omitted snapshot properties and the reference400 rejection of an omitted required artifact selector. Earlier exploratory200 expectation is retained in its failed receipt, not a product oracle.",
+  "snapshot": {
+    "id": "VivUs013Dependency_080e302e634b_Upstream",
+    "type": "snapshot_dependency",
+    "properties": {
+      "count": 6,
+      "property": [
+        {
+          "name": "run-build-if-dependency-failed",
+          "value": "MAKE_FAILED_TO_START"
+        },
+        {
+          "name": "run-build-if-dependency-failed-to-start",
+          "value": "MAKE_FAILED_TO_START"
+        },
+        {
+          "name": "run-build-on-the-same-agent",
+          "value": "false"
+        },
+        {
+          "name": "sync-revisions",
+          "value": "true"
+        },
+        {
+          "name": "take-started-build-with-same-revisions",
+          "value": "false"
+        },
+        {
+          "name": "take-successful-builds-only",
+          "value": "false"
+        }
+      ]
+    },
+    "source-buildType": {
+      "id": "VivUs013Dependency_080e302e634b_Upstream",
+      "name": "Upstream",
+      "projectName": "Owned dependency defaults",
+      "projectId": "VivUs013Dependency_080e302e634b",
+      "href": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Upstream",
+      "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Dependency_080e302e634b_Upstream?mode=builds"
+    }
+  },
+  "snapshotReadback": {
+    "count": 1,
+    "snapshot-dependency": [
+      {
+        "id": "VivUs013Dependency_080e302e634b_Upstream",
+        "type": "snapshot_dependency",
+        "properties": {
+          "count": 6,
+          "property": [
+            {
+              "name": "run-build-if-dependency-failed",
+              "value": "MAKE_FAILED_TO_START"
+            },
+            {
+              "name": "run-build-if-dependency-failed-to-start",
+              "value": "MAKE_FAILED_TO_START"
+            },
+            {
+              "name": "run-build-on-the-same-agent",
+              "value": "false"
+            },
+            {
+              "name": "sync-revisions",
+              "value": "true"
+            },
+            {
+              "name": "take-started-build-with-same-revisions",
+              "value": "false"
+            },
+            {
+              "name": "take-successful-builds-only",
+              "value": "false"
+            }
+          ]
+        },
+        "source-buildType": {
+          "id": "VivUs013Dependency_080e302e634b_Upstream",
+          "name": "Upstream",
+          "projectName": "Owned dependency defaults",
+          "projectId": "VivUs013Dependency_080e302e634b",
+          "href": "/app/rest/buildTypes/id:VivUs013Dependency_080e302e634b_Upstream",
+          "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013Dependency_080e302e634b_Upstream?mode=builds"
+        }
+      }
+    ]
+  },
+  "artifact": {
+    "errors": [
+      {
+        "statusText": "Responding with error, status code: 400 (Bad Request).",
+        "additionalMessage": "jetbrains.buildServer.server.rest.errors.BadRequestException: Error adding artifact dependency: jetbrains.buildServer.server.rest.errors.BadRequestException: Missing or empty artifact dependency property 'revisionName'. Should contain one of supported values.",
+        "stackTrace": null,
+        "message": "Error adding artifact dependency: jetbrains.buildServer.server.rest.errors.BadRequestException: Missing or empty artifact dependency property 'revisionName'. Should contain one of supported values."
+      }
+    ]
+  },
+  "artifactReadback": {
+    "count": 0
+  },
+  "ownedProjectRemoved": true,
+  "permissionsRestored": true
+}

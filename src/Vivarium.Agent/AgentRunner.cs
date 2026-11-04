@@ -49,6 +49,10 @@ public sealed class AgentRunner
     private BuildOutputSpool? outputSpool;
     private volatile bool durableOutputNegotiated;
     private volatile bool literalPublisherNegotiated;
+    private volatile bool vcsCheckoutNegotiated;
+    private volatile bool containerRunnerNegotiated;
+    private volatile bool artifactRulesNegotiated;
+    private volatile bool buildNumbersNegotiated;
     private ActiveBuild? activeBuild;
     private PlatformFactSnapshot? platformFacts;
     private ulong credentialGeneration;
@@ -276,6 +280,10 @@ public sealed class AgentRunner
         Task output = Task.CompletedTask;
         durableOutputNegotiated = false;
         literalPublisherNegotiated = false;
+        vcsCheckoutNegotiated = false;
+        containerRunnerNegotiated = false;
+        artifactRulesNegotiated = false;
+        buildNumbersNegotiated = false;
         try
         {
             await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
@@ -291,6 +299,10 @@ public sealed class AgentRunner
                     case ControllerMsg.MsgOneofCase.Welcome:
                         durableOutputNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == BuildOutputCapabilityId && c.ContractMajor == 1);
                         literalPublisherNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == ArtifactPublisherCapabilityId && c.ContractMajor == 1);
+                        vcsCheckoutNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && c.ContractMajor == 1);
+                        containerRunnerNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId && c.ContractMajor == 1);
+                        artifactRulesNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == ArtifactRuleProfile.CapabilityId && c.ContractMajor == 1);
+                        buildNumbersNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == BuildNumberProfile.CapabilityId && c.ContractMajor == 1);
                         ClockSkew = DateTimeOffset.FromUnixTimeMilliseconds(msg.Welcome.ServerTimeUnixMs) - DateTimeOffset.UtcNow;
                         if (msg.Welcome.SelectedProtocolVersion != 0 &&
                             msg.Welcome.SelectedProtocolVersion is < MinimumProtocolVersion or > CurrentProtocolVersion)
@@ -547,6 +559,23 @@ public sealed class AgentRunner
         }
 
         workloadRecoveryBuildId = record.BuildId;
+        if (record.Container is { } container)
+        {
+            try
+            {
+                if (options.DockerRuntime is null) throw new InvalidDataException("The installed container runtime is absent.");
+                await DockerWorkload.RecoverAsync(options.DockerRuntime, container, record.BuildId);
+                QueueResultDurably(new BuildResult { BuildId = record.BuildId, Outcome = BuildOutcome.InfrastructureFailed,
+                    StatusText = "Agent restarted while the Build owned a container workload", OutputProducerLost = outputSpool is not null });
+                activeBuildJournal.Complete(record.BuildId);
+                workloadRecoveryOutcome = WorkloadRecoveryOutcome.Succeeded;
+                workloadRecoveryFailureCode = string.Empty;
+            }
+            catch (Exception exception) when (exception is IOException or HttpRequestException or InvalidOperationException or
+                System.Security.Cryptography.CryptographicException or OperationCanceledException or System.Text.Json.JsonException)
+            { FailWorkloadRecovery("container_termination_unproven"); }
+            return;
+        }
         if (record.ProcessId is null || record.ProcessStartUtcTicks is null)
         {
             FailWorkloadRecovery("process_identity_unavailable");
@@ -671,8 +700,22 @@ public sealed class AgentRunner
     {
         if (assignment.OutputContractMajor > 1 || assignment.OutputContractMajor == 1 && !durableOutputNegotiated)
             throw new InvalidDataException("The required Build output contract was not negotiated.");
-        if (assignment.ArtifactPublicationContractMajor > 1 || assignment.ArtifactPublicationContractMajor == 1 && !literalPublisherNegotiated)
+        if (assignment.ArtifactPublicationContractMajor > 2 || assignment.ArtifactPublicationContractMajor == 1 && !literalPublisherNegotiated
+            || assignment.ArtifactPublicationContractMajor == 2 && !artifactRulesNegotiated)
             throw new InvalidDataException("The required artifact publisher was not negotiated.");
+        if (assignment.NumberReportingContractMajor > 1 || assignment.NumberReportingContractMajor == 1 && !buildNumbersNegotiated)
+            throw new InvalidDataException("The required number reporting contract was not negotiated.");
+        if (assignment.VcsCheckout is not null && !vcsCheckoutNegotiated
+            || assignment.VcsCheckout is null && (assignment.Payload.Any(p => p.PrivateInput) || assignment.Steps.Any(s => s.ScriptInput.Length != 0)))
+            throw new InvalidDataException("The required VCS checkout contract was not negotiated.");
+        if (assignment.VcsCheckout is { } source) Vivarium.Contracts.VcsCheckoutProfile.Validate(source);
+        foreach (var step in assignment.Steps.Where(s => s.Container is not null))
+        {
+            if (!containerRunnerNegotiated || options.DockerRuntime is null)
+                throw new InvalidDataException("The required container runner was not negotiated.");
+            Vivarium.Contracts.ContainerStepProfile.Validate(step.Container);
+        }
+        if (assignment.Payload.Any(p => p.PrivateInput && p.Archive)) throw new InvalidDataException("Private generated inputs cannot be archives.");
         ActiveBuild? build = null;
         var accepted = false;
         lock (activeBuildLock)
@@ -778,7 +821,8 @@ public sealed class AgentRunner
                 SendRoutedAsync,
                 currentSessionId,
                 build.Stop,
-                process => activeBuildJournal.ObserveProcess(assignment.BuildId, process));
+                process => activeBuildJournal.ObserveProcess(assignment.BuildId, process),
+                options.DockerRuntime, container => activeBuildJournal.ObserveContainer(assignment.BuildId, container));
         }
         catch (WorkloadTerminationException exception)
         {
@@ -891,6 +935,12 @@ public sealed class AgentRunner
         });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildOutputCapabilityId, ContractMajor = 1 });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactPublisherCapabilityId, ContractMajor = 1 });
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactRuleProfile.CapabilityId, ContractMajor = 1 });
+        hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildNumberProfile.CapabilityId, ContractMajor = 1 });
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+            hello.Capabilities.Add(new CapabilitySupport { CapabilityId = Vivarium.Contracts.VcsCheckoutProfile.CapabilityId, ContractMajor = 1 });
+        if (options.DockerRuntime is not null && OperatingSystem.IsLinux() && RuntimeInformation.ProcessArchitecture == Architecture.X64)
+            hello.Capabilities.Add(new CapabilitySupport { CapabilityId = Vivarium.Contracts.ContainerStepProfile.CapabilityId, ContractMajor = 1 });
         if (options.BootstrapLeasePath is not null && options.BootstrapLeaseId is not null)
         {
             hello.Capabilities.Add(new CapabilitySupport

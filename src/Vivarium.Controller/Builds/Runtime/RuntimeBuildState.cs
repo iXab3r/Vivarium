@@ -35,8 +35,58 @@ public sealed class RuntimeBuildCounter
     public long NextValue { get; set; } = 1;
 }
 
+// Observation/quiet-period cursor, never desired configuration or a second work queue.
+public sealed class RuntimeVcsTriggerState
+{
+    public long BuildTypeId { get; set; }
+    public Guid RevisionId { get; set; }
+    public string ProfileHash { get; set; } = "";
+    public string ObservedVersion { get; set; } = "";
+    public string? PendingVersion { get; set; }
+    public Guid? PendingId { get; set; }
+    public DateTimeOffset? DueAt { get; set; }
+    public DateTimeOffset ObservedAt { get; set; }
+}
+
+// Immutable initiating cause for every member of an automatically admitted graph.
+public sealed class RuntimeBuildVcsTrigger
+{
+    public long BuildId { get; set; }
+    public long RootBuildId { get; set; }
+    public Guid EventId { get; set; }
+    public string Version { get; set; } = "";
+}
+
+// One encrypted execution request, not a reusable Project secret reference.
+public sealed class RuntimeBuildRunInput
+{
+    public Guid Id { get; set; }
+    public Guid ActorId { get; set; }
+    public long BuildTypeId { get; set; }
+    public long ProjectId { get; set; }
+    public Guid RevisionId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public string State { get; set; } = "PENDING";
+    public byte[] ProtectedInputs { get; set; } = [];
+    public long? AcceptedBuildId { get; set; }
+}
+
+// Current queue resolution, flattened under the queue fence. Original request/input and every
+// replacement audit event remain retained; an assigned/finished physical execution is never replaced.
+public sealed class RuntimeBuildResolution
+{
+    public long RequestedBuildId { get; set; }
+    public long ResolvedBuildId { get; set; }
+    public long BuildTypeId { get; set; }
+    public long ProjectId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+}
+
 // This is the actually collected settings relation, not a writable PG desired-settings override.
-// Source-free R0 collects it before queue admission; VCS source selection is a distinct later fact.
+// Settings and the Source declaration are collected at admission; workload revision and actual
+// checkout remain separate later facts, never a rewrite of this input or of the historical plan.
 public sealed class RuntimeBuildInput
 {
     public long BuildId { get; set; }
@@ -47,6 +97,61 @@ public sealed class RuntimeBuildInput
     public required string OverridesJson { get; set; }
     public required string AdmissionJson { get; set; }
     public byte[] ProtectedEnvironment { get; set; } = [];
+    public long? VcsRootInstanceId { get; set; }
+    public string? SourceJson { get; set; }
+}
+
+// Immutable effective VCS properties; checkout attachment rules remain in each collected input.
+public sealed class RuntimeVcsRootInstance
+{
+    public long Id { get; set; }
+    public long ProjectId { get; set; }
+    public string RootId { get; set; } = "";
+    public string PropertiesHash { get; set; } = "";
+    public string PropertiesJson { get; set; } = "";
+}
+
+// The coordinator's selected workload revision, distinct from settings and Agent checkout evidence.
+public sealed class RuntimeBuildSourceSelection
+{
+    public long BuildId { get; set; }
+    public string Version { get; set; } = "";
+    public DateTimeOffset SelectedAt { get; set; }
+}
+
+public sealed class RuntimeBuildSourceReceipt
+{
+    public long BuildId { get; set; }
+    public byte[] Evidence { get; set; } = [];
+    public DateTimeOffset ReceivedAt { get; set; }
+}
+
+public sealed class RuntimeBuildNumberObservation
+{
+    public long BuildId { get; set; }
+    public int Sequence { get; set; }
+    public string Value { get; set; } = "";
+    public DateTimeOffset ReceivedAt { get; set; }
+}
+
+// Actual selections between ordinary Builds; desired edges remain in the immutable Git plan.
+public sealed class RuntimeBuildDependency
+{
+    public long BuildId { get; set; }
+    public string Kind { get; set; } = "";
+    public long UpstreamBuildTypeId { get; set; }
+    public long UpstreamBuildId { get; set; }
+    public DateTimeOffset SelectedAt { get; set; }
+}
+
+// File-level consumption provenance is committed with the assignment, not inferred from latest outputs.
+public sealed class RuntimeBuildConsumedArtifact
+{
+    public long BuildId { get; set; }
+    public int Ordinal { get; set; }
+    public long ProducerBuildId { get; set; }
+    public int ProducerArtifactOrdinal { get; set; }
+    public string DestinationPath { get; set; } = "";
 }
 
 public sealed class RuntimeBuildExecution
@@ -97,6 +202,7 @@ public sealed class RuntimeBuildObservation
     public int? ExitCode { get; set; }
     public bool? TimedOut { get; set; }
     public bool? Skipped { get; set; }
+    public byte[]? ContainerEvidence { get; set; }
 }
 
 public sealed class RuntimeBuildPayload

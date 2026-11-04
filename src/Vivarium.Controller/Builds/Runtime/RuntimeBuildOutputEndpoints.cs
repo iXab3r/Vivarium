@@ -17,12 +17,12 @@ internal static class RuntimeBuildOutputEndpoints
             {
                 await using var database = await databases.CreateDbContextAsync(http.RequestAborted);
                 await using var snapshot = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, http.RequestAborted);
-                if (await builds.VisibleAsync(database, actor, id, http.RequestAborted) is null) throw RuntimeBuildService.Missing();
+                var resolvedId = (await builds.VisibleAsync(database, actor, id, http.RequestAborted) ?? throw RuntimeBuildService.Missing()).Id;
                 int limit;
                 try { limit = RestPagination.ParseLimit(http.Request); }
                 catch (RestApiException) { return InvalidQuery(http); }
                 var resource = "/api/v1/builds/" + id.ToString(CultureInfo.InvariantCulture) + "/output";
-                var state = await database.RuntimeBuildOutputs.AsNoTracking().SingleAsync(o => o.BuildId == id, http.RequestAborted);
+                var state = await database.RuntimeBuildOutputs.AsNoTracking().SingleAsync(o => o.BuildId == resolvedId, http.RequestAborted);
                 var query = RestQueryFingerprint.Create(http.Request);
                 var sort = http.Request.Query["sort"].ToString();
                 long position = 0;
@@ -48,7 +48,7 @@ internal static class RuntimeBuildOutputEndpoints
                     }
                 }
                 if (sort.Length != 0 || http.Request.Query.Keys.Any(k => k is not ("limit" or "cursor" or "sort"))) return InvalidQuery(http);
-                var rows = await database.RuntimeOutputRanges.AsNoTracking().Where(r => r.BuildId == id && r.Position > position)
+                var rows = await database.RuntimeOutputRanges.AsNoTracking().Where(r => r.BuildId == resolvedId && r.Position > position)
                     .OrderBy(r => r.Position).Take(limit + 1).ToArrayAsync(http.RequestAborted);
                 var page = rows.Take(limit).ToArray();
                 var last = page.LastOrDefault()?.Position ?? position;
@@ -58,7 +58,7 @@ internal static class RuntimeBuildOutputEndpoints
                 var expired = (await database.RuntimeOutputExpiries.Where(e => ids.Contains(e.RangeId)).Select(e => e.RangeId)
                     .ToArrayAsync(http.RequestAborted)).ToHashSet();
                 var anyExpired = state.RetentionEpoch > 0 && await (from expiry in database.RuntimeOutputExpiries
-                    join range in database.RuntimeOutputRanges on expiry.RangeId equals range.Id where range.BuildId == id select expiry.RangeId)
+                    join range in database.RuntimeOutputRanges on expiry.RangeId equals range.Id where range.BuildId == resolvedId select expiry.RangeId)
                     .AnyAsync(http.RequestAborted);
                 return Results.Json(new { items = page.Select(r => View(r, resource, expired.Contains(r.Id))),
                     page = new { limit, nextCursor = rows.Length > limit ? resume : null },
@@ -74,7 +74,7 @@ internal static class RuntimeBuildOutputEndpoints
                 await using (var database = await databases.CreateDbContextAsync(http.RequestAborted))
                 {
                     await using var snapshot = await database.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, http.RequestAborted);
-                    if (await builds.VisibleAsync(database, actor, id, http.RequestAborted) is null) throw RuntimeBuildService.Missing();
+                    id = (await builds.VisibleAsync(database, actor, id, http.RequestAborted) ?? throw RuntimeBuildService.Missing()).Id;
                     range = await database.RuntimeOutputRanges.AsNoTracking().SingleOrDefaultAsync(r => r.BuildId == id
                         && r.Id == entryId && r.Position != null && r.Kind != "GAP", http.RequestAborted);
                     if (range is null) return RestProblems.NotFound(http, "output-entry", entryId.ToString());

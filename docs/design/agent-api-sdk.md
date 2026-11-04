@@ -296,6 +296,111 @@ The welcome response carries:
 Negotiation is additive. The controller schedules or dispatches only against the negotiated set for
 the current session, never against the version string alone.
 
+### Selected workload checkout seam (US-013 PILOT)
+
+`teamcity.vcs-checkout.v1` is an additive, exclusive Build-assignment capability on Windows and Linux.
+The fresh Host opts into negotiation; a stale Agent without it remains eligible for supported
+source-free work and receives no checkout assignment. Missing Git or per-run access failure does not
+erase binary support or quarantine a healthy Agent. macOS does not advertise this implementation.
+This checkout capability does not change Bootstrap or allocate AgentMsg tag 7.
+
+The owning TeamCity operation supplies one anonymous `http`/`https`/`git` source, canonical branch,
+selected 40-character commit and root checkout with up to 32 literal top-level exclusions. URLs have
+no userinfo/query/fragment and are bounded to 2048 characters; branch length is at most 256. Each Git
+process has a two-minute deadline and 64-KiB stdout/stderr bounds. It uses the existing workload
+process journal, graceful/authorized-force stop and termination quarantine. Git runs without system,
+global or inherited Git configuration, credential helpers, proxies or the Host/Agent home directory;
+local-file/SSH transports, hooks, submodules and author-supplied filters are not delegated. Ordinary
+build code retains the existing operator-enrolled Agent trust boundary; this is not D43 evaluator
+isolation, native disk governance or a sandbox for build steps.
+
+`BuildAssignment.vcs_checkout` (tag 10) selects the coordinator's immutable commit. An Agent verifies
+fetched commit and actual checked-out HEAD before any user step. Generated `Blob.private_input`
+(tag 5) and `Step.script_input`/`script_argument_index` (tags 8/9) place the compiler's scripts outside
+the source tree, without changing legacy source-free assignment paths. Archives are not private
+script inputs. Windows uses a relative private Git directory and per-command long-path support;
+global Git settings remain untouched.
+
+After checkout, an ordinary relative `.git` file links the worktree to its own private Git
+directory, with a non-bare repository view. Windows enables long paths only in that repository.
+This supports author `git rev-parse HEAD` from root and nested directories without a long absolute
+GIT_DIR, which installed Git2.32 rejects before long-path handling. A container receives a read-only
+gitfile override and its own read-only metadata mount; its exact `/workspace` safe-directory setting
+handles a differing runner UID, and optional index refresh locks are disabled. No wildcard trust,
+Host Git configuration, runtime credential directory or unrelated Build metadata is mounted.
+This proves selected metadata reads, not arbitrary writable Git operations in containers.
+
+`StepStatus.vcs_checkout` (tag 5, FETCHING/-1) independently commits the bounded checkout receipt
+before user-step progress; `BuildResult.vcs_checkout` (tag 9) repeats it. The Host validates the actual
+revision/outcome against the protected assignment and retains one immutable receipt under the
+current Agent/session/lease fence. Contradictory replay quarantines the Agent. Source collection and
+checkout failure are separate: collection retains an explicit unavailable revision; checkout failure
+retains the already selected revision and runs no user steps. Public errors contain typed codes,
+never Git stderr. This selected profile does not accept private source credentials, arbitrary checkout
+rules, source-aware reuse, full VCS resource CRUD, Docker runners or their remaining fault variants.
+
+### Selected container process seam (D47, US-013 PILOT)
+
+The adjacent artifact extension `teamcity.artifact-publisher.rules.v1` selects
+`BuildAssignment.artifact_publication_contract_major=2` on existing tag9. It adds no AgentMsg case,
+uses the existing private byte data plane and ordered artifact result, and leaves negotiated
+literal.v1/contract1 assignments intact. The exact selected rule, mapping and transfer boundaries
+are specified in [Results/Artifacts](results-artifacts.md#v1-artifact-rules-limits-and-precedence).
+This extension is under implementation, not final PILOT acceptance.
+
+`teamcity.container-runner.v1` adds `Step.container` (tag 10) and
+`StepResult.container` (tag 5), retaining the existing Build assignment, lease, session fences,
+step-completion observation and terminal result. Only an installed Linux x64 module advertises it;
+the fresh Host explicitly negotiates it and rechecks support and typed platform observations at
+selection and delivery. Other controllers and stale Agents keep their existing process contract.
+This container contract leaves Bootstrap and AgentMsg tag 7 unchanged. It has selected real
+private-Engine, ordinary REST failure/cancel and full Docker → Windows PowerShell → Docker chain
+evidence; PILOT acceptance remains open.
+
+The operator supplies an HTTPS origin, private client certificate directory and bounded stable
+scope in the local Agent installation. Mutual TLS validates the private CA and server hostname;
+there is no HTTP, proxy, redirect, Host-socket or project-selected runtime fallback. API requests
+use Engine v1.45, 30-second control deadlines, 4-MiB JSON bounds and a five-minute image-pull
+deadline with 64-KiB progress-line bounds. Errors retain typed codes, never remote response bodies.
+Transient Engine failures do not erase binary capability support.
+
+The selected input is one immutable `repository@sha256` image, `linux/amd64`, a numeric UID/GID,
+optional init and at most eight non-overlapping named caches. Cache names resolve beneath the
+installed scope; existing volumes must carry that owner. The Build workspace and generated private
+scripts are separate mounts; the latter is read-only. Workloads receive no Agent data, runtime TLS
+keys, outer Docker socket, host PID namespace or privileged mode. The dedicated Engine used for
+acceptance is a trusted privileged installation with its own graph and workspace volumes; its
+workloads are ordinary containers. This is not VM isolation or complete native resource governance.
+
+A secret-free helper owns the container namespace. The actual command uses Exec with an explicit
+environment, directly attached non-TTY stdout/stderr and no container log driver. Run secrets are
+not placed in Container.Config, image metadata, command arguments or generated files. The trusted
+Engine installation also keeps `/run` and `/tmp` on tmpfs, so OCI runtime process specifications do
+not become persistent graph data; daemon request-body/debug logging is disabled. Moby's pinned
+[container state](https://github.com/moby/moby/blob/docker-v29.3.1/daemon/container/container.go)
+excludes ExecCommands from its on-disk JSON; its
+[Exec store](https://github.com/moby/moby/blob/docker-v29.3.1/daemon/container/exec.go)
+retains the command environment in memory. Those source facts do not by themselves prove the
+runtime filesystem or log boundary. The output
+decoder handles bounded chunks of Docker's eight-byte multiplexed frames and feeds the existing
+post-mask spool, watermarks and loss evidence. The initial profile requires `/bin/sh` in the image.
+
+The durable local journal records Engine identity and scope before preparation, creation intent
+before Create and actual container ID before Start. An interrupted known container is checked by
+Engine ID, container ID, name and scope/Build labels, then stopped/removed before capacity returns.
+Unacknowledged creation or changed ownership/Engine remains quarantined. A subsequent native step
+retires the prior container proof before native process creation. Graceful stop signals TERM to the
+owned namespace and waits; explicit force, step timeout or output failure permits containment.
+Removal is followed by an independent absent-object read on the same Engine.
+
+Receipts keep actual image/container/Exec identities and nullable user-process exit separate from
+the runner exit. The pinned TeamCity missing-image case is an ordinary failure with runner code 1
+and `failedToStart=false`; it creates no fictitious user exit. Completed receipts are committed with
+immutable step observations and must agree with final evidence. The reference corpus also captures
+success/exact artifact bytes, exit 7 and cancellation only after observing the actual Node
+executable, with no remaining containers and fully owned cleanup. General Docker options, private
+registries, non-Linux platforms and arbitrary runner families remain unaccepted.
+
 ### AgentPolicyBundle application
 
 Git-backed agent policy is delivered as a validated, authenticated `AgentPolicyBundle`, not as
@@ -335,8 +440,8 @@ Protocol rules:
 1. Existing proto field tags and enum numbers are immutable and never reused.
 2. New optional fields and new `oneof` cases are appended. Unknown fields and messages are tolerated
    according to proto3 behavior.
-3. The next conceptual extension is designed before tags are allocated. `AgentMsg` tag 7 is already
-   reserved for D14 TeamCity service messages.
+3. The next conceptual extension is designed before tags are allocated. D50 assigns the D14-planned
+   `AgentMsg` tag 7 to negotiated literal Build-number metadata; it was unused by earlier senders.
 4. The controller gates every outbound message on negotiated support. A stale agent is allowed to
    remain connected and finish/recover supported work.
 5. Every executable unit carries a stable work/operation ID, accepting session ID, deadline,
@@ -390,7 +495,33 @@ existing upload/result-manifest contract. It does not advertise glob/directory/a
 rules or general service-message projection. The current fresh byte profile bounds a file to 64 KiB
 and a manifest to 128 files; broader T3 publication remains a delivery prerequisite, not acceptance
 of this subset as full TeamCity artifact compatibility. Legacy assignments remain unchanged. Tag 7
-on AgentMsg stays reserved for the separate structured service-message transport.
+on AgentMsg now carries the separate D50 typed Build-number message.
+
+### Selected literal Build-number messages (D50)
+
+`teamcity.build-number.literal.v1` is an explicit fresh-Host negotiation opt-in.
+`BuildAssignment.number_reporting_contract_major` at new tag 11 is zero for older/default
+assignments and one only for a peer that negotiated the profile. The SDK observes bounded complete
+single-attribute stdout `buildNumber` lines across UTF-8 reads, decodes the selected TeamCity escapes,
+and masks registered exact values before producing `AgentMsg.build_number_changed` at the D14-planned
+tag 7. Unrelated output still follows its original durable masked output path. The same collector
+handles native and container stdout without changing process ownership, outcome or Bootstrap.
+
+Typed changes carry the exact workload ID, monotonically increasing sequence and literal value.
+The selected bound is 128 observations and 4096 UTF-8 bytes per nonempty NUL-free value, with 64 KiB
+line/chunk bounds. `{build.number}` substitution and general service-message families remain outside
+this literal profile. The Agent's result adds the complete bounded `number_changes` list at tag 10;
+the existing encrypted/private terminal result retry retains it through reconnect and acknowledgement.
+Live delivery is best effort, while a complete terminal list repairs missing live frames. Partial
+infrastructure fallback may omit observations and cannot erase previously committed metadata.
+
+The Host independently checks negotiated assignment support, current authenticated workload/session/
+lease, bounds, exact-secret exclusion and consistency against its immutable sequenced PG observations.
+It changes the ordinary display number and audit in that same transaction, leaving numeric counters,
+identity, selected inputs, current management authorization and independent process/byte outcomes
+unchanged. Exact replay is harmless; contradictory values or retracted complete snapshots quarantine
+the owner. Both REST projections and Workbench read the same display field. This is the used recipe
+profile, not complete Build-number REST or generic service-message acceptance.
 
 The result manifest adds optional `Artifact.modification_time_unix_ms` at tag 4. The Agent reports
 the source file's observed modification time; the Host validates its representable range and retains

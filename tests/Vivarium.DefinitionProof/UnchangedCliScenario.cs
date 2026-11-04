@@ -104,6 +104,28 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         await SaveAsync();
     }
 
+    internal async Task<long> RunWholeChainAsync(string credential, string? runInput = null)
+    {
+        await RunAsync(credential, 0, "-p", "owned-r0", "permissions", "grant", "Update");
+        var arguments = new List<string> { "-p", "owned-r0", "jobs", "run", "P_Release",
+            "--wait", "--timeout", "2m", "--interval", "1s" };
+        if (runInput is not null) arguments.AddRange(["--param", "vivarium.run-input=" + runInput]);
+        var result = await RunAsync(credential, 0, arguments.ToArray());
+        Assert.That(result.GetProperty("accepted").GetBoolean(), Is.True);
+        Assert.That(result.GetProperty("outcome").GetString(), Is.EqualTo("succeeded"));
+        var build = result.GetProperty("build");
+        Assert.That(build.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Release"));
+        Assert.That(build.GetProperty("state").GetString(), Is.EqualTo("finished"));
+        var id = build.GetProperty("id").GetInt64();
+        var downloaded = await RunAsync(credential, 0, "-p", "owned-r0", "builds", "artifacts", "download",
+            id.ToString(CultureInfo.InvariantCulture), "release.txt", "--output", "chain-release.txt");
+        var saved = Path.GetFullPath(downloaded.GetProperty("path").GetString()!);
+        Assert.That(saved.StartsWith(Path.GetFullPath(root) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase), Is.True);
+        Assert.That(await File.ReadAllBytesAsync(saved), Is.EqualTo("coherent-reference-version\n"u8.ToArray()));
+        Assert.That(downloaded.GetProperty("sha256").GetString(), Is.EqualTo("97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8"));
+        return id;
+    }
+
     internal async Task<long> CancelQueuedAsync(string credential, HttpClient native)
     {
         var run = await RunAsync(credential, 0, "-p", "owned-r0", "jobs", "run", "P_LocalSmoke");
@@ -121,7 +143,13 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
         return id;
     }
 
-    internal async Task<JsonElement> RunAsync(string credential, int expectedExit, params string[] arguments)
+    internal Task<JsonElement> RunAsync(string credential, int expectedExit, params string[] arguments) =>
+        RunAsync(credential, expectedExit, TimeSpan.FromMinutes(3), arguments);
+
+    internal Task<JsonElement> RunAsync(string credential, int expectedExit, TimeSpan processDeadline, params string[] arguments) =>
+        RunAsync(credential, expectedExit, processDeadline, CancellationToken.None, arguments);
+
+    internal async Task<JsonElement> RunAsync(string credential, int expectedExit, TimeSpan processDeadline, CancellationToken cancellationToken, params string[] arguments)
     {
         var environment = new Dictionary<string, string>
         {
@@ -130,7 +158,7 @@ internal sealed class UnchangedCliScenario(string root, Uri origin, string certi
             ["TEAMCITY_TOKEN"] = credential, ["NODE_EXTRA_CA_CERTS"] = Path.Combine(root, "cli-ca.pem"),
         };
         var result = await ProofProcess.RunAsync("node", new[] { Path.Combine(installed!, "dist/src/bin.js"), "--json" }.Concat(arguments),
-            root, environment, allowFailure: true, deadline: TimeSpan.FromMinutes(3));
+            root, environment, allowFailure: true, deadline: processDeadline, cancellationToken: cancellationToken);
         Assert.That(Encoding.UTF8.GetString(result.Output).Contains(credential, StringComparison.Ordinal), Is.False);
         Assert.That(Encoding.UTF8.GetString(result.Error).Contains(credential, StringComparison.Ordinal), Is.False);
         using var document = JsonDocument.Parse(result.Output.Length == 0 ? result.Error : result.Output);

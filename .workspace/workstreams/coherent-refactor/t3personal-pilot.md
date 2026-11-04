@@ -1,6 +1,123 @@
 # First real product: the full T3Personal chain
 
+Current delivery — 2026-11-05: selected PILOT gates are reviewed and ready for parent delivery. See the [canonical final delivery record](pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+
+
+## Retained implementation checkpoints
+
+Pending-review/renewal statements below are dated provenance, superseded by the final delivery record above.
+
 ## Current story delivery plan
+
+Bounded 2026-11-05 implementation checkpoint: the four selected reference gaps have literal outcomes,
+and source/conflict/failed-artifact projection alignment passes the focused real-PG fixture. Required
+solution build passes; solution tests report722 PASS/11 skipped. See [evidence and review boundary](selection-boundaries-20261105.md).
+Prior33-story/SDK raw evidence remains historical. The [selected runtime renewal](selection-runtime-renewal-20261105.md)
+qualifies changed explicit branches and renews three ordinary source-reuse/artifact regressions
+with four selected real-PG cases on the final binary, retaining the earlier D52 proof separately.
+Exact-candidate offline accounting binds every normative row and
+SDK separately; Controller IL changes are runtime, never metadata-only. Aggregate/Security review,
+zero due debt and main remain due.
+
+### Current checkpoint — 2026-11-04 (not milestone closure)
+
+Offline accounting now has a focused `--pilot` assessment mode in the existing
+ApiLedger tool. Raw evidence is 33 business rows plus the required SDK PASS; this
+does not renew five stale legacy SQLite probes or materialize seven declared wire
+variants. Candidate-specific source/producer impact and heavy composed asset/actor/
+readback support remain due. Raw observer FAIL and read-only continuation PASS
+stay separate. Individual gaps are in the external
+`artifacts/pilot-chain/remediation-20261104/pilot-current.json` report.
+Global API denominator remains unknown and API-complete false.
+
+
+Remediation checkpoint: one fresh unchanged published CLI 0.5.6 entry completed Prepare 1,
+Windows 2 and Release root 3 successfully, version `0.1.6-nightly.20261104.1297`, with corrected
+versioned definition `70ea3e173fb28f8bc91c15b5db971d2d3234d92a` and unchanged package source
+`3ae8f481bc7c118747c8d01f0ec14f3f18e8b6ec`. Test-only release
+[434492192](https://github.com/iXab3r/vivarium-us013-e2e/releases/tag/v0.1.6-nightly.20261104.1297)
+passed controlled partial upload, resume and published repetition. No built application was launched.
+Evidence: `artifacts/us013-t3-acceptance/runs/f7139347660a4e8cb074cac8aac3fa9b/`.
+The original acceptance invocation remains raw FAIL: after CLI success an EF observer query could
+not translate an in-memory selection. A corrected read-only continuation passed exact downloaded
+GitHub asset hashes and ordinary-actor REST/Workbench artifact/log/configuration-history checks
+against those same three builds; it admitted no builds and made no publication mutation.
+
+Publisher controls are now clean-copy/offline reproducible from a committed MIT manifest helper
+with checked SHA-256 provenance. All 34 controls pass, including complete SHA256SUMS deletion;
+four offline fake-GH transport controls pass. Created draft selection/readback/upload/publication
+uses the REST returned ID with strict existing identity/ownership/digest checks. The manually
+started recovery worker now stops with an awaited 30-second bound before evidence/disposal;
+the tiny declaration/lifecycle proof passed. Root build passed and root tests report700 PASS/11 skipped.
+Prior b7 cumulative34/34 is qualified reuse: runtime/story/SDK sources are unchanged; affected
+actual-T3 setup, publisher and observation boundaries have their own focused evidence. Fresh
+independent aggregate and Security/Adversarial review at the parent's new commit, model unknowns,
+zero-debt/main delivery and full PILOT acceptance remain open. No full API percentage is known.
+
+
+Historical pre-remediation mechanical accounting was **INVALID_ACCOUNTING**, not GREEN. The existing offline ApiLedger
+reader exits 1: `Orphan ledger case: TCREST-PILOT-EXPLICIT-SELECTION-DIRECT-001`.
+`api-ledger.tsv` links this existing case and `r0-contract-variants.tsv` records its reference
+contract gap, but `Ledger.Read` joins only `rest-first-cohort-cases.tsv` and
+`rest-local-mutation-cases.tsv`, neither of which supplies this case. Validation stops before
+candidate freshness/receipt transfer. The tracked `api-status.json` and `api-evidence.json` remain
+historical; neither authorizes current reuse. Raw output is retained in
+`artifacts/pilot-chain/remediation-20261104/accounting-before.json`. #117/#118 must reconcile
+this existing binding/input-scope mismatch, then validate source/producer/oracle seals under the
+existing assessment rules. No new case, guessed oracle, automatic RED allowance or scope move
+was made. The frozen first PILOT cohort and selected R0 28 obligations remain separate from
+global discovery/allocation and the unknown full API denominator. Actual used selection behavior
+remains due to this story; broader family completion retains its existing later owners.
+The four bounded reference gaps now have literal evidence: ordinary project-viewer selection HTTP403;
+required filename-rule absence HTTP200 then failed-to-start FAILURE; contradictory B/A HTTP400;
+advanced root HEAD with retained old producers and bytes. See [bounded acquisition and alignment](selection-boundaries-20261105.md).
+Physical deleted-byte, changed settings/branches and broader field/graph profiles remain unaccepted.
+The seven declarations remain outside materialized wire GREEN; product validation and exact-candidate
+accounting are reported separately.
+
+Publisher portability/checksum/transport and worker-lifecycle P2 findings are fixed with focused
+receipts, pending independent aggregate and Security/Adversarial review at the new candidate.
+Prior static Security PASS applies only to b7d3f48. Full PILOT/main/milestone acceptance is open.
+Root summary is 700 PASS/11 skipped; raw TRX separately contains 12 NotExecuted rows.
+
+Prior retained-dependency checkpoint (preserved provenance):
+
+D52 selected retained-dependency admission and actual T3 publication are checkpoint evidence on
+`feature/us013-whole-chain`. Raw receipt: `artifacts/pilot-chain/release-recovery-20261104-203528/receipt.json`.
+Root 8 is PASS; original Prepare 1 and Windows 2 are reused, and only builds 1/2/3/7/8 executed.
+The initial unchanged CLI chain built Prepare/Windows successfully and failed publication. Later
+native Release-only admission used a corrected, versioned Release definition. This composition
+is not a single successful unchanged-CLI whole-chain journey; original failures remain evidence.
+
+Package source remains `3ae8f481bc7c118747c8d01f0ec14f3f18e8b6ec`.
+Release-definition Git is `893ab2d6aa109f200e3be5b0a5bdba0ca032c5fa`, helper SHA-256
+`eb8ff213db945a4fe858798db0a05c7c5a2590e48415acec446207ee7f73c19e`, script SHA-256
+`7e35344872e34a814b331defc3f2b8951bbe8510b20b9e1f7e99b56cb80ba51c`.
+Controlled exit 75 after the first asset, same-draft resume, published repetition and actual remote
+asset SHA-256 checks passed in the selected recovery proof. Release
+[434102890](https://github.com/iXab3r/vivarium-us013-e2e/releases/tag/v0.1.6-nightly.20261104.918)
+(version `0.1.6-nightly.20261104.918`) is published only in the owned test repository.
+No built application was launched. Receipt and `ActualT3ReleaseRecovery.cs` assertions were inspected;
+this documentation checkpoint performs no remote mutation, download or execution.
+
+Existing candidate receipts report publisher 33 controls, tiny proof/preflight, clean root build and
+root 700 Passed/11 skipped, with 891 source inputs/15 producer copies and zero drift. These are
+qualified reuse of the preceding source candidate, not freshly executed checks on this commit.
+Raw setup failures and earlier failed publication attempts remain separate. Full PILOT/main is open.
+
+Remaining acceptance uses the existing contract and tasks, without another case universe:
+
+| Remaining item / owner | Evidence and cheapest adequate boundary |
+|---|---|
+| [#117](https://github.com/iXab3r/Vivarium/issues/117) model/contract | Reconcile existing explicit-selection variants and AC-BLD-07/TCM bindings against captured literal observations. Ordinary authority, missing bytes, contradictory graph and changed-HEAD reference variants remain unknown/unaccepted; existing conservative controls are not wire GREEN. Use bounded source/reference fixtures before product assertions. Full API denominator remains unknown; no percentage. |
+| [#118](https://github.com/iXab3r/Vivarium/issues/118) cumulative small-chain proof | Review qualified b7 reuse of the already renewed 34-case cohort (33 story bindings plus SDK/owner-death), preserving raw failures and setup classifications. Confirm actual test discovery/bindings before selecting the cohort; this count does not require 33 new tests or another heavy build. Cover independent UI/REST/unchanged-CLI entries, current rights/byte denial, waiting, upstream failure/cancel, restart/ownership and trigger/quiet-period/exclusion/single-publisher behavior. Use existing shared Host/owned Agents and tiny workloads, with browser evidence only for UI entry/effects. |
+| [#78](https://github.com/iXab3r/Vivarium/issues/78) heavy journey composition | Assess the fresh successful unchanged-CLI chain and its read-only observer continuation against the heavy-journey contract. Keep the raw observer FAIL separate from product success and the continuation PASS. No second heavy run is required by this selected evidence; independent review remains due. |
+| Milestone delivery (#78/#118) | Root coordinates exact-revision evidence transfer/invalidation, due cumulative checks and mechanical ledger assessment only with current explicit source seals. Independent aggregate correctness/simplicity and Security/Adversarial review, zero due findings/debt, reviewed main delivery and task closure remain due. This checkpoint neither accepts nor merges the milestone. |
+
+Historical planning and earlier checkpoints below remain provenance; their no-implementation/current
+availability statements describe their dated sessions. Current selected evidence above supersedes
+those status claims, without changing the completion contract below.
+
 
 **Execution update, 2026-11-01:** the owner assigned this plan with “let's work”. The
 [integrated P0 execution checkpoint](us013-p0-execution.md) records actual reference effects,

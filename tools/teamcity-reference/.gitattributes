@@ -1,0 +1,8 @@
+# Preserve the exact producer bytes recorded in these reference receipts on every platform.
+PowerShellProbe.java text eol=lf
+powershell-profile-capture.py text eol=lf
+docker-runner-capture.mjs text eol=crlf
+artifact-rules-capture.mjs text eol=crlf
+source-reuse-capture.mjs text eol=crlf
+build-number-capture.mjs text eol=crlf
+vcs-trigger-capture.mjs text eol=crlf

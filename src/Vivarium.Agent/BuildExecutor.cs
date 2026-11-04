@@ -11,7 +11,7 @@ namespace Vivarium.Agent;
 /// Runs one BuildAssignment: fetch payload → run steps → collect artifacts (D3).
 /// The machine's cleanup is the controller's problem (clean policies, D5) — not this class's.
 /// </summary>
-public static class BuildExecutor
+public static partial class BuildExecutor
 {
     private static readonly TimeSpan ForceTerminationTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan OutputDrainTimeout = TimeSpan.FromSeconds(5);
@@ -36,22 +36,50 @@ public static class BuildExecutor
         Func<AgentMsg, CancellationToken, Task> send,
         string sessionId,
         BuildStopController stop,
-        Action<Process?>? observeProcess)
+        Action<Process?>? observeProcess,
+        DockerRuntimeOptions? dockerRuntime = null,
+        Action<ContainerJournalRecord>? observeContainer = null)
     {
         var workdir = ResolveUnder(workRoot, assignment.BuildId);
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
-        var publisher = assignment.ArtifactPublicationContractMajor == 1 ? new LiteralArtifactPublisher() : null;
+        var numbers = assignment.NumberReportingContractMajor == 1 ? new BuildNumberPublisher(assignment.BuildId, assignment.OutputSecrets) : null;
+        var sendOriginal = send;
+        send = async (message, token) =>
+        {
+            if (numbers is not null && message.Log is { Stream: LogStream.Stdout } log)
+                foreach (var change in numbers.Append(log.Data.Span))
+                {
+                    result.NumberChanges.Add(change.Clone());
+                    await sendOriginal(new AgentMsg { BuildNumberChanged = change }, token);
+                }
+            await sendOriginal(message, token);
+        };
+        var publisher = assignment.ArtifactPublicationContractMajor is 1 or 2
+            ? new LiteralArtifactPublisher(allowRules: assignment.ArtifactPublicationContractMajor == 2) : null;
 
         try
         {
             await SendStatusAsync(
                 send, assignment.BuildId, -1, "FETCHING", stop.GracefulToken);
+            if (assignment.VcsCheckout is { } source)
+            {
+                result.VcsCheckout = await CheckoutAsync(workRoot, workdir, assignment.BuildId, source, stop, observeProcess);
+                await send(new AgentMsg { Status = new StepStatus { BuildId = assignment.BuildId, StepIndex = -1,
+                    Phase = "FETCHING", VcsCheckout = result.VcsCheckout.Clone() } }, stop.GracefulToken);
+                if (!result.VcsCheckout.Succeeded)
+                {
+                    for (var index = 0; index < assignment.Steps.Count; index++) result.Steps.Add(new StepResult { StepIndex = index, Skipped = true });
+                    result.Outcome = BuildOutcome.Failed;
+                    return result;
+                }
+            }
             foreach (var blob in assignment.Payload)
             {
                 await FetchBlobAsync(
-                    blob, workdir, assignment.BuildId, sessionId, blobs, stop.GracefulToken);
+                    blob, blob.PrivateInput ? PrivateInputs(workRoot, assignment.BuildId) : workdir,
+                    assignment.BuildId, sessionId, blobs, stop.GracefulToken);
             }
         }
         catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
@@ -91,7 +119,16 @@ public static class BuildExecutor
                     i,
                     stopping ? "CANCELLATION_CLEANUP" : "RUNNING",
                     stepToken);
-                execution = await RunStepAsync(
+                if (step.Container is not null)
+                {
+                    Directory.CreateDirectory(ResolveUnder(workdir, "results"));
+                    if (dockerRuntime is null || observeContainer is null)
+                        throw new InvalidDataException("The container runtime is not installed.");
+                    var container = await DockerWorkload.RunAsync(dockerRuntime, workdir, assignment, i, step,
+                        send, stop, stepToken, observeContainer, publisher);
+                    execution = new(container.Result, stop.Mode != BuildStopMode.Unspecified, container.OutputComplete);
+                }
+                else execution = await RunStepAsync(
                     workdir, assignment, i, step, send, stop, stepToken, observeProcess, publisher);
             }
             catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
@@ -101,6 +138,12 @@ public static class BuildExecutor
                 continue;
             }
             result.Steps.Add(execution.Result);
+            if (execution.OutputComplete && numbers?.FinishStep() is { } finalNumber)
+            {
+                result.NumberChanges.Add(finalNumber.Clone());
+                if (stop.Mode == BuildStopMode.Unspecified)
+                    await sendOriginal(new AgentMsg { BuildNumberChanged = finalNumber }, stepToken);
+            }
             if (stop.Mode != BuildStopMode.Force)
             {
                 try
@@ -131,10 +174,13 @@ public static class BuildExecutor
             {
                 await SendStatusAsync(
                     send, assignment.BuildId, -1, "COLLECTING", collectionToken);
-                foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect)
-                    .Concat(publisher?.Files(workdir) ?? []).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
+                var publications = MatchCollectGlobs(workdir, assignment.Collect).Select(p => (Source: p, Path: p))
+                    .Concat(publisher?.PublishedFiles(workdir, collectionToken) ?? []).ToArray();
+                if (publications.GroupBy(p => p.Path, StringComparer.OrdinalIgnoreCase).Any(g => g.Select(p => p.Source).Distinct(StringComparer.Ordinal).Count() > 1))
+                    throw new InvalidDataException("Collected artifact paths conflict.");
+                foreach (var file in publications.Distinct().OrderBy(p => p.Path, StringComparer.Ordinal))
                 {
-                    var fullPath = Path.Combine(workdir, relativePath);
+                    var fullPath = Path.Combine(workdir, file.Source);
                     var sha = await blobs.UploadAsync(
                         fullPath,
                         assignment.BuildId,
@@ -142,7 +188,7 @@ public static class BuildExecutor
                         collectionToken);
                     result.Artifacts.Add(new Artifact
                     {
-                        Path = relativePath.Replace('\\', '/'),
+                        Path = file.Path.Replace('\\', '/'),
                         Sha256 = sha,
                         Size = new FileInfo(fullPath).Length,
                         ModificationTimeUnixMs = new DateTimeOffset(File.GetLastWriteTimeUtc(fullPath)).ToUnixTimeMilliseconds(),
@@ -237,6 +283,13 @@ public static class BuildExecutor
         {
             psi.ArgumentList.Add(arg);
         }
+        if (step.ScriptInput.Length != 0)
+        {
+            if (assignment.VcsCheckout is null || step.ScriptArgumentIndex < 0 || step.ScriptArgumentIndex >= step.Args.Count
+                || step.Args[step.ScriptArgumentIndex].Replace('\\', '/') != step.ScriptInput.Replace('\\', '/'))
+                throw new InvalidDataException("The generated script input differs from its argument.");
+            psi.ArgumentList[step.ScriptArgumentIndex] = ResolveUnder(PrivateInputs(Path.GetDirectoryName(workdir)!, assignment.BuildId), step.ScriptInput);
+        }
 
         psi.Environment["VIVARIUM_BUILD_ID"] = assignment.BuildId;
         psi.Environment["VIVARIUM_WORKDIR"] = workdir;
@@ -256,6 +309,8 @@ public static class BuildExecutor
             psi.Environment[key] = value;
         }
 
+        // Retire a prior container's removal proof before a new native creation can race a crash.
+        observeProcess?.Invoke(null);
         using var process = Process.Start(psi)
             ?? throw new InvalidOperationException($"failed to start '{step.Program}'");
         try
@@ -451,6 +506,9 @@ public static class BuildExecutor
     }
 
     private sealed record StepExecution(StepResult Result, bool Stopped, bool OutputComplete);
+
+    internal static string PrivateInputsForContainer(string workdir, string buildId) =>
+        PrivateInputs(Path.GetDirectoryName(workdir)!, buildId);
 
     [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
     private static extern int Kill(int processId, int signal);

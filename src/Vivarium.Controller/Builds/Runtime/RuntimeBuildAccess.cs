@@ -7,6 +7,18 @@ namespace Vivarium.Controller.Builds.Runtime;
 
 internal static class RuntimeBuildAccess
 {
+    internal static async Task<long> ResolveAsync(VivariumDbContext database, long requestedId, CancellationToken token)
+    {
+        var resolved = await database.RuntimeBuildResolutions.AsNoTracking().Where(r => r.RequestedBuildId == requestedId)
+            .Select(r => (long?)r.ResolvedBuildId).SingleOrDefaultAsync(token);
+        if (resolved is null) return requestedId;
+        // Queue replacements flatten incoming handles atomically. A chain/cycle is corruption,
+        // not authority to follow an unbounded caller-influenced lookup graph.
+        if (await database.RuntimeBuildResolutions.AnyAsync(r => r.RequestedBuildId == resolved, token))
+            throw new InvalidDataException("Build resolution is not canonical.");
+        return resolved.Value;
+    }
+
     // All queue mutations take the permission fence first, then this queue fence, then an Agent
     // fence if assigned. Session/result/output transitions need only that exact Agent fence.
     internal static Task FencePermissionsAsync(VivariumDbContext database, CancellationToken token) =>

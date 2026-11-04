@@ -11,7 +11,9 @@ public sealed record Project(string Id, string Parent, string Name, string Descr
 public sealed record Parameter(string Name, string? Literal, string? Expression);
 public sealed record Step(string Id, string Name, string Runner, Parameter[] Properties);
 public sealed record Requirement(string Name, string Value);
-public sealed record Snapshot(string Configuration, string Failure, string Cancel);
+public sealed record Snapshot(string Configuration, string Failure, string Cancel,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool ReuseBuilds = false,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool SuccessfulOnly = false);
 public sealed record Artifact(string Configuration, string Selector, string Rules, bool CleanDestination);
 public sealed record Trigger(string Type, string BranchFilter, int QuietSeconds,
     string? QuietPeriodMode = null, string? Rules = null);

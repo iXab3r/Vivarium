@@ -180,3 +180,49 @@ with valid product GREEN reproduced the defect before the fix; all 47 current ac
 and root build then passed. The 183 product/reference inputs and prior execution receipts remain
 unchanged. Product raw, reference/composition and unaffected ordinary evidence are explicitly reused;
 no new full ordinary/raw run or final milestone review is claimed for this one-line error-path fix.
+
+### PILOT declarations
+
+`api-ledger.tsv` keeps materialized wire bindings in `variant_case_ids`. Its optional
+`declared_variant_ids` relation joins the bounded `pilot-contract-variants.tsv` inventory and
+`pilot-contract-scope.json` declaration roster. These retain existing IDs, owners, tasks,
+source pointers and unresolved reference variants. The reader checks both API join directions,
+unique identity, PILOT slice/task ownership and source existence. Declarations increase only
+`declared_pilot_variants`; selected story/product receipts remain separate and do not establish
+materialized, executed or GREEN wire cases. R0 retains its original inventory and scope.
+
+`accounting_state` distinguishes structurally valid registries from execution evidence status.
+`VALID` with `STALE_OR_INVALID_EVIDENCE` still exits nonzero and grants no GREEN or acceptance.
+An invalidation assessment retains original receipts; new required metadata absent from those
+receipts remains an explicit stale-evidence error, even after the registry itself is repaired.
+Source-disposition hashes observe current source bytes only and do not renew replacement proof.
+
+
+The existing offline reader also accepts `--pilot <assessment-file>`. It joins the
+normative `pilot-contract-scope.json` business IDs to exact discovered test names and
+raw TRX class/name/outcome rows, with hash-bound cohort receipt, binding table,
+discovery log and seal. These are business/SDK evidence, never additional literal
+TCREST cases. Seven declared variants remain declarations in the global join.
+The external assessment binds `candidate_id`, `receipt`, `seal`, `bindings`,
+`discovery` (each path/sha256), and `trx`. Optional `heavy_results` use the existing
+raw-result descriptor (artifact/sha256/counters/exit_code) plus a role. Original
+observer failure and subsequent read-only continuation have separate outcomes.
+Input and producer drift is reported individually. Missing candidate reuse decisions
+or input-specific impact support withholds current GREEN while preserving raw
+outcomes. Heavy composition has separate hash-bound CLI, graph/source/definition,
+remote metadata and exact downloaded-file checks. Actor/readback assertions remain
+bounded by the raw continuation and source review; summary booleans alone are insufficient.
+Legacy SQLite baseline currency, selected Chiral/PG evidence, unknown reference
+variants and review/debt/main acceptance remain separate. No runtime is executed.
+
+
+## PILOT input-specific transfer
+
+`--pilot` reports currency for the existing 33 business bindings plus required SDK separately
+from heavy composition, reference gaps, historical baseline and milestone acceptance. See the
+[bounded reuse assessment](pilot-reuse-assessment.md). `current_green` is selected evidence
+currency only. `heavy_gaps` must also be inspected; a successful exit does not accept a milestone.
+Each changed/additional input needs its old hash (or ADDED), current hash, affected binding,
+category, observed diff, assessor, rationale, hash-bound supporting evidence and explicit independent
+review requirement. Producer decisions additionally identify metadata or test-only cause; unknown
+runtime impact stays unqualified. These fields attribute human reasoning; they cannot prove it correct.

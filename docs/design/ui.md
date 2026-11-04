@@ -1,7 +1,7 @@
 # TeamCity/Vivarium UI on the shared Workbench stack
 
 > Status: **Accepted — D35, 2026-10-31**
-> Implementation: **Legacy panel remains; fresh Host Workbench Access delivery is in progress**
+> Implementation: **Legacy panel remains; selected fresh Host Workbench Access and PILOT Builds evidence exists**
 > Maintainers: UI, REST, Identity, TeamCity, AgentExplorer, Test Steward
 > Related: [Architecture](../ARCHITECTURE.md) D24/D25/D32–D35
 
@@ -25,8 +25,17 @@ tools, not services required in production.
 The fresh Vivarium entry now builds `src/Vivarium.Controller/Workbench` with the same pinned
 TypeScript/Vite/Workbench versions and a package lock. Its same-origin `/access` shell injects only
 current account presentation, capability hints and stock CSRF data. The current real page handles
-paged users, role assignments and account enablement through common PostgreSQL services. CI pages,
-Nodes and complete Access editing remain due; the legacy panel is not retired by this first view.
+paged users, role assignments and account enablement through common PostgreSQL services. The active
+US-013 PILOT branch also adds project/configuration navigation, active requirements/dependency views,
+ordinary chain run/cancel, Build deep links, current status, paged output and actual artifact downloads
+through native `/api/v1`. Its selected real Windows/Linux browser journey includes an unchanged-cookie
+permission withdrawal; this is not full PILOT/main acceptance.
+The selected Source build view now displays the declared root/branch, selected workload revision and
+actual checked-out revision separately, with truthful pending/unavailable outcomes. It keeps those
+fields current without clearing paged output; the real source/PowerShell case verifies them after
+a Host restart and at a 390-pixel viewport. No bearer secret or private assignment is sent to the page.
+Full readiness/history, remaining CI
+views, Nodes and complete Access editing remain due; the legacy panel is not retired by this view.
 Monaco is retained as Workbench 0.2.6's required peer, not a newly exposed configuration editor.
 
 Reference paths are in [the Depot study](../../.workspace/workstreams/coherent-refactor/depot-study.md).
@@ -123,3 +132,12 @@ Cover keyboard/selection, narrow-width reflow, stable navigation, empty/error/de
 CAS/draft preservation/masked secrets, same-session permission withdrawal, run/cancel, log tail/
 download, individual test history and actual artifact bytes. Fake preview approval is not runtime
 acceptance, and a platform/admin-only happy path cannot close the ordinary-user journey.
+
+### Selected US-013 configuration history
+
+The fresh Workbench configuration view provides bounded Build history through the public native
+configuration-history resource, including empty/error states, explicit refresh, pagination and stable
+Build links. Build details link back to that configuration history. Automatic source/dependency
+causes come from the same persisted D51 cause; live polling updates the display number as well as
+status/source/Agent projections. Current access withdrawal clears the protected view on reload.
+These selected flows do not imply individual test-history or complete Queue/Agent UI acceptance.
