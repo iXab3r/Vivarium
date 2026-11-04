@@ -78,20 +78,43 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         {
             var declared = config.Steps[index];
             var properties = declared.Properties.ToDictionary(p => p.Name, p => Expand(p.Value), StringComparer.Ordinal);
-            if (declared.Runner != "simpleRunner" || !properties.TryGetValue("script.content", out var script)
-                || properties.ContainsKey("teamcity.step.mode") || properties.Keys.Any(p => p.StartsWith("plugin.docker.", StringComparison.Ordinal)))
+            if (properties.ContainsKey("teamcity.step.mode"))
                 throw new InvalidDataException("The selected runner profile is not implemented.");
             var windows = osFamily == "windows";
-            var path = ".vivarium/steps/" + index.ToString(CultureInfo.InvariantCulture) + (windows ? ".cmd" : ".sh");
-            var content = Encoding.UTF8.GetBytes(windows ? "@echo off\r\n" + script.ReplaceLineEndings("\r\n") : script.ReplaceLineEndings("\n"));
-            var hash = Convert.ToHexStringLower(SHA256.HashData(content));
-            var key = $"build-payloads/{build.Id}/{hash}";
-            await bytes.PutAsync(key, content, token); // Preparation intent/Agent lease is already durable; no SQL transaction spans this I/O.
-            payloads.Add(new() { BuildId = build.Id, Sha256 = hash, ObjectKey = key, Size = content.LongLength });
-            assignment.Payload.Add(new Blob { Sha256 = hash, FileName = path, PrivateInput = assignment.VcsCheckout is not null });
-            var step = new AgentStep { Program = windows ? "cmd.exe" : UnixInterpreter(script) };
-            if (windows) step.Args.Add(["/d", "/c", path.Replace('/', '\\')]); else step.Args.Add(path);
-            if (assignment.VcsCheckout is not null) { step.ScriptInput = path; step.ScriptArgumentIndex = step.Args.Count - 1; }
+            AgentStep step;
+            if (declared.Runner == "simpleRunner" && properties.TryGetValue("script.content", out var script))
+            {
+                var path = ".vivarium/steps/" + index.ToString(CultureInfo.InvariantCulture) + (windows ? ".cmd" : ".sh");
+                var content = Encoding.UTF8.GetBytes(windows ? "@echo off\r\n" + script.ReplaceLineEndings("\r\n") : script.ReplaceLineEndings("\n"));
+                var hash = Convert.ToHexStringLower(SHA256.HashData(content));
+                var key = $"build-payloads/{build.Id}/{hash}";
+                await bytes.PutAsync(key, content, token); // Durable preparation/Agent lease precedes Storage I/O.
+                payloads.Add(new() { BuildId = build.Id, Sha256 = hash, ObjectKey = key, Size = content.LongLength });
+                assignment.Payload.Add(new Blob { Sha256 = hash, FileName = path, PrivateInput = assignment.VcsCheckout is not null });
+                step = new AgentStep { Program = windows ? "cmd.exe" : UnixInterpreter(script) };
+                if (windows) step.Args.Add(["/d", "/c", path.Replace('/', '\\')]); else step.Args.Add(path);
+                if (assignment.VcsCheckout is not null) { step.ScriptInput = path; step.ScriptArgumentIndex = step.Args.Count - 1; }
+            }
+            else if (declared.Runner == "jetbrains_powershell" && windows && assignment.VcsCheckout is not null
+                && properties.GetValueOrDefault("jetbrains_powershell_script_mode") == "FILE"
+                && properties.GetValueOrDefault("jetbrains_powershell_execution") == "PS1"
+                && properties.GetValueOrDefault("jetbrains_powershell_noprofile") == "true"
+                && properties.GetValueOrDefault("jetbrains_powershell_bitness") == "x64"
+                && properties.TryGetValue("jetbrains_powershell_script_file", out var file)
+                && properties.Count == 5 && file.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase))
+            {
+                // The pinned 222742 plugin selects Desktop before Core when edition is absent.
+                // Reuse the existing files/process SDK; FILE is an actual checked-out author script.
+                step = new AgentStep { Program = "powershell.exe" };
+                step.Args.Add(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "ByPass", "-File", RelativePath(file).Replace('/', '\\')]);
+            }
+            else throw new InvalidDataException("The selected runner profile is not implemented.");
+            if (properties.Keys.Any(p => p.StartsWith("plugin.docker.", StringComparison.Ordinal)))
+            {
+                if (windows || declared.Runner != "simpleRunner")
+                    throw new InvalidDataException("The selected container runner platform is not implemented.");
+                step.Container = ContainerProfile(properties);
+            }
             foreach (var (name, value) in values.Where(p => p.Key.StartsWith("env.", StringComparison.Ordinal)))
                 step.Env[name[4..]] = Expand(value);
             step.Env["BUILD_NUMBER"] = number;
@@ -109,6 +132,53 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         if (assignment.CalculateSize() > 3 * 1024 * 1024)
             throw new InvalidDataException("The prepared assignment exceeds the selected transport profile.");
         return new(assignment, payloads.DistinctBy(p => p.Sha256).ToArray(), consumed.ToArray());
+    }
+
+    internal static bool MatchesRunnerPlatform(ResolvedConfiguration config, IReadOnlyDictionary<string, string> reported, string? observation)
+    {
+        var powershell = config.Steps.Any(s => s.Runner == "jetbrains_powershell");
+        var container = RequiresContainer(config);
+        if (!powershell && !container) return true;
+        var os = container ? "linux" : "windows";
+        if (powershell && container || reported.GetValueOrDefault("system.os.family") != os || observation is null) return false;
+        // Process architecture is an existing typed observation, not a freely writable custom
+        // requirement or an invented fallback to OS architecture.
+        var facts = JsonSerializer.Deserialize<Vivarium.Controller.Agents.AgentStaticObservation>(observation, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        return facts?.Facts is { ProcessArchitecture: "x64" } host && host.OsFamily == os;
+    }
+
+    internal static bool RequiresContainer(ResolvedConfiguration config) => config.Steps.Any(s =>
+        s.Properties.Any(p => p.Name.StartsWith("plugin.docker.", StringComparison.Ordinal)));
+
+    private static ContainerStep ContainerProfile(IReadOnlyDictionary<string, string> properties)
+    {
+        var names = new[] { "plugin.docker.imageId", "plugin.docker.imagePlatform", "plugin.docker.run.parameters" };
+        if (properties.Keys.Any(p => p.StartsWith("plugin.docker.", StringComparison.Ordinal) && !names.Contains(p))
+            || properties.GetValueOrDefault("plugin.docker.imagePlatform") != "linux")
+            throw new InvalidDataException("The selected Docker property profile is not implemented.");
+        var value = new ContainerStep { Image = properties.GetValueOrDefault("plugin.docker.imageId") ?? "", Platform = "linux/amd64", User = "0" };
+        var arguments = (properties.GetValueOrDefault("plugin.docker.run.parameters") ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        for (var index = 0; index < arguments.Length; index++)
+        {
+            var flag = arguments[index];
+            if (flag != "--volume" && !seen.Add(flag)) throw new InvalidDataException("Duplicate Docker option.");
+            if (flag == "--init") { value.Init = true; continue; }
+            if (++index == arguments.Length) throw new InvalidDataException("A Docker option value is missing.");
+            var argument = arguments[index];
+            switch (flag)
+            {
+                case "--user": value.User = argument; break;
+                case "--platform" when argument == "linux/amd64": value.Platform = argument; break;
+                case "--volume":
+                    var pair = argument.Split(':');
+                    if (pair.Length != 2) throw new InvalidDataException("Only scoped named Docker caches are implemented.");
+                    value.Caches.Add(new ContainerCache { Name = pair[0], Target = pair[1] }); break;
+                default: throw new InvalidDataException("The selected Docker option is not implemented.");
+            }
+        }
+        Vivarium.Contracts.ContainerStepProfile.Validate(value);
+        return value;
     }
 
     private static string RelativePath(string path)

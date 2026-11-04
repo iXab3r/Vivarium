@@ -196,6 +196,19 @@ runner settings, enabled flag, execution conditions, timeout, and execution poli
 type remains a portable process/command runner. Typed runners are adapters that compile to the same
 small agent execution contract unless they require a separately negotiated agent capability.
 
+The selected PILOT PowerShell adapter accepts the recipe's Windows `FILE`/`PS1`/`x64`, explicit
+NoProfile profile with an absent edition. Its independent control executes the pinned 222742
+vendor selection, execution-policy and argument-provider code with controlled installed-tool facts;
+this is not a REST or reference Windows execution claim. With Desktop and Core installed, that
+control selects Desktop and the ordinary `powershell.exe -NoProfile -NonInteractive
+-ExecutionPolicy ByPass -File` invocation. The real product case checks Desktop/x64 inside the
+checked-out script, exact selected bytes, native/compatible revision readback and Workbench after
+Host restart; another case retains an actual exit7 and prevents downstream Release execution.
+The adapter uses the existing process SDK. Scheduling and delivery use the current typed process
+architecture, retaining that observation with target provenance. Other editions, script modes,
+arguments, failure-condition settings and runner-specific requirements remain unaccepted profiles;
+this does not claim full PowerShell/API compatibility.
+
 Step execution policies preserve D14's distinction:
 
 - `default`: run only while the build is successful;

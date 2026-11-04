@@ -24,6 +24,7 @@ internal sealed record AgentProtocolNegotiation(
     public bool SupportsLiteralArtifactPublisher => NegotiatedCapabilities.Any(
         capability => capability.CapabilityId == AgentProtocolCompatibility.ArtifactPublisherCapabilityId);
     public bool SupportsVcsCheckout => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId);
+    public bool SupportsContainerRunner => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId);
 }
 
 /// <summary>
@@ -58,7 +59,7 @@ internal static class AgentProtocolCompatibility
         };
 
     public static AgentProtocolNegotiation Negotiate(Hello hello, bool enableDurableBuildOutput = false,
-        bool enableLiteralArtifactPublisher = false, bool enableVcsCheckout = false)
+        bool enableLiteralArtifactPublisher = false, bool enableVcsCheckout = false, bool enableContainerRunner = false)
     {
         ArgumentNullException.ThrowIfNull(hello);
 
@@ -120,7 +121,8 @@ internal static class AgentProtocolCompatibility
                 KnownCapabilities.TryGetValue(capability.CapabilityId, out var major) && major == capability.ContractMajor
                 || enableDurableBuildOutput && capability.CapabilityId == BuildOutputCapabilityId && capability.ContractMajor == 1
                 || enableLiteralArtifactPublisher && capability.CapabilityId == ArtifactPublisherCapabilityId && capability.ContractMajor == 1
-                || enableVcsCheckout && capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && capability.ContractMajor == 1)
+                || enableVcsCheckout && capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && capability.ContractMajor == 1
+                || enableContainerRunner && capability.CapabilityId == Vivarium.Contracts.ContainerStepProfile.CapabilityId && capability.ContractMajor == 1)
             .Select(capability => capability.Clone())
             .ToArray();
 

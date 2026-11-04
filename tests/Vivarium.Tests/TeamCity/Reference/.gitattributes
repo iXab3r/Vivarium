@@ -1,0 +1,4 @@
+# These selected source receipts have byte hashes in the PILOT scope register.
+docker-runner-observations.json text eol=lf
+powershell-profile-observations.json text eol=crlf
+artifact-rules-observations.json text eol=lf

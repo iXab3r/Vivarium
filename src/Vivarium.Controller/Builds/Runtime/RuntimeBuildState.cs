@@ -157,6 +157,7 @@ public sealed class RuntimeBuildObservation
     public int? ExitCode { get; set; }
     public bool? TimedOut { get; set; }
     public bool? Skipped { get; set; }
+    public byte[]? ContainerEvidence { get; set; }
 }
 
 public sealed class RuntimeBuildPayload

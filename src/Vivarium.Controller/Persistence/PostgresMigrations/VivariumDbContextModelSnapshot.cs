@@ -946,6 +946,9 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<int>("Ordinal")
                         .HasColumnType("integer");
 
+                    b.Property<byte[]>("ContainerEvidence")
+                        .HasColumnType("bytea");
+
                     b.Property<int?>("ExitCode")
                         .HasColumnType("integer");
 

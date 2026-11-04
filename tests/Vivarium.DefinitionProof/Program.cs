@@ -2,6 +2,13 @@ using System.Text.Json;
 using Vivarium.DefinitionProof;
 using Vivarium.Controller.Catalog;
 
+if (args is ["--container-sdk-worker", var runtimeScope])
+    return await ContainerSdkPhysicalTests.WorkerAsync(runtimeScope);
+if (args is ["--container-orphan-worker", var orphanScope])
+    return await ContainerSdkPhysicalTests.OrphanWorkerAsync(orphanScope);
+if (args is ["--container-recovery-worker", var recoveryScope])
+    return await ContainerSdkPhysicalTests.RecoveryWorkerAsync(recoveryScope);
+
 if (args is ["--production-evaluator-worker", var invocation])
 {
     var sources = ProductionEvaluatorPhysicalTests.Sources("File.WriteAllText(\"/work/author-ready\", \"ready\"); UserCode.Attack();");

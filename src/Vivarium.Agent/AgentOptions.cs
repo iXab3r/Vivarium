@@ -38,4 +38,7 @@ public sealed class AgentOptions
 
     /// <summary>Replaceable only for deterministic platform-collector tests.</summary>
     public IPlatformFactsCollector? PlatformFactsCollector { get; init; }
+
+    /// <summary>Operator-installed private Engine; never selected by a project or build parameter.</summary>
+    public DockerRuntimeOptions? DockerRuntime { get; init; }
 }

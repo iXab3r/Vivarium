@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Google.Protobuf;
 using Vivarium.Contracts.V1;
 using Vivarium.Controller.Persistence;
 
@@ -15,12 +16,15 @@ internal static class RuntimeBuildProgress
             || (status.Phase is "FETCHING" or "COLLECTING") && status.StepIndex != -1
             || status.Completed is { } completed && (status.Phase != "RUNNING" || completed.StepIndex != status.StepIndex || completed.Skipped))
             throw new InvalidDataException("Execution progress is invalid.");
+        if (status.Completed is { } result) RuntimeContainerReceipt.Validate(result, assignment.Steps[result.StepIndex]);
         return status.Completed is not null ? "COMPLETED" : status.Phase == "CANCELLATION_CLEANUP" ? "RUNNING" : status.Phase;
     }
 
     internal static bool SameResult(RuntimeBuildObservation observed, StepResult? result) => result is not null
         && observed.StepIndex == result.StepIndex && observed.ExitCode == result.ExitCode
-        && observed.TimedOut == result.TimedOut && observed.Skipped == result.Skipped;
+        && observed.TimedOut == result.TimedOut && observed.Skipped == result.Skipped
+        && (observed.ContainerEvidence is null ? result.Container is null
+            : result.Container is not null && ContainerStepReceipt.Parser.ParseFrom(observed.ContainerEvidence).Equals(result.Container));
 
     // The caller holds the same Agent/Build transaction fence as assignment/result processing.
     internal static async Task<(bool Added, bool Conflict)> ObserveAsync(VivariumDbContext database, long buildId,
@@ -36,7 +40,8 @@ internal static class RuntimeBuildProgress
             throw new InvalidDataException("Execution progress order is invalid.");
         database.RuntimeBuildObservations.Add(new() { BuildId = buildId, Ordinal = observations.Length,
             Phase = phase, StepIndex = status.StepIndex, ReceivedAt = now,
-            ExitCode = status.Completed?.ExitCode, TimedOut = status.Completed?.TimedOut, Skipped = status.Completed?.Skipped });
+            ExitCode = status.Completed?.ExitCode, TimedOut = status.Completed?.TimedOut, Skipped = status.Completed?.Skipped,
+            ContainerEvidence = status.Completed?.Container?.ToByteArray() });
         return (true, false);
     }
 }

@@ -15,7 +15,7 @@ internal sealed class OwnedGitSource(string root) : IAsyncDisposable
     private bool created;
     internal string Url { get; private set; } = "";
 
-    internal async Task<string> StartAsync()
+    internal async Task<string> StartAsync(bool powershellFailure = false)
     {
         Directory.CreateDirectory(Work);
         await GitAsync(["init", "--initial-branch=main", Work]);
@@ -26,6 +26,16 @@ internal sealed class OwnedGitSource(string root) : IAsyncDisposable
         await File.WriteAllTextAsync(Path.Combine(Work, ".vivarium/steps/0.sh"), "exit 83\n");
         Directory.CreateDirectory(Path.Combine(Work, ".repos"));
         await File.WriteAllTextAsync(Path.Combine(Work, ".repos/omitted.txt"), "excluded source\n");
+        await File.WriteAllTextAsync(Path.Combine(Work, "windows.ps1"), (powershellFailure ? "exit 7\n" : "") + """
+            $ErrorActionPreference = 'Stop'
+            if ([Environment]::Is64BitProcess -ne $true) { exit 72 }
+            if ($PSVersionTable.PSEdition -ne 'Desktop') { exit 73 }
+            $source = [IO.File]::ReadAllBytes('selected.txt')
+            $selected = [IO.File]::ReadAllBytes('ci-input/prepare/prepare.txt')
+            if ([Convert]::ToBase64String($source) -ne [Convert]::ToBase64String($selected)) { exit 74 }
+            [IO.File]::WriteAllBytes('windows.txt', $selected)
+            Write-Output "##teamcity[publishArtifacts 'windows.txt']"
+            """, new UTF8Encoding(false));
         await GitAsync(["-C", Work, "add", "."]);
         await GitAsync(["-C", Work, "commit", "-m", "fixture: initial workload source"]);
         await GitAsync(["clone", "--bare", Work, Bare]);

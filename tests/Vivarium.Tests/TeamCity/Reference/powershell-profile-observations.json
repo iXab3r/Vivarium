@@ -1,0 +1,42 @@
+{
+  "kind": "PINNED_VENDOR_PLUGIN_CONTROL_NOT_REST_OR_WINDOWS_EXECUTION",
+  "serverImage": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a",
+  "agentImage": "jetbrains/teamcity-minimal-agent@sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765",
+  "pluginBuild": "222742",
+  "complete": true,
+  "scope": "Actual pinned PowerShell selection, Windows default execution-policy method and command provider. Synthetic installed Desktop5.1/Core7.5 x64 facts; empty ordinary configuration. Only API/context wiring is supplied; no replacement selection or command model. No Windows process/REST/auth/cancel/whole-runner completeness claim.",
+  "inputs": {
+    "PowerShellProbe.java": "596c551f5abff8684a0457007c894f889d434aabd2c5336f83f2faa1f941d7b1",
+    "powershell.zip": "808103f7ec82fdb955b1ad4287a69fb3ec68ad6fc6c1d7c0d6988e89cedff8f9",
+    "powershell-agent-222742.jar": "7a94e73632c2131ee43dca79bd53d757e32c7f6281ef94cb386f7cb733850236",
+    "powershell-common-222742.jar": "272c7535a93f46adf70532d073b1c1d3a6bf6cfcc65db64ecd089b48197dec4b",
+    "agent-openapi.jar": "66235234b4bf5ffd106e20af4216feaf990b547f1004061676741c718838f51b"
+  },
+  "cleanup": [
+    {
+      "name": "us013-powershell-profile-9044258b4ff7-1",
+      "removed": true
+    },
+    {
+      "name": "us013-powershell-profile-9044258b4ff7-0",
+      "removed": true
+    }
+  ],
+  "producerSha256": "22f38eb74bd114910b70712fe74072daf9f695f2a1355853af4601a1d4e9121c",
+  "stdoutBase64": "Q09OVFJPTF9KU09OIHsiZWRpdGlvbiI6IkRlc2t0b3AiLCJleGVjdXRhYmxlIjoicG93ZXJzaGVsbC5leGUiLCJ1c2VFeGVjdXRpb25Qb2xpY3kiOnRydWUsImFyZ3VtZW50cyI6WyItTm9Qcm9maWxlIiwiLU5vbkludGVyYWN0aXZlIiwiLUV4ZWN1dGlvblBvbGljeSIsIkJ5UGFzcyIsIi1GaWxlIiwic2NyaXB0cy9wZXJzb25hbC1yZWxlYXNlL3dpbmRvd3MucHMxIl19Cg==",
+  "stdoutSha256": "3645b0076b261a93aa73ccbeb4a76eab018e47c52473b1ccf52532a152672e49",
+  "observation": {
+    "edition": "Desktop",
+    "executable": "powershell.exe",
+    "useExecutionPolicy": true,
+    "arguments": [
+      "-NoProfile",
+      "-NonInteractive",
+      "-ExecutionPolicy",
+      "ByPass",
+      "-File",
+      "scripts/personal-release/windows.ps1"
+    ]
+  },
+  "ownedResourcesRemoved": true
+}

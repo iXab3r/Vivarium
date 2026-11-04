@@ -173,6 +173,30 @@ message Step {
   bool expected_reboot = 7;  // provisioning: suppress lost-heartbeat INFRA (D6/D9)
   string script_input = 8; // private generated script path, not a source-tree file
   int32 script_argument_index = 9; // replace this exact matching argument with the private input path
+  ContainerStep container = 10; // requires negotiated teamcity.container-runner.v1
+}
+
+message ContainerStep {
+  string image = 1; // immutable repository@sha256 digest
+  string platform = 2; // selected implementation: linux/amd64
+  string user = 3; // numeric container UID, never the Agent's identity
+  bool init = 4;
+  repeated ContainerCache caches = 5;
+}
+
+message ContainerCache {
+  string name = 1; // logical name; installed runtime scope owns the effective volume
+  string target = 2; // absolute path inside the workload
+}
+
+message ContainerStepReceipt {
+  string engine_id = 1;
+  string container_id = 2;
+  string image_id = 3;
+  string exec_id = 4;
+  optional int32 process_exit_code = 5; // absent when no user process was started
+  bool removed = 6; // confirmed stopped and absent on the same installed Engine
+  string failure_code = 7; // typed, bounded; no remote diagnostics or environment values
 }
 
 enum OnFail {
@@ -352,6 +376,7 @@ message StepResult {
   int32 exit_code = 2;
   bool timed_out = 3;
   bool skipped = 4;
+  ContainerStepReceipt container = 5;
 }
 
 message Artifact {

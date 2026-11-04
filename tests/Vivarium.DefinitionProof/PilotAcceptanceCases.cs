@@ -190,6 +190,70 @@ public sealed class PilotAcceptanceCases
     public async Task Workload_source_is_collected_after_admission_and_pinned_through_both_real_Agents()
         => await WholeChainAsync(viaCli: false, source: true);
 
+    [Test, Description("PILOT-POWERSHELL-FILE-CHAIN-001")]
+    public async Task The_recipe_PowerShell_FILE_PS1_x64_profile_runs_the_checked_out_script_on_Windows()
+        => await WholeChainAsync(viaCli: false, source: true, powershell: true);
+
+    [Test, Description("PILOT-POWERSHELL-NONZERO-CHAIN-001")]
+    public async Task A_real_PowerShell_nonzero_exit_is_retained_and_prevents_the_dependent_Release()
+        => await WholeChainAsync(viaCli: false, source: true, powershell: true, powershellFailure: true);
+
+    [Test, Description("PILOT-CONTAINER-POWERSHELL-SOURCE-CHAIN-001")]
+    public async Task The_complete_source_chain_uses_real_Docker_PowerShell_and_owned_cache_with_exact_bytes()
+        => await WholeChainAsync(viaCli: false, source: true, powershell: true, docker: true);
+
+    [TestCase("exit7"), TestCase("missing-image"), TestCase("cancel")]
+    public async Task Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(string mode)
+    {
+        await using var host = await installation.CreateCaseAsync(catalogued: true);
+        using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
+        var image = mode == "missing-image" ? "node@sha256:" + new string('0', 64) : OwnedContainerRuntime.Node;
+        var settings = WithDocker(Settings.ReplaceLineEndings("\n"), image);
+        var script = mode == "cancel" ? "node -e \\\"setInterval(()=>{},1000)\\\"" : "exit 7";
+        var start = settings.IndexOf("\"#!/bin/sh", StringComparison.Ordinal);
+        var end = settings.IndexOf("\", null)", start, StringComparison.Ordinal);
+        settings = settings[..start] + "\"#!/bin/sh\\n" + script + settings[end..];
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), settings);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: Docker " + mode);
+        Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
+        using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
+        actor.BuildClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        using var body = new StringContent("{\"buildType\":{\"id\":\"P_Prepare\"}}", Encoding.UTF8, "application/json");
+        using var admission = await actor.BuildClient.PostAsync("/app/rest/buildQueue", body);
+        Assert.That(admission.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        using var admitted = JsonDocument.Parse(await admission.Content.ReadAsStringAsync());
+        var id = admitted.RootElement.GetProperty("id").GetInt64();
+        await using var runtime = new OwnedContainerRuntime(); await runtime.StartAsync();
+        await using var linux = new OwnedDockerAgent(host.Root, runtime: runtime);
+        await host.StartLinuxAgentAsync(linux, administrator, csrf);
+        if (mode == "cancel")
+        {
+            using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+            while (!await runtime.NodeRunningAsync()) await Task.Delay(100, limit.Token);
+            using var cancel = new StringContent("{\"comment\":\"Owned lifecycle cancel\",\"readdIntoQueue\":false}", Encoding.UTF8, "application/json");
+            using var canceled = await actor.BuildClient.PostAsync("/app/rest/builds/id:" + id, cancel);
+            Assert.That(canceled.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+        var terminal = await FinishedAsync(actor.BuildClient, id, mode == "cancel" ? "UNKNOWN" : "FAILURE");
+        var repository = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
+        while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "Vivarium.slnx"))) repository = repository.Parent;
+        using var oracle = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
+            "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json")));
+        var reference = oracle.RootElement.GetProperty("cases").EnumerateArray().Single(c => c.GetProperty("id").GetString() == "docker:" + mode)
+            .GetProperty("terminalObservation");
+        foreach (var field in new[] { "status", "failedToStart", "number", "state" })
+            Assert.That(terminal.GetProperty(field).GetRawText(), Is.EqualTo(reference.GetProperty(field).GetRawText()), field);
+        if (mode != "cancel") Assert.That(terminal.GetProperty("statusText").GetString(),
+            Is.EqualTo(reference.GetProperty("statusText").GetString()!.Replace("Owned Docker step", "Prepare", StringComparison.Ordinal)));
+        await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+        var result = Vivarium.Contracts.V1.BuildResult.Parser.ParseFrom((await database.RuntimeBuildResults.SingleAsync(r => r.BuildId == id)).Evidence);
+        Assert.That(result.Steps.Single().Container.HasProcessExitCode, Is.EqualTo(mode != "missing-image"));
+        Assert.That(result.Steps.Single().Container.Removed, Is.EqualTo(mode != "missing-image"));
+        Assert.That(await database.RuntimeBuildArtifacts.AnyAsync(), Is.False);
+        Assert.That(await database.AgentRegistrations.AnyAsync(a => a.Quarantined), Is.False);
+        Assert.That(await runtime.RemainingAsync(), Is.Empty);
+    }
+
     [Test]
     public async Task Unkeyed_queued_repetition_resolves_old_locators_to_the_new_request_across_restart_and_cancel()
     {
@@ -313,16 +377,37 @@ public sealed class PilotAcceptanceCases
         Assert.That(await database.RuntimeBuilds.CountAsync(), Is.EqualTo(3));
     }
 
-    private async Task WholeChainAsync(bool viaCli, bool reuse = false, bool source = false)
+    private async Task WholeChainAsync(bool viaCli, bool reuse = false, bool source = false, bool powershell = false, bool powershellFailure = false, bool docker = false)
     {
         await using var host = await installation.CreateCaseAsync(catalogued: true);
         using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
         await using var git = new OwnedGitSource(host.Root);
-        string? before = source ? await git.StartAsync() : null;
-        var settings = reuse ? ReuseSettings : Settings;
+        string? before = source ? await git.StartAsync(powershellFailure) : null;
+        var settings = (reuse ? ReuseSettings : Settings).ReplaceLineEndings("\n");
         if (source) settings = settings.Replace("new(\"P\", null, [], [", "new(\"P\", new(\"P_Git\", " + JsonSerializer.Serialize(git.Url) + ", \"refs/heads/main\", \"+:.\\n-:.repos\"), [], [", StringComparison.Ordinal)
             .Replace("2, [])", "2, [], \"ON_AGENT\")", StringComparison.Ordinal)
             .Replace("""printf 'coherent-reference-version\\n' > prepare.txt""", """test ! -e .repos/omitted.txt\ncat selected.txt > prepare.txt""", StringComparison.Ordinal);
+        if (powershell)
+        {
+            var start = settings.IndexOf("new(\"windows\", \"Windows\", \"simpleRunner\"", StringComparison.Ordinal);
+            var end = settings.IndexOf("],\n      [new(\"system.os.family\", \"windows\")", start, StringComparison.Ordinal);
+            Assert.That(start, Is.GreaterThanOrEqualTo(0)); Assert.That(end, Is.GreaterThan(start));
+            settings = settings[..start] + """
+                new("windows", "Windows", "jetbrains_powershell", [
+                  new("jetbrains_powershell_script_mode", "FILE", null),
+                  new("jetbrains_powershell_script_file", "windows.ps1", null),
+                  new("jetbrains_powershell_execution", "PS1", null),
+                  new("jetbrains_powershell_noprofile", "true", null),
+                  new("jetbrains_powershell_bitness", "x64", null)])
+                """ + settings[end..];
+        }
+        if (docker)
+        {
+            settings = WithDocker(settings, OwnedContainerRuntime.Node);
+            settings = settings.Replace("#!/bin/sh\\nset -eu\\n", "#!/bin/sh\\nset -eu\\nnode --version\\n", StringComparison.Ordinal)
+                .Replace("cat selected.txt > prepare.txt", "cat selected.txt > prepare.txt\\nmkdir -p /root/.vite-plus\\ncp selected.txt /root/.vite-plus/owned-cache.txt", StringComparison.Ordinal)
+                .Replace("cmp ci-input/prepare/prepare.txt", "cmp /root/.vite-plus/owned-cache.txt selected.txt\\ncmp ci-input/prepare/prepare.txt", StringComparison.Ordinal);
+        }
         await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), settings);
         await R0AcceptanceCases.CommitCaseAsync(host, "fixture: prepare the complete small Linux Windows Release chain");
         Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
@@ -342,7 +427,9 @@ public sealed class PilotAcceptanceCases
 
         string? selectedRevision = source ? await git.ChangeAsync() : null;
         string? windowsAgent, linuxAgent;
-        await using var linux = new OwnedDockerAgent(host.Root, gitTools: source);
+        await using var containerRuntime = docker ? new OwnedContainerRuntime() : null;
+        if (containerRuntime is not null) await containerRuntime.StartAsync();
+        await using var linux = new OwnedDockerAgent(host.Root, gitTools: source, runtime: containerRuntime);
         if (source)
         {
             Assert.That(selectedRevision, Is.Not.EqualTo(before));
@@ -368,7 +455,7 @@ public sealed class PilotAcceptanceCases
             id = await cli.RunWholeChainAsync(credential);
         }
         JsonElement release;
-        try { release = await FinishedAsync(actor.BuildClient, id); }
+        try { release = await FinishedAsync(actor.BuildClient, id, powershellFailure ? "UNKNOWN" : "SUCCESS"); }
         catch
         {
             TestContext.Out.WriteLine(await linux.ProcessStatesAsync());
@@ -386,10 +473,41 @@ public sealed class PilotAcceptanceCases
         Assert.That(release.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Release"));
         Assert.That(release.TryGetProperty("composite", out var composite) && composite.GetBoolean(), Is.False);
         var windowsId = release.GetProperty("snapshot-dependencies").GetProperty("build").EnumerateArray().Single().GetProperty("id").GetInt64();
-        var windows = await FinishedAsync(actor.BuildClient, windowsId);
+        var windows = await FinishedAsync(actor.BuildClient, windowsId, powershellFailure ? "FAILURE" : "SUCCESS");
         Assert.That(windows.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Windows"));
+        if (powershellFailure)
+        {
+            Assert.That(windows.GetProperty("failedToStart").GetBoolean(), Is.False);
+            Assert.That(release.GetProperty("failedToStart").GetBoolean(), Is.True);
+            await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+            var result = Vivarium.Contracts.V1.BuildResult.Parser.ParseFrom((await database.RuntimeBuildResults.SingleAsync(r => r.BuildId == windowsId)).Evidence);
+            Assert.That(result.VcsCheckout.Succeeded, Is.True);
+            Assert.That(result.VcsCheckout.Revision, Is.EqualTo(selectedRevision));
+            Assert.That(result.Steps.Single().ExitCode, Is.EqualTo(7));
+            Assert.That(await database.RuntimeBuildExecutions.CountAsync(), Is.EqualTo(2), "No Release execution follows the actual PowerShell failure.");
+            Assert.That(await database.RuntimeBuildArtifacts.AnyAsync(a => a.BuildId == id || a.BuildId == windowsId), Is.False);
+            return;
+        }
         var prepareId = windows.GetProperty("snapshot-dependencies").GetProperty("build").EnumerateArray().Single().GetProperty("id").GetInt64();
         var prepare = await FinishedAsync(actor.BuildClient, prepareId);
+        if (docker)
+        {
+            await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+            var ids = new List<string>();
+            foreach (var build in new[] { prepareId, id })
+            {
+                var result = Vivarium.Contracts.V1.BuildResult.Parser.ParseFrom((await database.RuntimeBuildResults.SingleAsync(r => r.BuildId == build)).Evidence);
+                var step = result.Steps.Single();
+                Assert.That(step.Container.Removed, Is.True);
+                Assert.That(step.Container.ProcessExitCode, Is.Zero);
+                Assert.That(step.Container.ImageId, Does.StartWith("sha256:"));
+                var independent = await database.RuntimeBuildObservations.SingleAsync(o => o.BuildId == build && o.Phase == "COMPLETED");
+                Assert.That(Vivarium.Contracts.V1.ContainerStepReceipt.Parser.ParseFrom(independent.ContainerEvidence!), Is.EqualTo(step.Container));
+                ids.Add(step.Container.ContainerId);
+            }
+            Assert.That(ids.Distinct().Count(), Is.EqualTo(2));
+            Assert.That(await containerRuntime!.RemainingAsync(), Is.Empty);
+        }
         Assert.That(prepare.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Prepare"));
         Assert.That(new[] { id, windowsId, prepareId }.Distinct().Count(), Is.EqualTo(3));
         Assert.That(release.GetProperty("artifact-dependencies").GetProperty("build").EnumerateArray().Select(b => b.GetProperty("id").GetInt64()),
@@ -422,6 +540,31 @@ public sealed class PilotAcceptanceCases
                 using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + build));
                 Assert.That(native.RootElement.GetProperty("source").GetProperty("consumedRevision").GetString(), Is.EqualTo(selectedRevision));
             }
+            if (powershell)
+            {
+                using var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+                await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
+                await using var context = await browser.NewContextAsync(new() { IgnoreHTTPSErrors = true });
+                await actor.AddBrowserSessionAsync(context);
+                var page = await context.NewPageAsync();
+                await page.GotoAsync(host.Origin + "builds/" + windowsId);
+                await page.GetByTestId("selected-revision").Filter(new() { HasText = selectedRevision! }).WaitForAsync();
+                await page.GetByTestId("consumed-revision").Filter(new() { HasText = selectedRevision! }).WaitForAsync();
+                await page.SetViewportSizeAsync(390, 844);
+                Assert.That(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth <= window.innerWidth"), Is.True);
+                var repository = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
+                while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "Vivarium.slnx"))) repository = repository.Parent;
+                using var oracle = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
+                    "tests/Vivarium.Tests/TeamCity/Reference/powershell-profile-observations.json")));
+                await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+                var execution = await database.RuntimeBuildExecutions.SingleAsync(e => e.BuildId == windowsId);
+                var assignment = host.Services.GetRequiredService<Vivarium.Controller.Builds.Runtime.RuntimeBuildSecrets>()
+                    .ReadAssignment(windowsId, execution.Assignment, execution.AssignmentProtectionVersion);
+                Assert.That(assignment.Steps[0].Program, Is.EqualTo(oracle.RootElement.GetProperty("observation").GetProperty("executable").GetString()));
+                var expected = oracle.RootElement.GetProperty("observation").GetProperty("arguments").EnumerateArray().Select(v => v.GetString()!).ToArray();
+                expected[^1] = "windows.ps1"; // Only the fixture's source path differs from the recipe control.
+                Assert.That(assignment.Steps[0].Args, Is.EqualTo(expected));
+            }
         }
         if (reuse)
         {
@@ -445,7 +588,21 @@ public sealed class PilotAcceptanceCases
 
     private static string ReuseSettings => Settings.Replace(", \"CANCEL\", \"CANCEL\")", ", \"CANCEL\", \"CANCEL\", true, true)", StringComparison.Ordinal);
 
-    private static async Task<JsonElement> FinishedAsync(HttpClient client, long id)
+    private static string WithDocker(string settings, string image)
+    {
+        foreach (var name in new[] { "prepare", "release" })
+        {
+            var header = $"new(\"{name}\", \"{(name == "prepare" ? "Prepare" : "Release")}\", \"simpleRunner\", [";
+            Assert.That(settings, Does.Contain(header));
+            settings = settings.Replace(header, header
+                + "new(\"plugin.docker.imageId\", " + JsonSerializer.Serialize(image) + ", null), "
+                + "new(\"plugin.docker.imagePlatform\", \"linux\", null), "
+                + "new(\"plugin.docker.run.parameters\", \"--user 0 --init --platform linux/amd64 --volume t3-personal-vite:/root/.vite-plus\", null), ", StringComparison.Ordinal);
+        }
+        return settings;
+    }
+
+    private static async Task<JsonElement> FinishedAsync(HttpClient client, long id, string expectedStatus = "SUCCESS")
     {
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(90));
         while (true)
@@ -453,7 +610,7 @@ public sealed class PilotAcceptanceCases
             using var response = JsonDocument.Parse(await client.GetStringAsync("/app/rest/builds/id:" + id, deadline.Token));
             var build = response.RootElement;
             if (build.GetProperty("state").GetString() == "finished")
-            { Assert.That(build.GetProperty("status").GetString(), Is.EqualTo("SUCCESS")); return build.Clone(); }
+            { Assert.That(build.GetProperty("status").GetString(), Is.EqualTo(expectedStatus)); return build.Clone(); }
             await Task.Delay(100, deadline.Token);
         }
     }

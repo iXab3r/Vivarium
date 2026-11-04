@@ -330,6 +330,61 @@ retains the already selected revision and runs no user steps. Public errors cont
 never Git stderr. This selected profile does not accept private source credentials, arbitrary checkout
 rules, source-aware reuse, full VCS resource CRUD, Docker runners or their remaining fault variants.
 
+### Selected container process seam (D47, US-013 PILOT)
+
+`teamcity.container-runner.v1` adds `Step.container` (tag 10) and
+`StepResult.container` (tag 5), retaining the existing Build assignment, lease, session fences,
+step-completion observation and terminal result. Only an installed Linux x64 module advertises it;
+the fresh Host explicitly negotiates it and rechecks support and typed platform observations at
+selection and delivery. Other controllers and stale Agents keep their existing process contract.
+Bootstrap and reserved AgentMsg tag 7 remain unchanged. This contract has selected real
+private-Engine, ordinary REST failure/cancel and full Docker → Windows PowerShell → Docker chain
+evidence; PILOT acceptance remains open.
+
+The operator supplies an HTTPS origin, private client certificate directory and bounded stable
+scope in the local Agent installation. Mutual TLS validates the private CA and server hostname;
+there is no HTTP, proxy, redirect, Host-socket or project-selected runtime fallback. API requests
+use Engine v1.45, 30-second control deadlines, 4-MiB JSON bounds and a five-minute image-pull
+deadline with 64-KiB progress-line bounds. Errors retain typed codes, never remote response bodies.
+Transient Engine failures do not erase binary capability support.
+
+The selected input is one immutable `repository@sha256` image, `linux/amd64`, a numeric UID/GID,
+optional init and at most eight non-overlapping named caches. Cache names resolve beneath the
+installed scope; existing volumes must carry that owner. The Build workspace and generated private
+scripts are separate mounts; the latter is read-only. Workloads receive no Agent data, runtime TLS
+keys, outer Docker socket, host PID namespace or privileged mode. The dedicated Engine used for
+acceptance is a trusted privileged installation with its own graph and workspace volumes; its
+workloads are ordinary containers. This is not VM isolation or complete native resource governance.
+
+A secret-free helper owns the container namespace. The actual command uses Exec with an explicit
+environment, directly attached non-TTY stdout/stderr and no container log driver. Run secrets are
+not placed in Container.Config, image metadata, command arguments or generated files. The trusted
+Engine installation also keeps `/run` and `/tmp` on tmpfs, so OCI runtime process specifications do
+not become persistent graph data; daemon request-body/debug logging is disabled. Moby's pinned
+[container state](https://github.com/moby/moby/blob/docker-v29.3.1/daemon/container/container.go)
+excludes ExecCommands from its on-disk JSON; its
+[Exec store](https://github.com/moby/moby/blob/docker-v29.3.1/daemon/container/exec.go)
+retains the command environment in memory. Those source facts do not by themselves prove the
+runtime filesystem or log boundary. The output
+decoder handles bounded chunks of Docker's eight-byte multiplexed frames and feeds the existing
+post-mask spool, watermarks and loss evidence. The initial profile requires `/bin/sh` in the image.
+
+The durable local journal records Engine identity and scope before preparation, creation intent
+before Create and actual container ID before Start. An interrupted known container is checked by
+Engine ID, container ID, name and scope/Build labels, then stopped/removed before capacity returns.
+Unacknowledged creation or changed ownership/Engine remains quarantined. A subsequent native step
+retires the prior container proof before native process creation. Graceful stop signals TERM to the
+owned namespace and waits; explicit force, step timeout or output failure permits containment.
+Removal is followed by an independent absent-object read on the same Engine.
+
+Receipts keep actual image/container/Exec identities and nullable user-process exit separate from
+the runner exit. The pinned TeamCity missing-image case is an ordinary failure with runner code 1
+and `failedToStart=false`; it creates no fictitious user exit. Completed receipts are committed with
+immutable step observations and must agree with final evidence. The reference corpus also captures
+success/exact artifact bytes, exit 7 and cancellation only after observing the actual Node
+executable, with no remaining containers and fully owned cleanup. General Docker options, private
+registries, non-Linux platforms and arbitrary runner families remain unaccepted.
+
 ### AgentPolicyBundle application
 
 Git-backed agent policy is delivered as a validated, authenticated `AgentPolicyBundle`, not as

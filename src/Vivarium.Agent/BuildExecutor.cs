@@ -36,7 +36,9 @@ public static partial class BuildExecutor
         Func<AgentMsg, CancellationToken, Task> send,
         string sessionId,
         BuildStopController stop,
-        Action<Process?>? observeProcess)
+        Action<Process?>? observeProcess,
+        DockerRuntimeOptions? dockerRuntime = null,
+        Action<ContainerJournalRecord>? observeContainer = null)
     {
         var workdir = ResolveUnder(workRoot, assignment.BuildId);
         Directory.CreateDirectory(workdir);
@@ -104,7 +106,16 @@ public static partial class BuildExecutor
                     i,
                     stopping ? "CANCELLATION_CLEANUP" : "RUNNING",
                     stepToken);
-                execution = await RunStepAsync(
+                if (step.Container is not null)
+                {
+                    Directory.CreateDirectory(ResolveUnder(workdir, "results"));
+                    if (dockerRuntime is null || observeContainer is null)
+                        throw new InvalidDataException("The container runtime is not installed.");
+                    var container = await DockerWorkload.RunAsync(dockerRuntime, workdir, assignment, i, step,
+                        send, stop, stepToken, observeContainer, publisher);
+                    execution = new(container.Result, stop.Mode != BuildStopMode.Unspecified, container.OutputComplete);
+                }
+                else execution = await RunStepAsync(
                     workdir, assignment, i, step, send, stop, stepToken, observeProcess, publisher);
             }
             catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
@@ -276,6 +287,8 @@ public static partial class BuildExecutor
             psi.Environment[key] = value;
         }
 
+        // Retire a prior container's removal proof before a new native creation can race a crash.
+        observeProcess?.Invoke(null);
         using var process = Process.Start(psi)
             ?? throw new InvalidOperationException($"failed to start '{step.Program}'");
         try
@@ -471,6 +484,9 @@ public static partial class BuildExecutor
     }
 
     private sealed record StepExecution(StepResult Result, bool Stopped, bool OutputComplete);
+
+    internal static string PrivateInputsForContainer(string workdir, string buildId) =>
+        PrivateInputs(Path.GetDirectoryName(workdir)!, buildId);
 
     [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
     private static extern int Kill(int processId, int signal);

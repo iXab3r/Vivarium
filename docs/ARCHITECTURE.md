@@ -1573,6 +1573,42 @@ separate compatibility gate passes. R0 uses two distinct behavioral obligations 
 their passes cannot be reported as GREEN for the deferred full wire cases. Other D36-D40 compatibility,
 ledger, independent-review and zero-debt gates retain their meaning within this revised scope.
 
+### D47. Container steps retain remote workload ownership independently of a local process
+
+US-013's Docker-wrapped recipe needs a negotiated Agent execution seam, not a shell command whose
+exit is mistaken for container termination. `teamcity.container-runner.v1` owns one exclusive step
+inside the existing Build/Agent lease. It does not add a scheduler, fleet provider or Bootstrap work.
+The initial platform is Linux x64 with an operator-provisioned Docker Engine connection; other
+platforms and unproved runner variants are not advertised as supported.
+
+The trusted installation supplies the runtime endpoint, private mutual-TLS material and stable
+ownership scope outside project definitions. A project cannot choose that connection or receive its
+credentials. Source/Git owns image/command/environment and selected named-cache declarations;
+runtime connection settings do not become editable project configuration or a second Git desired
+authority. Use a dedicated engine for this story's repeatable tests and final build; do not mount the
+working machine's Docker socket or Agent credentials into a workload. The engine is a trusted
+administrative component, not a VM-grade boundary against kernel/daemon compromise.
+
+Durably record container creation intent before dispatch, then its immutable actual ID and ownership
+labels before starting user work. Container IDs, image identity, actual exit and verified removal
+remain distinct from local PIDs, stream connections and Build outcome. Graceful cancellation sends
+TERM and waits; hard kill needs the existing force/timeout/containment authority. Never free capacity
+because a client disconnected or exited. Reconcile an interrupted owned container before reporting
+the Agent ready; uncertain creation/ownership/stop remains quarantined. Never stop an object whose
+identity/scope does not match the durable intent.
+
+Transfer environment values through the private runtime request, never command arguments, Git,
+public representations or ordinary diagnostics; retain D45 protected assignments and output masking.
+The trusted Engine installation keeps OCI/Exec runtime state and temporary process specifications
+on memory-backed runtime directories, with request-body/debug logging disabled. Secrets must not
+enter the persistent Engine graph; an in-memory application map alone is not sufficient evidence.
+Stream actual stdout/stderr through the existing bounded output producer and final-watermark/gap
+contract. An independently committed step/container receipt must agree with the terminal result.
+Partial output or lost runtime authority cannot manufacture a successful/clean-host receipt.
+Append protocol fields and gate their delivery on negotiated support. This is an execution contract,
+not acceptance of all Docker parameters, compatible error strings or publication behavior; freeze
+and bind the used TeamCity profiles before public integration and retain the D39/PILOT final gates.
+
 ## 5. Protocol sketch
 
 ```proto

@@ -30,8 +30,12 @@ Explicit successful snapshot reuse and durable queued-request resolution also ha
 The branch now adds anonymous ON_AGENT Git checkout on Windows/Linux, separate immutable selected
 and consumed workload revisions, same-chain revision pinning, private generated script inputs and
 source-collection/missing-Git failure evidence. These are selected cohorts, not PILOT/main acceptance;
-source-aware reuse, remaining source fault/authority profiles, actual Docker/PowerShell runners,
-triggers, large artifacts and T3 publication remain due.
+the selected recipe now also runs actual Docker Prepare/Release and Windows Desktop PowerShell
+FILE/PS1/x64, with immutable step/container receipts, scoped cache and exact bytes. D47 adds private
+Engine ownership and conservative restart recovery; selected actual owner-death and live synthetic
+secret metadata/output checks have evidence. These runner cohorts do not accept their complete API
+families. Source-aware reuse, remaining source fault/authority profiles, triggers, large artifact
+rules/streaming, targeted chain secrets and actual T3 publication remain due.
 
 Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object

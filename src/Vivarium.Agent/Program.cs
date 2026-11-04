@@ -8,11 +8,14 @@ string? enrollToken = ArgValue(args, "--token");
 var dataDir = ArgValue(args, "--data");
 
 var configPath = ArgValue(args, "--config");
+DockerRuntimeOptions? dockerRuntime = null;
 if (configPath != null)
 {
     using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
     url = doc.RootElement.GetProperty("controllerUrl").GetString();
     fingerprint = doc.RootElement.GetProperty("certFingerprint").GetString();
+    if (doc.RootElement.TryGetProperty("dockerRuntime", out var runtime))
+        dockerRuntime = JsonSerializer.Deserialize<DockerRuntimeOptions>(runtime.GetRawText(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     if (enrollToken == null &&
         doc.RootElement.TryGetProperty("enrollToken", out var t) &&
         t.ValueKind == JsonValueKind.String)
@@ -44,6 +47,7 @@ var runner = new AgentRunner(new AgentOptions
     UpgradeFailureCode = ArgValue(args, "--upgrade-failure-code"),
     BootstrapLeasePath = ArgValue(args, "--bootstrap-lease"),
     BootstrapLeaseId = ArgValue(args, "--bootstrap-lease-id"),
+    DockerRuntime = dockerRuntime,
 });
 
 Console.WriteLine($"viv-agent {AgentRunner.Version} (agent id {runner.AgentId})");

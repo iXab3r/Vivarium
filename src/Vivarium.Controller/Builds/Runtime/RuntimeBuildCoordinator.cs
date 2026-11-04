@@ -133,7 +133,9 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                     || !Current(agent, connection!) || !connection!.Protocol.SupportsDurableBuildOutput
                     || !connection.Protocol.SupportsLiteralArtifactPublisher) continue;
                 if (input.SourceJson is not null && !connection.Protocol.SupportsVcsCheckout) continue;
+                if (RuntimeStepCompiler.RequiresContainer(config) && !connection.Protocol.SupportsContainerRunner) continue;
                 var reported = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.ReportedParametersJson, Json)!;
+                if (!RuntimeStepCompiler.MatchesRunnerPlatform(config, reported, agent.StaticObservationJson)) continue;
                 if (!reported.TryGetValue("system.os.family", out var platform) || platform is not ("windows" or "linux" or "macos")) continue;
                 var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.CustomParametersJson, Json)!;
                 var parameters = new Dictionary<string, string>(reported, StringComparer.Ordinal);
@@ -151,6 +153,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                         agent.ReportedName, agent.DesiredName, reportedParameters = reported, customParameters = custom,
                         agent.CredentialGeneration, agent.ConnectionGeneration, agent.CurrentSessionId,
                         negotiatedCapabilities = JsonSerializer.Deserialize<JsonElement>(agent.NegotiatedCapabilitiesJson),
+                        staticObservation = agent.StaticObservationJson is null ? (JsonElement?)null : JsonSerializer.Deserialize<JsonElement>(agent.StaticObservationJson),
                         agent.DesiredRevision, poolId = 0, trustClass = "operator-enrolled-physical",
                         cleanPolicy = "clean-workdir", input.RevisionId, definition.PlanHash }, Json),
                 };
@@ -309,7 +312,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(currentAgent.CustomParametersJson, Json)!;
             var effective = new Dictionary<string, string>(reported, StringComparer.Ordinal);
             foreach (var pair in custom) effective[pair.Key] = pair.Value;
-            if (reported.GetValueOrDefault("system.os.family") != os || ReadDefinition(definition).Requirements
+            if (RuntimeStepCompiler.RequiresContainer(ReadDefinition(definition)) && !connection!.Protocol.SupportsContainerRunner
+                || reported.GetValueOrDefault("system.os.family") != os || !RuntimeStepCompiler.MatchesRunnerPlatform(ReadDefinition(definition), reported, currentAgent.StaticObservationJson) || ReadDefinition(definition).Requirements
                 .Any(r => !effective.TryGetValue(r.Name, out var value) || value != r.Value))
             {
                 await transaction.RollbackAsync(token);
@@ -320,6 +324,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 currentAgent.AgentId, currentAgent.TeamCityId, currentAgent.ReportedName, currentAgent.DesiredName,
                 reportedParameters = reported, customParameters = custom, currentAgent.CredentialGeneration,
                 currentAgent.CurrentSessionId, currentAgent.ConnectionGeneration, currentAgent.DesiredRevision,
+                staticObservation = currentAgent.StaticObservationJson is null ? (JsonElement?)null : JsonSerializer.Deserialize<JsonElement>(currentAgent.StaticObservationJson),
                 negotiatedCapabilities = JsonSerializer.Deserialize<JsonElement>(currentAgent.NegotiatedCapabilitiesJson) }, Json);
             owner.AcknowledgementDeadline = now.AddSeconds(30);
             foreach (var payload in prepared.Payloads) state.RuntimeBuildPayloads.Add(payload);
@@ -614,6 +619,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             || result.Steps.Any(s => s.StepIndex < 0 || s.StepIndex >= assignment.Steps.Count)
             || result.Steps.Select(s => s.StepIndex).Distinct().Count() != result.Steps.Count)
             throw new InvalidDataException("The terminal result is invalid.");
+        foreach (var step in result.Steps) RuntimeContainerReceipt.Validate(step, assignment.Steps[step.StepIndex]);
         if (result.Outcome == BuildOutcome.Succeeded && (result.Steps.Count != assignment.Steps.Count
             || result.Steps.Any(s => s.Skipped || s.ExitCode != 0 || s.TimedOut)))
             throw new InvalidDataException("Successful execution conflicts with its step evidence.");

@@ -29,7 +29,12 @@ paged users, role assignments and account enablement through common PostgreSQL s
 US-013 PILOT branch also adds project/configuration navigation, active requirements/dependency views,
 ordinary chain run/cancel, Build deep links, current status, paged output and actual artifact downloads
 through native `/api/v1`. Its selected real Windows/Linux browser journey includes an unchanged-cookie
-permission withdrawal; this is not full PILOT/main acceptance. Full readiness/history, remaining CI
+permission withdrawal; this is not full PILOT/main acceptance.
+The selected Source build view now displays the declared root/branch, selected workload revision and
+actual checked-out revision separately, with truthful pending/unavailable outcomes. It keeps those
+fields current without clearing paged output; the real source/PowerShell case verifies them after
+a Host restart and at a 390-pixel viewport. No bearer secret or private assignment is sent to the page.
+Full readiness/history, remaining CI
 views, Nodes and complete Access editing remain due; the legacy panel is not retired by this view.
 Monaco is retained as Workbench 0.2.6's required peer, not a newly exposed configuration editor.
 

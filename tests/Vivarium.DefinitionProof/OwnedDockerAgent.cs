@@ -6,7 +6,7 @@ using System.Text;
 namespace Vivarium.DefinitionProof;
 
 /// <summary>One dedicated Linux process, with only its own data and bootstrap plus read-only Agent binaries.</summary>
-internal sealed class OwnedDockerAgent(string root, bool gitTools = false) : IAsyncDisposable
+internal sealed class OwnedDockerAgent(string root, bool gitTools = false, OwnedContainerRuntime? runtime = null) : IAsyncDisposable
 {
     private const string Owner = "us013-r0-runtime-proof";
     private string Image => gitTools ? "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
@@ -27,6 +27,7 @@ internal sealed class OwnedDockerAgent(string root, bool gitTools = false) : IAs
         {
             controllerUrl = $"https://host.docker.internal:{origin.Port}",
             certFingerprint = certificate.GetCertHashString(HashAlgorithmName.SHA256), enrollToken = enrollment,
+            dockerRuntime = runtime is null ? null : new Vivarium.Agent.DockerRuntimeOptions("https://docker:2376", "/cert-client", runtime.Scope),
         }));
         volumeCreated = true;
         await ProofProcess.RunAsync("docker", ["volume", "create", "--label", "vivarium.owner=" + Owner, Volume]);
@@ -39,7 +40,7 @@ internal sealed class OwnedDockerAgent(string root, bool gitTools = false) : IAs
             "--security-opt", "no-new-privileges", "--read-only", "--tmpfs", "/tmp:rw,nosuid,size=16m", "--user", "1654:1654",
             "--mount", $"type=bind,source={binaries},target=/app,readonly",
             "--mount", $"type=bind,source={bootstrap},target=/bootstrap.json,readonly",
-            "--mount", $"type=volume,source={Volume},target=/data", Image,
+            "--mount", $"type=volume,source={Volume},target=/data", .. (runtime?.MountArguments ?? []), Image,
             "dotnet", "/app/Vivarium.Agent.dll", "--config", "/bootstrap.json", "--data", "/data"]);
     }
 

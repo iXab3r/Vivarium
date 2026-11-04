@@ -126,11 +126,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -171,13 +171,14 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       },
-      "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
+      "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001",
+      "product_test_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
     },
     {
       "id": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
@@ -217,13 +218,14 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       },
-      "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
+      "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001",
+      "product_test_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
     },
     {
       "id": "PILOT-CHAIN-ROOT-CANCEL-001",
@@ -263,13 +265,14 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       },
-      "display_name": "PILOT-CHAIN-ROOT-CANCEL-001"
+      "display_name": "PILOT-CHAIN-ROOT-CANCEL-001",
+      "product_test_name": "PILOT-CHAIN-ROOT-CANCEL-001"
     },
     {
       "id": "PILOT-CHAIN-UNCHANGED-CLI-001",
@@ -324,11 +327,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -365,11 +368,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -408,11 +411,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -456,11 +459,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -504,11 +507,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -551,12 +554,13 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
-        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
-        "cohort_passed": 13,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
-      }
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      },
+      "product_test_name": "PILOT-CHAIN-FAILED-PRODUCER-NOT-REUSED-001"
     },
     {
       "id": "PILOT-SOURCE-COLLECTION-FAILURE-001",
@@ -607,11 +611,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
-        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
-        "cohort_passed": 3,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -663,11 +667,11 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
-        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
-        "cohort_passed": 3,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
       }
     },
     {
@@ -719,15 +723,377 @@
       ],
       "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
-        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
-        "cohort_passed": 3,
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
         "cohort_failed": 0,
-        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-POWERSHELL-FILE-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/powershell-profile-observations.json",
+        "sha256": "b5813d36dbbc409be113149b1acb03dac4ae97bc5d91916175dcff65ee9c0a70",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual vendor default edition/arguments plus product Windows execution, exact source artifacts and Workbench source reads after restart.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.The_recipe_PowerShell_FILE_PS1_x64_profile_runs_the_checked_out_script_on_Windows",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-POWERSHELL-NONZERO-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/powershell-profile-observations.json",
+        "sha256": "b5813d36dbbc409be113149b1acb03dac4ae97bc5d91916175dcff65ee9c0a70",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual Desktop PowerShell exits7; dependent Release never executes; selected revision remains intact.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.A_real_PowerShell_nonzero_exit_is_retained_and_prevents_the_dependent_Release",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-POWERSHELL-SOURCE-CHAIN-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual immutable-image Docker Prepare/Release, shared scoped cache, Windows PowerShell, independent immutable container receipts, exact bytes and source reads after restart.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.The_complete_source_chain_uses_real_Docker_PowerShell_and_owned_cache_with_exact_bytes",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/container-private-runtime-renewal.trx",
+        "sha256": "0c8b29698e3d51bd8a3c5bddb68ece5ff60fda811b7edbdea26ae4dcbee48af9",
+        "limits": "Selected current positive chain/Engine boundary; corresponding three ordinary REST failure/cancel cases remain from the combined cohort."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-EXIT7-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual exit7 through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"exit7\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/container-private-runtime-renewal.trx",
+        "sha256": "0c8b29698e3d51bd8a3c5bddb68ece5ff60fda811b7edbdea26ae4dcbee48af9",
+        "limits": "Selected current positive chain/Engine boundary; corresponding three ordinary REST failure/cancel cases remain from the combined cohort."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-MISSING_IMAGE-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual missing-image through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"missing-image\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/container-private-runtime-renewal.trx",
+        "sha256": "0c8b29698e3d51bd8a3c5bddb68ece5ff60fda811b7edbdea26ae4dcbee48af9",
+        "limits": "Selected current positive chain/Engine boundary; corresponding three ordinary REST failure/cancel cases remain from the combined cohort."
+      }
+    },
+    {
+      "id": "PILOT-CONTAINER-CANCEL-001",
+      "kind": "selected-runner-behavior",
+      "primary_subsystem": "SS-EXEC",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-VCS",
+        "SS-AGT",
+        "SS-CFG",
+        "SS-BLOB",
+        "SS-IAM",
+        "SS-LOG"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/docker-runner-observations.json",
+        "sha256": "6920631164acae79b0f4a9ddab172b179cfb99860bb0baf95dfdaa71d50e1094",
+        "interpretation": "Independent pinned vendor control/reference. Product process and platform evidence remains distinct; no full runner-family wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Fresh owned Host/PG/Git/Storage, real Windows Agent and dedicated Linux Agent/private Engine as required by the case.",
+      "entry": "Ordinary actor compatible run/cancel and native/shared reads; selected positive includes Workbench source observations.",
+      "effect": "Actual cancel through ordinary compatible REST: pinned status/number/failedToStart, real container removal, healthy capacity and nullable actual user exit.",
+      "completion": "Actual processes, immutable receipts, exact bytes and owned cleanup. No built T3 application execution.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Docker_failures_and_running_cancel_match_the_reference_and_release_actual_capacity(\"cancel\")",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Only the captured recipe profile and bound behavior; complete runner families, broader platform/fault/publication acceptance remain open.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/runner-twenty-case-cohort.trx",
+        "sha256": "b68ff22d12a6df6bf9e9972bb45c3183749c9cceb4368ce1fa2d680647f773c0",
+        "cohort_passed": 20,
+        "cohort_failed": 0,
+        "qualification": "19 selected story rows plus one SDK case containing runtime and actual owner-death recovery. Combined cohort precedes bounded containment-exception refinement; current Docker/source/PowerShell positive chain and private-runtime SDK renewed2/2, then SDK1/1 after metadata-scan fixture error handling. See runner-checkpoint/receipt.json; no final-revision milestone claim."
+      },
+      "supporting_renewal": {
+        "path": "artifacts/pilot-chain/results/container-private-runtime-renewal.trx",
+        "sha256": "0c8b29698e3d51bd8a3c5bddb68ece5ff60fda811b7edbdea26ae4dcbee48af9",
+        "limits": "Selected current positive chain/Engine boundary; corresponding three ordinary REST failure/cancel cases remain from the combined cohort."
       }
     }
   ],
-  "remaining_due": "Complete US-013 remains in #78/#116/#117/#118: source-aware reuse and due source/authority/cancel/recovery variants, actual recipe Docker/PowerShell runners and large selected artifact rules/bytes, UI source/readiness/operations, used trigger/coexistence/single-publisher controls, actual T3 build/package and test-repository release, cumulative gates and independent final review/main. Selected surface and source cases do not close their broader API families.",
+  "remaining_due": "Complete #78/#116/#117/#118: source-aware reuse, remaining current-rights/cancel/restart variants, large selected artifact rules and streaming, targeted temporary chain secrets, UI readiness/operations, used triggers/coexistence/single publisher, actual T3 build/package and test-repository release, cumulative R0 gates, final exact-revision ledger/review/main. Selected Docker/PowerShell cases do not close their whole API families.",
   "global_variant_denominator": null,
   "api_complete": false
 }

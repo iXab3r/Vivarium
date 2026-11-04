@@ -6,9 +6,11 @@ interface Project { id: string; name: string }
 interface Configuration { id: string; name: string; projectId: string; activeRevisionId: string;
     snapshotDependencies?: string[]; artifactDependencies?: string[]; requirements?: { name: string; value: string }[] }
 interface Selection { id: number; configurationId: string; state: string; status: string }
+interface Source { rootId: string; branch: string; selectedRevision: string | null;
+    consumedRevision: string | null; checkoutFailure: string | null }
 interface Build { id: number; configurationId: string; projectId: string; number: string | null;
     state: string; status: string; statusText: string; agentId: string | null;
-    snapshotDependencies?: Selection[]; artifactDependencies?: Selection[] }
+    snapshotDependencies?: Selection[]; artifactDependencies?: Selection[]; source?: Source }
 interface Artifact { path: string; length: number; sha256: string; href: string }
 interface Output { items: { kind: string; reason?: string; content?: { href: string } }[];
     page: { nextCursor: string | null }; output: { state: string; resumeCursor: string } }
@@ -129,6 +131,24 @@ export function renderBuilds(host: HTMLElement): IDisposable {
             resetDetail(); element(detail, "h2", `${build.configurationId} #${build.number ?? build.id}`);
             const status = element(detail, "p", `${build.state} · ${build.status} · ${build.statusText}`); status.dataset.testid = "build-status";
             const agent = element(detail, "p", build.agentId ? "Agent: " + build.agentId : "No Agent assigned.");
+            const source = element(detail, "section", ""); source.setAttribute("aria-label", "Source revision");
+            source.className = "build-source";
+            element(source, "h3", "Source");
+            const sourceRoot = element(source, "p", ""), selectedRevision = element(source, "p", ""), consumedRevision = element(source, "p", "");
+            selectedRevision.dataset.testid = "selected-revision"; consumedRevision.dataset.testid = "consumed-revision";
+            function updateSource(value: Source | undefined) {
+                source.hidden = !value;
+                if (!value) return;
+                sourceRoot.textContent = `${value.rootId} · ${value.branch}`;
+                selectedRevision.textContent = "Selected revision: " + (value.selectedRevision === "N/A" ? "Unavailable" : value.selectedRevision ?? "Waiting for source selection");
+                const failures: Record<string, string> = {
+                    git_unavailable: "Git is unavailable on the Agent", git_init_failed: "The Agent could not prepare a Git working directory",
+                    fetch_failed: "The Agent could not fetch the selected revision", checkout_failed: "The Agent could not check out the selected revision",
+                    checkout_denied: "The Agent could not access the checkout files", revision_mismatch: "The checkout revision differs from the selected revision",
+                };
+                consumedRevision.textContent = "Checked out revision: " + (value.consumedRevision ?? (value.checkoutFailure ? failures[value.checkoutFailure] ?? "Checkout unavailable" : "Pending"));
+            }
+            updateSource(build.source);
             const actions = element(detail, "div", ""); actions.className = "actions";
             button(actions, "Refresh build", () => { void showBuild(id); });
             let stop: WorkbenchButton | undefined;
@@ -178,6 +198,7 @@ export function renderBuilds(host: HTMLElement): IDisposable {
                     notice.textContent = "";
                     status.textContent = `${current.state} · ${current.status} · ${current.statusText}`;
                     agent.textContent = current.agentId ? "Agent: " + current.agentId : "No Agent assigned.";
+                    updateSource(current.source);
                     for (const [selections, states] of [[current.snapshotDependencies ?? [], snapshotStates], [current.artifactDependencies ?? [], artifactStates]] as const)
                         for (const selected of selections) {
                             const state = states.get(selected.id); if (state) state.textContent = `Build ${selected.id} · ${selected.state} · ${selected.status}`;
