@@ -18,6 +18,9 @@ public sealed class PilotReport
     public List<string> ProducerDrift { get; } = [];
     public int RawPassed => Cases.Count(c => c.Outcome == "Passed");
     public int CurrentGreen => Gaps.Count == 0 ? RawPassed : 0;
+    public string HeavyComposition { get; set; } = "UNQUALIFIED";
+    public List<string> HeavyGaps { get; } = [];
+    public string ReferenceGates => "#117/#118: selection denial, missing bytes, conflict and changed-HEAD reference variants remain due/unaccepted; seven declarations are not literal wire GREEN";
     public List<PilotCase> HeavyRawResults { get; } = [];
 }
 public sealed record PilotCase(string Id, string Binding, string Outcome);
@@ -28,6 +31,7 @@ public static partial class Ledger
     public static PilotReport ReadPilot(string root, string candidate, string assessmentPath,
         Func<string, Identity>? inspect = null)
     {
+        root = Path.GetFullPath(root);
         var report = new PilotReport { Candidate = candidate };
         try
         {
@@ -49,7 +53,7 @@ public static partial class Ledger
             var seal = Bound("seal");
             var sealedPaths = seal["inputs"]!.AsArray().Select(e => S(e!, "path")).ToHashSet();
             foreach (var required in identity.RequiredInputPaths ?? [])
-                if (!sealedPaths.Contains(required)) report.Gaps.Add("Execution seal omits current required input: " + required);
+                if (!sealedPaths.Contains(required)) QualifyPilotInput(root, assessment, required, null, "addition", report.Gaps);
             var bindings = Bound("bindings").AsArray();
             var discovery = assessment["discovery"]!;
             Require(Hash(root, S(discovery, "path")) == S(discovery, "sha256"), "Discovery hash mismatch.");
@@ -89,29 +93,111 @@ public static partial class Ledger
             // A changed source/binary requires an input-specific impact decision, never a blanket summary.
             foreach (var path in report.InputDrift.Concat(report.ProducerDrift))
             {
-                var decisions = assessment["impact_bindings"]?.AsArray().Where(d => S(d!, "path") == path).ToArray() ?? [];
-                if (decisions.Length != 1 || S(decisions[0]!, "current_sha256") != Hash(root, path)
-                    || S(decisions[0]!, "classification") != "no_selected_behavior_impact"
-                    || string.IsNullOrWhiteSpace(S(decisions[0]!, "rationale")))
-                    report.Gaps.Add("Unqualified source/producer impact: " + path);
+                var old = seal[report.InputDrift.Contains(path) ? "inputs" : "producers"]!.AsArray().Single(e => S(e!, "path") == path)!;
+                QualifyPilotInput(root, assessment, path, S(old, "sha256"),
+                    report.InputDrift.Contains(path) ? "source" : "producer", report.Gaps);
             }
+
             var decision = assessment["decision"];
             if (decision is null || S(decision, "to_candidate") != candidate || S(decision, "from_candidate") != S(receipt, "candidate")
                 || S(decision, "action") != "reuse" || string.IsNullOrWhiteSpace(S(decision, "assessor")))
                 report.Gaps.Add("Missing explicit execution-to-candidate reuse assessment.");
             if (rows.Any(r => r.Outcome != "Passed")) report.Gaps.Add("Required raw cohort contains non-Passed results.");
+            var heavyDiagnostics = new Report { Candidate = candidate };
             foreach (var heavy in assessment["heavy_results"]?.AsArray() ?? [])
             {
-                var observed = Results(root, heavy!, diagnostics);
+                var observed = Results(root, heavy!, heavyDiagnostics);
                 foreach (var row in observed)
-                    report.HeavyRawResults.Add(new(S(heavy!, "role"), row.Class + "." + row.Name, row.Outcome));
+                {
+                    var role = S(heavy!, "role");
+                    var expected = role switch {
+                        "ordinary-heavy-observer" => "Published_CLI_builds_packages_and_publishes_actual_T3_with_partial_draft_recovery_and_exact_bytes",
+                        "read-only-continuation" => "Retained_successful_CLI_chain_has_exact_remote_bytes_and_ordinary_readbacks",
+                        _ => "" };
+                    if (row.Class != "Vivarium.DefinitionProof.ActualT3AcceptanceCases" || row.Name != expected)
+                        report.HeavyGaps.Add("Wrong raw heavy test binding: " + role);
+                    if (role == "ordinary-heavy-observer" && !row.Message.Contains("could not be translated", StringComparison.Ordinal))
+                        report.HeavyGaps.Add("Heavy failure is not the retained observer translation failure.");
+                    report.HeavyRawResults.Add(new(role, row.Class + "." + row.Name, row.Outcome));
+                }
             }
-            report.Gaps.AddRange(diagnostics.Errors.Except(report.Gaps));
-            report.Gaps.Add("Heavy composition: raw results retained separately; exact asset/actor/readback receipt support and producer impact still require qualification.");
-            report.Gaps.Add("Unknown selection denial/missing-byte/conflict/changed-HEAD reference variants remain unaccepted.");
+            report.HeavyGaps.AddRange(heavyDiagnostics.Errors);
+            try { ReadPilotHeavy(root, assessment, report); }
+            catch (Exception e) when (e is IOException or InvalidDataException or InvalidOperationException or NullReferenceException or KeyNotFoundException)
+            { report.HeavyGaps.Add(e.Message); }
         }
         catch (Exception e) when (e is IOException or InvalidDataException or System.Text.Json.JsonException or InvalidOperationException or NullReferenceException or KeyNotFoundException)
         { report.Gaps.Add(e.Message); }
         return report;
     }
+    public static void QualifyPilotInput(string root, JsonNode assessment, string path, string? previous, string kind, List<string> gaps)
+    {
+        var decisions = assessment["impact_bindings"]?.AsArray().Where(d => S(d!, "path") == path).ToArray() ?? [];
+        if (decisions.Length != 1) { gaps.Add("Missing/duplicate impact assessment: " + path); return; }
+        var d = decisions[0]!;
+        if (S(d, "previous_sha256") != (previous ?? "ADDED") || S(d, "current_sha256") != Hash(root, path)
+            || S(d, "kind") != kind || S(d, "classification") != "no_selected_behavior_impact"
+            || new[] { "rationale", "assessor", "affected_binding", "evidence_category", "observed_diff", "independent_review" }
+                .Any(k => string.IsNullOrWhiteSpace(S(d, k)))
+            || d["evidence"] is not JsonArray evidence || evidence.Count == 0)
+        { gaps.Add("Invalid input-specific impact assessment: " + path); return; }
+        foreach (var e in evidence)
+            if (Hash(root, S(e!, "path")) != S(e!, "sha256")) gaps.Add("Impact evidence mismatch: " + path);
+        // Rationale is an attributed human judgment, not a mechanical behavioral oracle.
+        if (kind == "producer" && S(d, "producer_cause") is not ("metadata" or "test_only"))
+            gaps.Add("Unresolved runtime producer impact: " + path);
+    }
+
+    public static void ReadPilotHeavy(string root, JsonNode assessment, PilotReport report)
+    {
+        JsonNode Bound(string key)
+        {
+            var b = assessment["heavy_composition"]![key]!;
+            Require(Hash(root, S(b, "path")) == S(b, "sha256"), "Heavy hash mismatch: " + key);
+            return Json(root, S(b, "path"));
+        }
+        var cli = Bound("cli"); var receipt = Bound("receipt"); var execution = Bound("execution");
+        var definition = Bound("definition"); var manifest = Bound("manifest");
+        var version = S(receipt, "version"); var revision = S(receipt, "revision");
+        Require(S(cli, "outcome") == "succeeded" && cli["build"]!["id"]!.GetValue<int>() == 3
+            && receipt["rootBuildId"]!.GetValue<int>() == 3 && S(cli["build"]!, "number") == version,
+            "Heavy CLI/root identity mismatch.");
+        Require(revision == S(definition, "packageSource") && revision == S(manifest, "revision")
+            && version == S(manifest, "version"), "Heavy source mismatch.");
+        foreach (var key in new[] { "definitionGit", "scriptSha256", "helperSha256", "publisherSha256" })
+            Require(S(definition, key) == S(assessment["heavy_composition"]!["identity"]!, key), "Heavy definition mismatch: " + key);
+        var builds = execution["builds"]!.AsArray();
+        Require(builds.Count == 3 && builds.Select(b => b!["Id"]!.GetValue<int>()).SequenceEqual(new[] { 1, 2, 3 })
+            && builds.All(b => S(b!, "State") == "FINISHED" && S(b!, "Status") == "SUCCESS" && S(b!, "Number") == version),
+            "Heavy build graph mismatch.");
+        var release = receipt["release"]!;
+        Require(release["id"]!.GetValue<long>() == 434492192 && !release["draft"]!.GetValue<bool>()
+            && S(release, "tag_name") == "v" + version, "Heavy release identity mismatch.");
+        var assets = receipt["assets"]!.AsArray();
+        Require(assets.Count == 10, "Heavy asset count mismatch.");
+        Require(release["assets"]!.AsArray().Count == 10 && assets.Select(a => S(a!, "Path")).Distinct().Count() == 10,
+            "Heavy remote asset inventory mismatch.");
+        Require(execution["source"]!.AsArray().Count == 3 && execution["source"]!.AsArray().All(s => S(s!, "Version") == revision),
+            "Heavy selected source mismatch.");
+        var executions = execution["executions"]!.AsArray();
+        Require(executions.Count == 3 && executions.All(e => S(e!, "AgentId") == S(receipt,
+            e!["BuildId"]!.GetValue<int>() == 2 ? "windowsId" : "linuxId")), "Heavy assigned Agent mismatch.");
+        foreach (var asset in release["assets"]!.AsArray())
+        {
+            var name = S(asset!, "name");
+            Require(Path.GetFileName(name) == name && !name.Contains('\\') && !name.Contains('/'), "Heavy asset name is not a leaf.");
+            var file = S(assessment["heavy_composition"]!, "directory") + "/published/" + name;
+            var hash = Hash(root, file);
+            Require(S(asset!, "digest") == "sha256:" + hash && new FileInfo(SafePath(root, file)).Length == asset!["size"]!.GetValue<long>(),
+                "Heavy asset bytes mismatch: " + name);
+            var retained = assets.Single(a => S(a!, "Path") == "release/" + name)!;
+            Require(S(retained, "Sha256") == hash && retained["Length"]!.GetValue<long>() == asset!["size"]!.GetValue<long>(),
+                "Heavy receipt bytes mismatch: " + name);
+            if (manifest["files"]![name] is JsonNode digest) Require(digest.GetValue<string>() == hash, "Heavy manifest mismatch: " + name);
+        }
+        Require(report.HeavyRawResults.Any(r => r.Id == "ordinary-heavy-observer" && r.Outcome == "Failed")
+            && report.HeavyRawResults.Any(r => r.Id == "read-only-continuation" && r.Outcome == "Passed"), "Heavy raw observer/continuation identities missing.");
+        report.HeavyComposition = "CLI_SUCCESS_BYTES_VERIFIED; observer FAIL and read-only continuation PASS retained separately; actor/cookie/current-key observations require independent receipt/source review";
+    }
+
 }

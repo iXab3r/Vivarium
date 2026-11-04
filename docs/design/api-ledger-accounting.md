@@ -209,7 +209,20 @@ raw-result descriptor (artifact/sha256/counters/exit_code) plus a role. Original
 observer failure and subsequent read-only continuation have separate outcomes.
 Input and producer drift is reported individually. Missing candidate reuse decisions
 or input-specific impact support withholds current GREEN while preserving raw
-outcomes. This focused mode currently reports heavy composition support as a gap:
-raw test outcomes alone do not validate all asset/actor/readback boolean receipts.
+outcomes. Heavy composition has separate hash-bound CLI, graph/source/definition,
+remote metadata and exact downloaded-file checks. Actor/readback assertions remain
+bounded by the raw continuation and source review; summary booleans alone are insufficient.
 Legacy SQLite baseline currency, selected Chiral/PG evidence, unknown reference
 variants and review/debt/main acceptance remain separate. No runtime is executed.
+
+
+## PILOT input-specific transfer
+
+`--pilot` reports currency for the existing 33 business bindings plus required SDK separately
+from heavy composition, reference gaps, historical baseline and milestone acceptance. See the
+[bounded reuse assessment](pilot-reuse-assessment.md). `current_green` is selected evidence
+currency only. `heavy_gaps` must also be inspected; a successful exit does not accept a milestone.
+Each changed/additional input needs its old hash (or ADDED), current hash, affected binding,
+category, observed diff, assessor, rationale, hash-bound supporting evidence and explicit independent
+review requirement. Producer decisions additionally identify metadata or test-only cause; unknown
+runtime impact stays unqualified. These fields attribute human reasoning; they cannot prove it correct.

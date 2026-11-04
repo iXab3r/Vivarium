@@ -12,7 +12,7 @@ try
     {
         var pilot = Ledger.ReadPilot(args[0], args[1], args.Length == 4 ? args[3] : Ledger.Workstream + "pilot-api-evidence.json");
         Console.WriteLine(JsonSerializer.Serialize(pilot, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower }));
-        return pilot.Gaps.Count == 0 ? 0 : 1;
+        return pilot.Gaps.Count == 0 && pilot.HeavyGaps.Count == 0 ? 0 : 1;
     }
     if (args.Length >= 3 && args[2] == "--r0")
     {
