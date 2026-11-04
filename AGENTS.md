@@ -26,7 +26,12 @@ Prepare → Windows → Release integration remains in progress under #116–#11
 The active PILOT branch has selected real source-free Linux → Windows → Linux chain evidence through
 independent compatible REST, unchanged CLI 0.5.6 and Workbench entries, including exact selected
 artifact bytes, dependency failure/cancellation, native graph reads and same-cookie withdrawal.
-This is not PILOT/main acceptance; checkout, reuse, triggers, large artifacts and T3 publication remain due.
+Explicit successful snapshot reuse and durable queued-request resolution also have selected evidence.
+The branch now adds anonymous ON_AGENT Git checkout on Windows/Linux, separate immutable selected
+and consumed workload revisions, same-chain revision pinning, private generated script inputs and
+source-collection/missing-Git failure evidence. These are selected cohorts, not PILOT/main acceptance;
+source-aware reuse, remaining source fault/authority profiles, actual Docker/PowerShell runners,
+triggers, large artifacts and T3 publication remain due.
 
 Explicit local `init`, `nodes`, `migrate` and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
 Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object

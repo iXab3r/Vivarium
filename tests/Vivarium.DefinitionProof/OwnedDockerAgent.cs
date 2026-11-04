@@ -6,10 +6,11 @@ using System.Text;
 namespace Vivarium.DefinitionProof;
 
 /// <summary>One dedicated Linux process, with only its own data and bootstrap plus read-only Agent binaries.</summary>
-internal sealed class OwnedDockerAgent(string root) : IAsyncDisposable
+internal sealed class OwnedDockerAgent(string root, bool gitTools = false) : IAsyncDisposable
 {
     private const string Owner = "us013-r0-runtime-proof";
-    private const string Image = "mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3";
+    private string Image => gitTools ? "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
+        : "mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3";
     private readonly string name = "vivarium-r0-agent-" + Guid.NewGuid().ToString("N")[..12];
     private bool created;
     private bool volumeCreated;

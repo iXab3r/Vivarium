@@ -196,7 +196,8 @@ public sealed class RuntimeHostPhysicalTests
             scopedActor.ConfigureServices(services);
             services.Replace(ServiceDescriptor.Singleton<RuntimeStepCompiler>(provider => new RuntimeStepCompiler(
                 compilerBytes = new RuntimeBuildBytes(provider.GetRequiredService<IObjectStorage>(), payloadPause),
-                provider.GetRequiredService<RuntimeBuildSecrets>(), provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>())));
+                provider.GetRequiredService<RuntimeBuildSecrets>(), provider.GetRequiredService<IDbContextFactory<VivariumDbContext>>(),
+                provider.GetRequiredService<RuntimeBuildSources>())));
         }))
         {
             // This owned logger receives only the product's intended private disclosure. It never

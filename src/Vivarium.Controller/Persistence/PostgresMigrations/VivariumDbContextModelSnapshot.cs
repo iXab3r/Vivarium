@@ -917,14 +917,25 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.Property<Guid>("RevisionId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("SourceJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<long?>("VcsRootInstanceId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("BuildId");
 
                     b.HasIndex("BuildTypeId", "RevisionId");
 
+                    b.HasIndex("VcsRootInstanceId", "ProjectId");
+
                     b.HasIndex("BuildId", "BuildTypeId", "ProjectId")
                         .IsUnique();
 
-                    b.ToTable("RuntimeBuildInputs", (string)null);
+                    b.ToTable("RuntimeBuildInputs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildInputs_Source", "(\"VcsRootInstanceId\" IS NULL) = (\"SourceJson\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildObservation", b =>
@@ -1074,6 +1085,43 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.ToTable("RuntimeBuildResults", null, t =>
                         {
                             t.HasCheckConstraint("CK_RuntimeBuildResults_Hash", "\"SemanticHash\" ~ '^[a-f0-9]{64}$'");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceReceipt", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("BuildId");
+
+                    b.ToTable("RuntimeBuildSourceReceipts", (string)null);
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceSelection", b =>
+                {
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("SelectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BuildId");
+
+                    b.ToTable("RuntimeBuildSourceSelections", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeBuildSourceSelections_Version", "\"Version\" = 'N/A' OR \"Version\" ~ '^[a-f0-9]{40}$'");
                         });
                 });
 
@@ -1228,6 +1276,40 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                             t.HasCheckConstraint("CK_RuntimeOutputStreams_Prefix", "\"CommittedSequence\" BETWEEN 0 AND 18446744073709551615 AND \"CommittedBytes\" BETWEEN 0 AND 18446744073709551615");
 
                             t.HasCheckConstraint("CK_RuntimeOutputStreams_Scope", "\"StepIndex\" >= 0 AND \"Stream\" IN (0,1)");
+                        });
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeVcsRootInstance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PropertiesHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PropertiesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("RootId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId", "RootId", "PropertiesHash")
+                        .IsUnique();
+
+                    b.ToTable("RuntimeVcsRootInstances", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeVcsRootInstances_Identity", "\"Id\" > 0 AND length(\"RootId\") BETWEEN 1 AND 256 AND \"PropertiesHash\" ~ '^[a-f0-9]{64}$'");
                         });
                 });
 
@@ -1918,6 +2000,12 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeVcsRootInstance", null)
+                        .WithMany()
+                        .HasForeignKey("VcsRootInstanceId", "ProjectId")
+                        .HasPrincipalKey("Id", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", "BuildId", "BuildTypeId", "ProjectId")
@@ -1979,6 +2067,24 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceReceipt", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildExecution", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceReceipt", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceSelection", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildInput", null)
+                        .WithOne()
+                        .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildSourceSelection", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputDeletion", b =>
                 {
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
@@ -2011,6 +2117,15 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuildOutput", null)
                         .WithMany()
                         .HasForeignKey("BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeVcsRootInstance", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Catalog.CatalogProjectIdentity", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

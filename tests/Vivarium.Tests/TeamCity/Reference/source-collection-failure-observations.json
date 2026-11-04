@@ -1,0 +1,1445 @@
+{
+  "kind": "PINNED_SOURCE_LIFECYCLE_REFERENCE_NOT_PRODUCT_ACCEPTANCE",
+  "target": "http://127.0.0.1:18111",
+  "profile": "vivarium-teamcity-lab-202613",
+  "image": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a",
+  "project": "VivUs013SourceLifecycle_4837dc31dc3c",
+  "sourceSha256": "a368d8cf396388418fb258bb1316a340f15b04b04ec99d72fc2b52a0436c4979",
+  "agentImage": "jetbrains/teamcity-minimal-agent@sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765",
+  "cases": [
+    {
+      "id": "source:server-resolves-agent-checkout-unreachable",
+      "exchanges": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {},
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2NfUHJlcGFyZSJ9fQ==",
+            "bodyBytes": 67,
+            "bodySha256": "e2facf580826d10ea4b971f6bb3eaff108da967d31e9025bcaaefe2346976699"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTUzLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwic3RhdGUiOiJxdWV1ZWQiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkUXVldWUvaWQ6MTUzIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZC8xNTMiLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2NfUHJlcGFyZSIsIm5hbWUiOiJPbi1BZ2VudCBzb3VyY2UgZmFpbHVyZSIsInByb2plY3ROYW1lIjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSIsInByb2plY3RJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyIsImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRUeXBlcy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2NfUHJlcGFyZSIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlP21vZGU9YnVpbGRzIn0sIndhaXRSZWFzb24iOiJCdWlsZCBzZXR0aW5ncyBoYXZlIG5vdCBiZWVuIGZpbmFsaXplZCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI1MjcrMDAwMCIsInRyaWdnZXJlZCI6eyJ0eXBlIjoidXNlciIsImRhdGUiOiIyMDI2MTEwNFQwNDI1MjcrMDAwMCIsInVzZXIiOnsidXNlcm5hbWUiOiJ2aXZhcml1bS1sYWItYWRtaW4iLCJpZCI6MSwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDoxIn19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDoxNTMpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MTUzKSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjE1My9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ==",
+            "bodyBytes": 1045,
+            "bodySha256": "7abfe29b9181a5d01c2bfc844463b950fcaab7d8524675efc99861ff7f124c60"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:153",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTUzLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwic3RhdGUiOiJxdWV1ZWQiLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJxdWV1ZWREYXRlIjoiMjAyNjExMDRUMDQyNTI3KzAwMDAiLCJyZXZpc2lvbnMiOnsiY291bnQiOjAsInJldmlzaW9uIjpbXX0sInNuYXBzaG90LWRlcGVuZGVuY2llcyI6eyJidWlsZCI6W10sImNvdW50IjowfX0=",
+            "bodyBytes": 248,
+            "bodySha256": "3d5fe4f15a45941d80e4f25fa925c885f0f47ec1c4a9bd3368f7bb12648e638d"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:153",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTUzLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI1MjcrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjUyNyswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjowLCJyZXZpc2lvbiI6W119LCJhZ2VudCI6eyJpZCI6MjZ9LCJzbmFwc2hvdC1kZXBlbmRlbmNpZXMiOnsiYnVpbGQiOltdLCJjb3VudCI6MH19",
+            "bodyBytes": 357,
+            "bodySha256": "9b33a1f75fd121962f44d148e5ef616af993213fdbc23fddd004d9104233be02"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:153",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTUzLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6dHJ1ZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiVW5hYmxlIHRvIGNvbGxlY3QgY2hhbmdlcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI1MjcrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjUyNyswMDAwIiwiZmluaXNoRGF0ZSI6IjIwMjYxMTA0VDA0MjUyOCswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6Ik4vQSIsImludGVybmFsVmVyc2lvbiI6Ik4vQSIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzMiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI2fSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+            "bodyBytes": 541,
+            "bodySha256": "0f15b2d3da6f66c4b200d35730a6f421b83d656ebb3a605d35a4e9ae680c0b90"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/settings/buildNumberCounter",
+            "query": {},
+            "headers": {
+              "accept": "text/plain"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain"
+            },
+            "bodyBase64": "Mg==",
+            "bodyBytes": 1,
+            "bodySha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:153/artifacts/children/",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJjb3VudCI6MCwiZmlsZSI6W119",
+            "bodyBytes": 21,
+            "bodySha256": "c9b1285c40ac2c05767b4c5c0ae8278e12d84a2ac688493f0e51d7b88ddc8f1b"
+          }
+        }
+      ],
+      "observations": [
+        {
+          "id": 153,
+          "buildTypeId": "VivUs013SourceLifecycle_4837dc31dc3c_Prepare",
+          "state": "queued",
+          "failedToStart": false,
+          "personal": false,
+          "queuedDate": "20261104T042527+0000",
+          "revisions": {
+            "count": 0,
+            "revision": []
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 153,
+          "buildTypeId": "VivUs013SourceLifecycle_4837dc31dc3c_Prepare",
+          "number": "1",
+          "status": "SUCCESS",
+          "state": "running",
+          "failedToStart": false,
+          "personal": false,
+          "statusText": "Running",
+          "queuedDate": "20261104T042527+0000",
+          "startDate": "20261104T042527+0000",
+          "revisions": {
+            "count": 0,
+            "revision": []
+          },
+          "agent": {
+            "id": 26
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        },
+        {
+          "id": 153,
+          "buildTypeId": "VivUs013SourceLifecycle_4837dc31dc3c_Prepare",
+          "number": "1",
+          "status": "FAILURE",
+          "state": "finished",
+          "failedToStart": true,
+          "personal": false,
+          "statusText": "Unable to collect changes",
+          "queuedDate": "20261104T042527+0000",
+          "startDate": "20261104T042527+0000",
+          "finishDate": "20261104T042528+0000",
+          "revisions": {
+            "count": 1,
+            "revision": [
+              {
+                "version": "N/A",
+                "internalVersion": "N/A",
+                "vcs-root-instance": {
+                  "id": "33",
+                  "vcs-root-id": "VivUs013SourceLifecycle_4837dc31dc3c_Git"
+                }
+              }
+            ]
+          },
+          "agent": {
+            "id": 26
+          },
+          "snapshot-dependencies": {
+            "build": [],
+            "count": 0
+          }
+        }
+      ],
+      "terminalObservation": {
+        "id": 153,
+        "buildTypeId": "VivUs013SourceLifecycle_4837dc31dc3c_Prepare",
+        "number": "1",
+        "status": "FAILURE",
+        "state": "finished",
+        "failedToStart": true,
+        "personal": false,
+        "statusText": "Unable to collect changes",
+        "queuedDate": "20261104T042527+0000",
+        "startDate": "20261104T042527+0000",
+        "finishDate": "20261104T042528+0000",
+        "revisions": {
+          "count": 1,
+          "revision": [
+            {
+              "version": "N/A",
+              "internalVersion": "N/A",
+              "vcs-root-instance": {
+                "id": "33",
+                "vcs-root-id": "VivUs013SourceLifecycle_4837dc31dc3c_Git"
+              }
+            }
+          ]
+        },
+        "agent": {
+          "id": 26
+        },
+        "snapshot-dependencies": {
+          "build": [],
+          "count": 0
+        }
+      },
+      "lastObservation": {
+        "id": 153,
+        "buildTypeId": "VivUs013SourceLifecycle_4837dc31dc3c_Prepare",
+        "number": "1",
+        "status": "FAILURE",
+        "state": "finished",
+        "failedToStart": true,
+        "personal": false,
+        "statusText": "Unable to collect changes",
+        "queuedDate": "20261104T042527+0000",
+        "startDate": "20261104T042527+0000",
+        "finishDate": "20261104T042528+0000",
+        "revisions": {
+          "count": 1,
+          "revision": [
+            {
+              "version": "N/A",
+              "internalVersion": "N/A",
+              "vcs-root-instance": {
+                "id": "33",
+                "vcs-root-id": "VivUs013SourceLifecycle_4837dc31dc3c_Git"
+              }
+            }
+          ]
+        },
+        "agent": {
+          "id": 26
+        },
+        "snapshot-dependencies": {
+          "build": [],
+          "count": 0
+        }
+      },
+      "terminalProven": true
+    }
+  ],
+  "setup": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/server",
+        "query": {
+          "fields": "version,versionMajor,versionMinor,buildNumber,startTime,currentTime,role,webUrl"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2ZXJzaW9uIjoiMjAyNi4xLjMgKGJ1aWxkIDIyMjc0MikiLCJ2ZXJzaW9uTWFqb3IiOjIwMjYsInZlcnNpb25NaW5vciI6MSwic3RhcnRUaW1lIjoiMjAyNjExMDJUMTkyMzM4KzAwMDAiLCJjdXJyZW50VGltZSI6IjIwMjYxMTA0VDA0MjUxMSswMDAwIiwiYnVpbGROdW1iZXIiOiIyMjI3NDIiLCJyb2xlIjoibWFpbl9ub2RlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMSJ9",
+        "bodyBytes": 222,
+        "bodySha256": "86b7bd533c1bd8042db8e19781d6447d09b0fa3424f2afe6ffc62d813137127a"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildQueue",
+        "query": {
+          "locator": "start:0,count:2",
+          "fields": "nextHref,build(id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJidWlsZCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "13a6714001c1328c0e492df00630b17dc9d8c27d29a7a479ee1d7130d4bd6807"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/projects",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyIsIm5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290In19",
+        "bodyBytes": 111,
+        "bodySha256": "0701257f8f21cbd781ff537f50761224364b3f7693122c3df51ad7e2afda3ec9"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyIsIm5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicGFyZW50UHJvamVjdElkIjoiX1Jvb3QiLCJ2aXJ0dWFsIjpmYWxzZSwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL3Byb2plY3QuaHRtbD9wcm9qZWN0SWQ9Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiZGVzY3JpcHRpb24iOiJDb250YWlucyBhbGwgb3RoZXIgcHJvamVjdHMiLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOl9Sb290Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPV9Sb290In0sImJ1aWxkVHlwZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJkZXBsb3ltZW50RGFzaGJvYXJkcyI6eyJjb3VudCI6MH0sInBhcmFtZXRlcnMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjL3BhcmFtZXRlcnMiLCJwcm9wZXJ0eSI6W119LCJ2Y3NSb290cyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC92Y3Mtcm9vdHM/bG9jYXRvcj1wcm9qZWN0OihpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MpIn0sInByb2plY3RGZWF0dXJlcyI6eyJjb3VudCI6MCwiaHJlZiI6Ii9hcHAvcmVzdC9wcm9qZWN0cy9pZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MvcHJvamVjdEZlYXR1cmVzIn0sInByb2plY3RzIjp7ImNvdW50IjowfX0=",
+        "bodyBytes": 962,
+        "bodySha256": "15e7afbf6034a7d0ed687f1476d79c6be5e7b2af2f7a470fdcde6fe942136455"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W119",
+        "bodyBytes": 12,
+        "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents",
+        "query": {
+          "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+          "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJhZ2VudCI6W3siaWQiOjI2LCJuYW1lIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX0FnZW50IiwiY29ubmVjdGVkIjp0cnVlLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpemVkIjpmYWxzZSwidXB0b2RhdGUiOmZhbHNlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2FnZW50RGV0YWlscy5odG1sP2lkPTI2JmFnZW50VHlwZUlkPTI2JnJlYWxBZ2VudE5hbWU9Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX0FnZW50In1dfQ==",
+        "bodyBytes": 271,
+        "bodySha256": "c9ff5acfeadd516adb207e2af922b41c4ae0f1ff6dd184d90412487c5361f18c"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:26/enabledInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRleHQiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIn19",
+        "bodyBytes": 63,
+        "bodySha256": "d88a564cd7606e1316f4dc0a8227311aa7a54afc8204f3d0ddc54ae2225c6122"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRpbWVzdGFtcCI6IjIwMjYxMTA0VDA0MjUyNiswMDAwIiwidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 98,
+        "bodySha256": "4418c3b12629a6697b08e7f114a9c2a2089eddab25e127d7847ddffdffd3dd94"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:26/authorizedInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 62,
+        "bodySha256": "b334b6543efdd899b405429b2e2d5ec3514c2c26fee5c91eb5aa81dfc720867c"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDRUMDQyNTI2KzAwMDAiLCJ0ZXh0IjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fQ==",
+        "bodyBytes": 97,
+        "bodySha256": "e80db29688466e50f96711d38c87532beaf9357b492da29d4322fe19f3afeafd"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwibmFtZSI6Ik9uLUFnZW50IHNvdXJjZSBmYWlsdXJlIiwicHJvamVjdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyJ9fQ==",
+        "bodyBytes": 142,
+        "bodySha256": "fc12d4f6b7efe024baf06b4ef570a1b277856fea0a5443960df6f908045db6a3"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwibmFtZSI6Ik9uLUFnZW50IHNvdXJjZSBmYWlsdXJlIiwicHJvamVjdE5hbWUiOiJPd25lZCBsaWZlY3ljbGUgcmVmZXJlbmNlIiwicHJvamVjdElkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX1ByZXBhcmU/bW9kZT1idWlsZHMiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwibmFtZSI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyJ9LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ2Y3Mtcm9vdC1lbnRyaWVzIjp7ImNvdW50IjowLCJ2Y3Mtcm9vdC1lbnRyeSI6W119LCJzZXR0aW5ncyI6eyJjb3VudCI6MSwicHJvcGVydHkiOlt7Im5hbWUiOiJidWlsZE51bWJlckNvdW50ZXIiLCJ2YWx1ZSI6IjEifV19LCJwYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX1ByZXBhcmUvcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sIm91dHB1dC1wYXJhbWV0ZXJzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX1ByZXBhcmUvb3V0cHV0LXBhcmFtZXRlcnMiLCJwcm9wZXJ0eSI6W119LCJzdGVwcyI6eyJjb3VudCI6MH0sImZlYXR1cmVzIjp7ImNvdW50IjowfSwidHJpZ2dlcnMiOnsiY291bnQiOjB9LCJzbmFwc2hvdC1kZXBlbmRlbmNpZXMiOnsiY291bnQiOjB9LCJhcnRpZmFjdC1kZXBlbmRlbmNpZXMiOnsiY291bnQiOjB9LCJhZ2VudC1yZXF1aXJlbWVudHMiOnsiY291bnQiOjB9LCJidWlsZHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9idWlsZFR5cGVzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlL2J1aWxkcy8ifSwiaW52ZXN0aWdhdGlvbnMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9pbnZlc3RpZ2F0aW9ucz9sb2NhdG9yPWJ1aWxkVHlwZTooaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjX1ByZXBhcmUpIn0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZFR5cGU6KGlkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlKSkifSwiY29tcGF0aWJsZUNsb3VkSW1hZ2VzIjp7fX0=",
+        "bodyBytes": 1628,
+        "bodySha256": "f03a5ec2c30eb3e38fa6e34f1ae75c84b7925ca27b9fcfac50ba5f1e5f076d30"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/steps",
+        "query": {
+          "fields": "step(id,name,type,disabled,inherited,properties(property(name,value,inherited,type(rawValue))))"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGVwIjpbeyJuYW1lIjoiTXVzdCBub3QgcnVuIGFmdGVyIGZhaWxlZCBjaGVja291dCIsInR5cGUiOiJzaW1wbGVSdW5uZXIiLCJwcm9wZXJ0aWVzIjp7InByb3BlcnR5IjpbeyJuYW1lIjoic2NyaXB0LmNvbnRlbnQiLCJ2YWx1ZSI6IiMhL2Jpbi9zaFxuZWNobyBzb3VyY2UtY2hlY2tvdXQtc2hvdWxkLW5vdC1ydW5cbiJ9LHsibmFtZSI6InVzZS5jdXN0b20uc2NyaXB0IiwidmFsdWUiOiJ0cnVlIn1dfX1dfQ==",
+        "bodyBytes": 235,
+        "bodySha256": "73feadb6170029bc183a5d8f5a9e55ee1b65c8c573eb8c24eea46854f95783ed"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGVwIjpbeyJpZCI6IlJVTk5FUl8zNSIsIm5hbWUiOiJNdXN0IG5vdCBydW4gYWZ0ZXIgZmFpbGVkIGNoZWNrb3V0IiwidHlwZSI6InNpbXBsZVJ1bm5lciIsImRpc2FibGVkIjpmYWxzZSwiaW5oZXJpdGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6InNjcmlwdC5jb250ZW50IiwidmFsdWUiOiIjIS9iaW4vc2hcbmVjaG8gc291cmNlLWNoZWNrb3V0LXNob3VsZC1ub3QtcnVuXG4ifSx7Im5hbWUiOiJ1c2UuY3VzdG9tLnNjcmlwdCIsInZhbHVlIjoidHJ1ZSJ9XX19XX0=",
+        "bodyBytes": 287,
+        "bodySha256": "672f411f09f98f7fdf6a9d7650de079101d774054350d6c9b9e263b9e54a66f2"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/vcs-roots",
+        "query": {},
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsInByb2plY3QiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MifSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6ImF1dGhNZXRob2QiLCJ2YWx1ZSI6IkFOT05ZTU9VUyJ9LHsibmFtZSI6ImJyYW5jaCIsInZhbHVlIjoicmVmcy9oZWFkcy9tYWluIn0seyJuYW1lIjoidXJsIiwidmFsdWUiOiJnaXQ6Ly8xMjcuMC4wLjE6NTA0ODcvc291cmNlLmdpdCJ9XX19",
+        "bodyBytes": 339,
+        "bodySha256": "5b7d96f67b2dce5a94c360591fa8a9a3b4cb5efcd2267594a22d481dc0027a1f"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsImhyZWYiOiIvYXBwL3Jlc3QvdmNzLXJvb3RzL2lkOlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwibmFtZSI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYyJ9LCJwcm9wZXJ0aWVzIjp7ImNvdW50IjozLCJwcm9wZXJ0eSI6W3sibmFtZSI6ImF1dGhNZXRob2QiLCJ2YWx1ZSI6IkFOT05ZTU9VUyJ9LHsibmFtZSI6ImJyYW5jaCIsInZhbHVlIjoicmVmcy9oZWFkcy9tYWluIn0seyJuYW1lIjoidXJsIiwidmFsdWUiOiJnaXQ6Ly8xMjcuMC4wLjE6NTA0ODcvc291cmNlLmdpdCJ9XX0sInZjc1Jvb3RJbnN0YW5jZXMiOnsiaHJlZiI6Ii9hcHAvcmVzdC92Y3Mtcm9vdC1pbnN0YW5jZXM/bG9jYXRvcj12Y3NSb290OihpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2NfR2l0KSJ9fQ==",
+        "bodyBytes": 766,
+        "bodySha256": "b11bbedee019a2fe699bacec5830c75bc0eddaaf479a15eb443ce2f34af9b7b3"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/vcs-root-entries",
+        "query": {
+          "fields": "vcs-root(id,name,vcsName,project(id,name)),checkout-rules"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2Y3Mtcm9vdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQifSwiY2hlY2tvdXQtcnVsZXMiOiIifQ==",
+        "bodyBytes": 82,
+        "bodySha256": "153c039aa153def90f7afe109c150b01e1e69572b4c78c35e89cdc7dce9358d8"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJ2Y3Mtcm9vdCI6eyJpZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQiLCJuYW1lIjoiT3duZWQgc291cmNlIGxpZmVjeWNsZSBHaXQiLCJ2Y3NOYW1lIjoiamV0YnJhaW5zLmdpdCIsInByb2plY3QiOnsiaWQiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MiLCJuYW1lIjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fSwiY2hlY2tvdXQtcnVsZXMiOiIifQ==",
+        "bodyBytes": 235,
+        "bodySha256": "54044d9a08414b292994dfee0570182942b8d579f311a3be7f51e48f911923b0"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/settings/checkoutMode",
+        "query": {},
+        "headers": {
+          "accept": "text/plain",
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/settings/checkoutMode",
+        "query": {},
+        "headers": {
+          "accept": "text/plain"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "T05fQUdFTlQ=",
+        "bodyBytes": 8,
+        "bodySha256": "a08d80ae6bd4dff9c23362026c06a13a1c714bcdc3b794a75f7e75ee2bce3031"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/buildTypes/id:VivUs013SourceLifecycle_4837dc31dc3c_Prepare/settings/buildNumberCounter",
+        "query": {},
+        "headers": {
+          "accept": "text/plain"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "bodyBase64": "MQ==",
+        "bodyBytes": 1,
+        "bodySha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/app/rest/agents/id:26/enabledInfo",
+        "query": {
+          "fields": "status,comment(text,timestamp)"
+        },
+        "headers": {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIGxpZmVjeWNsZSByZWZlcmVuY2UifX0=",
+        "bodyBytes": 62,
+        "bodySha256": "b334b6543efdd899b405429b2e2d5ec3514c2c26fee5c91eb5aa81dfc720867c"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDRUMDQyNTI3KzAwMDAiLCJ0ZXh0IjoiT3duZWQgbGlmZWN5Y2xlIHJlZmVyZW5jZSJ9fQ==",
+        "bodyBytes": 97,
+        "bodySha256": "7d96e1ea6de016659c3dd62104808af8fd09d8dd546b686b831e415172a60639"
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/builds/id:153",
+        "query": {
+          "fields": "id,buildTypeId,number,state,status,statusText,failedToStart,personal,queuedDate,startDate,finishDate,canceledInfo,agent(id),revisions(count,revision(version,internalVersion,vcsBranchName,vcs-root-instance(id,vcs-root-id))),snapshot-dependencies(build(id,buildTypeId,state,status),count)"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6MTUzLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19QcmVwYXJlIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IkZBSUxVUkUiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6dHJ1ZSwicGVyc29uYWwiOmZhbHNlLCJzdGF0dXNUZXh0IjoiVW5hYmxlIHRvIGNvbGxlY3QgY2hhbmdlcyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwNFQwNDI1MjcrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTA0VDA0MjUyNyswMDAwIiwiZmluaXNoRGF0ZSI6IjIwMjYxMTA0VDA0MjUyOCswMDAwIiwicmV2aXNpb25zIjp7ImNvdW50IjoxLCJyZXZpc2lvbiI6W3sidmVyc2lvbiI6Ik4vQSIsImludGVybmFsVmVyc2lvbiI6Ik4vQSIsInZjcy1yb290LWluc3RhbmNlIjp7ImlkIjoiMzMiLCJ2Y3Mtcm9vdC1pZCI6IlZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19HaXQifX1dfSwiYWdlbnQiOnsiaWQiOjI2fSwic25hcHNob3QtZGVwZW5kZW5jaWVzIjp7ImJ1aWxkIjpbXSwiY291bnQiOjB9fQ==",
+        "bodyBytes": 541,
+        "bodySha256": "0f15b2d3da6f66c4b200d35730a6f421b83d656ebb3a605d35a4e9ae680c0b90"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/app/rest/projects/id:VivUs013SourceLifecycle_4837dc31dc3c",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/projects/id:VivUs013SourceLifecycle_4837dc31dc3c",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDQgKE5vdCBGb3VuZCkuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyLnJlc3QuZXJyb3JzLk5vdEZvdW5kRXhjZXB0aW9uOiBObyBwcm9qZWN0IGZvdW5kIGJ5IGxvY2F0b3IgJ2NvdW50OjEsaWQ6Vml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjJy4gUHJvamVjdCBjYW5ub3QgYmUgZm91bmQgYnkgZXh0ZXJuYWwgaWQgJ1ZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzYycuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6Ik5vIHByb2plY3QgZm91bmQgYnkgbG9jYXRvciAnY291bnQ6MSxpZDpWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2MnLiBQcm9qZWN0IGNhbm5vdCBiZSBmb3VuZCBieSBleHRlcm5hbCBpZCAnVml2VXMwMTNTb3VyY2VMaWZlY3ljbGVfNDgzN2RjMzFkYzNjJy4ifV19",
+        "bodyBytes": 510,
+        "bodySha256": "5280d5a880d162cf87e97678c6400b9fdc040ef145cee644ac5315e850398eea"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/app/rest/agents/id:26",
+        "query": {
+          "fields": "id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status)"
+        },
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "eyJpZCI6MjYsIm5hbWUiOiJWaXZVczAxM1NvdXJjZUxpZmVjeWNsZV80ODM3ZGMzMWRjM2NfQWdlbnQiLCJjb25uZWN0ZWQiOmZhbHNlLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpemVkIjp0cnVlLCJ1cHRvZGF0ZSI6dHJ1ZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9hZ2VudERldGFpbHMuaHRtbD9pZD0yNiZhZ2VudFR5cGVJZD0yNiZyZWFsQWdlbnROYW1lPVZpdlVzMDEzU291cmNlTGlmZWN5Y2xlXzQ4MzdkYzMxZGMzY19BZ2VudCJ9",
+        "bodyBytes": 258,
+        "bodySha256": "a00a1f66d19a83647f9cc7884b5d5c320d95741b848483b3e98637f37fd8efae"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/app/rest/agents/id:26",
+        "query": {},
+        "headers": {
+          "accept": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "bodyBase64": "",
+        "bodyBytes": 0,
+        "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "complete": true,
+  "limits": "One owned ON_AGENT Git checkout. Server can read a Git daemon in its own loopback namespace; Agent cannot reach that same loopback port. Observes actual source checkout failure/state/counter with no guessed outcome. Up to80s observation; an unfinished result is not a terminal oracle. No Windows/ordinary-actor or generic VCS completeness claim.",
+  "sourceFixture": {
+    "sourceImage": "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317",
+    "sourceContainer": "vivarium-source-git-4837dc31dc3c",
+    "sourceUrl": "git://127.0.0.1:50487/source.git",
+    "sourceCommit": "81f1551fa684a51cc7f35a806e71cc8fe38e529c",
+    "work": "D:\\Work\\Vivarium\\artifacts\\pilot-chain\\source-lifecycle-4837dc31dc3c\\source-work",
+    "bare": "D:\\Work\\Vivarium\\artifacts\\pilot-chain\\source-lifecycle-4837dc31dc3c\\source.git",
+    "namespace": "Pinned reference server network; loopback-only Git is intentionally unreachable from the separate Agent."
+  },
+  "checkoutMode": {
+    "status": 200,
+    "value": "ON_AGENT"
+  },
+  "counterBefore": "1",
+  "buildId": 153,
+  "counterAfter": "2",
+  "ownedProjectRemoved": true,
+  "ownedResourcesRemoved": true,
+  "permissionsRestored": true
+}

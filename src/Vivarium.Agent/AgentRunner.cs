@@ -49,6 +49,7 @@ public sealed class AgentRunner
     private BuildOutputSpool? outputSpool;
     private volatile bool durableOutputNegotiated;
     private volatile bool literalPublisherNegotiated;
+    private volatile bool vcsCheckoutNegotiated;
     private ActiveBuild? activeBuild;
     private PlatformFactSnapshot? platformFacts;
     private ulong credentialGeneration;
@@ -276,6 +277,7 @@ public sealed class AgentRunner
         Task output = Task.CompletedTask;
         durableOutputNegotiated = false;
         literalPublisherNegotiated = false;
+        vcsCheckoutNegotiated = false;
         try
         {
             await writer.SendAsync(new AgentMsg { Hello = BuildHello(sessionId) }, ct);
@@ -291,6 +293,7 @@ public sealed class AgentRunner
                     case ControllerMsg.MsgOneofCase.Welcome:
                         durableOutputNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == BuildOutputCapabilityId && c.ContractMajor == 1);
                         literalPublisherNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == ArtifactPublisherCapabilityId && c.ContractMajor == 1);
+                        vcsCheckoutNegotiated = msg.Welcome.NegotiatedCapabilities.Any(c => c.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && c.ContractMajor == 1);
                         ClockSkew = DateTimeOffset.FromUnixTimeMilliseconds(msg.Welcome.ServerTimeUnixMs) - DateTimeOffset.UtcNow;
                         if (msg.Welcome.SelectedProtocolVersion != 0 &&
                             msg.Welcome.SelectedProtocolVersion is < MinimumProtocolVersion or > CurrentProtocolVersion)
@@ -673,6 +676,11 @@ public sealed class AgentRunner
             throw new InvalidDataException("The required Build output contract was not negotiated.");
         if (assignment.ArtifactPublicationContractMajor > 1 || assignment.ArtifactPublicationContractMajor == 1 && !literalPublisherNegotiated)
             throw new InvalidDataException("The required artifact publisher was not negotiated.");
+        if (assignment.VcsCheckout is not null && !vcsCheckoutNegotiated
+            || assignment.VcsCheckout is null && (assignment.Payload.Any(p => p.PrivateInput) || assignment.Steps.Any(s => s.ScriptInput.Length != 0)))
+            throw new InvalidDataException("The required VCS checkout contract was not negotiated.");
+        if (assignment.VcsCheckout is { } source) Vivarium.Contracts.VcsCheckoutProfile.Validate(source);
+        if (assignment.Payload.Any(p => p.PrivateInput && p.Archive)) throw new InvalidDataException("Private generated inputs cannot be archives.");
         ActiveBuild? build = null;
         var accepted = false;
         lock (activeBuildLock)
@@ -891,6 +899,8 @@ public sealed class AgentRunner
         });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = BuildOutputCapabilityId, ContractMajor = 1 });
         hello.Capabilities.Add(new CapabilitySupport { CapabilityId = ArtifactPublisherCapabilityId, ContractMajor = 1 });
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+            hello.Capabilities.Add(new CapabilitySupport { CapabilityId = Vivarium.Contracts.VcsCheckoutProfile.CapabilityId, ContractMajor = 1 });
         if (options.BootstrapLeasePath is not null && options.BootstrapLeaseId is not null)
         {
             hello.Capabilities.Add(new CapabilitySupport

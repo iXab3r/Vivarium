@@ -296,6 +296,40 @@ The welcome response carries:
 Negotiation is additive. The controller schedules or dispatches only against the negotiated set for
 the current session, never against the version string alone.
 
+### Selected workload checkout seam (US-013 PILOT)
+
+`teamcity.vcs-checkout.v1` is an additive, exclusive Build-assignment capability on Windows and Linux.
+The fresh Host opts into negotiation; a stale Agent without it remains eligible for supported
+source-free work and receives no checkout assignment. Missing Git or per-run access failure does not
+erase binary support or quarantine a healthy Agent. macOS does not advertise this implementation.
+No Bootstrap or AgentMsg tag 7 change is involved.
+
+The owning TeamCity operation supplies one anonymous `http`/`https`/`git` source, canonical branch,
+selected 40-character commit and root checkout with up to 32 literal top-level exclusions. URLs have
+no userinfo/query/fragment and are bounded to 2048 characters; branch length is at most 256. Each Git
+process has a two-minute deadline and 64-KiB stdout/stderr bounds. It uses the existing workload
+process journal, graceful/authorized-force stop and termination quarantine. Git runs without system,
+global or inherited Git configuration, credential helpers, proxies or the Host/Agent home directory;
+local-file/SSH transports, hooks, submodules and author-supplied filters are not delegated. Ordinary
+build code retains the existing operator-enrolled Agent trust boundary; this is not D43 evaluator
+isolation, native disk governance or a sandbox for build steps.
+
+`BuildAssignment.vcs_checkout` (tag 10) selects the coordinator's immutable commit. An Agent verifies
+fetched commit and actual checked-out HEAD before any user step. Generated `Blob.private_input`
+(tag 5) and `Step.script_input`/`script_argument_index` (tags 8/9) place the compiler's scripts outside
+the source tree, without changing legacy source-free assignment paths. Archives are not private
+script inputs. Windows uses a relative private Git directory and per-command long-path support;
+global Git settings remain untouched.
+
+`StepStatus.vcs_checkout` (tag 5, FETCHING/-1) independently commits the bounded checkout receipt
+before user-step progress; `BuildResult.vcs_checkout` (tag 9) repeats it. The Host validates the actual
+revision/outcome against the protected assignment and retains one immutable receipt under the
+current Agent/session/lease fence. Contradictory replay quarantines the Agent. Source collection and
+checkout failure are separate: collection retains an explicit unavailable revision; checkout failure
+retains the already selected revision and runs no user steps. Public errors contain typed codes,
+never Git stderr. This selected profile does not accept private source credentials, arbitrary checkout
+rules, source-aware reuse, full VCS resource CRUD, Docker runners or their remaining fault variants.
+
 ### AgentPolicyBundle application
 
 Git-backed agent policy is delivered as a validated, authenticated `AgentPolicyBundle`, not as

@@ -33,7 +33,27 @@ internal static class RuntimeBuildModel
             .HasPrincipalKey<RuntimeBuild>(b => new { b.Id, b.BuildTypeId, b.ProjectId }).OnDelete(DeleteBehavior.Restrict);
         input.HasOne<CatalogBuildDefinition>().WithMany().HasForeignKey(i => new { i.BuildTypeId, i.RevisionId }).OnDelete(DeleteBehavior.Restrict);
         input.Property(i => i.OverridesJson).HasColumnType("jsonb"); input.Property(i => i.AdmissionJson).HasColumnType("jsonb");
-        input.ToTable("RuntimeBuildInputs");
+        input.Property(i => i.SourceJson).HasColumnType("jsonb");
+        input.HasOne<RuntimeVcsRootInstance>().WithMany().HasForeignKey(i => new { i.VcsRootInstanceId, i.ProjectId })
+            .HasPrincipalKey(r => new { r.Id, r.ProjectId }).OnDelete(DeleteBehavior.Restrict);
+        input.ToTable("RuntimeBuildInputs", t => t.HasCheckConstraint("CK_RuntimeBuildInputs_Source",
+            "(\"VcsRootInstanceId\" IS NULL) = (\"SourceJson\" IS NULL)"));
+
+        var root = model.Entity<RuntimeVcsRootInstance>();
+        root.HasKey(r => r.Id); root.Property(r => r.Id).UseIdentityAlwaysColumn();
+        root.HasAlternateKey(r => new { r.Id, r.ProjectId });
+        root.HasIndex(r => new { r.ProjectId, r.RootId, r.PropertiesHash }).IsUnique();
+        root.HasOne<CatalogProjectIdentity>().WithMany().HasForeignKey(r => r.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        root.Property(r => r.PropertiesJson).HasColumnType("jsonb");
+        root.ToTable("RuntimeVcsRootInstances", t => t.HasCheckConstraint("CK_RuntimeVcsRootInstances_Identity",
+            "\"Id\" > 0 AND length(\"RootId\") BETWEEN 1 AND 256 AND \"PropertiesHash\" ~ '^[a-f0-9]{64}$'"));
+        var selection = model.Entity<RuntimeBuildSourceSelection>(); selection.HasKey(s => s.BuildId);
+        selection.HasOne<RuntimeBuildInput>().WithOne().HasForeignKey<RuntimeBuildSourceSelection>(s => s.BuildId).OnDelete(DeleteBehavior.Restrict);
+        selection.ToTable("RuntimeBuildSourceSelections", t => t.HasCheckConstraint("CK_RuntimeBuildSourceSelections_Version",
+            "\"Version\" = 'N/A' OR \"Version\" ~ '^[a-f0-9]{40}$'"));
+        var receipt = model.Entity<RuntimeBuildSourceReceipt>(); receipt.HasKey(s => s.BuildId);
+        receipt.HasOne<RuntimeBuildExecution>().WithOne().HasForeignKey<RuntimeBuildSourceReceipt>(s => s.BuildId).OnDelete(DeleteBehavior.Restrict);
+        receipt.ToTable("RuntimeBuildSourceReceipts");
 
         var resolution = model.Entity<RuntimeBuildResolution>();
         resolution.HasKey(r => r.RequestedBuildId); resolution.Property(r => r.RequestedBuildId).ValueGeneratedNever();

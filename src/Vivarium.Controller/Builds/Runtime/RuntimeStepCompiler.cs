@@ -16,7 +16,7 @@ internal sealed record RuntimePreparedAssignment(BuildAssignment Assignment, Run
 
 /// <summary>Translate the selected C#/Git process contract to the existing files-in/process Agent SDK.</summary>
 internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildSecrets secrets,
-    IDbContextFactory<Vivarium.Controller.Persistence.VivariumDbContext> databases)
+    IDbContextFactory<Vivarium.Controller.Persistence.VivariumDbContext> databases, RuntimeBuildSources sources)
 {
     internal async Task<RuntimePreparedAssignment> PrepareAsync(RuntimeBuild build, RuntimeBuildInput input,
         CatalogBuildDefinition definition, RuntimeBuildExecution execution, string osFamily, CancellationToken token)
@@ -37,6 +37,7 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
         string Expand(string value) => Regex.Replace(value, "%([^%\\r\\n]+)%", match =>
             values.TryGetValue(match.Groups[1].Value, out var resolved) ? resolved : match.Value, RegexOptions.CultureInvariant);
         var assignment = new BuildAssignment { BuildId = execution.WorkloadId, OutputContractMajor = 1, ArtifactPublicationContractMajor = 1 };
+        assignment.VcsCheckout = await sources.SelectAsync(input, execution, token);
         var environment = secrets.ReadEnvironment(build.Id, input.ProtectedEnvironment);
         assignment.OutputSecrets.AddRange(environment.Values.Distinct(StringComparer.Ordinal).Select(Google.Protobuf.ByteString.CopyFromUtf8));
         var payloads = new List<RuntimeBuildPayload>();
@@ -87,9 +88,10 @@ internal sealed class RuntimeStepCompiler(RuntimeBuildBytes bytes, RuntimeBuildS
             var key = $"build-payloads/{build.Id}/{hash}";
             await bytes.PutAsync(key, content, token); // Preparation intent/Agent lease is already durable; no SQL transaction spans this I/O.
             payloads.Add(new() { BuildId = build.Id, Sha256 = hash, ObjectKey = key, Size = content.LongLength });
-            assignment.Payload.Add(new Blob { Sha256 = hash, FileName = path });
+            assignment.Payload.Add(new Blob { Sha256 = hash, FileName = path, PrivateInput = assignment.VcsCheckout is not null });
             var step = new AgentStep { Program = windows ? "cmd.exe" : UnixInterpreter(script) };
             if (windows) step.Args.Add(["/d", "/c", path.Replace('/', '\\')]); else step.Args.Add(path);
+            if (assignment.VcsCheckout is not null) { step.ScriptInput = path; step.ScriptArgumentIndex = step.Args.Count - 1; }
             foreach (var (name, value) in values.Where(p => p.Key.StartsWith("env.", StringComparison.Ordinal)))
                 step.Env[name[4..]] = Expand(value);
             step.Env["BUILD_NUMBER"] = number;

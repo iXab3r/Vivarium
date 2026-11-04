@@ -16,6 +16,76 @@ public sealed class PilotAcceptanceCases
     [OneTimeSetUp] public async Task Prepare() { installation = new(); await installation.StartAsync(); }
     [OneTimeTearDown] public async Task Cleanup() => await installation.DisposeAsync();
 
+    [Test, Description("PILOT-SOURCE-COLLECTION-FAILURE-001")]
+    public async Task Source_collection_failure_retains_the_number_and_an_explicit_unavailable_revision()
+    {
+        await using var host = await installation.CreateCaseAsync(catalogued: true);
+        using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
+        var settings = Settings.Replace("new(\"P\", null, [], [", "new(\"P\", new(\"P_Git\", \"git://127.0.0.1:1/absent.git\", \"refs/heads/main\", \"+:.\"), [], [", StringComparison.Ordinal)
+            .Replace("2, [])", "2, [], \"ON_AGENT\")", StringComparison.Ordinal);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), settings);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: source collection failure before checkout");
+        Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
+        using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
+        actor.BuildClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        using var request = new StringContent("{\"buildType\":{\"id\":\"P_Prepare\"}}", Encoding.UTF8, "application/json");
+        using var accepted = await actor.BuildClient.PostAsync("/app/rest/buildQueue", request);
+        Assert.That(accepted.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        using var admission = JsonDocument.Parse(await accepted.Content.ReadAsStringAsync());
+        var id = admission.RootElement.GetProperty("id").GetInt64();
+        await using var linux = new OwnedDockerAgent(host.Root);
+        await host.StartLinuxAgentAsync(linux, administrator, csrf);
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+        JsonElement terminal;
+        while ((terminal = await ReadAsync(actor.BuildClient, id, deadline.Token)).GetProperty("state").GetString() != "finished")
+            await Task.Delay(100, deadline.Token);
+        Assert.That(terminal.GetProperty("number").GetString(), Is.EqualTo("1"));
+        Assert.That(terminal.GetProperty("status").GetString(), Is.EqualTo("FAILURE"));
+        Assert.That(terminal.GetProperty("failedToStart").GetBoolean(), Is.True);
+        Assert.That(terminal.GetProperty("statusText").GetString(), Is.EqualTo("Unable to collect changes"));
+        var revision = terminal.GetProperty("revisions").GetProperty("revision")[0];
+        Assert.That(revision.GetProperty("version").GetString(), Is.EqualTo("N/A"));
+        Assert.That(revision.GetProperty("vcs-root-instance").GetProperty("vcs-root-id").GetString(), Is.EqualTo("P_Git"));
+        await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+        Assert.That((await database.RuntimeBuildCounters.SingleAsync()).NextValue, Is.EqualTo(2));
+        Assert.That(await database.RuntimeBuildResults.CountAsync(), Is.Zero, "No Agent step result is fabricated for server-side collection failure.");
+    }
+
+    [Test, Description("PILOT-SOURCE-AGENT-GIT-UNAVAILABLE-001")]
+    public async Task A_missing_Agent_Git_tool_preserves_the_selected_revision_and_does_not_run_user_steps()
+    {
+        await using var host = await installation.CreateCaseAsync(catalogued: true);
+        await using var git = new OwnedGitSource(host.Root); var revision = await git.StartAsync();
+        using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
+        var settings = Settings.Replace("new(\"P\", null, [], [", "new(\"P\", new(\"P_Git\", " + JsonSerializer.Serialize(git.Url) + ", \"refs/heads/main\", \"+:.\"), [], [", StringComparison.Ordinal)
+            .Replace("2, [])", "2, [], \"ON_AGENT\")", StringComparison.Ordinal);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), settings);
+        await R0AcceptanceCases.CommitCaseAsync(host, "fixture: selected source with missing Agent Git tool");
+        Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
+        using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
+        actor.BuildClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        using var request = new StringContent("{\"buildType\":{\"id\":\"P_Prepare\"}}", Encoding.UTF8, "application/json");
+        using var accepted = await actor.BuildClient.PostAsync("/app/rest/buildQueue", request);
+        Assert.That(accepted.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        using var admission = JsonDocument.Parse(await accepted.Content.ReadAsStringAsync()); var id = admission.RootElement.GetProperty("id").GetInt64();
+        await using var linux = new OwnedDockerAgent(host.Root);
+        await host.StartLinuxAgentAsync(linux, administrator, csrf);
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30)); JsonElement terminal;
+        while ((terminal = await ReadAsync(actor.BuildClient, id, deadline.Token)).GetProperty("state").GetString() != "finished") await Task.Delay(100, deadline.Token);
+        Assert.That(terminal.GetProperty("number").GetString(), Is.EqualTo("1"));
+        Assert.That(terminal.GetProperty("status").GetString(), Is.EqualTo("FAILURE"));
+        Assert.That(terminal.GetProperty("failedToStart").GetBoolean(), Is.True);
+        Assert.That(terminal.GetProperty("statusText").GetString(), Is.EqualTo("Error while applying patch"));
+        Assert.That(terminal.GetProperty("revisions").GetProperty("revision")[0].GetProperty("version").GetString(), Is.EqualTo(revision));
+        using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + id));
+        Assert.That(native.RootElement.GetProperty("source").GetProperty("checkoutFailure").GetString(), Is.EqualTo("git_unavailable"));
+        await using var database = await host.Services.GetRequiredService<IDbContextFactory<VivariumDbContext>>().CreateDbContextAsync();
+        var result = Vivarium.Contracts.V1.BuildResult.Parser.ParseFrom((await database.RuntimeBuildResults.SingleAsync()).Evidence);
+        Assert.That(result.Steps.All(s => s.Skipped), Is.True);
+        Assert.That(result.Artifacts, Is.Empty);
+        Assert.That((await database.AgentRegistrations.SingleAsync()).Quarantined, Is.False, "Tool unavailability is a per-run result, not a lost capability or health conflict.");
+    }
+
     [TestCase("failure", false, TestName = "PILOT-CHAIN-UPSTREAM-FAILURE-001")]
     [TestCase("cancel-upstream", false, TestName = "PILOT-CHAIN-UPSTREAM-CANCEL-001")]
     [TestCase("cancel-root", false, TestName = "PILOT-CHAIN-ROOT-CANCEL-001")]
@@ -115,6 +185,10 @@ public sealed class PilotAcceptanceCases
     [Test]
     public async Task Repeated_Release_reuses_the_successful_producers_selected_by_explicit_snapshot_policy()
         => await WholeChainAsync(viaCli: false, reuse: true);
+
+    [Test, Description("PILOT-SOURCE-CHAIN-PINNING-001")]
+    public async Task Workload_source_is_collected_after_admission_and_pinned_through_both_real_Agents()
+        => await WholeChainAsync(viaCli: false, source: true);
 
     [Test]
     public async Task Unkeyed_queued_repetition_resolves_old_locators_to_the_new_request_across_restart_and_cancel()
@@ -239,11 +313,17 @@ public sealed class PilotAcceptanceCases
         Assert.That(await database.RuntimeBuilds.CountAsync(), Is.EqualTo(3));
     }
 
-    private async Task WholeChainAsync(bool viaCli, bool reuse = false)
+    private async Task WholeChainAsync(bool viaCli, bool reuse = false, bool source = false)
     {
         await using var host = await installation.CreateCaseAsync(catalogued: true);
         using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
-        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), reuse ? ReuseSettings : Settings);
+        await using var git = new OwnedGitSource(host.Root);
+        string? before = source ? await git.StartAsync() : null;
+        var settings = reuse ? ReuseSettings : Settings;
+        if (source) settings = settings.Replace("new(\"P\", null, [], [", "new(\"P\", new(\"P_Git\", " + JsonSerializer.Serialize(git.Url) + ", \"refs/heads/main\", \"+:.\\n-:.repos\"), [], [", StringComparison.Ordinal)
+            .Replace("2, [])", "2, [], \"ON_AGENT\")", StringComparison.Ordinal)
+            .Replace("""printf 'coherent-reference-version\\n' > prepare.txt""", """test ! -e .repos/omitted.txt\ncat selected.txt > prepare.txt""", StringComparison.Ordinal);
+        await File.WriteAllTextAsync(Path.Combine(host.Definitions, ".vivarium/unbound/P/Settings.g.cs"), settings);
         await R0AcceptanceCases.CommitCaseAsync(host, "fixture: prepare the complete small Linux Windows Release chain");
         Assert.That((await R0AcceptanceCases.ReconcileCaseAsync(administrator, csrf)).GetProperty("state").GetString(), Is.EqualTo("applied"));
         using var actor = await R0AcceptanceCases.RestrictedActorAsync(host, administrator, csrf);
@@ -260,9 +340,24 @@ public sealed class PilotAcceptanceCases
             Assert.That(admission.RootElement.GetProperty("state").GetString(), Is.EqualTo("queued"));
         }
 
-        await host.StartWindowsAgentAsync(administrator, csrf); var windowsAgent = host.AgentId;
-        await using var linux = new OwnedDockerAgent(host.Root);
-        await host.StartLinuxAgentAsync(linux, administrator, csrf); var linuxAgent = host.AgentId;
+        string? selectedRevision = source ? await git.ChangeAsync() : null;
+        string? windowsAgent, linuxAgent;
+        await using var linux = new OwnedDockerAgent(host.Root, gitTools: source);
+        if (source)
+        {
+            Assert.That(selectedRevision, Is.Not.EqualTo(before));
+            await host.StartLinuxAgentAsync(linux, administrator, csrf); linuxAgent = host.AgentId;
+            var root = await ReadAsync(actor.BuildClient, id);
+            var waiting = await ReadAsync(actor.BuildClient, root.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64());
+            await FinishedAsync(actor.BuildClient, waiting.GetProperty("snapshot-dependencies").GetProperty("build")[0].GetProperty("id").GetInt64());
+            Assert.That(await git.ChangeAsync("late-unselected-after-Prepare\n"), Is.Not.EqualTo(selectedRevision));
+            await host.StartWindowsAgentAsync(administrator, csrf); windowsAgent = host.AgentId;
+        }
+        else
+        {
+            await host.StartWindowsAgentAsync(administrator, csrf); windowsAgent = host.AgentId;
+            await host.StartLinuxAgentAsync(linux, administrator, csrf); linuxAgent = host.AgentId;
+        }
         Assert.That(linuxAgent, Is.Not.EqualTo(windowsAgent));
         if (viaCli)
         {
@@ -284,6 +379,8 @@ public sealed class PilotAcceptanceCases
                 .Select(e => new { e.BuildId, e.Phase, e.AgentId, e.ReleasedAt }).ToArrayAsync()));
             TestContext.Out.WriteLine(JsonSerializer.Serialize(await database.RuntimeBuildObservations.OrderBy(e => e.BuildId).ThenBy(e => e.Ordinal)
                 .Select(e => new { e.BuildId, e.Phase, e.StepIndex, e.ExitCode }).ToArrayAsync()));
+            TestContext.Out.WriteLine(JsonSerializer.Serialize((await database.RuntimeBuildSourceReceipts.OrderBy(e => e.BuildId).ToArrayAsync())
+                .Select(e => new { e.BuildId, Vivarium.Contracts.V1.VcsCheckoutReceipt.Parser.ParseFrom(e.Evidence).FailureCode })));
             throw;
         }
         Assert.That(release.GetProperty("buildTypeId").GetString(), Is.EqualTo("P_Release"));
@@ -301,6 +398,13 @@ public sealed class PilotAcceptanceCases
         {
             using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + build));
             Assert.That(native.RootElement.GetProperty("agentId").GetString(), Is.EqualTo(agent));
+            if (source)
+            {
+                Assert.That(native.RootElement.GetProperty("source").GetProperty("selectedRevision").GetString(), Is.EqualTo(selectedRevision));
+                Assert.That(native.RootElement.GetProperty("source").GetProperty("consumedRevision").GetString(), Is.EqualTo(selectedRevision));
+                var compatible = await ReadAsync(actor.BuildClient, build);
+                Assert.That(compatible.GetProperty("revisions").GetProperty("revision")[0].GetProperty("version").GetString(), Is.EqualTo(selectedRevision));
+            }
         }
         foreach (var (build, file) in new[] { (prepareId, "prepare.txt"), (windowsId, "windows.txt"), (id, "release.txt") })
         {
@@ -309,6 +413,15 @@ public sealed class PilotAcceptanceCases
             var bytes = await response.Content.ReadAsByteArrayAsync();
             Assert.That(bytes, Is.EqualTo("coherent-reference-version\n"u8.ToArray()));
             Assert.That(Convert.ToHexStringLower(SHA256.HashData(bytes)), Is.EqualTo("97dc31e36da90b592250f4e30e01d0364a3abcafa36d57fccaccbaedbd6629c8"));
+        }
+        if (source)
+        {
+            await host.RestartAsync();
+            foreach (var build in new[] { prepareId, windowsId, id })
+            {
+                using var native = JsonDocument.Parse(await actor.BuildClient.GetStringAsync("/api/v1/builds/" + build));
+                Assert.That(native.RootElement.GetProperty("source").GetProperty("consumedRevision").GetString(), Is.EqualTo(selectedRevision));
+            }
         }
         if (reuse)
         {

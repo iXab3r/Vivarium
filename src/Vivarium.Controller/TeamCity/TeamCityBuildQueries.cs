@@ -67,6 +67,21 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             result["startDate"] = TeamCityProtocol.Date(build.CancelRequestedAt.Value);
         }
         var dependencies = await RuntimeBuildService.SelectionViewsAsync(database, id, token);
+        var sourceInput = await database.RuntimeBuildInputs.AsNoTracking().SingleAsync(i => i.BuildId == id, token);
+        if (sourceInput.SourceJson is not null)
+        {
+            var source = JsonSerializer.Deserialize<Vivarium.Definitions.Source>(sourceInput.SourceJson, Catalog.DefinitionValidation.Json)!;
+            var selected = await database.RuntimeBuildSourceSelections.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == id, token);
+            var revisions = new JsonArray();
+            if (selected is not null)
+            {
+                var revision = new JsonObject { ["version"] = selected.Version, ["internalVersion"] = selected.Version,
+                    ["vcs-root-instance"] = new JsonObject { ["id"] = sourceInput.VcsRootInstanceId!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), ["vcs-root-id"] = source.RootId } };
+                if (selected.Version != "N/A") revision["vcsBranchName"] = source.Branch;
+                revisions.Add(revision);
+            }
+            result["revisions"] = new JsonObject { ["count"] = revisions.Count, ["revision"] = revisions };
+        }
         foreach (var kind in new[] { "SNAPSHOT", "ARTIFACT" })
         {
             var selected = dependencies.Where(d => d.Kind == kind).Select(d => d.Build).ToArray();
@@ -94,7 +109,7 @@ internal sealed class TeamCityBuildQueries(IDbContextFactory<VivariumDbContext> 
             result["triggered"] = trigger;
             // R0 admits source-free configurations only. These links identify the same numeric Build.
             result["changes"] = new JsonObject { ["href"] = "/app/rest/changes?locator=build:(id:" + id + ")" };
-            result["revisions"] = new JsonObject { ["count"] = 0 };
+            if (sourceInput.SourceJson is null) result["revisions"] = new JsonObject { ["count"] = 0 };
             if (state == "queued") result["compatibleAgents"] = new JsonObject { ["href"] = "/app/rest/agents?locator=compatible:(build:(id:" + id + "))" };
             result["artifacts"] = new JsonObject { ["href"] = "/app/rest/builds/id:" + id + "/artifacts/children/" };
             result["vcsLabels"] = new JsonArray(); result["customization"] = new JsonObject();

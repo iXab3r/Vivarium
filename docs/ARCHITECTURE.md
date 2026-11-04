@@ -1190,9 +1190,23 @@ physical execution. Successful snapshot reuse requires explicit reuse/success-on
 matching collected plans, ordinary parameters and selected producers; encrypted run-secret inputs
 are not compared for this cohort. Actual assignment/consumed producer/file/destination evidence
 remains immutable. This is runtime resolution, not a Git desired override or an independent chain
-scheduler. Literal same-chain transfers and selected CANCEL/CANCEL propagation exist; source
-checkout, other reuse/selector/policy profiles, full recipe runners and publication remain due before
-PILOT acceptance.
+scheduler. Literal same-chain transfers and selected CANCEL/CANCEL propagation exist.
+
+The selected workload-source extension retains the Git-owned Source declaration in immutable Build
+input, with a PostgreSQL identity for the effective VCS-root properties. That identity excludes
+attachment checkout rules and is distinct from the catalogue/settings revision. The coordinator
+collects the workload branch revision when an eligible Agent is claimed, or uses its same-root
+snapshot producer's selected revision; later branch movement cannot change that chain's checkout.
+Selection and the Agent's actual checked-out HEAD are separate immutable facts. Anonymous Git
+collection inherits no Host home, Git configuration or credentials. The negotiated Windows/Linux
+`teamcity.vcs-checkout.v1` seam performs checkout before user steps and stores generated script
+inputs outside the source tree. A fenced early receipt and matching final receipt prove actual HEAD;
+process success alone cannot supply that proof. Native reads expose selected/consumed revisions,
+while the compatible `revisions` projection reports the same workload identity. A collection failure
+retains `N/A`; a checkout failure retains the selected commit and runs no user steps. Private-source
+credentials, source-aware reuse, other checkout/selector/policy profiles, full recipe runners,
+remaining fault variants and publication remain due before affected PILOT acceptance. This selected
+implementation neither changes D43 evaluator isolation nor claims full VCS resource compatibility.
 
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router

@@ -23,6 +23,7 @@ internal sealed record AgentProtocolNegotiation(
         capability => capability.CapabilityId == AgentProtocolCompatibility.BuildOutputCapabilityId);
     public bool SupportsLiteralArtifactPublisher => NegotiatedCapabilities.Any(
         capability => capability.CapabilityId == AgentProtocolCompatibility.ArtifactPublisherCapabilityId);
+    public bool SupportsVcsCheckout => NegotiatedCapabilities.Any(capability => capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId);
 }
 
 /// <summary>
@@ -57,7 +58,7 @@ internal static class AgentProtocolCompatibility
         };
 
     public static AgentProtocolNegotiation Negotiate(Hello hello, bool enableDurableBuildOutput = false,
-        bool enableLiteralArtifactPublisher = false)
+        bool enableLiteralArtifactPublisher = false, bool enableVcsCheckout = false)
     {
         ArgumentNullException.ThrowIfNull(hello);
 
@@ -118,7 +119,8 @@ internal static class AgentProtocolCompatibility
             .Where(capability =>
                 KnownCapabilities.TryGetValue(capability.CapabilityId, out var major) && major == capability.ContractMajor
                 || enableDurableBuildOutput && capability.CapabilityId == BuildOutputCapabilityId && capability.ContractMajor == 1
-                || enableLiteralArtifactPublisher && capability.CapabilityId == ArtifactPublisherCapabilityId && capability.ContractMajor == 1)
+                || enableLiteralArtifactPublisher && capability.CapabilityId == ArtifactPublisherCapabilityId && capability.ContractMajor == 1
+                || enableVcsCheckout && capability.CapabilityId == Vivarium.Contracts.VcsCheckoutProfile.CapabilityId && capability.ContractMajor == 1)
             .Select(capability => capability.Clone())
             .ToArray();
 

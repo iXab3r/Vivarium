@@ -154,6 +154,7 @@ message Blob {
   string file_name = 2;  // target path relative to the build workdir (forward slashes)
   bool archive = 3;      // zip; extracted under unpack_to
   string unpack_to = 4;  // extraction root relative to workdir; empty = workdir
+  bool private_input = 5; // negotiated VCS checkout: generated inputs live outside the source tree
 }
 
 enum StepPolicy {
@@ -170,6 +171,8 @@ message Step {
   int32 timeout_sec = 5;   // 0 = no per-step timeout
   StepPolicy policy = 6;
   bool expected_reboot = 7;  // provisioning: suppress lost-heartbeat INFRA (D6/D9)
+  string script_input = 8; // private generated script path, not a source-tree file
+  int32 script_argument_index = 9; // replace this exact matching argument with the private input path
 }
 
 enum OnFail {
@@ -188,6 +191,20 @@ message BuildAssignment {
   uint32 output_contract_major = 7; // 1 requires negotiated teamcity.build-output.v1
   repeated bytes output_secrets = 8; // ephemeral exact-value masks; never desired Git data or ordinary logs
   uint32 artifact_publication_contract_major = 9; // 1: negotiated teamcity.artifact-publisher.literal.v1
+  VcsCheckout vcs_checkout = 10; // requires negotiated teamcity.vcs-checkout.v1
+}
+
+message VcsCheckout {
+  string url = 1; // credential-free anonymous Git transport; no Host credential inheritance
+  string branch = 2; // canonical refs/heads/*
+  string revision = 3; // coordinator-selected immutable Git SHA-1
+  repeated string excluded_directories = 4; // selected root checkout rules, validated relative paths
+}
+
+message VcsCheckoutReceipt {
+  string revision = 1; // actual HEAD, present only after successful checkout
+  bool succeeded = 2;
+  string failure_code = 3; // bounded typed code, never Git diagnostics or remote data
 }
 
 message AssignmentAccepted {
@@ -283,6 +300,7 @@ message StepStatus {
   int32 step_index = 2;   // -1 for build-level phases
   string phase = 3;       // FETCHING | RUNNING | COLLECTING
   StepResult completed = 4; // optional actual step receipt; phase remains RUNNING for older readers
+  VcsCheckoutReceipt vcs_checkout = 5; // independent pre-step observation; phase FETCHING, step -1
 }
 
 enum LogStream {
@@ -352,6 +370,7 @@ message BuildResult {
   string status_text = 6;
   repeated BuildOutputWatermark output_watermarks = 7;
   bool output_producer_lost = 8; // no final watermark can be asserted (crash or incomplete pipe drain)
+  VcsCheckoutReceipt vcs_checkout = 9;
 }
 
 message BuildResultAccepted {

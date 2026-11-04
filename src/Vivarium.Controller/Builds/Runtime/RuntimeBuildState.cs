@@ -48,7 +48,8 @@ public sealed class RuntimeBuildResolution
 }
 
 // This is the actually collected settings relation, not a writable PG desired-settings override.
-// Source-free R0 collects it before queue admission; VCS source selection is a distinct later fact.
+// Settings and the Source declaration are collected at admission; workload revision and actual
+// checkout remain separate later facts, never a rewrite of this input or of the historical plan.
 public sealed class RuntimeBuildInput
 {
     public long BuildId { get; set; }
@@ -59,6 +60,33 @@ public sealed class RuntimeBuildInput
     public required string OverridesJson { get; set; }
     public required string AdmissionJson { get; set; }
     public byte[] ProtectedEnvironment { get; set; } = [];
+    public long? VcsRootInstanceId { get; set; }
+    public string? SourceJson { get; set; }
+}
+
+// Immutable effective VCS properties; checkout attachment rules remain in each collected input.
+public sealed class RuntimeVcsRootInstance
+{
+    public long Id { get; set; }
+    public long ProjectId { get; set; }
+    public string RootId { get; set; } = "";
+    public string PropertiesHash { get; set; } = "";
+    public string PropertiesJson { get; set; } = "";
+}
+
+// The coordinator's selected workload revision, distinct from settings and Agent checkout evidence.
+public sealed class RuntimeBuildSourceSelection
+{
+    public long BuildId { get; set; }
+    public string Version { get; set; } = "";
+    public DateTimeOffset SelectedAt { get; set; }
+}
+
+public sealed class RuntimeBuildSourceReceipt
+{
+    public long BuildId { get; set; }
+    public byte[] Evidence { get; set; } = [];
+    public DateTimeOffset ReceivedAt { get; set; }
 }
 
 // Actual selections between ordinary Builds; desired edges remain in the immutable Git plan.

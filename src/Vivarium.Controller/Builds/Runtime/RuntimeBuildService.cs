@@ -25,7 +25,9 @@ internal sealed record RuntimeBuildView(long Id, string? Number, string State, s
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? SnapshotDependencies { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSelectionView[]? ArtifactDependencies { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public RuntimeBuildSourceView? Source { get; init; }
 }
+internal sealed record RuntimeBuildSourceView(string RootId, long RootInstanceId, string Branch, string? SelectedRevision, string? ConsumedRevision, string? CheckoutFailure);
 internal sealed record RuntimeBuildSelectionView(long Id, string ConfigurationId, string State, string Status);
 internal sealed record RuntimeBuildDependencyHandle
 {
@@ -71,13 +73,21 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
         }
         // R0 collects the selected source-free/server settings now, matching its independent queued
         // edit observation. This is not a universal VCS/settings freeze rule or a YAML payload entry.
-        if (selected.Project.Definition.Source is not null || selected.Configuration.Steps.Length > 128)
+        if (selected.Configuration.Steps.Length > 128)
         {
             StageAudit(database, actor, "build.submit", "build-configuration", request.ConfigurationId, AuditOutcome.Failed);
             await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
             throw new RestApiException(422, "execution_subset_unavailable", "This execution profile is unavailable",
-                "The current runner accepts source-free ordinary configurations with at most 128 steps.");
+                "The current runner accepts ordinary configurations with at most 128 steps.");
         }
+        var source = selected.Project.Definition.Source;
+        if (source is not null)
+        {
+            try { RuntimeBuildSources.Profile(source); }
+            catch (InvalidDataException) { throw new RestApiException(422, "execution_subset_unavailable", "Checkout profile unavailable",
+                "This source profile requires anonymous Git, a canonical branch and root checkout with literal top-level exclusions."); }
+        }
+        long? rootInstance = source is null ? null : await RuntimeBuildSources.InstanceAsync(database, snapshot.ProjectIds[selected.Project.Control.Id], source, token);
         var now = time.GetUtcNow();
         var configurations = selected.Project.Definition.Configurations.ToDictionary(c => c.Id, StringComparer.Ordinal);
         var collected = new Dictionary<string, RuntimeBuild>(StringComparer.Ordinal);
@@ -89,6 +99,9 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
                 throw Invalid("The Build dependency graph is cyclic or exceeds the current bound.");
             if (!configurations.TryGetValue(configurationId, out var config) || config.Steps.Length > 128)
                 throw Invalid("A Build dependency definition is unavailable.");
+            if (source is not null && (config.CheckoutMode != "ON_AGENT" || config.Snapshots.Any(d => d.ReuseBuilds)))
+                throw new RestApiException(422, "execution_subset_unavailable", "Checkout profile unavailable",
+                    "This source cohort requires explicit ON_AGENT checkout without snapshot reuse.");
             if (config.Snapshots.Any(d => d.Failure != "CANCEL" || d.Cancel != "CANCEL" || d.ReuseBuilds && !d.SuccessfulOnly))
                 throw new RestApiException(422, "execution_subset_unavailable", "Dependency policy unavailable",
                     "This cohort requires CANCEL/CANCEL edges and successful-only selection when reuse is enabled.");
@@ -100,6 +113,7 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             var isRoot = configurationId == request.ConfigurationId;
             database.RuntimeBuildInputs.Add(new() { BuildId = member.Id, BuildTypeId = member.BuildTypeId, ProjectId = member.ProjectId,
                 RevisionId = snapshot.Revision.Id, CollectedAt = now,
+                VcsRootInstanceId = rootInstance, SourceJson = source is null ? null : JsonSerializer.Serialize(source, DefinitionValidation.Json),
                 ProtectedEnvironment = secrets.ProtectEnvironment(member.Id, isRoot ? environment : []),
                 OverridesJson = JsonSerializer.Serialize(isRoot ? new SortedDictionary<string, string>(parameters, StringComparer.Ordinal) : []),
                 AdmissionJson = JsonSerializer.Serialize(new { actorId = member.ActorId, permissions, projectAndAncestors = ancestry,
@@ -152,10 +166,21 @@ internal sealed class RuntimeBuildService(IDbContextFactory<VivariumDbContext> d
             _ => build.State.ToLowerInvariant()
         };
         var selections = await SelectionViewsAsync(database, id, token);
+        RuntimeBuildSourceView? sourceView = null;
+        if (input.SourceJson is not null)
+        {
+            var source = JsonSerializer.Deserialize<Source>(input.SourceJson, DefinitionValidation.Json)!;
+            var selection = await database.RuntimeBuildSourceSelections.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == id, token);
+            var receipt = await database.RuntimeBuildSourceReceipts.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == id, token);
+            var checkout = receipt is null ? null : Vivarium.Contracts.V1.VcsCheckoutReceipt.Parser.ParseFrom(receipt.Evidence);
+            sourceView = new(source.RootId, input.VcsRootInstanceId!.Value, source.Branch, selection?.Version,
+                checkout is { Succeeded: true } ? checkout.Revision : null, checkout is { Succeeded: false } ? checkout.FailureCode : null);
+        }
         return new(build.Id, build.Number, publicState, build.Status, build.StatusText, type.ExternalId,
             project.ExternalId, input.RevisionId, definition.PlanHash, build.QueuedAt, build.StartedAt, build.FinishedAt,
             build.CancelRequestedAt, build.CancelReason, execution?.Phase.ToLowerInvariant(), execution?.AgentId, build.FailedToStart)
         {
+            Source = sourceView,
             SnapshotDependencies = selections.Any(d => d.Kind == "SNAPSHOT") ? selections.Where(d => d.Kind == "SNAPSHOT").Select(d => d.Build).ToArray() : null,
             ArtifactDependencies = selections.Any(d => d.Kind == "ARTIFACT") ? selections.Where(d => d.Kind == "ARTIFACT").Select(d => d.Build).ToArray() : null,
         };

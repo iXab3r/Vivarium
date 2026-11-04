@@ -132,6 +132,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                 if (!Eligible(agent) || !sessions.TryGetCurrent(id, out var connection)
                     || !Current(agent, connection!) || !connection!.Protocol.SupportsDurableBuildOutput
                     || !connection.Protocol.SupportsLiteralArtifactPublisher) continue;
+                if (input.SourceJson is not null && !connection.Protocol.SupportsVcsCheckout) continue;
                 var reported = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.ReportedParametersJson, Json)!;
                 if (!reported.TryGetValue("system.os.family", out var platform) || platform is not ("windows" or "linux" or "macos")) continue;
                 var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.CustomParametersJson, Json)!;
@@ -179,7 +180,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     {
         // This first source-free cohort never compares encrypted secrets or substitutes an
         // already assigned execution. Queue resolution and actual work ownership are separate.
-        if (input.ProtectedEnvironment.Length != 0
+        if (input.SourceJson is not null || input.ProtectedEnvironment.Length != 0
             || await database.RuntimeBuildExecutions.AnyAsync(e => e.BuildId == build.Id, token)) return false;
         var incoming = await database.RuntimeBuildDependencies.AsNoTracking().Where(d => d.UpstreamBuildId == build.Id && d.Kind == "SNAPSHOT")
             .Join(database.RuntimeBuildInputs.AsNoTracking(), d => d.BuildId, i => i.BuildId, (d, i) => i)
@@ -268,6 +269,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             using var timeout = new CancellationTokenSource(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, time);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
             try { prepared = await compiler.PrepareAsync(build, input, definition, snapshot, os, deadline.Token); }
+            catch (RuntimeSourceCollectionException)
+            { await FailAsync(id, "Unable to collect changes", safeUnsent: true, token, sourceFailure: true); return; }
             catch (Exception error) when (error is InvalidDataException or HttpRequestException or IOException or TimeoutException
                 || error is OperationCanceledException && !token.IsCancellationRequested)
             { await FailAsync(id, "Execution preparation failed", safeUnsent: true, token); return; }
@@ -387,6 +390,23 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             var phase = RuntimeBuildProgress.Validate(status, assignment);
             if (execution.TerminalReceivedAt is not null) return;
+            if (status.VcsCheckout is { } checkout)
+            {
+                if (status.Phase != "FETCHING" || status.StepIndex != -1 || status.Completed is not null)
+                    throw new InvalidDataException("VCS checkout observation phase differs.");
+                if (!await RuntimeBuildSources.ObserveAsync(database, build.Id, checkout, assignment, time.GetUtcNow(), token))
+                {
+                    await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_source_receipt");
+                    await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                    registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("VCS checkout evidence conflicts.");
+                }
+            }
+            if (assignment.VcsCheckout is not null && phase is "RUNNING" or "COMPLETED" or "COLLECTING")
+            {
+                var receipt = await database.RuntimeBuildSourceReceipts.AsNoTracking().SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
+                if (receipt is null || !VcsCheckoutReceipt.Parser.ParseFrom(receipt.Evidence).Succeeded)
+                    throw new InvalidDataException("User-step progress precedes successful checkout evidence.");
+            }
             var observation = await RuntimeBuildProgress.ObserveAsync(database, build.Id, status, phase, time.GetUtcNow(), token);
             if (observation.Conflict)
             {
@@ -413,6 +433,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             var result = message.Result;
             var assignment = secrets.ReadAssignment(build.Id, execution.Assignment, execution.AssignmentProtectionVersion);
             ValidateResult(result, assignment);
+            var sourceReceipt = await database.RuntimeBuildSourceReceipts.AsNoTracking().SingleOrDefaultAsync(r => r.BuildId == build.Id, token);
+            if (result.VcsCheckout is { } checkout && !await RuntimeBuildSources.ObserveAsync(database, build.Id, checkout, assignment, time.GetUtcNow(), token)
+                || result.VcsCheckout is null && sourceReceipt is not null && result.Outcome != BuildOutcome.InfrastructureFailed)
+            {
+                await QuarantineProgressAsync(database, agent, build, workload, token, "conflicting_source_receipt");
+                await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
+                registry.Quarantine(agent.AgentId, agent.HealthReason); throw new InvalidDataException("VCS checkout evidence conflicts.");
+            }
             var steps = await database.RuntimeBuildObservations.AsNoTracking().Where(o => o.BuildId == build.Id && o.Phase == "COMPLETED").ToArrayAsync(token);
             if (steps.Any(observed =>
                 {
@@ -464,7 +492,10 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                     OriginalOutcome = result.Outcome.ToString(), ReceivedAt = time.GetUtcNow() });
                 build.Status = result.Outcome switch { BuildOutcome.Succeeded => "SUCCESS", BuildOutcome.Failed => "FAILURE", _ => "UNKNOWN" };
                 if (result.Outcome == BuildOutcome.Failed)
-                    build.StatusText = await RuntimeBuildStatus.FailureAsync(database, build, result, token);
+                {
+                    build.FailedToStart = result.VcsCheckout is { Succeeded: false };
+                    build.StatusText = build.FailedToStart ? "Error while applying patch" : await RuntimeBuildStatus.FailureAsync(database, build, result, token);
+                }
                 await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.result.accepted", workload: workload, token: token);
                 execution.Phase = "TERMINAL"; execution.TerminalReceivedAt = time.GetUtcNow();
                 execution.OutputDeadline = time.GetUtcNow().AddSeconds(30); build.State = "RELEASING";
@@ -493,14 +524,14 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
     }
 
     private async Task QuarantineProgressAsync(VivariumDbContext database, AgentRegistration agent, RuntimeBuild build,
-        string workload, CancellationToken token)
+        string workload, CancellationToken token, string reason = "conflicting_step_result")
     {
-        agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = "conflicting_step_result";
+        agent.Quarantined = true; agent.Health = "UNHEALTHY"; agent.HealthReason = reason;
         await RuntimeBuildAudit.StageAsync(database, build, time.GetUtcNow(), "build.progress.conflict", AuditOutcome.Failed,
-            "conflicting_step_result", workload, token: token);
+            reason, workload, token: token);
     }
 
-    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token)
+    private async Task FailAsync(long id, string reason, bool safeUnsent, CancellationToken token, bool sourceFailure = false)
     {
         await using var database = await databases.CreateDbContextAsync(token);
         var key = await database.RuntimeBuildExecutions.AsNoTracking().Where(e => e.BuildId == id).Select(e => e.AgentId).SingleAsync(token);
@@ -513,6 +544,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
         // A durable send intent always wins over a caller's earlier unsent observation.
         safeUnsent &= execution.SentAt is null;
         build.State = "FINISHED"; build.Status = "UNKNOWN"; build.StatusText = reason;
+        if (sourceFailure && build.CancelRequestedAt is null) build.Status = "FAILURE";
         build.Number ??= "N/A";
         build.FailedToStart = build.CancelRequestedAt is null && execution.AcceptedAt is null; build.FinishedAt = time.GetUtcNow();
         execution.Phase = "RELEASED"; execution.ReleasedAt = time.GetUtcNow();
@@ -572,6 +604,11 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
 
     internal static void ValidateResult(BuildResult result, BuildAssignment assignment)
     {
+        if (result.VcsCheckout is { } checkout) RuntimeBuildSources.ValidateReceipt(checkout, assignment);
+        if (assignment.VcsCheckout is not null && result.Outcome is BuildOutcome.Succeeded or BuildOutcome.Failed && result.VcsCheckout is null
+            || assignment.VcsCheckout is not null && result.Outcome == BuildOutcome.Succeeded && result.VcsCheckout is not { Succeeded: true }
+            || result.VcsCheckout is { Succeeded: false } && (result.Outcome is not (BuildOutcome.Failed or BuildOutcome.Cancelled) || result.Steps.Any(s => !s.Skipped) || result.Artifacts.Count != 0))
+            throw new InvalidDataException("Terminal execution contradicts its checkout evidence.");
         if (result.Outcome is not (BuildOutcome.Succeeded or BuildOutcome.Failed or BuildOutcome.Cancelled or BuildOutcome.InfrastructureFailed)
             || result.StatusText.Length > 1024 || result.Steps.Count > assignment.Steps.Count
             || result.Steps.Any(s => s.StepIndex < 0 || s.StepIndex >= assignment.Steps.Count)

@@ -126,10 +126,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Behavioral source fixture adaptation to actual Windows; original reference Windows-shaped job ran on Linux. No full-wire GREEN, background estimate oracle, reuse/default-policy assertion, checkout/trigger/publication/UI/CLI/T3 acceptance is claimed by this first case.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -170,10 +171,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-FAILURE-001"
     },
@@ -215,10 +217,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       },
       "display_name": "PILOT-CHAIN-UPSTREAM-CANCEL-001"
     },
@@ -260,10 +263,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "No running-cancel/reuse/source/other edge-policy or full-wire equality claim. First exploratory root-cancel all-terminal expectation failed; its source/cleanup-recovery receipt remains retained separately.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       },
       "display_name": "PILOT-CHAIN-ROOT-CANCEL-001"
     },
@@ -320,10 +324,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Its own fresh real chain admission and CLI file download, with shared REST/native selection/actual OS/byte readbacks. Reuses the existing 0.5.6 credential boundary; no UI/checkout/reuse/trigger/publication/T3 or full-wire claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -360,10 +365,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Selected source-free literal small-chain profile. Full readiness/compatibility variants, history/denial/cancel/current-rights/recovery and remaining checkout/reuse/triggers/publication/T3 stay due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -402,10 +408,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Prior ordinary framework cookie setup; independent R0 owns actual OIDC login. No raw auth DOM/HAR/trace captured. Remaining readiness/history/UI-cancel/recovery and checkout/reuse/triggers/publication/T3 remain due in this same story.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -449,10 +456,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -496,10 +504,11 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Pinned explicit-successful reuse source-free cohort only. Omitted REST reuse defaults remain false; other reuse/policy/source variants are not inferred. No full-wire timing or complete family/API claim.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     },
     {
@@ -542,14 +551,183 @@
       "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
       "limits": "Documented behavioral expectation and retained literal failure source, not full wire conformance. Other source/reuse/error/parameter profiles remain unaccepted.",
       "evidence": {
-        "path": "artifacts/pilot-chain/results/small-ten-case-cohort.trx",
-        "sha256": "5a4fc336fd634f39b5c65414f9977eb6278b44e2f31d500247e5475146f73539",
-        "cohort_passed": 10,
-        "cohort_failed": 0
+        "path": "artifacts/pilot-chain/results/small-thirteen-case-cohort.trx",
+        "sha256": "8cf4bb5990502ab7f85482948d677fe188e4d7e579a8219449872887b56aef0f",
+        "cohort_passed": 13,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-COLLECTION-FAILURE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-collection-failure-observations.json",
+        "sha256": "ff31d721f36deb15c59c8b7130d19fe2e7de003b8b739494173fee362b7f37d0",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Source declaration exists, branch collection fails before dispatch.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "The ordinary run retains number1/counter2, FAILURE/failedToStart, explicit N/A workload revision and no fabricated Agent result.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Source_collection_failure_retains_the_number_and_an_explicit_unavailable_revision",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
+        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
+        "cohort_passed": 3,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-AGENT-GIT-UNAVAILABLE-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/source-checkout-observations.json",
+        "sha256": "824274bfdf572b9bd1fe034571afcba285d4bb280294b6e03f9601a5e4297592",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Server resolves the immutable commit; the pinned runtime Agent has no Git executable.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "The selected revision remains readable, checkout fails before any user step, counter advances, no artifact is published and the Agent remains healthy.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.A_missing_Agent_Git_tool_preserves_the_selected_revision_and_does_not_run_user_steps",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
+        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
+        "cohort_passed": 3,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
+      }
+    },
+    {
+      "id": "PILOT-SOURCE-CHAIN-PINNING-001",
+      "kind": "reference-behavior",
+      "primary_subsystem": "SS-VCS",
+      "related_subsystems": [
+        "SS-RUN",
+        "SS-CHAIN",
+        "SS-CFG",
+        "SS-AGT",
+        "SS-EXEC",
+        "SS-BLOB",
+        "SS-IAM"
+      ],
+      "integration_slice": "SS-RUN@PILOT",
+      "business_ac": [
+        "AC-BLD-01",
+        "AC-RUN-01",
+        "AC-BLD-07"
+      ],
+      "model_invariants": [
+        "TCM-01",
+        "TCM-02",
+        "TCM-03",
+        "TCM-04",
+        "TCM-05",
+        "TCM-08",
+        "TCM-10"
+      ],
+      "source": {
+        "path": "tests/Vivarium.Tests/TeamCity/Reference/us013-observations.json",
+        "sha256": "76176262c095ceae345c7ec9751e7af6677331ee1690926b544f53a06bc64c55",
+        "interpretation": "Selected collection/checkout state, revision and counter facts; source-timing P0 observations govern late workload collection. Actual source Windows execution is a product adaptation, not reference Windows execution or full wire equality."
+      },
+      "principal": "Ordinary finite six-permission P account.",
+      "seed": "Queued whole chain uses anonymous owned Git. Branch advances before Prepare and again after Prepare, before Windows. Source includes a colliding generated-script path and an excluded .repos directory.",
+      "entry": "Compatible ordinary C#/Git run; native and compatible reads share its current authority.",
+      "effect": "Actual Linux and Windows checkout the first executing producer revision; selected/consumed facts and exact outputs survive Host restart, excluded content is absent and source files cannot replace private generated scripts.",
+      "completion": "Real Host/PG/Git/Storage and owned Agent execution/receipts, with no built T3 application launch.",
+      "product_binding": "Vivarium.DefinitionProof.PilotAcceptanceCases.Workload_source_is_collected_after_admission_and_pinned_through_both_real_Agents",
+      "state": "SELECTED_PRODUCT_GREEN_WORKING_TREE_NOT_MILESTONE_ACCEPTED",
+      "limits": "Anonymous ON_AGENT root checkout with literal top-level exclusions. Private source credentials, source-aware reuse, other modes/rules, cancellation/fault variants and full VCS REST remain unaccepted.",
+      "affected_wire_cases": [
+        "TC-WIR-02",
+        "TC-WIR-04",
+        "TC-WIR-07",
+        "TC-WIR-12"
+      ],
+      "wire_qualification": "Affected contract links, not full-family wire GREEN or an API-complete claim.",
+      "evidence": {
+        "path": "artifacts/pilot-chain/results/source-three-renewal.trx",
+        "sha256": "4fc175cfa42963baaa8661cf4d4053610ff3442c2e889efaaccd2e2cf08ca199",
+        "cohort_passed": 3,
+        "cohort_failed": 0,
+        "qualification": "Source cases renewed after the two source-stop/result refinements. The thirteen-case combined run precedes those refinements; no final exact-revision milestone claim."
       }
     }
   ],
-  "remaining_due": "The complete US-013 scope stays in117/118: independent UI/unchanged-CLI entries, source/settings selection/checkout, explicit reuse and failure/cancel/current-rights/recovery, actual recipe runners, used trigger/coexistence/publication controls and actual T3 build/package/test release. These are later cohorts in the same PILOT, not deferred story scope or new leaf milestones.",
+  "remaining_due": "Complete US-013 remains in #78/#116/#117/#118: source-aware reuse and due source/authority/cancel/recovery variants, actual recipe Docker/PowerShell runners and large selected artifact rules/bytes, UI source/readiness/operations, used trigger/coexistence/single-publisher controls, actual T3 build/package and test-repository release, cumulative gates and independent final review/main. Selected surface and source cases do not close their broader API families.",
   "global_variant_denominator": null,
   "api_complete": false
 }

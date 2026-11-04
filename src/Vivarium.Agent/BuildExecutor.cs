@@ -11,7 +11,7 @@ namespace Vivarium.Agent;
 /// Runs one BuildAssignment: fetch payload → run steps → collect artifacts (D3).
 /// The machine's cleanup is the controller's problem (clean policies, D5) — not this class's.
 /// </summary>
-public static class BuildExecutor
+public static partial class BuildExecutor
 {
     private static readonly TimeSpan ForceTerminationTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan OutputDrainTimeout = TimeSpan.FromSeconds(5);
@@ -48,10 +48,23 @@ public static class BuildExecutor
         {
             await SendStatusAsync(
                 send, assignment.BuildId, -1, "FETCHING", stop.GracefulToken);
+            if (assignment.VcsCheckout is { } source)
+            {
+                result.VcsCheckout = await CheckoutAsync(workRoot, workdir, assignment.BuildId, source, stop, observeProcess);
+                await send(new AgentMsg { Status = new StepStatus { BuildId = assignment.BuildId, StepIndex = -1,
+                    Phase = "FETCHING", VcsCheckout = result.VcsCheckout.Clone() } }, stop.GracefulToken);
+                if (!result.VcsCheckout.Succeeded)
+                {
+                    for (var index = 0; index < assignment.Steps.Count; index++) result.Steps.Add(new StepResult { StepIndex = index, Skipped = true });
+                    result.Outcome = BuildOutcome.Failed;
+                    return result;
+                }
+            }
             foreach (var blob in assignment.Payload)
             {
                 await FetchBlobAsync(
-                    blob, workdir, assignment.BuildId, sessionId, blobs, stop.GracefulToken);
+                    blob, blob.PrivateInput ? PrivateInputs(workRoot, assignment.BuildId) : workdir,
+                    assignment.BuildId, sessionId, blobs, stop.GracefulToken);
             }
         }
         catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
@@ -236,6 +249,13 @@ public static class BuildExecutor
         foreach (var arg in step.Args)
         {
             psi.ArgumentList.Add(arg);
+        }
+        if (step.ScriptInput.Length != 0)
+        {
+            if (assignment.VcsCheckout is null || step.ScriptArgumentIndex < 0 || step.ScriptArgumentIndex >= step.Args.Count
+                || step.Args[step.ScriptArgumentIndex].Replace('\\', '/') != step.ScriptInput.Replace('\\', '/'))
+                throw new InvalidDataException("The generated script input differs from its argument.");
+            psi.ArgumentList[step.ScriptArgumentIndex] = ResolveUnder(PrivateInputs(Path.GetDirectoryName(workdir)!, assignment.BuildId), step.ScriptInput);
         }
 
         psi.Environment["VIVARIUM_BUILD_ID"] = assignment.BuildId;
