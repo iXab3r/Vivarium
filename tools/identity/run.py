@@ -8,6 +8,7 @@ import sys
 import tarfile
 import time
 import uuid
+import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parents[2]
 context = Path(sys.argv[1]).resolve()
@@ -53,6 +54,7 @@ try:
                             "--shm-size", "256m", image])
     receipt["container_id"] = container_id
     value = inspect_owned()
+    receipt["runtime_command"] = value["Config"]["Cmd"]
     host = value["HostConfig"]
     if (host["NetworkMode"] != "none" or host["Privileged"] or value["Config"]["User"] != "vivarium"
             or value["Mounts"] or host.get("PortBindings") or host["CapDrop"] != ["ALL"]
@@ -71,7 +73,7 @@ try:
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE) as copy:
         with tarfile.open(fileobj=copy.stdout, mode="r|") as archive:
             for member in archive:
-                if member.isfile() and Path(member.name).name in ("run-summary.json", "tests.trx", "identity-progress.json", "browser-errors.log"):
+                if member.isfile() and Path(member.name).name in ("run-summary.json", "tests.trx", "identity-progress.json", "browser-errors.log", "cases.json", "plan.json", "results.json"):
                     if member.size > 8 * 1024**2:
                         raise RuntimeError("Result evidence exceeded its bound")
                     selected[member.name] = archive.extractfile(member).read()
@@ -86,9 +88,20 @@ try:
     for index, (path, data) in enumerate((item for item in selected.items() if item[0].endswith("tests.trx"))):
         (results / (str(index) + "-tests.trx")).write_bytes(data)
     for index, (path, data) in enumerate((item for item in selected.items()
+            if Path(item[0]).name in ("cases.json", "plan.json", "results.json"))):
+        (results / (str(index) + "-" + Path(path).name)).write_bytes(data)
+    for index, (path, data) in enumerate((item for item in selected.items()
             if Path(item[0]).name in ("identity-progress.json", "browser-errors.log"))):
         (results / (str(index) + "-" + Path(path).name)).write_bytes(data)
-    receipt["outcome"] = "PASSED" if exit_code == 0 and all(summary.get("cleanupComplete") for _, summary in summaries) else "FAILED"
+    ns = {"t": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
+    rows = [row for path, data in selected.items() if path.endswith("tests.trx")
+            for row in ET.fromstring(data).findall(".//t:UnitTestResult", ns)]
+    receipt["test_results"] = [{"name": row.attrib["testName"], "outcome": row.attrib["outcome"]} for row in rows]
+    required = {"Vivarium.Acceptance.AccessJourneyTests.Installation_operator_delegates_through_Workbench_and_withdrawal_and_disable_affect_the_same_cookie",
+                "Vivarium.Acceptance.OrdinaryIdentityTests.Trusted_provider_login_and_My_keys_use_real_framework_issuance_and_immediate_revocation"}
+    exact = len(rows) == 2 and {row.attrib["testName"] for row in rows} == required and all(row.attrib["outcome"] == "Passed" for row in rows)
+    receipt["exact_required_selection"] = exact
+    receipt["outcome"] = "PASSED" if exit_code == 0 and exact and all(summary.get("cleanupComplete") for _, summary in summaries) else "FAILED"
 except Exception as error:
     receipt["error"] = type(error).__name__ + ": " + str(error)
 finally:

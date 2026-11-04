@@ -1,11 +1,63 @@
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 using Vivarium.ApiLedger;
 
 namespace Vivarium.Tests.TeamCity;
 
 public sealed partial class ApiLedgerTests
 {
+    private void PrepareAutomationR0Accounting()
+    {
+        PrepareSyntheticR0Accounting();
+        ReplaceTable("r0-product-bindings.tsv", "\tCASE-1\tfresh-host-agent", "\tCASE_1\tfresh-host-agent");
+        XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
+        var path = Path.Combine(root, "r0-physical.trx"); var document = XDocument.Load(path);
+        document.Root!.SetAttributeValue("name", "Automation");
+        var definitions = document.Descendants(ns + "UnitTest").ToDictionary(d => (string)d.Attribute("id")!);
+        foreach (var result in document.Descendants(ns + "UnitTestResult"))
+        {
+            var definition = definitions[(string)result.Attribute("testId")!];
+            var method = definition.Element(ns + "TestMethod")!;
+            var name = (string)method.Attribute("className")! + "." + ((string)result.Attribute("testName")!).Replace('-', '_');
+            definition.SetAttributeValue("name", name); result.SetAttributeValue("testName", name); method.Remove();
+        }
+        document.Save(path); receipt["results"]!["physical"]!["sha256"] = Hash("r0-physical.trx");
+    }
+
+    [Test]
+    public void Selected_R0_reads_Automation_TRX_only_through_consistent_qualified_definitions()
+    {
+        PrepareAutomationR0Accounting(); var report = ReadR0Control();
+        Assert.That(report.Errors, Is.Empty); Assert.That(report.Green, Is.EqualTo(2));
+    }
+
+    [TestCase("definition-name")]
+    [TestCase("result-name")]
+    [TestCase("unqualified")]
+    [TestCase("missing-definition")]
+    [TestCase("duplicate-definition")]
+    [TestCase("other-producer")]
+    public void Selected_R0_rejects_ambiguous_Automation_TRX_identities(string corruption)
+    {
+        PrepareAutomationR0Accounting(); Assert.That(ReadR0Control().Errors, Is.Empty);
+        XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
+        var path = Path.Combine(root, "r0-physical.trx"); var document = XDocument.Load(path);
+        var definition = document.Descendants(ns + "UnitTest").First();
+        var result = document.Descendants(ns + "UnitTestResult").First();
+        switch (corruption)
+        {
+            case "definition-name": definition.SetAttributeValue("name", (string)definition.Attribute("name")! + "Other"); break;
+            case "result-name": result.SetAttributeValue("testName", (string)result.Attribute("testName")! + "Other"); break;
+            case "unqualified": definition.SetAttributeValue("name", "CASE_1"); result.SetAttributeValue("testName", "CASE_1"); break;
+            case "missing-definition": definition.Remove(); break;
+            case "duplicate-definition": definition.AddAfterSelf(new XElement(definition)); break;
+            case "other-producer": document.Root!.SetAttributeValue("name", "Unknown"); break;
+        }
+        document.Save(path); receipt["results"]!["physical"]!["sha256"] = Hash("r0-physical.trx");
+        var report = ReadR0Control(); Assert.That(report.Errors, Is.Not.Empty); Assert.That(report.Green, Is.Zero);
+    }
+
     private void PrepareSyntheticR0Accounting()
     {
         // Accounting controls use synthetic files/results; no product execution claim is made.
