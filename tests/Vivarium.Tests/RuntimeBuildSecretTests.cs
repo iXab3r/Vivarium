@@ -1,0 +1,55 @@
+using System.Security.Cryptography;
+using System.Text;
+using Google.Protobuf;
+using Microsoft.AspNetCore.DataProtection;
+using Vivarium.Contracts.V1;
+using Vivarium.Controller.Builds.Runtime;
+
+namespace Vivarium.Tests;
+
+public sealed class RuntimeBuildSecretTests
+{
+    [Test]
+    public void Recovery_is_bound_to_build_kind_and_key_and_rejects_tampering_and_unprotected_secrets()
+    {
+        var keys = new EphemeralDataProtectionProvider();
+        var codec = new RuntimeBuildSecrets(keys);
+        var value = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        var environment = new Dictionary<string, string> { ["OWNED_SECRET"] = value };
+        var assignment = new BuildAssignment { BuildId = "owned-workload", OutputContractMajor = 1 };
+        assignment.Steps.Add(new Step { Program = "owned", Env = { { "OWNED_SECRET", value } } });
+        assignment.OutputSecrets.Add(ByteString.CopyFromUtf8(value));
+        var protectedEnvironment = codec.ProtectEnvironment(42, environment);
+        var protectedAssignment = codec.ProtectAssignment(42, assignment);
+        foreach (var ciphertext in new[] { protectedEnvironment, protectedAssignment })
+            Assert.That(ciphertext.AsSpan().IndexOf(Encoding.UTF8.GetBytes(value)), Is.EqualTo(-1));
+        var afterRestart = new RuntimeBuildSecrets(keys);
+        Assert.That(afterRestart.ReadEnvironment(42, protectedEnvironment), Is.EqualTo(environment));
+        Assert.That(afterRestart.ReadAssignment(42, protectedAssignment), Is.EqualTo(assignment));
+        Assert.Throws<InvalidDataException>(() => codec.ReadEnvironment(43, protectedEnvironment));
+        Assert.Throws<InvalidDataException>(() => codec.ReadAssignment(43, protectedAssignment));
+        Assert.Throws<InvalidDataException>(() => codec.ReadEnvironment(42, protectedAssignment));
+        Assert.Throws<InvalidDataException>(() => codec.ReadAssignment(42, protectedEnvironment));
+        Assert.Throws<InvalidDataException>(() => new RuntimeBuildSecrets(new EphemeralDataProtectionProvider()).ReadEnvironment(42, protectedEnvironment));
+        protectedAssignment[^1] ^= 1;
+        Assert.Throws<InvalidDataException>(() => codec.ReadAssignment(42, protectedAssignment));
+        Assert.Throws<InvalidDataException>(() => codec.ReadAssignment(42, assignment.ToByteArray()));
+        Assert.Throws<InvalidDataException>(() => codec.ReadAssignment(42, assignment.ToByteArray(), version: 0));
+        assignment.OutputSecrets.Clear();
+        Assert.That(codec.ReadAssignment(42, assignment.ToByteArray(), version: 0), Is.EqualTo(assignment));
+    }
+
+    [Test]
+    public void Run_secret_input_rejects_environment_aliases_invalid_names_values_and_excessive_material()
+    {
+        Dictionary<string, string>[] invalid = [
+            new() { ["A"] = "x", ["a"] = "y" }, new() { ["A\n"] = "x" }, new() { ["env.A"] = "x" },
+            new() { ["A"] = "" }, new() { ["A"] = "nul\0value" }, new() { ["A"] = new('x', 4097) },
+            Enumerable.Range(0, 65).ToDictionary(i => "A" + i, _ => "x"),
+            Enumerable.Range(0, 5).ToDictionary(i => "A" + i, _ => new string('x', 4096))
+        ];
+        foreach (var environment in invalid)
+            Assert.Throws<InvalidDataException>(() => RuntimeBuildSecrets.Validate(environment));
+        Assert.DoesNotThrow(() => RuntimeBuildSecrets.Validate(new Dictionary<string, string> { ["A_1"] = "spaces and Unicode λ\r\n" }));
+    }
+}

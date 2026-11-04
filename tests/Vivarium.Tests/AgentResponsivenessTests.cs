@@ -146,6 +146,29 @@ public sealed class AgentResponsivenessTests
     }
 
     [Test]
+    public async Task Durable_gap_frames_consume_the_output_budget_and_cannot_overtake_control()
+    {
+        var stream = new GatedAgentStreamWriter();
+        var writer = new SessionWriter(stream);
+        for (ulong offset = 0; offset < 100_000; offset++)
+        {
+            var sent = writer.SendAsync(new AgentMsg { BuildOutput = new BuildOutput
+            {
+                BuildId = "owned-output-build", SessionId = "current-session", Stream = LogStream.Stdout,
+                SourceSequenceStart = offset, SourceSequenceEndExclusive = offset + 1,
+                GapReason = "spool-quota", ProducedBytes = 1,
+            } }, CancellationToken.None);
+            if (!sent.IsCompletedSuccessfully) Assert.Fail("Output must not block the producer on transport.");
+        }
+        Assert.That(writer.DroppedLogBytes, Is.Positive, "Empty data does not give gap frames an unbounded lane.");
+        var heartbeat = writer.SendAsync(new AgentMsg { Heartbeat = new Heartbeat { Sequence = 1 } }, CancellationToken.None);
+        writer.Complete(); stream.ReleaseFirstWrite.TrySetResult(true);
+        await writer.RunAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+        await heartbeat;
+        Assert.That(stream.Messages[0].MsgCase, Is.EqualTo(AgentMsg.MsgOneofCase.Heartbeat));
+    }
+
+    [Test]
     public async Task Graceful_deadline_quarantines_without_force_then_explicit_force_reopens_operation()
     {
         var time = new ManualTimeProvider(

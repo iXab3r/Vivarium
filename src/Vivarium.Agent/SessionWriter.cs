@@ -32,9 +32,9 @@ public sealed class SessionWriter
     public Task SendAsync(AgentMsg msg, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(msg);
-        if (msg.MsgCase == AgentMsg.MsgOneofCase.Log)
+        if (msg.MsgCase is AgentMsg.MsgOneofCase.Log or AgentMsg.MsgOneofCase.BuildOutput)
         {
-            var bytes = msg.Log.Data.Length;
+            var bytes = OutputBytes(msg);
             if (!TryReserveLogBytes(bytes))
             {
                 if (bytes > 0)
@@ -80,7 +80,7 @@ public sealed class SessionWriter
                     }
                     finally
                     {
-                        Interlocked.Add(ref queuedLogBytes, -log.Log.Data.Length);
+                        Interlocked.Add(ref queuedLogBytes, -OutputBytes(log));
                     }
                     continue;
                 }
@@ -123,7 +123,7 @@ public sealed class SessionWriter
             }
             while (output.Reader.TryRead(out var log))
             {
-                Interlocked.Add(ref queuedLogBytes, -log.Log.Data.Length);
+                Interlocked.Add(ref queuedLogBytes, -OutputBytes(log));
             }
         }
     }
@@ -133,6 +133,9 @@ public sealed class SessionWriter
         control.Writer.TryComplete();
         output.Writer.TryComplete();
     }
+
+    private static int OutputBytes(AgentMsg message) => message.MsgCase == AgentMsg.MsgOneofCase.Log
+        ? message.Log.Data.Length : checked(Google.Protobuf.CodedOutputStream.ComputeMessageSize(message.BuildOutput) + 1);
 
     private bool TryReserveLogBytes(int bytes)
     {

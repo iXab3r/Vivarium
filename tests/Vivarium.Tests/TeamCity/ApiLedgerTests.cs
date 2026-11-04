@@ -8,7 +8,7 @@ namespace Vivarium.Tests.TeamCity;
 
 [TestFixture]
 [Category("ApiLedgerControl")]
-public sealed class ApiLedgerTests
+public sealed partial class ApiLedgerTests
 {
     private string root = null!;
     private JsonObject receipt = null!;

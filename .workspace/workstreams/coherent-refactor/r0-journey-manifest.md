@@ -1,13 +1,18 @@
 # R0 request, principal, seed and effect manifest
 
-Status: **Selected R0 contract frozen for the P0 candidate; product bindings remain UNBOUND or
-prerequisite-blocked, not GREEN. Independent P0 acceptance/main delivery is still pending.**
-The mechanically checked [scope](r0-contract-scope.json) selects six complete reference workflows
-and [22 specified native/integration variants](r0-contract-variants.tsv), with all seven existing
+Status: **Selected R0 contract delivered with P0 on main `403d9be`, refined by owner decision D46.
+GitHub #113/#114/#115 own live R0 delivery; the selected ledger reader validates executed evidence.**
+The mechanically checked [scope](r0-contract-scope.json) selects four complete reference workflows
+and [24 native/integration/behavioral obligations](r0-contract-variants.tsv), with all seven existing
 R0 contributions joined in [the contribution register](subsystem-contributions.tsv). These are
 selected R0 obligations, not a frozen global compatibility denominator or a new test framework.
 The full five-exchange PAT revocation case remains R1 wire work; R0 selects its explicit post-revoke
 read effects after ordinary My keys preparation. Original captures/replay/case identities are intact.
+Owner decision D46 keeps complete nonzero/cancel behavior in R0 while exact background progress
+estimates and dynamic cancellation timestamps belong to #166 under SS-RUN@R2. The two original
+full wire cases remain unaccepted, separately from their distinct R0 behavioral obligations.
+The [product binding table](r0-product-bindings.tsv) names one primary subsystem and one unique
+execution row per selected obligation; a row is not GREEN without current byte-backed TRX evidence.
 
 Current owners are #111/#112 under #110 for P0 contract/acceptance and #114/#115 under #113 for R0.
 Legacy task IDs below preserve source lineage; [task migration](story-task-migration.md) identifies
@@ -73,8 +78,11 @@ The earlier PAT self-DELETE 403 and administrator DELETE 204 are not native My k
 Current account/grant checks, expiry and disable have their separate ordinary-credential obligations
 below; matching this one denial does not establish credential-system equivalence. Keep the full
 134-exchange replay and its source entities unchanged, and report selected-effect evidence separately
-from full-case wire conformance. The other six selected cases contain R0 actions rather than PAT
-issuance/revocation wire; their administrative controls remain part of their required effects.
+from full-case wire conformance. The other six captured cases contain build/Agent actions rather
+than PAT issuance/revocation wire; D46 selects four as full-wire R0 obligations and two as distinct
+behavioral obligations. Their administrative controls remain part of the selected required effects.
+This retained seven-case corpus is unchanged by D46: its replay and complete full-wire identities
+remain separate from current R0 behavioral acceptance and the #166 background compatibility gate.
 
 Build/Agent/user IDs in these literal transcripts are independent reference identities, not product
 seed values or a new ID allocator. Product bindings remain prerequisite-blocked until the actual

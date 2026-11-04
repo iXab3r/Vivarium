@@ -1,0 +1,402 @@
+{
+  "kind": "OBSERVED_PERMISSION_APPLICABILITY_NOT_COMPLETE_REGISTERED_PERMISSION_UNIVERSE",
+  "reference": "TeamCity 2026.1.3 build 222742",
+  "sourceReceiptSha256": "21d991e89b557e5638b768fdbfc8009d8ff91059af5921c5781e886996f7e9d1",
+  "permissions": [
+    {
+      "id": "administer_agent",
+      "name": "Administer build agent machines (e.g. reboot, view agent logs, etc.)",
+      "global": true
+    },
+    {
+      "id": "administer_agent_for_project",
+      "name": "Administer project agent machines (e.g. reboot, view agent logs, etc.)",
+      "global": false
+    },
+    {
+      "id": "archive_project",
+      "name": "Archive / dearchive project",
+      "global": false
+    },
+    {
+      "id": "assign_investigation",
+      "name": "Assign / unassign investigation",
+      "global": false
+    },
+    {
+      "id": "assign_users_add_subgroups",
+      "name": "Assign / unassign users to groups or change groups hierarchy",
+      "global": true
+    },
+    {
+      "id": "authorize_agent",
+      "name": "Authorize agent",
+      "global": true
+    },
+    {
+      "id": "authorize_agent_for_project",
+      "name": "Authorize project agent",
+      "global": false
+    },
+    {
+      "id": "backup",
+      "name": "Change backup settings and control backup process",
+      "global": true
+    },
+    {
+      "id": "cancel_any_personal_build",
+      "name": "Stop / remove from queue any personal build",
+      "global": false
+    },
+    {
+      "id": "cancel_build",
+      "name": "Stop build / remove from queue",
+      "global": false
+    },
+    {
+      "id": "change_agent_run_configuration_policy",
+      "name": "Change agent run configuration policy",
+      "global": true
+    },
+    {
+      "id": "change_agent_run_configuration_policy_for_project",
+      "name": "Change agent run configuration policy for project",
+      "global": false
+    },
+    {
+      "id": "change_cleanup_rules",
+      "name": "Change cleanup rules",
+      "global": false
+    },
+    {
+      "id": "change_https_settings",
+      "name": "Change HTTPS settings",
+      "global": true
+    },
+    {
+      "id": "change_own_profile",
+      "name": "Change own profile",
+      "global": true
+    },
+    {
+      "id": "change_server_settings",
+      "name": "Change server settings",
+      "global": true
+    },
+    {
+      "id": "change_user",
+      "name": "Modify user profile and roles",
+      "global": true
+    },
+    {
+      "id": "change_user_notifications",
+      "name": "Change user / group notification rules",
+      "global": true
+    },
+    {
+      "id": "change_user_notifications_in_project",
+      "name": "Change user / group notification rules in project",
+      "global": false
+    },
+    {
+      "id": "change_user_roles_in_project",
+      "name": "Change user roles in project",
+      "global": false
+    },
+    {
+      "id": "change_usergroup",
+      "name": "Modify user group (name, description and roles)",
+      "global": true
+    },
+    {
+      "id": "change_vcs_username_in_project",
+      "name": "Change VCS usernames in project",
+      "global": false
+    },
+    {
+      "id": "clean_agent_sources",
+      "name": "Clean sources on agent",
+      "global": true
+    },
+    {
+      "id": "clean_build_configuration_sources",
+      "name": "Clean build configuration sources",
+      "global": false
+    },
+    {
+      "id": "comment_build",
+      "name": "Comment build",
+      "global": false
+    },
+    {
+      "id": "configure_server_data_cleanup",
+      "name": "Configure server data cleanup",
+      "global": true
+    },
+    {
+      "id": "connect_to_agent",
+      "name": "Invoke interactive agent terminals",
+      "global": false
+    },
+    {
+      "id": "create_delete_vcs_root",
+      "name": "Create / delete VCS root",
+      "global": false
+    },
+    {
+      "id": "create_sub_project",
+      "name": "Create subproject",
+      "global": false
+    },
+    {
+      "id": "create_user",
+      "name": "Create user account",
+      "global": true
+    },
+    {
+      "id": "create_usergroup",
+      "name": "Create user group",
+      "global": true
+    },
+    {
+      "id": "customize_build_parameters",
+      "name": "Customize build parameters",
+      "global": false
+    },
+    {
+      "id": "customize_build_revisions",
+      "name": "Customize build revisions",
+      "global": false
+    },
+    {
+      "id": "delete_sub_project",
+      "name": "Delete subproject",
+      "global": false
+    },
+    {
+      "id": "delete_user",
+      "name": "Delete user account",
+      "global": true
+    },
+    {
+      "id": "delete_usergroup",
+      "name": "Delete user group",
+      "global": true
+    },
+    {
+      "id": "edit_enforced_settings",
+      "name": "Enable / disable enforced settings in project",
+      "global": false
+    },
+    {
+      "id": "edit_project",
+      "name": "Edit project",
+      "global": false
+    },
+    {
+      "id": "edit_vcs_modification",
+      "name": "Edit VCS change description",
+      "global": false
+    },
+    {
+      "id": "edit_versioned_settings",
+      "name": "Enable / disable versioned settings",
+      "global": false
+    },
+    {
+      "id": "enable_disable_agent",
+      "name": "Enable / disable agent",
+      "global": true
+    },
+    {
+      "id": "enable_disable_agent_for_project",
+      "name": "Enable / disable agents associated with project",
+      "global": false
+    },
+    {
+      "id": "import_projects",
+      "name": "Import projects",
+      "global": true
+    },
+    {
+      "id": "label_build",
+      "name": "Manually label / merge build sources",
+      "global": false
+    },
+    {
+      "id": "manage_agent_clouds",
+      "name": "Manage project's agent cloud profiles",
+      "global": false
+    },
+    {
+      "id": "manage_agent_pools",
+      "name": "Manage agent pools",
+      "global": true
+    },
+    {
+      "id": "manage_agent_pools_for_project",
+      "name": "Change agent pools associated with project",
+      "global": false
+    },
+    {
+      "id": "manage_authentication_settings",
+      "name": "Manage authentication settings",
+      "global": true
+    },
+    {
+      "id": "manage_build_problem_instances",
+      "name": "Change build status",
+      "global": false
+    },
+    {
+      "id": "manage_build_problems",
+      "name": "Mute / unmute problems and tests in project",
+      "global": false
+    },
+    {
+      "id": "manage_custom_ssl_certificates",
+      "name": "Manage custom SSL/HTTPS certificates",
+      "global": true
+    },
+    {
+      "id": "manage_experimental_features",
+      "name": "Manage experimental features",
+      "global": true
+    },
+    {
+      "id": "manage_roles",
+      "name": "Manage roles (create, delete, change permissions)",
+      "global": true
+    },
+    {
+      "id": "manage_server_installation",
+      "name": "Manage server installation: view logs, restart, etc.",
+      "global": true
+    },
+    {
+      "id": "manage_server_licenses",
+      "name": "Manage server licenses",
+      "global": true
+    },
+    {
+      "id": "patch_build_sources",
+      "name": "Change build source code with a custom patch",
+      "global": false
+    },
+    {
+      "id": "pause_activate_build_configuration",
+      "name": "Pause / activate build configuration",
+      "global": false
+    },
+    {
+      "id": "pin_unpin_build",
+      "name": "Pin / unpin build",
+      "global": false
+    },
+    {
+      "id": "remove_agent",
+      "name": "Remove agent",
+      "global": true
+    },
+    {
+      "id": "remove_agent_for_project",
+      "name": "Remove project agent",
+      "global": false
+    },
+    {
+      "id": "remove_build",
+      "name": "Remove finished build",
+      "global": false
+    },
+    {
+      "id": "reorder_build_queue",
+      "name": "Reorder builds in queue",
+      "global": true
+    },
+    {
+      "id": "run_build",
+      "name": "Run build",
+      "global": false
+    },
+    {
+      "id": "start_stop_cloud_agent",
+      "name": "Start / Stop cloud agent",
+      "global": false
+    },
+    {
+      "id": "tag_build",
+      "name": "Tag build",
+      "global": false
+    },
+    {
+      "id": "view_agent_clouds",
+      "name": "View cloud images and instances",
+      "global": false
+    },
+    {
+      "id": "view_agent_details",
+      "name": "View agent details",
+      "global": true
+    },
+    {
+      "id": "view_agent_details_for_project",
+      "name": "View project agents details",
+      "global": false
+    },
+    {
+      "id": "view_agent_usage_statistics",
+      "name": "View agent usage statistics",
+      "global": true
+    },
+    {
+      "id": "view_all_users",
+      "name": "View all registered users",
+      "global": true
+    },
+    {
+      "id": "view_audit_log",
+      "name": "View audit log",
+      "global": true
+    },
+    {
+      "id": "view_build_configuration_settings",
+      "name": "View build configuration settings",
+      "global": false
+    },
+    {
+      "id": "view_build_runtime_data",
+      "name": "View build runtime parameters and data",
+      "global": false
+    },
+    {
+      "id": "view_file_content",
+      "name": "View VCS file content",
+      "global": false
+    },
+    {
+      "id": "view_project",
+      "name": "View project and all parent projects",
+      "global": false
+    },
+    {
+      "id": "view_server_errors",
+      "name": "View server errors",
+      "global": true
+    },
+    {
+      "id": "view_server_settings",
+      "name": "View server settings",
+      "global": true
+    },
+    {
+      "id": "view_usage_statistics",
+      "name": "View usage statistics",
+      "global": true
+    },
+    {
+      "id": "view_user_profile",
+      "name": "View user profile",
+      "global": true
+    }
+  ]
+}

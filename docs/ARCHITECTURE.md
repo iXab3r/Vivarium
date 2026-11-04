@@ -433,6 +433,39 @@ collection), and retention is explicit: blobs referenced by retained builds are 
 
 ### D14. The work model is TeamCity's, names included
 
+D32/D37 refine the legacy YAML queue policies below for the fresh C#/Git catalogue path: admission,
+waiting limits and defaults follow the pinned TeamCity operation contract, rather than inheriting
+the legacy fail-fast selector or 30-minute queue default. An authorized accepted run remains an
+accepted action if its author's `run_build` grant is later withdrawn. The scheduler still enforces
+current target policy and Agent eligibility; new actions and reads require current rights. The
+[scoped queued-authority observation](../tests/Vivarium.Tests/TeamCity/Reference/queued-authority-observations.json)
+proves the distinction with per-project authorization enabled, a denied new run and an independently
+verified artifact from the original accepted Build. It does not generalize to PAT revocation,
+account disablement or pool-policy changes.
+
+The selected source-free lifecycle allocates no number/counter merely on queue admission. An
+unassigned queued cancellation finishes with number `N/A` without consuming a counter. A suitable
+Agent claim allocates the number once and exposes `running`, `startDate` and current `SUCCESS`
+before assignment acceptance; that provisional start is refined once on the first authenticated
+Agent acceptance, while the immutable claim/preparation receipt remains separate. The literal
+R0 success observation retains both start values; acceptance and process execution remain distinct receipts. The
+[paused owned-Agent observation](../tests/Vivarium.Tests/TeamCity/Reference/claimed-counter-observations.json)
+proves that distinction. A later observed step failure changes the current outcome to `FAILURE`;
+cancellation is `UNKNOWN`, and internal output finalization remains publicly `running` until finished.
+Current, lease-fenced Agent step/collection observations update the shared Build progress text:
+`Step i/n` during execution and `Running` during preparation/collection. Compatible reads preserve
+that observed text and any received failure outcome while output finalization remains pending.
+An optional additive `StepStatus.completed` carries the actual step result before collection. The
+Host retains bounded append-only phase/completion observations in PostgreSQL under the same Agent
+and workload fence. Identical replay has no effect; conflicting step or terminal evidence quarantines
+the Agent. These observations cannot complete a Build or replace its independently acknowledged
+terminal result/output receipts. Older readers ignore the added field and retain the existing phase.
+When a stopped or timed-out process has actually exited, its receipt retains the OS exit code;
+cancellation outcome and timeout flags remain separate facts rather than replacing that code with `-1`.
+Exact background estimates and dynamic cancellation timestamps remain a separate compatibility
+obligation (D46, #166). The current adapter retains its unknown running estimate and zero pending
+cancellation projection; those values are not claimed as full estimator conformance.
+
 `Project` → `Build Configuration` (steps, requirements, parameters, artifact rules) → `Build`
 (queued → running → finished), scheduled from a `Build Queue` onto compatible agents. A scenario
 matrix expands into a **matrix build** whose cells are ordinary builds, aggregated composite-style.
@@ -1058,7 +1091,10 @@ Generate the method/path/request-variant inventory from client source/tests, ref
 and other consumers. The required conformance gate uses unchanged clients and isolated mutation
 fixtures, not production TeamCity writes. See
 [`design/teamcity-rest-compatibility.md`](design/teamcity-rest-compatibility.md) and the stable
-`TC-WIR-*` requirements in the parity catalog. This facade is planned, not implemented.
+`TC-WIR-*` requirements in the parity catalog. The fresh R0 Host implements a selected adapter for
+current-user/server/catalogue reads, source-free Build run/inspect/cancel, private artifact reads and
+Git-backed Agent enabled-state management. Published CLI process evidence covers selected ordinary
+flows; full reference bindings, remaining variants and milestone acceptance remain open.
 
 Owner clarification, 2026-10-31: adopted TeamCity operations inherit TeamCity's handling, including
 defaults, validation, permissions, state transitions, collection mutation, ordering, retry/reuse,
@@ -1098,6 +1134,13 @@ and API credentials; no stale role-claim authority. Native `/api/v1` and TeamCit
 that evaluator and persistence. New AgentExplorer-only actions use separate permission IDs/scopes
 without weakening or restricting the copied TeamCity permission semantics.
 
+R0 implementation evidence now includes 79 reference-observed permission applicability records,
+current global-only permissions through project assignments, and native project delegation limited
+to the actor's effective permissions. This is an observed subset, not the complete permission
+catalogue or compatible wire acceptance. The native force-stop extension retains D31's separate
+`build.force-stop` authorization in addition to TeamCity `cancel_build`; ordinary TeamCity
+cancellation does not acquire that extra requirement.
+
 Ordinary identity lifecycle and compatible token/user endpoints must be specified from actual clients;
 Depot's deferred account deletion/linking and package token scopes are not automatically Vivarium
 limits. Adoption of the framework does not prove wire compatibility. Required evidence includes
@@ -1115,6 +1158,24 @@ including masked secrets, with CAS and saved-versus-active restart semantics. Do
 settings service. Large log/artifact bytes use EyeAuras.Storage where its contract fits; PostgreSQL
 owns references, manifests, authorization, retention and import lineage. Framework keys/settings need
 private durable storage and backup; “PostgreSQL for state” does not mean binary artifacts inside SQL.
+
+The selected R0 output policy uses optional Chiral Host `OutputRetentionDays` (disabled by default),
+PostgreSQL availability epochs/expiry marks and retryable Storage deletion. It never rewrites
+published producer ranges. The broader TeamCity/per-project retention policy remains later scope.
+Private output/artifact PUTs first journal their object keys in PostgreSQL. An object-row lock protects
+the bounded PUT from cleanup without holding an Agent/queue fence; adopting the range removes
+that intent in the reference transaction. Quota eviction journals deletion before forgetting its
+key. The independent retention worker retries abandoned/evicted objects after restart, skips active
+PUT locks, and bounds each deletion batch. A bounded pending-object backlog applies ingress
+backpressure. Published gap metadata shares the head budget; unpublished adjacent gaps coalesce,
+using `quota-exceeded` when bounded metadata cannot retain distinct original gap reasons.
+Artifact reservations and accepted objects share the 128-object per-Build bound; terminal owners
+cannot reserve new hashes. A result/ownership race after PUT leaves retryable private deletion intent.
+An output-reader failure contains the process even during graceful stopping, and infrastructure
+fallback records a lost producer instead of treating its captured prefix as a final watermark.
+An infrastructure fallback/recovery result may omit completed steps: their independent immutable
+observations remain retained. Any explicitly submitted contradictory step still quarantines the
+owner; successful results require complete non-skipped step coverage.
 
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router
@@ -1437,6 +1498,49 @@ activation, HTTP mode/completion or authorization implementation. R0 consumes an
 smoke and PILOT uses C#/Git preparation; full editable/language-specific variants remain allocated
 to their owners before exposure. XML/Kotlin compatibility is not waived. This decision resolves the
 shared source-authority/edit mechanism; exact unproved variants remain visible verification gaps.
+
+### D45. US-013 uses private runtime-only environment secrets
+
+US-013 accepts temporary secret environment values with one run. They are runtime inputs, not
+Project desired configuration, ordinary parameters, evaluator context or a persistent Project
+secret store. Native admission requires current `run_build` and `customize_build_parameters` under
+the same Project/target policy as other executable inputs. Values are never returned by management
+reads or mutation receipts and never copied into Git, collected plans, script payloads or audit.
+
+For the initial Host, existing private persistent ASP.NET Data Protection keys encrypt the collected
+environment and every newly retained Agent assignment with separate per-Build purposes. Recovery
+requires those keys together with PostgreSQL and object data; losing keys fails closed. Old pre-secret
+assignments have an explicit legacy version and cannot contain a registered-secret list. Protected
+assignments are never retried as plaintext after a decryption/version failure. This does not protect
+against a trusted Host/Agent administrator or replace private key-directory access controls.
+
+Only the selected authenticated Agent receives resolved values, as step environment entries plus
+ephemeral exact UTF-8 masks. Explicit secret entries override ordinary environment aliases; they do
+not participate in script/parameter expansion. Admission accepts at most 64 distinct environment
+names (ASCII letters/digits/underscore, non-digit first, at most 128 characters, case-insensitive
+uniqueness), nonempty NUL-free values of at most 4096 UTF-8 bytes, and 16 KiB serialized total. The
+native run request is bounded to 2 MiB. A prepared assignment is bounded to 3 MiB, failing preparation
+before delivery if ordinary environment expansion and run secrets together exceed that profile.
+
+The Agent masks registered exact values across stdout/stderr chunk boundaries before its durable
+output spool and transport; Host logs, errors and public output retain only masked bytes. This is
+not detection of transformed/unregistered secrets or redaction of arbitrary artifact files. The
+selected workload is trusted to use its credential for its intended external operation. Permanent
+Project secrets, rotation and user-managed secret references require their own story. Native runtime
+integration and its acceptance evidence do not establish TeamCity secure-parameter wire compatibility.
+
+### D46. US-013 acceptance preserves behavior while exact background estimation is separately owned
+
+Owner decision (2026-11-04): accept US-013 by its complete actor/process/outcome/stop/recovery/byte
+behavior, with exact background progress estimates and dynamic cancellation timestamp cadence owned
+separately by [#166](https://github.com/iXab3r/Vivarium/issues/166) under SS-RUN@R2 (#134/#135/#136).
+This explicitly refines the earlier R0 literal-transcript gate; it does not waive actual failure,
+current authorization, real process cancellation, durable identity/output recovery or exact artifacts.
+The four other selected full reference workflows remain literal R0 obligations. The full nonzero
+and running-cancel wire cases and every captured entity remain retained and unaccepted until their
+separate compatibility gate passes. R0 uses two distinct behavioral obligations for those journeys;
+their passes cannot be reported as GREEN for the deferred full wire cases. Other D36-D40 compatibility,
+ledger, independent-review and zero-debt gates retain their meaning within this revised scope.
 
 ## 5. Protocol sketch
 

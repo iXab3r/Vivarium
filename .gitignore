@@ -25,3 +25,7 @@ TestResults/
 *.db-shm
 *.db-wal
 .env
+
+# Workbench build inputs are locked; generated assets and installed packages are local.
+src/Vivarium.Controller/Workbench/node_modules/
+src/Vivarium.Controller/Workbench/dist/

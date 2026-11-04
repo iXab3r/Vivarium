@@ -31,6 +31,26 @@ public static partial class Ledger
         Require(requiredReference.Length > 0 && requiredReference.Distinct().Count() == requiredReference.Length,
             "Missing/duplicate selected R0 reference cases.");
         foreach (var id in requiredReference) Find(cases, id, "selected R0 reference case");
+        var behavioralSources = new Dictionary<string, string>();
+        foreach (var amendmentNode in scope["owner_scope_amendments"]?.AsArray() ?? [])
+        {
+            var amendment = amendmentNode ?? throw new InvalidDataException("Empty R0 scope amendment.");
+            Require(S(amendment!, "decision") == "D46" && amendment!["tracking_issue"]!.ToString() == "166"
+                && amendment!["owner_approved"]!.GetValue<bool>() && S(amendment, "due_owner") == "SS-RUN@R2",
+                "Unknown/unapproved R0 scope amendment.");
+            Find(slices, S(amendment, "due_owner"), "retained background compatibility owner");
+            var retained = Values(amendment["retained_full_cases"]!);
+            var replacement = Values(amendment["replacement_behavioral_obligations"]!);
+            Require(retained.Length == 2 && replacement.Length == retained.Length && retained.Distinct().Count() == retained.Length,
+                "Missing/duplicate retained full-wire or replacement behavioral obligation.");
+            for (var index = 0; index < retained.Length; index++)
+            {
+                Find(cases, retained[index], "retained complete background wire case");
+                Require(!requiredReference.Contains(retained[index]) && requiredVariants.Contains(replacement[index]),
+                    "Behavioral acceptance cannot discharge a retained full wire case.");
+                behavioralSources.Add(replacement[index], retained[index]);
+            }
+        }
         var own = contributions.Where(row => row["integration_slice"] == slice["slice_id"]).ToArray();
         Require(requiredContributions.Length > 0 && requiredContributions.Distinct().Count() == requiredContributions.Length &&
             requiredContributions.ToHashSet().SetEquals(own.Select(row => row["contribution_id"])),
@@ -66,7 +86,20 @@ public static partial class Ledger
                 Require(own.Any(c => c["subsystem_id"] == owner && Split(c["variant_case_ids"]).Contains(row["variant_id"])),
                     "Missing reverse R0 variant/contribution binding.");
             }
-            Require(row["kind"] is "native-contract" or "integration-contract" or "reference-effect", "Unknown selected R0 oracle boundary.");
+            Require(row["kind"] is "native-contract" or "integration-contract" or "reference-effect" or "reference-behavior", "Unknown selected R0 oracle boundary.");
+            if (row["kind"] == "reference-behavior")
+            {
+                Require(behavioralSources.TryGetValue(row["variant_id"], out var reference) && reference == row["source_case_id"]
+                    && row["source_exchange_indices"] == "effects-not-full-wire", "Unapproved behavioral/full-wire boundary.");
+                var observations = Json(root, source)["cases"]!.AsArray();
+                var workflow = observations.Single(item => S(item!, "id") == reference)!;
+                var final = workflow["exchanges"]!.AsArray().Last(item => S(item!, "actor") == "owned-scoped-pat"
+                    && S(item!["request"]!, "method") == "GET");
+                var response = JsonNode.Parse(Convert.FromBase64String(S(final!["response"]!, "bodyBase64")))!;
+                Require(S(response, "state") == "finished" && S(response, "status") is "FAILURE" or "UNKNOWN",
+                    "Behavioral source lost its independent ordinary terminal outcome.");
+                continue;
+            }
             if (row["kind"] != "reference-effect")
             {
                 Require(row["source_case_id"] == "" && row["source_exchange_indices"] == "", "Unexpected reference subset on a native contract.");

@@ -118,18 +118,19 @@ them.
 For the Phase 1 files-out contract, the agent performs this order:
 
 1. Finish all eligible steps, including allowed diagnostic collection steps.
-2. Finish both log streams for every step and persist a final exclusive byte watermark for each
-   `(step_index, stdout|stderr)` stream. A stream with no bytes has watermark zero.
+2. Finish both log streams for every step and persist a final exclusive chunk-sequence watermark
+   and post-mask byte count for each `(step_index, stdout|stderr)` stream. An empty stream has both
+   values zero. A lost producer explicitly omits final watermarks rather than asserting empty output.
 3. Resolve declared artifact rules under the build work directory.
 4. Upload each content blob idempotently by SHA-256.
 5. Persist the complete terminal result, final log watermarks, and ordered manifest locally.
-6. Send every log chunk through those watermarks, then send the terminal result on the currently
-   fenced session. The agent retains a bounded local spool until result acknowledgement.
+6. Independently retry output ranges and the terminal result on the currently fenced session.
+   A bounded output lane must not hold control/result delivery behind bulk output.
 7. Retain and retry the same pending result and any requested missing log ranges/content across
    disconnects until the matching
    `BuildResultAccepted` arrives.
-8. Delete the local pending-result/log-spool record only after that acknowledgement, then report
-   itself idle.
+8. Delete the local pending-result/log-spool record only after the result receipt and independent
+   output receipts resolve all retained ranges, then report itself idle.
 
 The agent does not parse reports or decide test outcomes.
 
@@ -142,8 +143,8 @@ Before accepting a terminal result, the controller validates:
 - build id and accepting session consistency;
 - supported enum values and structurally valid step indices;
 - exactly one step result per assigned step, or a documented compatibility rule for an older agent;
-- one final exclusive log watermark for every assigned step and stream, with contiguous durable log
-  bytes from offset zero through that watermark;
+- final exclusive sequence/byte watermarks for every assigned step and stream, or an explicit lost
+  producer; observed final values cannot regress already committed output evidence;
 - bounded status text, artifact count, path length, and total manifest bytes;
 - normalized relative artifact paths with no root, traversal, platform alias, or duplicate path;
 - non-negative sizes and valid lower-case SHA-256 identifiers;
@@ -155,24 +156,24 @@ permission to read it.
 
 ### Durable commit
 
-A finalization attempt first waits for the Logs Expert's store to durably seal contiguous ranges
-through every declared watermark. The returned immutable log-seal identity is then an input to one
-PostgreSQL transaction, which must preserve the same durable result boundary:
+A terminal-result receipt commits independently of the output receipt. One PostgreSQL transaction
+preserves the raw-result boundary; output may remain `sealing` while retained ranges retry:
 
 1. establish that no different terminal result has already won;
-2. persist the verified log-seal identity, watermarks, and log references;
+2. persist the declared output watermarks/lost-producer evidence and stream references;
 3. persist the immutable raw result, `rawOutcome`, and canonical result digest;
 4. persist all ordered manifest rows;
 5. create blob references that pin every manifest entry;
-6. finalize child-build lifecycle/outcome and cancellation state as `result committed`, without
-   prematurely declaring a persistent agent reusable;
+6. record `result committed` and enter the release barrier without declaring the output complete or
+   the persistent agent reusable;
 7. complete or remove the queue claim according to the TeamCity lifecycle contract;
 8. append the audit event for result acceptance;
 9. enqueue idempotent projection work, without requiring adapters to finish.
 
 Only a successful commit permits `BuildResultAccepted`. Adapter parsing and UI projection are not
-part of the ACK boundary: making them synchronous would make a parser defect or large report keep the
-agent occupied and retrying an already safe result.
+part of the result ACK boundary. Output ACK follows its own durable byte/gap commit. A bounded sealing
+deadline resolves unavailable ranges into explicit gaps, including an unknown terminal tail when no
+producer watermark exists; it never invents an exit result or proves process termination.
 
 If a result references a missing blob, the result is not acknowledged. The target protocol should
 return a typed, bounded rejection/request for missing content or log ranges instead of relying on
@@ -183,9 +184,9 @@ range validation.
 
 Result durability, agent awareness, and machine reuse are separate facts:
 
-1. `raw_result_committed` means the terminal envelope, manifest/blob references, and logs through all
-   final watermarks are durable. It is the earliest point at which the controller may send
-   `BuildResultAccepted`.
+1. `raw_result_committed` means the terminal envelope, declared watermarks/lost-producer evidence and
+   manifest/blob references are durable. It permits `BuildResultAccepted` independently of output
+   completion. Output must separately seal to retained bytes or explicit gaps.
 2. `agent_idle_confirmed` means an enrolled/persistent agent consumed that ACK, cleared its local
    pending result/spool, and reported no running or pending build on the current fenced session. Only
    this barrier makes that agent schedulable again.
@@ -794,8 +795,9 @@ model additively.
 ## Invariants
 
 1. First valid durable terminal result wins; retries cannot rewrite it.
-2. ACK follows durable logs through terminal watermarks plus raw result, manifest, and blob-reference
-   commit, not adapter completion.
+2. Result ACK follows the raw result, declared watermark/lost-producer evidence, manifest and
+   blob-reference commit. Output ACK independently follows durable bytes or explicit gaps. Neither
+   receipt waits for adapter completion; output sealing remains a separate release barrier.
 3. Persistent-agent reuse waits for ACK consumption and idle confirmation. Managed epilogue may use
    the explicit earlier raw-commit barrier, but reuse still waits for D5 readiness.
 4. Raw evidence and `rawOutcome` are immutable; every `failureClass` and derived interpretation names

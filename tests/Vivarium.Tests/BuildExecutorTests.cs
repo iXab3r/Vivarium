@@ -29,6 +29,51 @@ public sealed class BuildExecutorTests
         }
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Publisher_failure_stops_a_flooding_process_without_waiting_for_its_pipe_to_drain(bool graceful)
+    {
+        var gate = Path.Combine(root, "publisher-gate");
+        var assignment = new BuildAssignment { BuildId = "publisher-flood", ArtifactPublicationContractMajor = 1 };
+        var step = new Step { Program = OperatingSystem.IsWindows() ? "powershell.exe" : "/bin/sh" };
+        if (OperatingSystem.IsWindows()) step.Args.Add(["-NoProfile", "-NonInteractive", "-Command",
+            (graceful ? "[Console]::WriteLine('owned-publisher-waiting'); while (!(Test-Path -LiteralPath $env:OWNED_GATE)) { Start-Sleep -Milliseconds 10 }; " : "")
+            + "[Console]::WriteLine(\"##teamcity[publishArtifacts '../escape']\"); while ($true) { [Console]::Write(('x' * 8192)) }"]);
+        else step.Args.Add(["-c", (graceful ? "trap '' TERM; echo owned-publisher-waiting; while [ ! -f \"$OWNED_GATE\" ]; do sleep 0.01; done; " : "")
+            + "printf \"##teamcity[publishArtifacts '../escape']\\n\"; while :; do printf '%8192s' x; done"]);
+        step.Env["OWNED_GATE"] = gate;
+        assignment.Steps.Add(step);
+        using var blobs = new BlobClient("https://localhost", "unused");
+        using var watchdog = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        using var stop = new BuildStopController(watchdog.Token);
+        var waiting = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var stopped = false;
+        var execution = BuildExecutor.ExecuteAsync(root, assignment, blobs, (message, _) =>
+            { if (message.Log is not null) waiting.TrySetResult(); return Task.CompletedTask; },
+            "publisher-flood-session", stop, process => { if (process is null) stopped = true; });
+        try
+        {
+            if (graceful)
+            {
+                await waiting.Task.WaitAsync(TimeSpan.FromSeconds(5));
+                stop.Request(BuildStopMode.Graceful, "Owned graceful fault case", DateTimeOffset.UtcNow.AddMinutes(1));
+                await Task.Delay(100);
+                Assert.That(execution.IsCompleted, Is.False);
+                Assert.That(stop.Mode, Is.EqualTo(BuildStopMode.Graceful));
+                await File.WriteAllTextAsync(gate, "release");
+            }
+            Assert.That(await Task.WhenAny(execution, Task.Delay(TimeSpan.FromSeconds(5))), Is.SameAs(execution),
+                "A failed stdout parser must terminate the producer before the external watchdog.");
+            Assert.ThrowsAsync<InvalidDataException>(async () => await execution);
+            Assert.That(stopped, Is.True, "The owned process must have exited before failure is reported.");
+        }
+        finally
+        {
+            await watchdog.CancelAsync();
+            try { await execution; } catch (InvalidDataException) { }
+        }
+    }
+
     [Test]
     public async Task Execute_sets_the_portable_environment_and_recreates_results_for_each_step()
     {

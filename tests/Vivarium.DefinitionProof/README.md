@@ -1,9 +1,19 @@
-# C#/Git/PostgreSQL physical feasibility study
+# C#/Git/PostgreSQL physical checks and historical studies
 
-This explicitly invoked P0 target uses the existing NUnit/Test SDK stack. It is not a product
-acceptance target or a second reference model. The source declarations, evaluator and activation
-algorithm are experimental candidates; replacement Host, Chiral and ordinary OIDC are absent.
-Passing this target cannot accept a milestone or turn a raw REST case GREEN.
+This explicitly invoked target uses the existing NUnit/Test SDK stack. Production checks and
+historical P0 studies are separate evidence; passing this target alone cannot accept a milestone
+or turn a raw REST case GREEN.
+
+`ProductionEvaluatorPhysicalTests`, `ProductionCatalogPhysicalTests` and `RuntimeHostPhysicalTests`
+exercise the actual fresh Host, pinned isolated compiler, PostgreSQL catalogue and current
+authorization. They cover rejected source and projection rollback, retained evaluated output,
+source removal during recovery, immutable definitions and cold Host/storage continuity.
+`AgentCredentialPhysicalTests` proves audited, protected credential delivery and bearer proof;
+the Host test additionally starts the real separate Agent process, authorizes it through REST,
+enables it through committed Git policy and reconnects it after Host restart. These are not yet
+fresh Build execution, compatible API or whole-story acceptance.
+
+The studies below retain their original experimental sources and narrower evidence boundaries.
 
 `IsolatedCompilerTests` proves D43's newly accepted Linux/Docker boundary separately from the
 historical trusted-source studies. It compiles actual Git-selected C# and runs ordinary computations

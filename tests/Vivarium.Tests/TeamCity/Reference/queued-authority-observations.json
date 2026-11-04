@@ -1,0 +1,3122 @@
+{
+  "kind": "BOUNDED_QUEUED_ACTOR_GRANT_REFERENCE_NOT_PRODUCT_CONFORMANCE",
+  "profile": "vivarium-teamcity-lab-202613",
+  "target": "http://127.0.0.1:18111",
+  "prefix": "VivUs013QueuedAuthority_20261103_b547592db654",
+  "project": "VivUs013QueuedAuthority_20261103_b547592db654_Project",
+  "job": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+  "username": "vivus013queuedauthority_20261103_b547592db654_user",
+  "sourceSha256": "6738aaea0dc3572bfa3d0fe0668029e14fb68ab622d85792ed2b8c4072121cba",
+  "setup": [
+    {
+      "id": "verify-private-reference-and-empty-fixture",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/server",
+            "query": {
+              "fields": "version,versionMajor,versionMinor,buildNumber,startTime,currentTime,role,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJ2ZXJzaW9uIjoiMjAyNi4xLjMgKGJ1aWxkIDIyMjc0MikiLCJ2ZXJzaW9uTWFqb3IiOjIwMjYsInZlcnNpb25NaW5vciI6MSwic3RhcnRUaW1lIjoiMjAyNjExMDJUMTkyMzM4KzAwMDAiLCJjdXJyZW50VGltZSI6IjIwMjYxMTAzVDEzMTM1NyswMDAwIiwiYnVpbGROdW1iZXIiOiIyMjI3NDIiLCJyb2xlIjoibWFpbl9ub2RlIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMSJ9",
+            "bodyBytes": 222,
+            "bodySha256": "f22a0215bb99094c0e1c87c4e6710b9207278b4fae3d01ae186aad5d26bc7d07"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/buildQueue",
+            "query": {
+              "locator": "start:0,count:2",
+              "fields": "nextHref,build(id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJidWlsZCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "13a6714001c1328c0e492df00630b17dc9d8c27d29a7a479ee1d7130d4bd6807"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects",
+            "query": {
+              "locator": "archived:false,start:0,count:11",
+              "fields": "nextHref,project(id,name,parentProjectId,archived,description,webUrl)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJwcm9qZWN0IjpbeyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiYXJjaGl2ZWQiOmZhbHNlLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIGFsbCBvdGhlciBwcm9qZWN0cyIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvcHJvamVjdC5odG1sP3Byb2plY3RJZD1fUm9vdCJ9XX0=",
+            "bodyBytes": 176,
+            "bodySha256": "d338118b2728490554ad1fb2bc03daeb02098b8a9ae3ec395b8ee85c914b49dd"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/server/authSettings",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhbGxvd0d1ZXN0IjpmYWxzZSwiZ3Vlc3RVc2VybmFtZSI6Imd1ZXN0IiwiY29sbGFwc2VMb2dpbkZvcm0iOmZhbHNlLCJwZXJQcm9qZWN0UGVybWlzc2lvbnMiOmZhbHNlLCJlbWFpbFZlcmlmaWNhdGlvbiI6ZmFsc2UsImJ1aWxkQXV0aGVudGljYXRpb25Nb2RlIjoic3RyaWN0IiwibW9kdWxlcyI6eyJtb2R1bGUiOlt7Im5hbWUiOiJEZWZhdWx0IiwicHJvcGVydGllcyI6eyJjb3VudCI6MywicHJvcGVydHkiOlt7Im5hbWUiOiJ1c2Vyc0NhblJlc2V0T3duUGFzc3dvcmRzIiwidmFsdWUiOiJ0cnVlIn0seyJuYW1lIjoidXNlcnNDYW5DaGFuZ2VPd25QYXNzd29yZHMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJmcmVlUmVnaXN0cmF0aW9uQWxsb3dlZCIsInZhbHVlIjoiZmFsc2UifV19fSx7Im5hbWUiOiJUb2tlbi1BdXRoIiwicHJvcGVydGllcyI6eyJjb3VudCI6MCwicHJvcGVydHkiOltdfX0seyJuYW1lIjoiSFRUUC1CYXNpYyIsInByb3BlcnRpZXMiOnsiY291bnQiOjAsInByb3BlcnR5IjpbXX19XX19",
+            "bodyBytes": 519,
+            "bodySha256": "f37d30698cd9c7001086cf23b46a77ca51b86ba6df71d7c9dd6ceef72b9fa3cb"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/users/current",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJ1c2VybmFtZSI6InZpdmFyaXVtLWxhYi1hZG1pbiIsImlkIjoxLCJsYXN0TG9naW4iOiIyMDI2MTEwM1QxMzA5MzErMDAwMCIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MSIsInByb3BlcnRpZXMiOnsiY291bnQiOjExLCJocmVmIjoiL2FwcC9yZXN0L3VzZXJzL2lkOjEvcHJvcGVydGllcyIsInByb3BlcnR5IjpbeyJuYW1lIjoiYWRkVHJpZ2dlcmVkQnVpbGRUb0Zhdm9yaXRlcyIsInZhbHVlIjoidHJ1ZSJ9LHsibmFtZSI6ImZlZWRiYWNrTGFzdERpc21pc3NlZERhdGVUaW1lIiwidmFsdWUiOiIifSx7Im5hbWUiOiJmZWVkYmFja0xhc3RTdWJtaXR0ZWREYXRlVGltZSIsInZhbHVlIjoiIn0seyJuYW1lIjoiZmVlZGJhY2tOZXZlclNob3dNYWpvclZlcnNpb24iLCJ2YWx1ZSI6IjIwMjYuMS4zIn0seyJuYW1lIjoiZmVlZGJhY2tSZWdpc3RyYXRpb25EYXRlVGltZSIsInZhbHVlIjoiMjAyNi0xMS0wMVQwMzoxMzowNCswMTowMCJ9LHsibmFtZSI6ImZ1c19zZXNzaW9uIiwidmFsdWUiOiJjODU4MDAxNi1iZGNjLTRjMGUtYjQ1NS03MWUxYzg5YmNlNGU6MTc5MzcxMTM3MTY3MSJ9LHsibmFtZSI6Imxhc3RTZWVuU2FrdXJhVUlWZXJzaW9uIiwidmFsdWUiOiIyMDI2LjEuMyJ9LHsibmFtZSI6InBsdWdpbjp2Y3M6YW55VmNzOmFueVZjc1Jvb3QiLCJ2YWx1ZSI6InZpdmFyaXVtLWxhYi1hZG1pbiJ9LHsibmFtZSI6InRlYW1jaXR5LnNlcnZlci5idWlsZE51bWJlciIsInZhbHVlIjoiMjIyNzQyIn0seyJuYW1lIjoidmlzaWJsZS5wcm9qZWN0cy5jb25maWd1cmVkIiwidmFsdWUiOiJ0cnVlIn0seyJuYW1lIjoid2FzLmxvZ2dlZC5pbiIsInZhbHVlIjoidHJ1ZSJ9XX0sInJvbGVzIjp7InJvbGUiOlt7InJvbGVJZCI6IlNZU1RFTV9BRE1JTiIsInNjb3BlIjoiZyIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MS9yb2xlcy9TWVNURU1fQURNSU4vZyJ9XX0sImdyb3VwcyI6eyJjb3VudCI6MSwiZ3JvdXAiOlt7ImtleSI6IkFMTF9VU0VSU19HUk9VUCIsIm5hbWUiOiJBbGwgVXNlcnMiLCJocmVmIjoiL2FwcC9yZXN0L3VzZXJHcm91cHMva2V5OkFMTF9VU0VSU19HUk9VUCIsImRlc2NyaXB0aW9uIjoiQ29udGFpbnMgYWxsIFRlYW1DaXR5IHVzZXJzIn1dfX0=",
+            "bodyBytes": 1115,
+            "bodySha256": "e68fd7ad17e04d00e0854cd2ed388405800db3ce269c1b6dccd13a4118776b47"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/users/id:1/roles",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlIjpbeyJyb2xlSWQiOiJTWVNURU1fQURNSU4iLCJzY29wZSI6ImciLCJocmVmIjoiL2FwcC9yZXN0L3VzZXJzL2lkOjEvcm9sZXMvU1lTVEVNX0FETUlOL2cifV19",
+            "bodyBytes": 99,
+            "bodySha256": "5eb49dd6aea9b2ee09584ef20aaf5065c11a573d07ef256836d40f781faf0b71"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/server/authSettings",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhbGxvd0d1ZXN0IjpmYWxzZSwiZ3Vlc3RVc2VybmFtZSI6Imd1ZXN0IiwiY29sbGFwc2VMb2dpbkZvcm0iOmZhbHNlLCJwZXJQcm9qZWN0UGVybWlzc2lvbnMiOmZhbHNlLCJlbWFpbFZlcmlmaWNhdGlvbiI6ZmFsc2UsImJ1aWxkQXV0aGVudGljYXRpb25Nb2RlIjoic3RyaWN0IiwibW9kdWxlcyI6eyJtb2R1bGUiOlt7Im5hbWUiOiJEZWZhdWx0IiwicHJvcGVydGllcyI6eyJjb3VudCI6MywicHJvcGVydHkiOlt7Im5hbWUiOiJ1c2Vyc0NhblJlc2V0T3duUGFzc3dvcmRzIiwidmFsdWUiOiJ0cnVlIn0seyJuYW1lIjoidXNlcnNDYW5DaGFuZ2VPd25QYXNzd29yZHMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJmcmVlUmVnaXN0cmF0aW9uQWxsb3dlZCIsInZhbHVlIjoiZmFsc2UifV19fSx7Im5hbWUiOiJUb2tlbi1BdXRoIiwicHJvcGVydGllcyI6eyJjb3VudCI6MCwicHJvcGVydHkiOltdfX0seyJuYW1lIjoiSFRUUC1CYXNpYyIsInByb3BlcnRpZXMiOnsiY291bnQiOjAsInByb3BlcnR5IjpbXX19XX19",
+            "bodyBytes": 519,
+            "bodySha256": "f37d30698cd9c7001086cf23b46a77ca51b86ba6df71d7c9dd6ceef72b9fa3cb"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/server/authSettings",
+            "query": {},
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhbGxvd0d1ZXN0IjpmYWxzZSwiZ3Vlc3RVc2VybmFtZSI6Imd1ZXN0IiwiY29sbGFwc2VMb2dpbkZvcm0iOmZhbHNlLCJwZXJQcm9qZWN0UGVybWlzc2lvbnMiOnRydWUsImVtYWlsVmVyaWZpY2F0aW9uIjpmYWxzZSwiYnVpbGRBdXRoZW50aWNhdGlvbk1vZGUiOiJzdHJpY3QiLCJtb2R1bGVzIjp7Im1vZHVsZSI6W3sibmFtZSI6IkRlZmF1bHQiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjozLCJwcm9wZXJ0eSI6W3sibmFtZSI6InVzZXJzQ2FuUmVzZXRPd25QYXNzd29yZHMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJ1c2Vyc0NhbkNoYW5nZU93blBhc3N3b3JkcyIsInZhbHVlIjoidHJ1ZSJ9LHsibmFtZSI6ImZyZWVSZWdpc3RyYXRpb25BbGxvd2VkIiwidmFsdWUiOiJmYWxzZSJ9XX19LHsibmFtZSI6IlRva2VuLUF1dGgiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjowLCJwcm9wZXJ0eSI6W119fSx7Im5hbWUiOiJIVFRQLUJhc2ljIiwicHJvcGVydGllcyI6eyJjb3VudCI6MCwicHJvcGVydHkiOltdfX1dfX0=",
+            "bodyBytes": 518,
+            "bodySha256": "8aff6f4d59e7634902018ad09a0dca0d3faf6f5755ba0298ae2bbaba7eebe3f8"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhbGxvd0d1ZXN0IjpmYWxzZSwiZ3Vlc3RVc2VybmFtZSI6Imd1ZXN0IiwiY29sbGFwc2VMb2dpbkZvcm0iOmZhbHNlLCJwZXJQcm9qZWN0UGVybWlzc2lvbnMiOnRydWUsImVtYWlsVmVyaWZpY2F0aW9uIjpmYWxzZSwiYnVpbGRBdXRoZW50aWNhdGlvbk1vZGUiOiJzdHJpY3QiLCJtb2R1bGVzIjp7Im1vZHVsZSI6W3sibmFtZSI6IkRlZmF1bHQiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjozLCJwcm9wZXJ0eSI6W3sibmFtZSI6InVzZXJzQ2FuUmVzZXRPd25QYXNzd29yZHMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJ1c2Vyc0NhbkNoYW5nZU93blBhc3N3b3JkcyIsInZhbHVlIjoidHJ1ZSJ9LHsibmFtZSI6ImZyZWVSZWdpc3RyYXRpb25BbGxvd2VkIiwidmFsdWUiOiJmYWxzZSJ9XX19LHsibmFtZSI6IlRva2VuLUF1dGgiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjowLCJwcm9wZXJ0eSI6W119fSx7Im5hbWUiOiJIVFRQLUJhc2ljIiwicHJvcGVydGllcyI6eyJjb3VudCI6MCwicHJvcGVydHkiOltdfX1dfX0=",
+            "bodyBytes": 518,
+            "bodySha256": "8aff6f4d59e7634902018ad09a0dca0d3faf6f5755ba0298ae2bbaba7eebe3f8"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/server/authSettings",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhbGxvd0d1ZXN0IjpmYWxzZSwiZ3Vlc3RVc2VybmFtZSI6Imd1ZXN0IiwiY29sbGFwc2VMb2dpbkZvcm0iOmZhbHNlLCJwZXJQcm9qZWN0UGVybWlzc2lvbnMiOnRydWUsImVtYWlsVmVyaWZpY2F0aW9uIjpmYWxzZSwiYnVpbGRBdXRoZW50aWNhdGlvbk1vZGUiOiJzdHJpY3QiLCJtb2R1bGVzIjp7Im1vZHVsZSI6W3sibmFtZSI6IkRlZmF1bHQiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjozLCJwcm9wZXJ0eSI6W3sibmFtZSI6InVzZXJzQ2FuUmVzZXRPd25QYXNzd29yZHMiLCJ2YWx1ZSI6InRydWUifSx7Im5hbWUiOiJ1c2Vyc0NhbkNoYW5nZU93blBhc3N3b3JkcyIsInZhbHVlIjoidHJ1ZSJ9LHsibmFtZSI6ImZyZWVSZWdpc3RyYXRpb25BbGxvd2VkIiwidmFsdWUiOiJmYWxzZSJ9XX19LHsibmFtZSI6IlRva2VuLUF1dGgiLCJwcm9wZXJ0aWVzIjp7ImNvdW50IjowLCJwcm9wZXJ0eSI6W119fSx7Im5hbWUiOiJIVFRQLUJhc2ljIiwicHJvcGVydGllcyI6eyJjb3VudCI6MCwicHJvcGVydHkiOltdfX1dfX0=",
+            "bodyBytes": 518,
+            "bodySha256": "8aff6f4d59e7634902018ad09a0dca0d3faf6f5755ba0298ae2bbaba7eebe3f8"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/userGroups/key:ALL_USERS_GROUP/roles",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlIjpbeyJyb2xlSWQiOiJQUk9KRUNUX0RFVkVMT1BFUiIsInNjb3BlIjoiZyIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlckdyb3Vwcy9rZXk6QUxMX1VTRVJTX0dST1VQL3JvbGVzL1BST0pFQ1RfREVWRUxPUEVSL2cifV19",
+            "bodyBytes": 129,
+            "bodySha256": "16131f10a50591b18dbcbd600142738d2ca3204c7c51f6de36d82f6770144ba9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "create-owned-project-user-and-finite-pat",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/projects",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0IiwibmFtZSI6Ik93bmVkIHF1ZXVlZCBhdXRob3JpdHkiLCJwYXJlbnRQcm9qZWN0Ijp7ImlkIjoiX1Jvb3QifX0=",
+            "bodyBytes": 125,
+            "bodySha256": "8b9090fbd7f60c0b688c1bf415b08e892b1e7a1f825314cbbffc48ab51da036c"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0IiwibmFtZSI6Ik93bmVkIHF1ZXVlZCBhdXRob3JpdHkiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsInZpcnR1YWwiOmZhbHNlLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0IiwicGFyZW50UHJvamVjdCI6eyJpZCI6Il9Sb290IiwibmFtZSI6IjxSb290IHByb2plY3Q+IiwiZGVzY3JpcHRpb24iOiJDb250YWlucyBhbGwgb3RoZXIgcHJvamVjdHMiLCJocmVmIjoiL2FwcC9yZXN0L3Byb2plY3RzL2lkOl9Sb290Iiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPV9Sb290In0sImJ1aWxkVHlwZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJ0ZW1wbGF0ZXMiOnsiY291bnQiOjAsImJ1aWxkVHlwZSI6W119LCJkZXBsb3ltZW50RGFzaGJvYXJkcyI6eyJjb3VudCI6MH0sInBhcmFtZXRlcnMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3QvcGFyYW1ldGVycyIsInByb3BlcnR5IjpbXX0sInZjc1Jvb3RzIjp7ImNvdW50IjowLCJocmVmIjoiL2FwcC9yZXN0L3Zjcy1yb290cz9sb2NhdG9yPXByb2plY3Q6KGlkOlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0KSJ9LCJwcm9qZWN0RmVhdHVyZXMiOnsiY291bnQiOjAsImhyZWYiOiIvYXBwL3Jlc3QvcHJvamVjdHMvaWQ6Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3QvcHJvamVjdEZlYXR1cmVzIn0sInByb2plY3RzIjp7ImNvdW50IjowfX0=",
+            "bodyBytes": 1061,
+            "bodySha256": "cf94d2a82f81e74856563a23dd181de28c3f9744f9dbb13dbef483b6235886c1"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildTypes",
+            "query": {
+              "fields": "id,name,projectId,projectName,paused,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibmFtZSI6Ik93bmVkIGFjdG9yIHdpdGhkcmF3YWwiLCJwcm9qZWN0Ijp7ImlkIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3QifX0=",
+            "bodyBytes": 173,
+            "bodySha256": "d83187cf49785f498c9280838650b5893d50f46a712d9fc9d7c19a9c4558c900"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibmFtZSI6Ik93bmVkIGFjdG9yIHdpdGhkcmF3YWwiLCJwYXVzZWQiOmZhbHNlLCJwcm9qZWN0TmFtZSI6Ik93bmVkIHF1ZXVlZCBhdXRob3JpdHkiLCJwcm9qZWN0SWQiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdCIsIndlYlVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6MTgxMTEvYnVpbGRDb25maWd1cmF0aW9uL1ZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkP21vZGU9YnVpbGRzIn0=",
+            "bodyBytes": 347,
+            "bodySha256": "d74f4573676184eef0da9f8ce495f94951fcc26ede376ea0078390065d6eb0fd"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/buildTypes/id:VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/steps",
+            "query": {
+              "fields": "step(id,name,type,disabled,inherited,properties(property(name,value,inherited,type(rawValue))))"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGVwIjpbeyJuYW1lIjoiT3duZWQgbGl0ZXJhbCBwcm9kdWNlciIsInR5cGUiOiJzaW1wbGVSdW5uZXIiLCJwcm9wZXJ0aWVzIjp7InByb3BlcnR5IjpbeyJuYW1lIjoic2NyaXB0LmNvbnRlbnQiLCJ2YWx1ZSI6IiMhL2Jpbi9zaFxuc2V0IC1ldVxucHJpbnRmIFwib3duZWQtcXVldWVkLWF1dGhvcml0eVxcblwiID4gcHJvb2YudHh0XG5lY2hvIFwiIyN0ZWFtY2l0eVtwdWJsaXNoQXJ0aWZhY3RzICdwcm9vZi50eHQnXVwiXG5lY2hvIG93bmVkLXF1ZXVlZC1hdXRob3JpdHktZXhlY3V0ZWRcbiJ9LHsibmFtZSI6InVzZS5jdXN0b20uc2NyaXB0IiwidmFsdWUiOiJ0cnVlIn1dfX1dfQ==",
+            "bodyBytes": 334,
+            "bodySha256": "3adbc1a8aab525687ba48bfad62fb9f4030461a3402271f8fe68626b3803fd58"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGVwIjpbeyJpZCI6IlJVTk5FUl8xMSIsIm5hbWUiOiJPd25lZCBsaXRlcmFsIHByb2R1Y2VyIiwidHlwZSI6InNpbXBsZVJ1bm5lciIsImRpc2FibGVkIjpmYWxzZSwiaW5oZXJpdGVkIjpmYWxzZSwicHJvcGVydGllcyI6eyJwcm9wZXJ0eSI6W3sibmFtZSI6InNjcmlwdC5jb250ZW50IiwidmFsdWUiOiIjIS9iaW4vc2hcbnNldCAtZXVcbnByaW50ZiBcIm93bmVkLXF1ZXVlZC1hdXRob3JpdHlcXG5cIiA+IHByb29mLnR4dFxuZWNobyBcIiMjdGVhbWNpdHlbcHVibGlzaEFydGlmYWN0cyAncHJvb2YudHh0J11cIlxuZWNobyBvd25lZC1xdWV1ZWQtYXV0aG9yaXR5LWV4ZWN1dGVkXG4ifSx7Im5hbWUiOiJ1c2UuY3VzdG9tLnNjcmlwdCIsInZhbHVlIjoidHJ1ZSJ9XX19XX0=",
+            "bodyBytes": 386,
+            "bodySha256": "ed2f2f25b1b638edb872562e7a430a588b0867784d3c26a805aa09a9b5b95558"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/users/id:36/roles/PROJECT_ADMIN/p%3AVivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlSWQiOiJQUk9KRUNUX0FETUlOIiwic2NvcGUiOiJwOlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0IiwiaHJlZiI6Ii9hcHAvcmVzdC91c2Vycy9pZDozNi9yb2xlcy9QUk9KRUNUX0FETUlOL3A6Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3QifQ==",
+            "bodyBytes": 199,
+            "bodySha256": "869122d88e718a42225a1a463e3c969c8fe503dbcb7648a7a47c2f2a64786dd1"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "DELETE",
+            "path": "/app/rest/users/id:36/roles/PROJECT_ADMIN/p%3AVivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 204,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/users/id:36/roles/PROJECT_DEVELOPER/p%3AVivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlSWQiOiJQUk9KRUNUX0RFVkVMT1BFUiIsInNjb3BlIjoicDpWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdCIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MzYvcm9sZXMvUFJPSkVDVF9ERVZFTE9QRVIvcDpWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdCJ9",
+            "bodyBytes": 207,
+            "bodySha256": "19bc3fd3db53c0617233f1c2a0a836c62721810f131d21b0d73622b631e25804"
+          }
+        }
+      ]
+    },
+    {
+      "privateCredentialExchange": true,
+      "actor": "admin",
+      "method": "POST",
+      "path": "/app/rest/users",
+      "status": 200,
+      "entities": "OMITTED_PRIVATE_SETUP"
+    },
+    {
+      "privateCredentialExchange": true,
+      "actor": "owned-basic-bootstrap",
+      "method": "POST",
+      "path": "/app/rest/users/current/tokens",
+      "status": 200,
+      "entities": "OMITTED_PRIVATE_SETUP"
+    },
+    {
+      "id": "create-new-owned-disabled-agent",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W119",
+            "bodyBytes": 12,
+            "bodySha256": "400dfef01d2c6967e4288e824b51dba3b4f647f5470e2d6afed5eb0eed8d253b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents",
+            "query": {
+              "locator": "connected:any,enabled:any,authorized:any,start:0,count:11",
+              "fields": "nextHref,agent(id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status))"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJhZ2VudCI6W3siaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50IiwiY29ubmVjdGVkIjp0cnVlLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpemVkIjpmYWxzZSwidXB0b2RhdGUiOmZhbHNlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2FnZW50RGV0YWlscy5odG1sP2lkPTE5JmFnZW50VHlwZUlkPTE5JnJlYWxBZ2VudE5hbWU9Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In1dfQ==",
+            "bodyBytes": 289,
+            "bodySha256": "9b84e9328a41487ed470f369cbac7735a64776387637d9740c1b17a5d1f6636b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/agents/id:19/enabledInfo",
+            "query": {
+              "fields": "status,comment(text,timestamp)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRleHQiOiJPd25lZCBxdWV1ZWQtYXV0aG9yaXR5IHByb29mIn19",
+            "bodyBytes": 66,
+            "bodySha256": "4b5113147be50b7c7913d296baf9f4665d6aac503ac0a97c237e321bbd894636"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRpbWVzdGFtcCI6IjIwMjYxMTAzVDEzMTQxMyswMDAwIiwidGV4dCI6Ik93bmVkIHF1ZXVlZC1hdXRob3JpdHkgcHJvb2YifX0=",
+            "bodyBytes": 101,
+            "bodySha256": "661e4a3fc28c3ee2cd7529080e0c18a414fe9f2a2275908ddb6951c791e976e5"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/agents/id:19/authorizedInfo",
+            "query": {
+              "fields": "status,comment(text,timestamp)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIHF1ZXVlZC1hdXRob3JpdHkgcHJvb2YifX0=",
+            "bodyBytes": 65,
+            "bodySha256": "c8eea8fc761349161f82037dabd8362f900b3a70d45af60c167fab5a11b28adb"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJ0ZXh0IjoiT3duZWQgcXVldWVkLWF1dGhvcml0eSBwcm9vZiJ9fQ==",
+            "bodyBytes": 100,
+            "bodySha256": "65ef16f9912e1a37e4c4b36019c8572dd251cdc63c553a1e166acd3c4c68009a"
+          }
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "admit-as-ordinary-project-actor-then-withdraw-grant-before-dispatch",
+      "exchanges": [
+        {
+          "actor": "owned-scoped-pat",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/projects/id:VivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {
+              "fields": "id,name,parentProjectId,archived,description,webUrl"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0IiwibmFtZSI6Ik93bmVkIHF1ZXVlZCBhdXRob3JpdHkiLCJwYXJlbnRQcm9qZWN0SWQiOiJfUm9vdCIsImFyY2hpdmVkIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9wcm9qZWN0Lmh0bWw/cHJvamVjdElkPVZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0In0=",
+            "bodyBytes": 248,
+            "bodySha256": "5e9fa62b60398c8dc861f486aa4f8154e1caa1ddf6581ee36d8b6e51e95392d2"
+          }
+        },
+        {
+          "actor": "owned-account",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {},
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZCJ9fQ==",
+            "bodyBytes": 82,
+            "bodySha256": "d5b900d0cf47764b47e0e7ad01e592c0982d1649970dcaea76b2e9e0797bf1a9"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwic3RhdGUiOiJxdWV1ZWQiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkUXVldWUvaWQ6MTIxIiwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZC8xMjEiLCJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZCIsIm5hbWUiOiJPd25lZCBhY3RvciB3aXRoZHJhd2FsIiwicHJvamVjdE5hbWUiOiJPd25lZCBxdWV1ZWQgYXV0aG9yaXR5IiwicHJvamVjdElkIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3QiLCJocmVmIjoiL2FwcC9yZXN0L2J1aWxkVHlwZXMvaWQ6Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3RfQnVpbGQiLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZD9tb2RlPWJ1aWxkcyJ9LCJ3YWl0UmVhc29uIjoiQnVpbGQgc2V0dGluZ3MgaGF2ZSBub3QgYmVlbiBmaW5hbGl6ZWQiLCJxdWV1ZWREYXRlIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJ0cmlnZ2VyZWQiOnsidHlwZSI6InVzZXIiLCJkYXRlIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJ1c2VyIjp7InVzZXJuYW1lIjoidml2dXMwMTNxdWV1ZWRhdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X3VzZXIiLCJuYW1lIjoiT3duZWQgcXVldWVkIGFjdG9yIiwiaWQiOjM2LCJocmVmIjoiL2FwcC9yZXN0L3VzZXJzL2lkOjM2In19LCJjaGFuZ2VzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvY2hhbmdlcz9sb2NhdG9yPWJ1aWxkOihpZDoxMjEpIn0sInJldmlzaW9ucyI6eyJjb3VudCI6MH0sImNvbXBhdGlibGVBZ2VudHMiOnsiaHJlZiI6Ii9hcHAvcmVzdC9hZ2VudHM/bG9jYXRvcj1jb21wYXRpYmxlOihidWlsZDooaWQ6MTIxKSkifSwiYXJ0aWZhY3RzIjp7ImhyZWYiOiIvYXBwL3Jlc3QvYnVpbGRzL2lkOjEyMS9hcnRpZmFjdHMvY2hpbGRyZW4vIn0sInZjc0xhYmVscyI6W10sImN1c3RvbWl6YXRpb24iOnt9fQ==",
+            "bodyBytes": 1180,
+            "bodySha256": "1c26661b1c860c52e58427615de3e708dd720f33f8410c4dc73e492efaef19d6"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwic3RhdGUiOiJxdWV1ZWQiLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzEyMSIsInF1ZXVlUG9zaXRpb24iOjEsIndhaXRSZWFzb24iOiJCdWlsZCBzZXR0aW5ncyBoYXZlIG5vdCBiZWVuIGZpbmFsaXplZCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "0e495d72c9144e5f3c0c0463c3a5524b356de39cb1b55b006ae101d9516ce2fb"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "DELETE",
+            "path": "/app/rest/users/id:36/roles/PROJECT_DEVELOPER/p%3AVivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 204,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "DELETE",
+            "path": "/app/rest/userGroups/key:ALL_USERS_GROUP/roles/PROJECT_DEVELOPER/g",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 204,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/users/id:36/roles",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlIjpbXX0=",
+            "bodyBytes": 11,
+            "bodySha256": "84fa28ee0406f1c5a88e6f062c138d9b17c7904743397d852b15d091db5f2ec6"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/userGroups/key:ALL_USERS_GROUP/roles",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlIjpbXX0=",
+            "bodyBytes": 11,
+            "bodySha256": "84fa28ee0406f1c5a88e6f062c138d9b17c7904743397d852b15d091db5f2ec6"
+          }
+        },
+        {
+          "actor": "owned-account",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/buildQueue",
+            "query": {},
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJidWlsZFR5cGUiOnsiaWQiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZCJ9fQ==",
+            "bodyBytes": 82,
+            "bodySha256": "d5b900d0cf47764b47e0e7ad01e592c0982d1649970dcaea76b2e9e0797bf1a9"
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJlcnJvcnMiOlt7InN0YXR1c1RleHQiOiJSZXNwb25kaW5nIHdpdGggZXJyb3IsIHN0YXR1cyBjb2RlOiA0MDMgKEZvcmJpZGRlbikuIiwiYWRkaXRpb25hbE1lc3NhZ2UiOiJqZXRicmFpbnMuYnVpbGRTZXJ2ZXIuc2VydmVyU2lkZS5hdXRoLkFjY2Vzc0RlbmllZEV4Y2VwdGlvbjogWW91IGRvIG5vdCBoYXZlIGVub3VnaCBwZXJtaXNzaW9ucyB0byBhY2Nlc3MgcHJvamVjdCB3aXRoIGludGVybmFsIGlkOiBwcm9qZWN0OTEuIiwic3RhY2tUcmFjZSI6bnVsbCwibWVzc2FnZSI6IllvdSBkbyBub3QgaGF2ZSBlbm91Z2ggcGVybWlzc2lvbnMgdG8gYWNjZXNzIHByb2plY3Qgd2l0aCBpbnRlcm5hbCBpZDogcHJvamVjdDkxIn1dfQ==",
+            "bodyBytes": 358,
+            "bodySha256": "0dc006dc54ce95221de0fe0bfe535c476e9d962af967f2a059558d863e307c17"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/agents/id:19/enabledInfo",
+            "query": {
+              "fields": "status,comment(text,timestamp)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGV4dCI6Ik93bmVkIHF1ZXVlZC1hdXRob3JpdHkgcHJvb2YifX0=",
+            "bodyBytes": 65,
+            "bodySha256": "c8eea8fc761349161f82037dabd8362f900b3a70d45af60c167fab5a11b28adb"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOnRydWUsImNvbW1lbnQiOnsidGltZXN0YW1wIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJ0ZXh0IjoiT3duZWQgcXVldWVkLWF1dGhvcml0eSBwcm9vZiJ9fQ==",
+            "bodyBytes": 100,
+            "bodySha256": "65ef16f9912e1a37e4c4b36019c8572dd251cdc63c553a1e166acd3c4c68009a"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwic3RhdGUiOiJxdWV1ZWQiLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkLzEyMSIsInF1ZXVlUG9zaXRpb24iOjEsIndhaXRSZWFzb24iOiJCdWlsZCBzZXR0aW5ncyBoYXZlIG5vdCBiZWVuIGZpbmFsaXplZCIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCJ9",
+            "bodyBytes": 294,
+            "bodySha256": "0e495d72c9144e5f3c0c0463c3a5524b356de39cb1b55b006ae101d9516ce2fb"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents/id:19",
+            "query": {
+              "fields": "id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTksIm5hbWUiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfQWdlbnQiLCJjb25uZWN0ZWQiOnRydWUsImVuYWJsZWQiOnRydWUsImF1dGhvcml6ZWQiOnRydWUsInVwdG9kYXRlIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9hZ2VudERldGFpbHMuaHRtbD9pZD0xOSZhZ2VudFR5cGVJZD0xOSZyZWFsQWdlbnROYW1lPVZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9BZ2VudCJ9",
+            "bodyBytes": 276,
+            "bodySha256": "12149f29694966661bc6c768cb7e335dcc7e2ec748d259852bb375325a9552ac"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/agents/id:19",
+            "query": {
+              "fields": "id,name,connected,enabled,authorized,uptodate,webUrl,build(id,buildTypeId,number,state,status)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTksIm5hbWUiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfQWdlbnQiLCJjb25uZWN0ZWQiOnRydWUsImVuYWJsZWQiOnRydWUsImF1dGhvcml6ZWQiOnRydWUsInVwdG9kYXRlIjp0cnVlLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2FnZW50RGV0YWlscy5odG1sP2lkPTE5JmFnZW50VHlwZUlkPTE5JnJlYWxBZ2VudE5hbWU9Vml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50IiwiYnVpbGQiOnsiaWQiOjEyMSwiYnVpbGRUeXBlSWQiOiJWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZCIsIm51bWJlciI6IjEiLCJzdGF0dXMiOiJTVUNDRVNTIiwic3RhdGUiOiJydW5uaW5nIn19",
+            "bodyBytes": 420,
+            "bodySha256": "3a409435d18cc28028088981b5a89c20ecfe01b412433e46717929b4c3fb7d7b"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6InJ1bm5pbmciLCJmYWlsZWRUb1N0YXJ0IjpmYWxzZSwicGVyc29uYWwiOmZhbHNlLCJwZXJjZW50YWdlQ29tcGxldGUiOi0xLCJ3ZWJVcmwiOiJodHRwOi8vMTI3LjAuMC4xOjE4MTExL2J1aWxkQ29uZmlndXJhdGlvbi9WaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdF9CdWlsZC8xMjEiLCJzdGF0dXNUZXh0IjoiUnVubmluZyIsInF1ZXVlZERhdGUiOiIyMDI2MTEwM1QxMzE0MTMrMDAwMCIsInN0YXJ0RGF0ZSI6IjIwMjYxMTAzVDEzMTQxNCswMDAwIiwiYWdlbnQiOnsiaWQiOjE5LCJuYW1lIjoiVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X0FnZW50In19",
+            "bodyBytes": 489,
+            "bodySha256": "e29ab0ec46562797bc475a8e701f210a74f142c918525448c9508dc056bfb595"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6ZmFsc2UsInBlcnNvbmFsIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3RfQnVpbGQvMTIxIiwic3RhdHVzVGV4dCI6IlN1Y2Nlc3MiLCJxdWV1ZWREYXRlIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJzdGFydERhdGUiOiIyMDI2MTEwM1QxMzE0MTQrMDAwMCIsImZpbmlzaERhdGUiOiIyMDI2MTEwM1QxMzE0MjUrMDAwMCIsImFnZW50Ijp7ImlkIjoxOSwibmFtZSI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9BZ2VudCJ9fQ==",
+            "bodyBytes": 502,
+            "bodySha256": "3c44253b48e7d87246e90b2ce9b4164148a4da762a5bf4f7a70d3a63da56e929"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121/artifacts/files/proof.txt",
+            "query": {},
+            "headers": {
+              "accept": "*/*"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain",
+              "etag": "\"1002e7b983f668b52de01ed99fd63a31\""
+            },
+            "bodyBase64": "b3duZWQtcXVldWVkLWF1dGhvcml0eQo=",
+            "bodyBytes": 23,
+            "bodySha256": "32d6b9a3dd43753e90e5148487f5cd088ecf59f10c6550b0cdbde084e89fabc8"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/users/id:36/roles/PROJECT_VIEWER/p%3AVivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlSWQiOiJQUk9KRUNUX1ZJRVdFUiIsInNjb3BlIjoicDpWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdCIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlcnMvaWQ6MzYvcm9sZXMvUFJPSkVDVF9WSUVXRVIvcDpWaXZVczAxM1F1ZXVlZEF1dGhvcml0eV8yMDI2MTEwM19iNTQ3NTkyZGI2NTRfUHJvamVjdCJ9",
+            "bodyBytes": 201,
+            "bodySha256": "b5ca3950e92ec5fcc737d9b0ef448678c64eecc5d3a945ba702fd8987eb90caa"
+          }
+        },
+        {
+          "actor": "owned-account",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121/artifacts/files/proof.txt",
+            "query": {},
+            "headers": {
+              "accept": "*/*"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain",
+              "etag": "\"1002e7b983f668b52de01ed99fd63a31\""
+            },
+            "bodyBase64": "b3duZWQtcXVldWVkLWF1dGhvcml0eQo=",
+            "bodyBytes": 23,
+            "bodySha256": "32d6b9a3dd43753e90e5148487f5cd088ecf59f10c6550b0cdbde084e89fabc8"
+          }
+        }
+      ]
+    }
+  ],
+  "cleanup": [
+    {
+      "id": "restore-exact-all-users-lab-binding",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "POST",
+            "path": "/app/rest/userGroups/key:ALL_USERS_GROUP/roles/PROJECT_DEVELOPER/g",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlSWQiOiJQUk9KRUNUX0RFVkVMT1BFUiIsInNjb3BlIjoiZyIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlckdyb3Vwcy9rZXk6QUxMX1VTRVJTX0dST1VQL3JvbGVzL1BST0pFQ1RfREVWRUxPUEVSL2cifQ==",
+            "bodyBytes": 118,
+            "bodySha256": "5873d20e0b35fdbaf272ac47fb7c77edab4d48bf4ace3937a221b356b0fd2417"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/userGroups/key:ALL_USERS_GROUP/roles",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJyb2xlIjpbeyJyb2xlSWQiOiJQUk9KRUNUX0RFVkVMT1BFUiIsInNjb3BlIjoiZyIsImhyZWYiOiIvYXBwL3Jlc3QvdXNlckdyb3Vwcy9rZXk6QUxMX1VTRVJTX0dST1VQL3JvbGVzL1BST0pFQ1RfREVWRUxPUEVSL2cifV19",
+            "bodyBytes": 129,
+            "bodySha256": "16131f10a50591b18dbcbd600142738d2ca3204c7c51f6de36d82f6770144ba9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "stop-owned-work-and-remove-project",
+      "exchanges": [
+        {
+          "actor": "admin",
+          "request": {
+            "method": "GET",
+            "path": "/app/rest/builds/id:121",
+            "query": {
+              "fields": "id,buildTypeId,number,state,status,statusText,branchName,defaultBranch,personal,failedToStart,canceledInfo(timestamp),queuedDate,startDate,finishDate,percentageComplete,queuePosition,waitReason,webUrl,agent(id,name)"
+            },
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJpZCI6MTIxLCJidWlsZFR5cGVJZCI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9Qcm9qZWN0X0J1aWxkIiwibnVtYmVyIjoiMSIsInN0YXR1cyI6IlNVQ0NFU1MiLCJzdGF0ZSI6ImZpbmlzaGVkIiwiZmFpbGVkVG9TdGFydCI6ZmFsc2UsInBlcnNvbmFsIjpmYWxzZSwid2ViVXJsIjoiaHR0cDovLzEyNy4wLjAuMToxODExMS9idWlsZENvbmZpZ3VyYXRpb24vVml2VXMwMTNRdWV1ZWRBdXRob3JpdHlfMjAyNjExMDNfYjU0NzU5MmRiNjU0X1Byb2plY3RfQnVpbGQvMTIxIiwic3RhdHVzVGV4dCI6IlN1Y2Nlc3MiLCJxdWV1ZWREYXRlIjoiMjAyNjExMDNUMTMxNDEzKzAwMDAiLCJzdGFydERhdGUiOiIyMDI2MTEwM1QxMzE0MTQrMDAwMCIsImZpbmlzaERhdGUiOiIyMDI2MTEwM1QxMzE0MjUrMDAwMCIsImFnZW50Ijp7ImlkIjoxOSwibmFtZSI6IlZpdlVzMDEzUXVldWVkQXV0aG9yaXR5XzIwMjYxMTAzX2I1NDc1OTJkYjY1NF9BZ2VudCJ9fQ==",
+            "bodyBytes": 502,
+            "bodySha256": "3c44253b48e7d87246e90b2ce9b4164148a4da762a5bf4f7a70d3a63da56e929"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "DELETE",
+            "path": "/app/rest/projects/id:VivUs013QueuedAuthority_20261103_b547592db654_Project",
+            "query": {},
+            "headers": {
+              "accept": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "response": {
+            "status": 204,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "",
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/agents/id:19/enabledInfo",
+            "query": {
+              "fields": "status,comment(text,timestamp)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRleHQiOiJPd25lZCBxdWV1ZWQtYXV0aG9yaXR5IHByb29mIn19",
+            "bodyBytes": 66,
+            "bodySha256": "4b5113147be50b7c7913d296baf9f4665d6aac503ac0a97c237e321bbd894636"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRpbWVzdGFtcCI6IjIwMjYxMTAzVDEzMTQyNiswMDAwIiwidGV4dCI6Ik93bmVkIHF1ZXVlZC1hdXRob3JpdHkgcHJvb2YifX0=",
+            "bodyBytes": 101,
+            "bodySha256": "c6430e4e7e0abfd77b5f2753bf0333a20b3ceffeb17d830af42e04a03b28f2f5"
+          }
+        },
+        {
+          "actor": "admin",
+          "request": {
+            "method": "PUT",
+            "path": "/app/rest/agents/id:19/authorizedInfo",
+            "query": {
+              "fields": "status,comment(text,timestamp)"
+            },
+            "headers": {
+              "accept": "application/json",
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRleHQiOiJPd25lZCBxdWV1ZWQtYXV0aG9yaXR5IHByb29mIn19",
+            "bodyBytes": 66,
+            "bodySha256": "4b5113147be50b7c7913d296baf9f4665d6aac503ac0a97c237e321bbd894636"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "bodyBase64": "eyJzdGF0dXMiOmZhbHNlLCJjb21tZW50Ijp7InRpbWVzdGFtcCI6IjIwMjYxMTAzVDEzMTQyNiswMDAwIiwidGV4dCI6Ik93bmVkIHF1ZXVlZC1hdXRob3JpdHkgcHJvb2YifX0=",
+            "bodyBytes": 101,
+            "bodySha256": "c6430e4e7e0abfd77b5f2753bf0333a20b3ceffeb17d830af42e04a03b28f2f5"
+          }
+        }
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "label": "Queued before grant withdrawal",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "state": "queued",
+        "failedToStart": false,
+        "personal": false,
+        "webUrl": "http://127.0.0.1:18111/build/121",
+        "queuePosition": 1,
+        "waitReason": "Build settings have not been finalized",
+        "queuedDate": "20261103T131413+0000"
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "state": "queued",
+        "failedToStart": false,
+        "personal": false,
+        "webUrl": "http://127.0.0.1:18111/build/121",
+        "queuePosition": 1,
+        "waitReason": "Build settings have not been finalized",
+        "queuedDate": "20261103T131413+0000"
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "running",
+        "failedToStart": false,
+        "personal": false,
+        "percentageComplete": -1,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Running",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "After grant withdrawal and owned Agent enablement",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "finished",
+        "failedToStart": false,
+        "personal": false,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Success",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "finishDate": "20261103T131425+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    },
+    {
+      "label": "Cleanup state",
+      "build": {
+        "id": 121,
+        "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+        "number": "1",
+        "status": "SUCCESS",
+        "state": "finished",
+        "failedToStart": false,
+        "personal": false,
+        "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+        "statusText": "Success",
+        "queuedDate": "20261103T131413+0000",
+        "startDate": "20261103T131414+0000",
+        "finishDate": "20261103T131425+0000",
+        "agent": {
+          "id": 19,
+          "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+        }
+      }
+    }
+  ],
+  "resources": {
+    "owner": "us013-queued-authority-20261103",
+    "network": "vivarium-us013-queued-net-b547592db654",
+    "agentContainer": "vivarium-us013-queued-agent-b547592db654",
+    "agentName": "VivUs013QueuedAuthority_20261103_b547592db654_Agent",
+    "serverId": "a98f4443f2a5cddbe614fb442e4e8d644ce5a92ebc7bf085c40df51f1cb89cce",
+    "serverImage": "sha256:e62c922b94edbef8536bb0d514a193a38bd480fd3855fdac7a649e0a5f8a550a",
+    "agentImage": "jetbrains/teamcity-minimal-agent@sha256:f711ef16fd62a46bc6e5d3e07f0fcd0eaf7c3c8f905fc4500135a58d5ad05765"
+  },
+  "limits": "One finite P-scoped PAT with view_project/run_build/view_file_content and a Project Developer grant withdrawal, one newly owned Linux Agent. No PAT revocation, account-disable, pool-policy or general permissions inference.",
+  "authenticationSettings": {
+    "allowGuest": false,
+    "collapseLoginForm": false,
+    "perProjectPermissions": false,
+    "emailVerification": false,
+    "buildAuthenticationMode": "strict",
+    "modules": [
+      {
+        "name": "Default"
+      },
+      {
+        "name": "Token-Auth"
+      },
+      {
+        "name": "HTTP-Basic"
+      }
+    ]
+  },
+  "administratorRoles": [
+    {
+      "roleId": "SYSTEM_ADMIN",
+      "scope": "g"
+    }
+  ],
+  "scopedAuthenticationSettings": {
+    "allowGuest": false,
+    "collapseLoginForm": false,
+    "perProjectPermissions": true,
+    "emailVerification": false,
+    "buildAuthenticationMode": "strict",
+    "modules": [
+      {
+        "name": "Default"
+      },
+      {
+        "name": "Token-Auth"
+      },
+      {
+        "name": "HTTP-Basic"
+      }
+    ]
+  },
+  "allUsersRolesBefore": [
+    {
+      "roleId": "PROJECT_DEVELOPER",
+      "scope": "g"
+    }
+  ],
+  "userId": "36",
+  "agentId": 19,
+  "buildId": 121,
+  "userRolesAfterWithdrawal": [],
+  "allUsersRolesAfterWithdrawal": [],
+  "afterWithdrawalRunStatus": 403,
+  "lastAgentObservation": {
+    "id": 19,
+    "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent",
+    "connected": true,
+    "enabled": true,
+    "authorized": true,
+    "uptodate": true,
+    "webUrl": "http://127.0.0.1:18111/agentDetails.html?id=19&agentTypeId=19&realAgentName=VivUs013QueuedAuthority_20261103_b547592db654_Agent",
+    "build": {
+      "id": 121,
+      "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+      "number": "1",
+      "status": "SUCCESS",
+      "state": "running"
+    }
+  },
+  "finalBuild": {
+    "id": 121,
+    "buildTypeId": "VivUs013QueuedAuthority_20261103_b547592db654_Project_Build",
+    "number": "1",
+    "status": "SUCCESS",
+    "state": "finished",
+    "failedToStart": false,
+    "personal": false,
+    "webUrl": "http://127.0.0.1:18111/buildConfiguration/VivUs013QueuedAuthority_20261103_b547592db654_Project_Build/121",
+    "statusText": "Success",
+    "queuedDate": "20261103T131413+0000",
+    "startDate": "20261103T131414+0000",
+    "finishDate": "20261103T131425+0000",
+    "agent": {
+      "id": 19,
+      "name": "VivUs013QueuedAuthority_20261103_b547592db654_Agent"
+    }
+  },
+  "artifact": {
+    "status": 200,
+    "length": 23,
+    "sha256": "32d6b9a3dd43753e90e5148487f5cd088ecf59f10c6550b0cdbde084e89fabc8",
+    "matchesPreparedLiteral": true
+  },
+  "viewerArtifact": {
+    "status": 200,
+    "length": 23,
+    "sha256": "32d6b9a3dd43753e90e5148487f5cd088ecf59f10c6550b0cdbde084e89fabc8",
+    "matchesPreparedLiteral": true
+  },
+  "complete": true,
+  "allUsersRolesAfter": [
+    {
+      "roleId": "PROJECT_DEVELOPER",
+      "scope": "g"
+    }
+  ],
+  "authenticationSettingsAfter": {
+    "allowGuest": false,
+    "collapseLoginForm": false,
+    "perProjectPermissions": false,
+    "emailVerification": false,
+    "buildAuthenticationMode": "strict",
+    "modules": [
+      {
+        "name": "Default"
+      },
+      {
+        "name": "Token-Auth"
+      },
+      {
+        "name": "HTTP-Basic"
+      }
+    ]
+  },
+  "initialPermissions": [
+    {
+      "name": "ReadOnly",
+      "enabled": true,
+      "description": "Read remote state without changing it"
+    },
+    {
+      "name": "Update",
+      "enabled": false,
+      "description": "Perform operations that may change remote state"
+    },
+    {
+      "name": "Admin",
+      "enabled": false,
+      "description": "Change remote accounts, access policy and server administration"
+    },
+    {
+      "name": "Credentials",
+      "enabled": false,
+      "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+    }
+  ],
+  "finalPermissions": [
+    {
+      "name": "ReadOnly",
+      "enabled": true,
+      "description": "Read remote state without changing it"
+    },
+    {
+      "name": "Update",
+      "enabled": false,
+      "description": "Perform operations that may change remote state"
+    },
+    {
+      "name": "Admin",
+      "enabled": false,
+      "description": "Change remote accounts, access policy and server administration"
+    },
+    {
+      "name": "Credentials",
+      "enabled": false,
+      "description": "Issue/revoke remote credentials or remove explicitly owned local credentials"
+    }
+  ]
+}

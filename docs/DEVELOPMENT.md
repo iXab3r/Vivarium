@@ -43,11 +43,107 @@ TeamCity. Its generated status remains partial with unknown global scope and API
 
 ## Building
 
+Before restoring the fresh Host dependencies, run `pwsh -File tools/PrepareDependencies.ps1` from
+the repository root with GitHub CLI access to the owner releases. `dependency-artifacts.json` pins
+the exact Chiral/Storage prerelease bytes; preparation verifies SHA256 before populating the local
+feed selected by `NuGet.Config`. These are the adopted Depot package APIs, not local source projects.
+The Controller lock file pins the resolved runtime graph.
+
+The in-progress fresh-install runtime has explicit local commands:
+
+```text
+viv-server init --settings-directory <private-directory>
+viv-server migrate --settings-directory <private-directory>
+viv-server nodes --settings-directory <private-directory>
+viv-server run --settings-directory <private-directory>
+```
+
+`init` reads private node JSON on stdin, keyed by `vivarium-host`, `vivarium-database`,
+`vivarium-identity` and `vivarium-storage`. Schemas are embedded from `Hosting/Schemas`; Storage
+supplies its own schema. Provision persistent private TLS/Identity certificates and Data Protection
+paths before running. The Identity token lifetime cap is explicit (1–365 days), with no inherited
+default. `migrate` separately reads `{"ConnectionString":"<maintenance connection>"}` on stdin;
+it never persists that privileged input as runtime configuration. Run local maintenance with the
+Host stopped. Runtime DB credentials may have narrower permissions than maintenance credentials.
+
+The optional managed Host `OutputRetentionDays` setting enables age expiry of completed Build output
+after restart (1–3650 days). Omission/null preserves output by age; ingestion quotas still apply.
+Expiry records availability gaps without changing producer evidence, then retries private Storage
+deletion. Already committed expiry/deletion intent survives restart or later policy disablement.
+Artifacts and full TeamCity/per-project retention remain separate contracts.
+
+Native C#/Git run admission accepts optional `secretEnvironment` under `run_build` plus
+`customize_build_parameters`. These D45 temporary values override ordinary Agent environment
+aliases, never expand into scripts/parameters, and have no readback API. Recovering queued/running
+work requires the existing persistent Identity Data Protection directory as well as PostgreSQL and
+object data: collected secret input and new durable assignments are encrypted per Build. Registered
+exact UTF-8 values are masked in stdout/stderr before Agent spool persistence, including across
+chunk boundaries. Permanent Project secrets and arbitrary artifact redaction are separate scope.
+
+`nodes` emits masked Chiral views. Saves remain separate from active resources until restart;
+startup refuses missing/unready nodes, pending/unknown/checksum-drifted schema and unusable Identity
+keys before opening listeners. Object HTTP stays on a distinct loopback listener. The installation
+password is disclosed only in the intended private startup log after its framework hash commits.
+These commands establish infrastructure, ordinary account/My keys pages and Workbench Access.
+The fresh C#/Git catalogue path is in progress: optional Host `DefinitionSources` locates the
+control repository and explicit local settings-source registry. Prepare schema-2 C# declarations
+using the [selected activation contract](design/csharp-activation.md), provision its pinned Linux
+SDK image, then submit the native authenticated reconcile action and observe its status location.
+The Host must have Docker daemon access; project code receives neither that access nor Host mounts,
+network, settings or credentials. An unavailable evaluator cannot fall back to Host execution.
+Catalogue metadata is read under current project visibility, while Agent/build/chain integration
+remains due. This is not a completed local-run or US-013 claim.
+
+The Controller build includes the locked TypeScript/Vite Workbench assets. Root `dotnet build`
+runs `npm ci` and `npm run build` when frontend inputs change, so Node/npm are build prerequisites.
+An externally prepared frontend may use `-p:BuildWorkbench=false`; its `Workbench/dist` must already
+exist and is still copied into the Host output/publish tree. This is how the owned Linux browser
+contour separates its pinned Node build stage from .NET compilation.
+
+Selected real Host/Git/Docker/PostgreSQL checks are explicit in `tests/Vivarium.DefinitionProof`:
+`ProductionEvaluatorPhysicalTests`, `ProductionCatalogPhysicalTests`, `RuntimeHostPhysicalTests`,
+and the existing Host/Identity/access groups. The closed ordinary Identity and Workbench Access
+browser contour is prepared with `python tools/identity/prepare.py`, then executed with
+`python tools/identity/run.py <printed-context-path>`. Its summaries require clean owned processes
+and container removal; it is not the D43 author-code evaluator or complete R0/story acceptance.
+
+`RuntimeHostPhysicalTests` additionally executes the published, byte-verified TeamCity CLI 0.5.6
+as separate Node processes, with an isolated profile and stock ordinary-account credentials.
+It requires both pinned npm tarballs in `artifacts/us013-cli056-20261102` and matching installed
+`@eyeauras/teamcity-cli` / sibling `@eyeauras/cli-factory` packages; `VIVARIUM_PROOF_TEAMCITY_CLI`
+can select the CLI package directory. Fetch the exact tarballs with `npm pack` for version `0.5.6`;
+the fixture verifies the recorded archive digests and every packaged installed file. The owned Host
+listens on its allocated public port for the dedicated Docker Agent; Storage remains loopback-only.
+The Linux process uses pinned runtime image
+`mcr.microsoft.com/dotnet/runtime@sha256:939555726cae4c916d212323ac3c0792996dcac2614f00e82cc40fcf059e1af3`,
+its own labelled volume and unprivileged UID, and is removed before the later Windows secret journey.
+`DefinitionGitWriterPhysicalTests` separately cover real Git CAS, checkout recovery, local-edit
+preservation, and rejection of hook/filter execution. These are supporting integration checks;
+the R0 ledger still requires explicit complete-case bindings and milestone review.
+
+`R0AcceptanceCases` runs independent selected journeys against the actual fresh Host, PostgreSQL,
+private Storage and owned Windows Agent. One migrated/bootstrap database and one genuinely activated
+C#/Git database serve as templates; every case receives its own database, Git checkout, private keys,
+object directory and ordinary credentials. Only one case Host is live at a time. Runtime connections
+use a bounded PostgreSQL pool; teardown clears only that case's pool before cloning/dropping its
+database. Reusing the administrative unpooled connection for every runtime query can exhaust Windows
+ephemeral ports and is a fixture failure, not REST conformance evidence.
+
+Run this group explicitly with `dotnet test tests/Vivarium.DefinitionProof --filter
+FullyQualifiedName~R0AcceptanceCases`. Its bounded process gates, selective production clocks and
+transport/Storage faults exercise current access, live/resumed output, redaction, gaps, expiry,
+Host restart, C#/Git rejection and source handoff. The separate Identity browser contour proves real
+OIDC entry and a pre-grant My keys bearer observing current grant/withdrawal/disable effects.
+These standard NUnit/TRX results require explicit case and input-provenance bindings; passing the
+group alone does not close the selected reference cohort, R0 or US-013.
+
 The [first executable REST cohort](design/teamcity-rest-first-cohort.md) now publishes concrete
 ordinary/replay/composition/raw commands and evidence. Root build also compiles the separately
-invoked `tests/Vivarium.TeamCity.Conformance` project; its raw five-case product-ready run remains nonzero while
-the compatible routes are missing. No delivered TeamCity GREEN selection exists yet, and broader
-P0 composition/accounting/acceptance gates remain open. The [local mutation cohort](design/teamcity-rest-local-mutations.md)
+invoked `tests/Vivarium.TeamCity.Conformance` project; its legacy-controller raw five-case product-ready
+run remains nonzero. Fresh Host process checks do not replace that baseline or create delivered
+TeamCity GREEN cases. Broader
+P0 foundation was delivered in PR #164; R0 product binding and cumulative conformance remain open.
+The [local mutation cohort](design/teamcity-rest-local-mutations.md)
 separately records twelve observed/replay-bound workflows and ten product-prerequisite-blocked variants.
 
 D38 adds [explicit REST conformance verification](design/teamcity-rest-test-first.md) from the first

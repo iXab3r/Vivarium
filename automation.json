@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "rootDirectory": ".",
+  "resultsDirectory": "artifacts/automation",
+  "nuGetConfig": "NuGet.Config",
+  "suites": {
+    "identity": { "project": "tests/Vivarium.Acceptance/Vivarium.Acceptance.csproj", "timeoutSeconds": 600 }
+  }
+}

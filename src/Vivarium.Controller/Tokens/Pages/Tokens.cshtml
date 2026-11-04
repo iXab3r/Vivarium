@@ -1,0 +1,28 @@
+@page "/Identity/Account/Manage/Tokens"
+@model Vivarium.Controller.Tokens.Pages.TokensModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{ Layout = null; }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My keys · Vivarium</title>
+    <link rel="stylesheet" href="~/identity.css" asp-append-version="true">
+</head>
+<body class="account-page">
+<header class="app-header"><a class="brand" href="/">Vivarium</a><a href="/">Back to Vivarium</a></header>
+<main>
+<h1>My keys</h1><p class="account-intro">Tokens use your current permissions. A label does not restrict access.</p>
+<section class="account-panel" aria-labelledby="new-token-title"><h2 id="new-token-title">New token</h2><form method="post" asp-page-handler="Create" class="create">
+<label class="field token-label">Label<input asp-for="Label" maxlength="128" placeholder="e.g. Development"></label>
+<label class="field token-lifetime">Days<input asp-for="LifetimeDays" type="number" min="1" max="@Model.LifetimeCap" value="@Model.LifetimeCap" required></label>
+<button class="primary" type="submit">Get token</button></form></section>
+<section class="account-panel" aria-labelledby="recent-tokens-title"><h2 id="recent-tokens-title">Recent tokens</h2>
+@if (Model.Entries.Count == 0) { <p class="account-empty">No tokens.</p> }
+else { <div class="token-table" role="region" aria-labelledby="recent-tokens-title" tabindex="0"><table><thead><tr><th scope="col">Label</th><th scope="col">Created</th><th scope="col">Expires</th><th scope="col">Status</th><th scope="col"><span class="account-sr-only">Actions</span></th></tr></thead><tbody>
+@foreach (var token in Model.Entries) { <tr><td>@(token.Label.Length == 0 ? "—" : token.Label)</td>
+<td>@token.CreatedAt?.ToString("yyyy-MM-dd")</td><td>@token.ExpiresAt?.ToString("yyyy-MM-dd")</td><td>@token.Status</td>
+<td>@if (token.Status == "valid") { <form method="post" asp-page-handler="Revoke"><input type="hidden" name="id" value="@token.Id"><button type="submit">Revoke</button></form> }</td></tr> }
+</tbody></table></div> }
+</section></main></body></html>

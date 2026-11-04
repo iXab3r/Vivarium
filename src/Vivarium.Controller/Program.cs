@@ -1,5 +1,12 @@
 using System.Reflection;
 using Vivarium.Controller;
+using Vivarium.Controller.Hosting;
+
+if (args.FirstOrDefault() is "init" or "nodes" or "migrate" or "run")
+{
+    Environment.ExitCode = await VivariumConfigurationCommand.ExecuteAsync(args);
+    return;
+}
 
 if (args is ["--version"])
 {

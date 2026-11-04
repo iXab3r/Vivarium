@@ -15,6 +15,8 @@ internal sealed class OwnedPostgres : IAsyncDisposable
     private string Volume => name + "-data";
     private string Network => name + "-network";
     public string ConnectionString { get; private set; } = "";
+    public string PooledConnectionString => new NpgsqlConnectionStringBuilder(ConnectionString)
+        { Pooling = true, MaxPoolSize = 16 }.ConnectionString;
     public string ServerVersion { get; private set; } = "";
 
     public async Task StartAsync()
@@ -112,6 +114,8 @@ internal sealed class OwnedPostgres : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        if (ConnectionString.Length > 0)
+            using (var pool = new NpgsqlConnection(PooledConnectionString)) NpgsqlConnection.ClearPool(pool);
         if (containerCreated)
         {
             if (await VerifyAsync("container", name)) await DockerAsync("rm", "--force", name);

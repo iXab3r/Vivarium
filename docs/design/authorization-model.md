@@ -1,7 +1,7 @@
 # Identity and TeamCity authorization
 
 > Status: **Accepted — D34, 2026-10-31**
-> Implementation: **Legacy foundation exists; D34 replacement is not implemented**
+> Implementation: **Legacy foundation exists; fresh D34 Host/IAM delivery is in progress**
 > Maintainers: User Roles, Admin/SuperUser, REST, Security
 > Related: [Architecture](../ARCHITECTURE.md) D23, D26, D33–D35
 
@@ -19,11 +19,63 @@ configuration, not a second live RBAC authority. This explicitly replaces the ol
 
 ## Current implementation
 
-The shipped source still uses SQLite, custom local password verification, panel cookies, Git User
+The legacy entry still uses SQLite, custom local password verification, panel cookies, Git User
 and built-in RoleBinding projections, legacy admin/submit tokens, and a setup/recovery saga. A common
 evaluator and audit boundary already exist. General role/group CRUD, full project inheritance and
 the D34 Identity/OIDC model do not. Preserve boundary/invariant tests while replacing these mechanisms;
 do not describe the accepted target as working functionality.
+
+The fresh R0 Host composes stock `IdentityCore`, Identity authentication cookies and
+OpenIddict over PostgreSQL. Its scoped TeamCity roles, permission and included-role relations,
+direct grants and All Users contributions are separate application tables; unused framework
+global-role tables are removed only when empty. One PostgreSQL statement snapshot reads eligibility,
+direct/All Users grants and transitive included-role permissions, avoiding a mixture of old eligibility
+and newer grants. Current catalogue metadata and scope checks use one repeatable-read snapshot;
+the short activation commit fences concurrent eligibility/grant writes. Current access rereads this data,
+without an immutable SYSTEM_ADMIN floor. This is component-level implementation, not completed
+authorized role management, nested-group support, REST conformance or story acceptance.
+
+The common R0 service can edit direct role permissions, grant/withdraw global/project user roles and
+enable/disable ordinary accounts with current checks and the same PostgreSQL audit transaction.
+Its model tests include delegation, immediate loss of removed administrator permissions and a
+failed audit that rolls back a grant. The Access UI has selected real browser evidence. An owned
+Host/PG/Windows-Agent journey now issues an ordinary My keys credential, proves bounded project
+delegation, runs/downloads P results, denies Q bytes and Agent control, and rechecks the same key after
+grant withdrawal, account disablement, Host restart and own-key revocation. Credential expiry
+uses the stock validation TimeProvider with separate one-/three-day keys;
+the longer-lived key stays usable by the same subject after the shorter key expires. The prior ordinary
+Identity session is arranged through the actual audited SignInManager; the separate external-issuer
+browser cases own OIDC login evidence. The native current-account read resolves one framework credential and
+rereads eligibility, without falling back from an explicit bearer to a browser cookie.
+
+Native My keys issuance wraps framework entry creation/metadata and audit in one EF transaction
+before disclosure. Stock authorization-code consumption remains before that transaction, including
+on a later failed issuance. Revocation shares its mutation/audit transaction. OpenIddict entity
+caching is disabled so rollback cannot leave a committed-looking credential status in that cache.
+The first-party native token client's backchannel accepts the configured Host TLS certificate only
+at the configured public origin, alongside normal CA-valid HTTPS for that origin. It loads Chiral's
+Kestrel default certificate, disables redirects and leaves external-provider TLS validation intact;
+it never modifies the machine certificate store.
+
+Permission applicability is initialized from 79 observed permission definitions on the owned pinned
+2026.1.3 reference. A permission marked global applies even through a project-scoped role; other
+permissions retain their assignment scope. Project delegation requires the reference project role
+management permission and every effective permission in the assigned role, including included roles.
+The reference denies sibling/global grants and an unheld project permission. This observed subset is
+not a complete registered-permission universe; prior immutable role seed data is not overwritten.
+
+Initial migration data supplies the five standard TeamCity role definitions captured from 2026.1.3,
+including permission IDs and role inclusions, plus the All Users group without assignments. It does
+not import the owner's custom roles or infer a default group grant. This is a one-time schema-data
+migration: restart never restores removed permissions or recreates a deleted role. The original
+embedded migration data remains immutable; future reference changes need a new migration.
+
+The fresh Workbench Access view uses native paged user/role/grant reads and current global user-role
+and eligibility mutations. Role-definition reads follow the observed global `view_user_profile` or
+`change_user` alternatives; `manage_roles` alone is not a read grant. Own assignment reads remain
+available to the eligible subject. Full compatible wire, nested groups and broader delegation variants retain
+their due owners. Native My keys has a passing focused real-issuer/browser lifecycle case; this does
+not accept the complete IAM family or US-013.
 
 ## TeamCity parity contract
 

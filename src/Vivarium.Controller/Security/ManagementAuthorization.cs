@@ -4,6 +4,7 @@ using Vivarium.Controller.Auditing;
 using Vivarium.Controller.Persistence;
 
 [assembly: InternalsVisibleTo("Vivarium.Tests")]
+[assembly: InternalsVisibleTo("Vivarium.DefinitionProof")]
 
 namespace Vivarium.Controller.Security;
 

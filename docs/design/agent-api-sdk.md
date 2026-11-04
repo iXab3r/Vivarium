@@ -20,6 +20,25 @@ names, user-role membership, VM provider verbs, or a UI framework.
 
 ## Current state
 
+The fresh D34/D35 Host now has a separate PostgreSQL-backed credential and session composition
+using the existing Agent binary, proto fields and bounded live-session kernel. An authorized current
+operator issues a single-use enrollment proof, observes the pending Agent, and authorizes credential
+delivery through native REST. Only a subsequent bearer-authenticated Hello reconciles the session.
+The positive TeamCity Agent facet and credential/connection generations survive Host and Agent
+restart. Pending credential delivery is Data Protection-protected; issuance and authorization commit
+with audit, and management reads never serialize credential entities. Human OIDC remains separate.
+
+For this installation, the control repository can declare canonical Agent enablement documents
+alongside its C# Project sources. Activation requires current `enable_disable_agent` when those
+declarations change. The applied Git projection and activation commit atomically; registration and
+activation share a short PostgreSQL fence so a newly enrolled Agent cannot miss its declared policy.
+Missing policy leaves an Agent disabled. The real Host test also executes two collected source-free
+C#/Git Builds on the same Windows Agent, persists output and a literal published artifact, confirms
+idle reuse, rejects a cross-Build output cursor and reads bytes/cursors after a Host restart. This is
+selected integration evidence; it does not close the full scoped-actor, cancellation, fault/recovery,
+output-retention, upgrade or Agent REST acceptance surface.
+The legacy execution composition below remains available until its replacement gates pass.
+
 The Phase 1 implementation already provides:
 
 - One bidirectional proto3 `AgentHub.Session` stream per agent over pinned TLS.
@@ -360,6 +379,63 @@ string command with arbitrary JSON. A generic envelope may share correlation, de
 and result mechanics, but the capability payload remains typed and versioned.
 
 ## Internal Agent SDK
+
+### Selected durable Build output
+
+The selected fresh source-free execution also opts into `teamcity.artifact-publisher.literal.v1`.
+`BuildAssignment.artifact_publication_contract_major` uses new tag 9; major 1 is sent only to a peer
+that negotiated this capability. It recognizes bounded stdout `publishArtifacts` service messages
+for portable relative literal files, including split reads and TeamCity quote escapes, and feeds the
+existing upload/result-manifest contract. It does not advertise glob/directory/archive/destination
+rules or general service-message projection. The current fresh byte profile bounds a file to 64 KiB
+and a manifest to 128 files; broader T3 publication remains a delivery prerequisite, not acceptance
+of this subset as full TeamCity artifact compatibility. Legacy assignments remain unchanged. Tag 7
+on AgentMsg stays reserved for the separate structured service-message transport.
+
+The result manifest adds optional `Artifact.modification_time_unix_ms` at tag 4. The Agent reports
+the source file's observed modification time; the Host validates its representable range and retains
+it with the immutable artifact reference. Older senders leave the field absent. Neither a Storage
+upload timestamp nor Build completion substitutes for an unknown source-file time. Bootstrap and
+existing field numbers remain unchanged.
+
+R0's native output contract requires the additive `teamcity.build-output.v1` capability. The fresh
+Host explicitly opts into negotiating it; the legacy controller does not. An output-required
+assignment carries `output_contract_major = 1` and is never sent to an Agent without that negotiated
+capability. Existing sequence-free logs and Bootstrap remain unchanged for the legacy composition.
+
+`AgentMsg.build_output` uses new tag 13; `ControllerMsg.build_output_acknowledged` uses new tag 10.
+AgentMsg tag 7 remains reserved. Each chunk identifies the opaque Build workload, current session,
+step and stdout/stderr, with a zero-based half-open chunk-sequence range. A data
+chunk covers exactly one sequence and at most 64 KiB; a gap covers omitted consecutive sequences
+with their known post-mask byte count and reason. Additional internal byte offsets preserve exact
+amounts when a retained prefix splits a coalesced gap. Per-stream acknowledgements advance only through
+durable content or gaps. Replayed identical ranges are idempotent; conflicting or sealed-history
+input is a protocol error. No wall-clock ordering is inferred between streams.
+An eviction gap never replaces bytes already durable at the receiver: retain those bytes and resolve
+only the uncovered sequences. ACKs carry both the sequence prefix and its byte offset, allowing a
+retained prefix to split a coalesced gap without guessing the missing amount. A sealed gap cannot
+later be rewritten as data. Native REST still represents one sequence per data item.
+
+The assignment may carry ephemeral registered exact-value mask bytes, never Git or ordinary-log
+secret values. Streaming masking spans read boundaries and precedes both transport and local spool.
+Lengths, digests, produced-byte counts and gaps describe the post-mask stream. A private bounded
+Agent spool retains unacknowledged ranges across reconnect, preserving a head and rolling tail and
+coalescing omitted ranges into explicit gaps. Transport retry cannot block the child or control lane.
+
+`BuildResult.output_watermarks` (new tag 7) freezes every declared step/stdout/stderr stream,
+including empty/skipped streams, with final exclusive sequence and produced bytes. Result and output
+ACK are independent. The Agent retains its result/ownership until both are resolved; the Host's
+release barrier additionally requires durable sealing and workload reconciliation. Missing producer
+watermarks after a bounded deadline become explicit unknown-tail gaps, never invented empty output
+or proof of process termination. These fields specify the selected implementation seam; acceptance
+still requires the real owning services, Agent, PostgreSQL and Storage variants in R0.
+An already accepted result may be replayed after lease release, including while the same Agent owns
+newer work. The fresh Host authenticates the current Agent session and unchanged credential generation,
+compares the immutable prior receipt, and repeats only its ACK. It does not reopen the old lease or
+alter the current workload. A conflicting repeat still quarantines the Agent and preserves accepted
+evidence; an unknown workload, stale session or replaced credential does not qualify as a retained replay.
+`BuildResult.output_producer_lost` (new tag 8) explicitly reports a lost producer or incomplete pipe
+drain instead of asserting final watermarks. A genuine zero-step Build has no streams and is empty.
 
 The first SDK is a source-level contract within `Vivarium.Agent`, plus shared test fixtures. It is not
 a dynamic plugin loader or stable native ABI. Its purpose is to stop each capability from rebuilding

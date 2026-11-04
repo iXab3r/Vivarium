@@ -1,0 +1,6 @@
+html,body,#app{height:100%;margin:0}*{box-sizing:border-box}body{font:13px system-ui,sans-serif}
+#app{display:flex;flex-direction:column}.app-header{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#181c22;color:#d9e0ea;border-bottom:1px solid #39404a}
+a{color:#80bfff}.brand{color:inherit;text-decoration:none;font-weight:650;font-size:17px}.account,.actions{display:flex;align-items:center;gap:12px}.account form{margin:0}.account button{font:inherit}
+#workspace{flex:1;min-height:0}.access-page{height:100%;display:flex;flex-direction:column}.toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px}.toolbar h1{font-size:19px;margin:0}
+.notice{padding:0 20px;min-height:20px}.access-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(210px,30%) minmax(0,1fr)}.users,.inspector{padding:16px;overflow:auto}.users{border-right:1px solid var(--vscode-panel-border);display:flex;flex-direction:column;gap:8px}.role-assignment{display:flex;align-items:center;gap:8px;padding:8px 0}.inspector h2{margin-top:0}
+@media(max-width:650px){.access-body{grid-template-columns:1fr;grid-template-rows:minmax(120px,35%) 1fr}.users{border-right:0;border-bottom:1px solid var(--vscode-panel-border)}.account{gap:7px}.app-header{padding:0 10px}}

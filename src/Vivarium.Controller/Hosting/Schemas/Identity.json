@@ -1,0 +1,144 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "SuperuserEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "TokenLifetimeDays": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "DataProtectionDirectory": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ServerSigningCertificate": {
+      "$ref": "#/definitions/certificate"
+    },
+    "ServerEncryptionCertificate": {
+      "$ref": "#/definitions/certificate"
+    },
+    "ClientSigningCertificate": {
+      "$ref": "#/definitions/certificate"
+    },
+    "ClientEncryptionCertificate": {
+      "$ref": "#/definitions/certificate"
+    },
+    "Providers": {
+      "type": "array",
+      "default": [],
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,31}$"
+          },
+          "Issuer": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 1024
+          },
+          "ClientId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "ClientSecret": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true
+          },
+          "Scopes": {
+            "type": "array",
+            "maxItems": 32,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        },
+        "required": [
+          "Key",
+          "Issuer",
+          "ClientId",
+          "ClientSecret"
+        ]
+      }
+    },
+    "TokenCreationPermitLimit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000,
+      "default": 10
+    },
+    "TokenCreationWindowSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400,
+      "default": 60
+    },
+    "TokenCreationConcurrencyLimit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 2
+    },
+    "TokenCreationQueueLimit": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "TokenRedemptionConcurrencyLimit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 8
+    }
+  },
+  "required": [
+    "SuperuserEnabled",
+    "TokenLifetimeDays",
+    "DataProtectionDirectory",
+    "ServerSigningCertificate",
+    "ServerEncryptionCertificate",
+    "ClientSigningCertificate",
+    "ClientEncryptionCertificate",
+    "Providers",
+    "TokenCreationPermitLimit",
+    "TokenCreationWindowSeconds",
+    "TokenCreationConcurrencyLimit",
+    "TokenCreationQueueLimit",
+    "TokenRedemptionConcurrencyLimit"
+  ],
+  "definitions": {
+    "certificate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Password": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "writeOnly": true
+        }
+      },
+      "required": [
+        "Path"
+      ]
+    }
+  }
+}

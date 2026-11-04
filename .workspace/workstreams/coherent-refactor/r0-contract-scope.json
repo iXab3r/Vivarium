@@ -7,9 +7,7 @@
     "TCREST-R0-SCOPED-RUN-ARTIFACT-001",
     "TCREST-R0-PROTECTED-SIBLING-BYTES-DENIED-001",
     "TCREST-R0-PROJECT-ACTOR-AGENT-CONTROL-DENIED-001",
-    "TCREST-R0-SCOPED-NONZERO-EXIT-001",
-    "TCREST-R0-SCOPED-QUEUED-CANCEL-001",
-    "TCREST-R0-SCOPED-RUNNING-CANCEL-001"
+    "TCREST-R0-SCOPED-QUEUED-CANCEL-001"
   ],
   "required_specified_variants": [
     "NATIVE-R0-OUTPUT-LIVE-RESUME-001",
@@ -33,7 +31,9 @@
     "R0-RECOVERY-BUILD-AND-BYTES-001",
     "R0-RECOVERY-CREDENTIAL-CONTINUITY-001",
     "R0-HOST-DISCOVERY-001",
-    "R0-UNCHANGED-CLI-SMOKE-001"
+    "R0-UNCHANGED-CLI-SMOKE-001",
+    "R0-NONZERO-EXIT-BEHAVIOR-001",
+    "R0-RUNNING-CANCEL-BEHAVIOR-001"
   ],
   "contribution_ids": [
     "SS-IAM->SS-HOST@R0",
@@ -51,5 +51,23 @@
     "due_owner": "SS-IAM@R1",
     "reason": "Complete PAT wire remains R1; R0 native preparation binds only explicit post-revoke read effects, never partial GREEN of the fullcase."
   },
-  "integration_slice": "SS-HOST@R0"
+  "integration_slice": "SS-HOST@R0",
+  "owner_scope_amendments": [
+    {
+      "decision": "D46",
+      "decided_on": "2026-11-04",
+      "owner_approved": true,
+      "tracking_issue": 166,
+      "due_owner": "SS-RUN@R2",
+      "retained_full_cases": [
+        "TCREST-R0-SCOPED-NONZERO-EXIT-001",
+        "TCREST-R0-SCOPED-RUNNING-CANCEL-001"
+      ],
+      "replacement_behavioral_obligations": [
+        "R0-NONZERO-EXIT-BEHAVIOR-001",
+        "R0-RUNNING-CANCEL-BEHAVIOR-001"
+      ],
+      "boundary": "US-013 retains complete actor/process/outcome/stop/recovery/byte behavior. Exact background estimates and dynamic cancellation timestamp cadence are a separate compatibility gate. Original full wire cases remain unaccepted, not partial GREEN."
+    }
+  ]
 }

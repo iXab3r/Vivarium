@@ -296,7 +296,7 @@ public sealed class AuditEventStore(VivariumDatabase database)
         command.ExecuteNonQuery();
     }
 
-    private static void Validate(AuditEventDraft auditEvent)
+    internal static void Validate(AuditEventDraft auditEvent)
     {
         RequireBounded(auditEvent.AuditEventId, 64, "audit event ID");
         RequireBounded(auditEvent.RequestContext.Principal.ActorType, 32, "actor type");
@@ -352,7 +352,7 @@ public sealed class AuditEventStore(VivariumDatabase database)
         }
     }
 
-    private static string SerializeStoredDetails(
+    internal static string SerializeStoredDetails(
         IReadOnlyDictionary<string, string> details,
         string source)
     {
@@ -435,7 +435,7 @@ public sealed class AuditEventStore(VivariumDatabase database)
         }
     }
 
-    private static string SerializeOutcome(AuditOutcome outcome) => outcome switch
+    internal static string SerializeOutcome(AuditOutcome outcome) => outcome switch
     {
         AuditOutcome.Succeeded => "SUCCEEDED",
         AuditOutcome.Denied => "DENIED",

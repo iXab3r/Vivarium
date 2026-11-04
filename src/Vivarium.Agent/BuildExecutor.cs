@@ -42,6 +42,7 @@ public static class BuildExecutor
         Directory.CreateDirectory(workdir);
 
         var result = new BuildResult { BuildId = assignment.BuildId, SessionId = sessionId };
+        var publisher = assignment.ArtifactPublicationContractMajor == 1 ? new LiteralArtifactPublisher() : null;
 
         try
         {
@@ -91,7 +92,7 @@ public static class BuildExecutor
                     stopping ? "CANCELLATION_CLEANUP" : "RUNNING",
                     stepToken);
                 execution = await RunStepAsync(
-                    workdir, assignment, i, step, send, stop, stepToken, observeProcess);
+                    workdir, assignment, i, step, send, stop, stepToken, observeProcess, publisher);
             }
             catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
             {
@@ -100,6 +101,16 @@ public static class BuildExecutor
                 continue;
             }
             result.Steps.Add(execution.Result);
+            if (stop.Mode != BuildStopMode.Force)
+            {
+                try
+                {
+                    await send(new AgentMsg { Status = new StepStatus { BuildId = assignment.BuildId,
+                        StepIndex = i, Phase = "RUNNING", Completed = execution.Result.Clone() } }, stop.ForceToken);
+                }
+                catch (OperationCanceledException) when (stop.Mode == BuildStopMode.Force) { }
+            }
+            if (!execution.OutputComplete && assignment.OutputContractMajor == 1) result.OutputProducerLost = true;
             if (execution.Stopped)
             {
                 stopping = true;
@@ -120,7 +131,8 @@ public static class BuildExecutor
             {
                 await SendStatusAsync(
                     send, assignment.BuildId, -1, "COLLECTING", collectionToken);
-                foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect))
+                foreach (var relativePath in MatchCollectGlobs(workdir, assignment.Collect)
+                    .Concat(publisher?.Files(workdir) ?? []).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
                 {
                     var fullPath = Path.Combine(workdir, relativePath);
                     var sha = await blobs.UploadAsync(
@@ -133,6 +145,7 @@ public static class BuildExecutor
                         Path = relativePath.Replace('\\', '/'),
                         Sha256 = sha,
                         Size = new FileInfo(fullPath).Length,
+                        ModificationTimeUnixMs = new DateTimeOffset(File.GetLastWriteTimeUtc(fullPath)).ToUnixTimeMilliseconds(),
                     });
                 }
             }
@@ -205,7 +218,7 @@ public static class BuildExecutor
         Func<AgentMsg, CancellationToken, Task> send,
         BuildStopController stop,
         CancellationToken ct,
-        Action<Process?>? observeProcess)
+        Action<Process?>? observeProcess, LiteralArtifactPublisher? publisher)
     {
         var resultsDir = ResolveUnder(workdir, "results");
         Directory.CreateDirectory(resultsDir);
@@ -218,6 +231,7 @@ public static class BuildExecutor
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
+            CreateNoWindow = assignment.OutputContractMajor == 1,
         };
         foreach (var arg in step.Args)
         {
@@ -255,6 +269,7 @@ public static class BuildExecutor
         }
 
         using var outputCts = new CancellationTokenSource();
+        var outputFailed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var stdout = PumpAsync(process.StandardOutput.BaseStream, LogStream.Stdout, outputCts.Token);
         var stderr = PumpAsync(process.StandardError.BaseStream, LogStream.Stderr, outputCts.Token);
 
@@ -267,7 +282,10 @@ public static class BuildExecutor
 
         try
         {
-            await process.WaitForExitAsync(timeout.Token);
+            var exit = process.WaitForExitAsync(timeout.Token);
+            if (await Task.WhenAny(exit, outputFailed.Task) == outputFailed.Task)
+                await ForceTerminateAsync(process);
+            await exit;
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
@@ -276,7 +294,7 @@ public static class BuildExecutor
         }
         catch (OperationCanceledException) when (stop.Mode != BuildStopMode.Unspecified)
         {
-            await StopProcessAsync(process, stop);
+            await StopProcessAsync(process, stop, outputFailed.Task);
         }
 
         if (!process.HasExited)
@@ -285,13 +303,14 @@ public static class BuildExecutor
                 $"workload process {process.Id} remained alive after termination");
         }
         observeProcess?.Invoke(null);
-        await DrainOutputAsync(stdout, stderr, outputCts);
+        var outputComplete = await DrainOutputAsync(stdout, stderr, outputCts);
+        if (outputComplete) publisher?.FinishStep();
         return new StepExecution(new StepResult
         {
             StepIndex = stepIndex,
-            ExitCode = timedOut || stop.Mode != BuildStopMode.Unspecified ? -1 : process.ExitCode,
+            ExitCode = process.ExitCode,
             TimedOut = timedOut,
-        }, stop.Mode != BuildStopMode.Unspecified);
+        }, stop.Mode != BuildStopMode.Unspecified, outputComplete);
 
         async Task PumpAsync(Stream source, LogStream stream, CancellationToken outputToken)
         {
@@ -301,6 +320,7 @@ public static class BuildExecutor
             {
                 while ((read = await source.ReadAsync(buffer, outputToken)) > 0)
                 {
+                    if (stream == LogStream.Stdout) publisher?.Append(buffer.AsSpan(0, read));
                     await send(new AgentMsg
                     {
                         Log = new LogChunk
@@ -316,10 +336,16 @@ public static class BuildExecutor
             catch (OperationCanceledException) when (outputToken.IsCancellationRequested)
             {
             }
+            catch
+            {
+                // A failed reader must not leave a live producer blocked forever on a full pipe.
+                outputFailed.TrySetResult();
+                throw;
+            }
         }
     }
 
-    private static async Task StopProcessAsync(Process process, BuildStopController stop)
+    private static async Task StopProcessAsync(Process process, BuildStopController stop, Task outputFailed)
     {
         if (stop.Mode == BuildStopMode.Graceful && !process.HasExited)
         {
@@ -328,8 +354,12 @@ public static class BuildExecutor
             {
                 // A graceful deadline is controller evidence, not permission for a hard kill. Keep
                 // the Agent control loop alive and wait for either process exit or an explicit,
-                // authorized force command that cancels ForceToken.
-                await process.WaitForExitAsync(stop.ForceToken);
+                // authorized force command that cancels ForceToken. A broken output reader is
+                // an independent execution failure requiring containment, including during stop.
+                var exit = process.WaitForExitAsync(stop.ForceToken);
+                if (await Task.WhenAny(exit, outputFailed) == outputFailed)
+                    await ForceTerminateAsync(process);
+                await exit;
             }
             catch (OperationCanceledException) when (stop.Mode == BuildStopMode.Force)
             {
@@ -387,7 +417,7 @@ public static class BuildExecutor
         }
     }
 
-    private static async Task DrainOutputAsync(
+    private static async Task<bool> DrainOutputAsync(
         Task stdout,
         Task stderr,
         CancellationTokenSource outputCts)
@@ -395,6 +425,7 @@ public static class BuildExecutor
         try
         {
             await Task.WhenAll(stdout, stderr).WaitAsync(OutputDrainTimeout);
+            return true;
         }
         catch (TimeoutException)
         {
@@ -406,6 +437,7 @@ public static class BuildExecutor
             catch (OperationCanceledException)
             {
             }
+            return false;
         }
     }
 
@@ -418,7 +450,7 @@ public static class BuildExecutor
         return result;
     }
 
-    private sealed record StepExecution(StepResult Result, bool Stopped);
+    private sealed record StepExecution(StepResult Result, bool Stopped, bool OutputComplete);
 
     [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
     private static extern int Kill(int processId, int signal);

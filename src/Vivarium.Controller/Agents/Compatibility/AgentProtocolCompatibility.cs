@@ -19,6 +19,10 @@ internal sealed record AgentProtocolNegotiation(
 
     public bool SupportsBuildRunner => NegotiatedCapabilities.Any(
         capability => capability.CapabilityId == AgentProtocolCompatibility.BuildRunnerCapabilityId);
+    public bool SupportsDurableBuildOutput => NegotiatedCapabilities.Any(
+        capability => capability.CapabilityId == AgentProtocolCompatibility.BuildOutputCapabilityId);
+    public bool SupportsLiteralArtifactPublisher => NegotiatedCapabilities.Any(
+        capability => capability.CapabilityId == AgentProtocolCompatibility.ArtifactPublisherCapabilityId);
 }
 
 /// <summary>
@@ -39,6 +43,8 @@ internal static class AgentProtocolCompatibility
     public const int MaximumHostFactKeyLength = 128;
 
     public const string BuildRunnerCapabilityId = "teamcity.build-runner.v1";
+    public const string BuildOutputCapabilityId = "teamcity.build-output.v1";
+    public const string ArtifactPublisherCapabilityId = "teamcity.artifact-publisher.literal.v1";
     public const string HostFactsCapabilityId = "agent-explorer.host-facts.v1";
     public const string BootstrapSupervisorCapabilityId = "vivarium.bootstrap-supervisor.v1";
 
@@ -50,7 +56,8 @@ internal static class AgentProtocolCompatibility
             [BootstrapSupervisorCapabilityId] = 1,
         };
 
-    public static AgentProtocolNegotiation Negotiate(Hello hello)
+    public static AgentProtocolNegotiation Negotiate(Hello hello, bool enableDurableBuildOutput = false,
+        bool enableLiteralArtifactPublisher = false)
     {
         ArgumentNullException.ThrowIfNull(hello);
 
@@ -109,8 +116,9 @@ internal static class AgentProtocolCompatibility
         ValidateHostFacts(hello, advertised);
         var negotiated = advertised
             .Where(capability =>
-                KnownCapabilities.TryGetValue(capability.CapabilityId, out var major) &&
-                major == capability.ContractMajor)
+                KnownCapabilities.TryGetValue(capability.CapabilityId, out var major) && major == capability.ContractMajor
+                || enableDurableBuildOutput && capability.CapabilityId == BuildOutputCapabilityId && capability.ContractMajor == 1
+                || enableLiteralArtifactPublisher && capability.CapabilityId == ArtifactPublisherCapabilityId && capability.ContractMajor == 1)
             .Select(capability => capability.Clone())
             .ToArray();
 

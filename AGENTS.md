@@ -21,6 +21,26 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
+The fresh D34/D35 Host is being delivered under US-013/R0. Explicit local `init`, `nodes`, `migrate`
+and `run` commands now compose managed Chiral Host/Database/Identity/Storage settings, PostgreSQL
+Identity/OpenIddict migrations with checksum intent, ordinary account handlers and private object
+HTTP. Source-free C#/Git Builds now dispatch through PG-owned leases to a real Windows Agent with
+independent result/output receipts and a bounded literal-artifact publisher. Two-build Agent reuse
+and retained bytes/cursors after a Host restart have selected integration evidence. An ordinary key
+now has selected native P/Q isolation, project delegation, grant/eligibility/revocation, failure and
+queue/running-cancel evidence. Selected output-expiry/epoch/private-byte deletion and deletion-retry
+evidence now survives a cold Host restart. D45 adds native per-run secret environments with encrypted
+input/assignment recovery and existing Agent output masking; permanent Project secret storage is deferred.
+The selected fresh `/app/rest` adapter now runs the published unchanged CLI 0.5.6 through ordinary
+login, C#/Git discovery, successful/failed runs, queued/running cancellation and exact artifact
+download. Its bounded integration fixture uses a real Windows Agent and a dedicated Linux/Docker
+Agent, plus shared native reads. Agent enablement is a journalled Git edit through the catalogue
+coordinator; source-file modification times are additive immutable artifact observations.
+Full R0 bindings, remaining output/fault, compatibility and final review gates
+remain open. Ordinary OIDC/current
+TeamCity grants, catalogue/Agent/build integration and Workbench remain in progress. The legacy
+controller below remains available until its actual replacement gates pass.
+
 The immediate product priority is replacing the owner's TeamCity infrastructure without functional
 loss, including individual test history, Agent requirements/compatibility, durable logs and operator
 workflows. [Architecture D32](docs/ARCHITECTURE.md#d32-teamcity-behavioral-parity-is-the-immediate-build-product-contract)
@@ -101,7 +121,9 @@ platform evidence remain release-quality gates.
   PostgreSQL business storage and object/blob bytes. SQLite is the current transitional persistence.
 - Layout: `src/Vivarium.{Contracts,Controller,Agent,Bootstrap,Cli}`, controller-owned TypeScript sources,
   `tests/Vivarium.Tests`, `docs/`, plus `images/` for image recipes (later).
-- Dependencies must be MIT/Apache-2.0-compatible (the project is MIT).
+- Dependencies must be MIT/Apache-2.0-compatible (the project is MIT). Owner-approved exception
+  (2026-11-02): the closed `EyeAuras.Storage` and `EyeAuras.Storage.Contracts` libraries may be
+  consumed as dependencies; this does not declare those libraries or BankaStore MIT-licensed.
 - The bootstrap component is contractually **frozen once Phase 0 proves it** (ARCHITECTURE §7).
   Changes to it require an explicit design discussion first — it is the one piece baked into every VM
   image and installed on every physical machine.
@@ -201,6 +223,14 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
   Git owner per Project/field. Disabled synchronization uses managed-local Git, not PG desired state;
   an ancestor source cannot seize an independently owned child. Reference modes/completion and
   XML/Kotlin obligations remain; the source studies are not full SDK or product acceptance.
+- D45 scopes US-013 secrets to one run's Agent environment, with private per-Build encrypted recovery
+  input/assignments and Agent-side exact-value output masking. No raw values in Git, collected plans,
+  payload scripts, public representations or audit; permanent Project secret storage is a separate story.
+- D46 accepts US-013 by complete actor/process/outcome/stop/recovery/byte behavior. Exact background
+  progress estimates and dynamic cancellation timestamp cadence are separately owned by #166 under
+  SS-RUN@R2. Four full literal R0 workflows remain required; two distinct behavioral obligations
+  cannot discharge the retained complete nonzero/running-cancel wire cases. Other compatibility and
+  independent-review/zero-debt/main gates apply within that owner-approved scope.
 - Credentials, secret values, session/heartbeat state, observations, queue/build/operation state,
   results, and high-volume logs do **not** belong in Git. Runtime actions such as authorize, cancel,
   restart, rollback, or remote execution are authorized and written to the audit journal.

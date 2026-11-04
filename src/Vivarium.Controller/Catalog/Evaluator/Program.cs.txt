@@ -1,0 +1,33 @@
+using System.Text.Json;
+using Vivarium.Definitions;
+
+var project = Control.Declare();
+DefinitionContext.Initialize(project.Binding?.Context ?? []);
+var declared = Managed.Declare();
+var edits = typeof(Managed).GetProperty("Edits")?.GetValue(null) as ConfigurationEdit[] ?? [];
+var settings = DefinitionEdits.Apply(declared, edits);
+if (project.Id != settings.ProjectId) throw new InvalidOperationException("Settings owner mismatch.");
+var templates = settings.Templates ?? [];
+string Resolve(Parameter parameter)
+{
+    if ((parameter.Literal is null) == (parameter.Expression is null))
+        throw new InvalidOperationException("Exactly one parameter source is required.");
+    if (parameter.Literal is not null) return parameter.Literal;
+    var method = typeof(UserCode).GetMethod("Evaluate", [typeof(string)])
+        ?? throw new InvalidOperationException("An expression requires UserCode.Evaluate(string).");
+    return method.Invoke(null, [parameter.Expression]) as string
+        ?? throw new InvalidOperationException("A parameter expression must return a string.");
+}
+var effective = settings.Configurations.Select(c => new ResolvedConfiguration(c.Id, c.Name,
+    c.Parameters.Select(p => (Parameter: p, Inherited: false))
+        .Concat(settings.Parameters.Select(p => (Parameter: p, Inherited: true)))
+        .Concat((c.Templates ?? []).SelectMany(id => templates.Single(t => t.Id == id).Parameters)
+            .Select(p => (Parameter: p, Inherited: true)))
+        .DistinctBy(p => p.Parameter.Name, StringComparer.Ordinal)
+        .Select(p => new ResolvedParameter(p.Parameter.Name, Resolve(p.Parameter), p.Inherited))
+        .OrderBy(p => p.Name, StringComparer.Ordinal).ToArray(),
+    c.Steps.Select(s => new ResolvedStep(s.Id, s.Name, s.Runner,
+        s.Properties.Select(p => new ResolvedParameter(p.Name, Resolve(p), false)).ToArray())).ToArray(),
+    c.Requirements, c.Snapshots, c.Artifacts, c.TimeoutMinutes, c.Triggers, c.CheckoutMode, c.Templates ?? [])).ToArray();
+Console.Write(JsonSerializer.Serialize(new EvaluatedDefinition(project, declared, edits, settings.Source,
+    effective, DefinitionContext.Reads), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));

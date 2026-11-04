@@ -21,3 +21,11 @@ Feature: Build output remains useful during and after a run
     When a developer views and searches the retained output
     Then the page remains usable and treats that output as build text
     And the output cannot act as the viewing user's commands
+
+  @AC-LOG-03
+  Scenario: A temporary publication credential stays private through recovery
+    Given an authorized developer supplies a temporary publication credential to a build
+    When the build accidentally writes that credential to its output and the server restarts during execution
+    Then the original build can continue using its credential
+    And retained output masks the credential even when it was written in separate portions
+    And configuration history, build details and audit do not reveal its value

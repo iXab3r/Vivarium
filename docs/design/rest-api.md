@@ -109,6 +109,19 @@ ambiguous behavior.
 
 ### Target
 
+The fresh R0 Host now has a selected `/app/rest` adapter over the same framework credential,
+current-access, catalogue, Build and private-artifact services. It exposes current-user and truthful
+Vivarium server metadata, Project/BuildType reads, ordinary source-free run/inspect/cancel, artifact
+listing/download and Git-backed Agent enabled-state reads/writes. Its selected JSON/XML representations
+and field selection preserve the pinned client's request shape. Compatible protected-resource
+disclosure and plain-text rejected-token responses remain distinct from native Problem Details.
+This implementation subset and published CLI process evidence do not discharge the complete R0
+reference cases or imply full TeamCity REST conformance.
+
+Both artifact read surfaces use the same current authorization before and after private Storage
+reads. Native artifact metadata additionally exposes nullable `modifiedAt` from the immutable Agent
+manifest; compatible file metadata omits `modificationTime` when that observation is absent.
+
 - `/api/v1` is the canonical public management API for UI, CLI, CI, and integrations.
 - Both TeamCity and AgentExplorer call the same controller application services from REST; transport
   handlers contain no domain logic.
@@ -263,6 +276,40 @@ not a second public fleet resource.
 dummy endpoints before the corresponding Agent API capabilities and safety contracts exist. The UI
 may display planned sections from static product metadata; an endpoint that always returns “not
 implemented” is not a useful contract.
+
+### 4.2.1 Current account in the fresh Host
+
+The fresh R0 Host exposes `GET /api/v1/users/current` as a read of the current eligible
+Identity account: `id` (Guid), `teamCityId` (durable int64), `userName` and nullable
+`displayName`. This native projection is distinct from compatible TeamCity user DTOs.
+It uses the normal Identity application cookie or a validated native OpenIddict bearer
+with `vivarium_api` scope. Any explicit Authorization header selects bearer authentication
+without falling back to a cookie. Missing, invalid, expired, revoked or disabled-account
+credentials receive the existing native `authentication_required` Problem Details/401;
+responses are no-store. No role claims or new user/token authority are introduced.
+
+### 4.2.2 Fresh Access projection
+
+The fresh Host's native Access surface shares current PostgreSQL application services:
+
+- `GET /api/v1/users` and `GET /api/v1/roles` return `{items,total,offset,limit}` with default
+  offset 0/limit 50, maximum limit 200. Users expose Guid `id`, int64 `teamCityId`, nullable
+  `userName`/`displayName`, `isEnabled` and `isInstallation`. Roles expose `id`, `name`, direct
+  `permissions` and `includedRoles`. Global profile-read or user-management permission is required.
+- `GET /api/v1/users/{userId}` returns the same user projection or 404 under that read check.
+- `GET /api/v1/users/{userId}/roles` pages direct `{roleId,scope}` assignments; an eligible user
+  may read their own assignments. Other-user reads require the profile check. Optional `scope`
+  and up to 200 repeated `roleId` filters narrow the current collection without granting access.
+- `PUT`/`DELETE /api/v1/users/{userId}/roles/{roleId}/g` grants/withdraws the global assignment
+  through the common `change_user`/`manage_roles` operation; success and no-change return 204.
+- `PUT /api/v1/users/{userId}/enabled` takes exactly `{enabled:boolean}` and requires current
+  `change_user`. It applies only to ordinary accounts; Chiral remains the technical account's
+  enablement authority. Success/no-change returns 204.
+
+These mutations authorize the selected current framework identity, validate normal CSRF for a cookie
+caller and commit application mutation/audit together. Bearer callers do not borrow a cookie's rights.
+Missing targets return 404, denied mutations 403, malformed shape/CSRF 400 and non-JSON enablement
+input 415. These native projections do not claim completed TeamCity role/user wire conformance.
 
 ### 4.3 Errors
 
@@ -494,6 +541,17 @@ Agent registration/credential authorization is an audited security action; desir
 custom properties are versioned settings. Define their shared concurrency/activation boundary without
 inventing a Git authority over users or credentials. Current authorization comes from PostgreSQL.
 
+The fresh Host now exposes `POST /api/v1/enrollment-tokens` (no body, 201 with one-time proof),
+`PUT /api/v1/agents/{agentId}/authorization` (`{"authorized":true|false}`, 204), and paged
+`GET /api/v1/agents` / detail reads. Issuance and authorization require current global
+`authorize_agent`; reads require `view_agent_details`. Browser mutations use normal request
+verification. Reads expose stable native/positive TeamCity identity, separate authorization,
+Git enablement, connection, reconciliation and health axes, generations and applied configuration
+revision; no authentication secret is returned there. Ready requires a proven current bearer session
+and all eligibility axes. This is the bounded fresh registration contribution, not the complete
+Agent REST family or proof of fresh Build assignment. The existing legacy resources above retain
+their own implementation evidence.
+
 C# replaces submitted YAML for the new catalog (D32). Existing `vivarium.yaml` snapshots are legacy
 evidence, not a permanent target schema. C# editability and compatible mutations must be settled in
 P0 before implementing the catalog; writes target the owning repository and its configured workflow.
@@ -540,6 +598,22 @@ client-supplied display name or email is not trusted as identity. Commit message
 bounded, and sanitized; commit signing policy belongs to the Git/Versioning Expert.
 
 ### 5.3 Apply and conflict semantics
+
+R0's native installation-wide activation action is
+`POST /api/v1/configuration-changes/reconcile` with no body. It records the current operator and
+already accepted Git head, then returns `202`, `Location` and a pending change. The asynchronous
+coordinator uses the [selected C#/Git activation contract](csharp-activation.md); it does not mutate
+Git or substitute this action for batch/compatible authoring. `GET /configuration-changes/{id}`
+exposes pending/evaluated/applied/rejected/conflict and applied revision only after the PG commit.
+Both actions require current global `edit_project` and `create_sub_project`; browser mutation uses
+normal CSRF and explicit bearer credentials never fall back to a cookie. This initial whole-installation
+workflow is distinct from later scoped authoring and delegated external imports.
+
+The fresh native catalogue reads expose Project/configuration identity, name, parent/Project and
+active revision metadata. They filter using current `view_project` and active catalogue ancestry;
+invisible item reads are opaque `404`. An installation with no accepted active catalogue returns
+`503 catalogue_unavailable`, not a successful empty smoke catalogue. This initial projection does
+not declare the complete settings resource family implemented.
 
 1. Resolve and validate the caller's `baseConfigurationRevision`/`If-Match`.
 2. Materialize the proposed change without editing the active projection.
@@ -687,6 +761,23 @@ Retention changes the availability view/epoch, never the original producer evide
 contains explicit `retention` gaps for purged ranges and reports retained completeness; it does not
 relabel an empty retained tail as a complete original log. Cursors identify the retained view they
 can resume. Retention markers are availability metadata, not late producer bytes rewriting a sealed log.
+
+The fresh Host publishes `output.retention` with nullable `days` and a nonnegative `epoch`.
+Automatic age expiry is disabled when the managed Host `OutputRetentionDays` setting is absent/null;
+an explicit period from 1 through 3650 days applies to completed Builds by their finish time after
+Host restart. The worker processes one completed Build and at most 64 pending byte deletions per
+tick, independently of execution coordination. Committed expiry remains effective if the policy is
+later disabled. The PostgreSQL availability mark commits before retryable Storage deletion; the
+producer range, hash and published position remain immutable. A current authorized read of known
+expired content returns `410 output_expired`; unknown/hidden entries remain 404. A new epoch expires
+an otherwise young cursor with the same `cursor_expired` recovery contract. A fresh view reports
+`retention` gaps and `complete-with-gaps` when producer bytes were purged. This selected Host policy
+does not implement full TeamCity/per-project retention configuration.
+The same independent worker also retries up to 64 abandoned or quota-evicted private objects per
+tick. Their keys are journalled before PUT or eviction and survive a crash; active PUTs hold only
+their object-row lock and cleanup skips them. A pending-object backlog stops further object
+allocation until cleanup recovers. Data and gaps share the bounded published head; unpublished
+adjacent gaps may coalesce as `quota-exceeded` without rewriting published positions.
 
 The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
 registered-secret masking before transport/persistence, per-stream sequence identity, independent

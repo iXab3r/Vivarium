@@ -331,9 +331,25 @@ public static partial class Ledger
         var document = XDocument.Load(SafePath(root, path));
         XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
         var definitions = document.Descendants(ns + "UnitTest").ToDictionary(x => (string)x.Attribute("id")!);
-        var results = document.Descendants(ns + "UnitTestResult").Select(x => new Result((string)x.Attribute("testName")!,
-            (string)definitions[(string)x.Attribute("testId")!].Element(ns + "TestMethod")!.Attribute("className")!,
-            (string)x.Attribute("outcome")!, (string?)x.Element(ns + "Output")?.Element(ns + "ErrorInfo")?.Element(ns + "Message") ?? "")).ToArray();
+        var results = document.Descendants(ns + "UnitTestResult").Select(x =>
+        {
+            var name = (string)x.Attribute("testName")!;
+            var definition = definitions[(string)x.Attribute("testId")!];
+            var method = definition.Element(ns + "TestMethod");
+            string className;
+            if (method is not null) className = (string)method.Attribute("className")!;
+            else
+            {
+                // The pinned Automation producer emits a qualified name instead of TestMethod.
+                // Join the definition and result before splitting; never infer a missing result.
+                Require((string?)document.Root?.Attribute("name") == "Automation" && (string?)definition.Attribute("name") == name
+                    && System.Text.RegularExpressions.Regex.IsMatch(name, @"\A(?:[A-Za-z_][A-Za-z0-9_]*\.){2,}[A-Za-z_][A-Za-z0-9_]*\z"),
+                    "Missing or ambiguous qualified Automation result identity.");
+                var separator = name.LastIndexOf('.'); className = name[..separator]; name = name[(separator + 1)..];
+            }
+            return new Result(name, className, (string)x.Attribute("outcome")!,
+                (string?)x.Element(ns + "Output")?.Element(ns + "ErrorInfo")?.Element(ns + "Message") ?? "");
+        }).ToArray();
         Require(results.Length > 0 && results.Select(r => r.Name).Distinct().Count() == results.Length, "Empty/duplicate result selection.");
         var counters = document.Descendants(ns + "Counters").Single();
         Require((int)counters.Attribute("total")! == results.Length && (int)counters.Attribute("passed")! == results.Count(r => r.Outcome == "Passed") &&
@@ -401,7 +417,8 @@ public static partial class Ledger
             if (process.ExitCode != 0) throw new IOException("Git identity read failed: " + error.GetAwaiter().GetResult());
             return output.GetAwaiter().GetResult().Trim();
         }
-        string[] producerRoots = ["src", "tests", "tools", "build", "Directory.Build.props", "global.json", "Vivarium.slnx"];
+        string[] producerRoots = ["src", "tests", "tools", "build", "Directory.Build.props", "Directory.Build.targets",
+            "Directory.Packages.props", "NuGet.Config", "global.json", "Vivarium.slnx"];
         var inputPaths = Git(["ls-files", "--", .. producerRoots]) + "\n" + Git(["ls-files", "--others", "--exclude-standard", "--", .. producerRoots]);
         var required = inputPaths.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(path => path.TrimEnd('\r'))
             .Where(path => !path.EndsWith(".md", StringComparison.OrdinalIgnoreCase)).Distinct().ToArray();
