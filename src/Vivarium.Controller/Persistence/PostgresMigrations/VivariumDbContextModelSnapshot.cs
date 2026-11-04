@@ -985,6 +985,29 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                         });
                 });
 
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputDeletion", b =>
+                {
+                    b.Property<string>("ObjectKey")
+                        .HasColumnType("text");
+
+                    b.Property<long>("BuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ObjectKey");
+
+                    b.HasIndex("BuildId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.ToTable("RuntimeOutputDeletions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RuntimeOutputDeletions_Key", "\"ObjectKey\" ~ '^build-output/[a-f0-9]{32}$'");
+                        });
+                });
+
             modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputExpiry", b =>
                 {
                     b.Property<Guid>("RangeId")
@@ -1812,6 +1835,15 @@ namespace Vivarium.Controller.Persistence.PostgresMigrations
                     b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
                         .WithOne()
                         .HasForeignKey("Vivarium.Controller.Builds.Runtime.RuntimeBuildResult", "BuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vivarium.Controller.Builds.Runtime.RuntimeOutputDeletion", b =>
+                {
+                    b.HasOne("Vivarium.Controller.Builds.Runtime.RuntimeBuild", null)
+                        .WithMany()
+                        .HasForeignKey("BuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

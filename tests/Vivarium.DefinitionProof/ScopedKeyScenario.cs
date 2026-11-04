@@ -470,7 +470,7 @@ internal sealed class ScopedKeyScenario : IDisposable
         var stopped = await WaitBuildAsync(api, runningId, value => value.GetProperty("state").GetString() == "finished");
         Assert.That(stopped.GetProperty("status").GetString(), Is.EqualTo("UNKNOWN"));
         Assert.That(stopped.GetProperty("cancelReason").GetString(), Is.EqualTo("Owned running cancellation"));
-        Assert.That(stopped.GetProperty("statusText").GetString(), Is.EqualTo("Cancelled"));
+        Assert.That(stopped.GetProperty("statusText").GetString(), Is.EqualTo("Canceled"));
         // Actual later work proves the old queue entry does not run and the stopped lease releases.
         var nextId = await SubmitAsync(api, "P_LocalSmoke");
         await FinishedAsync(api, nextId);

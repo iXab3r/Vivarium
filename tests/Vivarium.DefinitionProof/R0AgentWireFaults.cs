@@ -12,6 +12,7 @@ internal sealed class R0AgentWireFaults : Interceptor
     private int droppedAcknowledgements;
     private readonly HashSet<string> observedSessions = [];
     internal bool DropOutputData { get; set; }
+    internal bool OmitPlatform { get; set; }
     internal bool DropOutputAcknowledgements { get; set; }
     internal int DroppedAcknowledgements => Volatile.Read(ref droppedAcknowledgements);
     internal int ObservedSessionCount { get { lock (sync) return observedSessions.Count; } }
@@ -24,6 +25,7 @@ internal sealed class R0AgentWireFaults : Interceptor
 
     private bool Observe(object? message)
     {
+        if (OmitPlatform && message is AgentMsg { Hello: { } hello }) hello.Parameters.Remove("system.os.family");
         if (message is not AgentMsg { BuildOutput: { } output }) return true;
         lock (sync)
         {

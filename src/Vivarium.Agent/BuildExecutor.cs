@@ -269,6 +269,7 @@ public static class BuildExecutor
         }
 
         using var outputCts = new CancellationTokenSource();
+        var outputFailed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var stdout = PumpAsync(process.StandardOutput.BaseStream, LogStream.Stdout, outputCts.Token);
         var stderr = PumpAsync(process.StandardError.BaseStream, LogStream.Stderr, outputCts.Token);
 
@@ -281,7 +282,10 @@ public static class BuildExecutor
 
         try
         {
-            await process.WaitForExitAsync(timeout.Token);
+            var exit = process.WaitForExitAsync(timeout.Token);
+            if (await Task.WhenAny(exit, outputFailed.Task) == outputFailed.Task)
+                await ForceTerminateAsync(process);
+            await exit;
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
@@ -331,6 +335,12 @@ public static class BuildExecutor
             }
             catch (OperationCanceledException) when (outputToken.IsCancellationRequested)
             {
+            }
+            catch
+            {
+                // A failed reader must not leave a live producer blocked forever on a full pipe.
+                outputFailed.TrySetResult();
+                throw;
             }
         }
     }

@@ -1162,6 +1162,13 @@ private durable storage and backup; “PostgreSQL for state” does not mean bin
 The selected R0 output policy uses optional Chiral Host `OutputRetentionDays` (disabled by default),
 PostgreSQL availability epochs/expiry marks and retryable Storage deletion. It never rewrites
 published producer ranges. The broader TeamCity/per-project retention policy remains later scope.
+Private output PUTs first journal their object keys in PostgreSQL. An object-row lock protects
+the bounded PUT from cleanup without holding an Agent/queue fence; adopting the range removes
+that intent in the reference transaction. Quota eviction journals deletion before forgetting its
+key. The independent retention worker retries abandoned/evicted objects after restart, skips active
+PUT locks, and bounds each deletion batch. A bounded pending-object backlog applies ingress
+backpressure. Published gap metadata shares the head budget; unpublished adjacent gaps coalesce,
+using `quota-exceeded` when bounded metadata cannot retain distinct original gap reasons.
 
 Use Depot's proven frontend technology/integration: TypeScript/Vite plus pinned `@eyeauras/workbench`
 (reference 0.2.6), with packaged static assets/fonts served on the Host origin. React/React Router

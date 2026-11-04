@@ -29,6 +29,7 @@ internal sealed class RuntimeOutputRetention(IDbContextFactory<VivariumDbContext
             if (days is < 1 or > 3650) throw new InvalidDataException("The output retention period is invalid.");
             await ExpireAsync(time.GetUtcNow().AddDays(-days), token);
         }
+        await DeleteUnreferencedAsync(token);
         // Finish an already committed deletion even if an operator subsequently disables expiry.
         // This worker is independent of queue/heartbeat/cancellation coordination.
         for (var count = 0; count < 64; count++)
@@ -45,6 +46,25 @@ internal sealed class RuntimeOutputRetention(IDbContextFactory<VivariumDbContext
             // A duplicate/idempotent delete after a crash is safe. Expiry identity never changes.
             await database.RuntimeOutputExpiries.Where(e => e.RangeId == pending.RangeId && e.DeletedAt == null)
                 .ExecuteUpdateAsync(update => update.SetProperty(e => e.DeletedAt, time.GetUtcNow()), token);
+        }
+    }
+
+    private async Task DeleteUnreferencedAsync(CancellationToken token)
+    {
+        for (var count = 0; count < 64; count++)
+        {
+            await using var database = await databases.CreateDbContextAsync(token);
+            await using var transaction = await database.Database.BeginTransactionAsync(token);
+            var pending = await database.RuntimeOutputDeletions.FromSqlRaw("""
+                SELECT * FROM "RuntimeOutputDeletions" ORDER BY "CreatedAt", "ObjectKey"
+                LIMIT 1 FOR UPDATE SKIP LOCKED
+                """).ToArrayAsync(token);
+            if (pending.Length == 0) return;
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
+            deadline.CancelAfter(TimeSpan.FromSeconds(15));
+            await bytes.DeleteAsync(pending[0].ObjectKey, deadline.Token).WaitAsync(TimeSpan.FromSeconds(15), token);
+            database.RuntimeOutputDeletions.Remove(pending[0]);
+            await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         }
     }
 

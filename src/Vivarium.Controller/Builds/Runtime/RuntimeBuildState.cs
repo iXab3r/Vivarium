@@ -142,6 +142,14 @@ public sealed class RuntimeOutputExpiry
     public DateTimeOffset? DeletedAt { get; set; }
 }
 
+// Pending private objects are journalled before PUT and remain until range adoption or deletion.
+public sealed class RuntimeOutputDeletion
+{
+    public string ObjectKey { get; set; } = "";
+    public long BuildId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
 public sealed class RuntimeOutputStream
 {
     public long BuildId { get; set; }

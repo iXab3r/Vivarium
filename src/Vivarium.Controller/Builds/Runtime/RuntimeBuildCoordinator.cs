@@ -112,6 +112,7 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
                     || !Current(agent, connection!) || !connection!.Protocol.SupportsDurableBuildOutput
                     || !connection.Protocol.SupportsLiteralArtifactPublisher) continue;
                 var reported = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.ReportedParametersJson, Json)!;
+                if (!reported.TryGetValue("system.os.family", out var platform) || platform is not ("windows" or "linux" or "macos")) continue;
                 var custom = JsonSerializer.Deserialize<Dictionary<string, string>>(agent.CustomParametersJson, Json)!;
                 var parameters = new Dictionary<string, string>(reported, StringComparer.Ordinal);
                 foreach (var pair in custom) parameters[pair.Key] = pair.Value;
@@ -168,8 +169,11 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             definition = await database.CatalogBuildDefinitions.AsNoTracking()
                 .SingleAsync(d => d.BuildTypeId == input.BuildTypeId && d.RevisionId == input.RevisionId, token);
             using var selection = JsonDocument.Parse(snapshot.SelectionSnapshotJson);
-            os = selection.RootElement.GetProperty("reportedParameters").GetProperty("system.os.family").GetString()!;
+            os = selection.RootElement.GetProperty("reportedParameters").TryGetProperty("system.os.family", out var platform)
+                && platform.ValueKind == JsonValueKind.String ? platform.GetString()! : "";
         }
+        if (os is not ("windows" or "linux" or "macos"))
+        { await FailAsync(id, "Execution platform is unavailable", safeUnsent: snapshot.SentAt is null, token); return; }
         RuntimePreparedAssignment? prepared = null;
         if (prepare && snapshot.Phase == "PREPARING" && build.CancelRequestedAt is null && time.GetUtcNow() < snapshot.PreparationDeadline)
         {
@@ -478,7 +482,8 @@ internal sealed class RuntimeBuildCoordinator(IDbContextFactory<VivariumDbContex
             || result.Steps.Any(s => s.StepIndex < 0 || s.StepIndex >= assignment.Steps.Count)
             || result.Steps.Select(s => s.StepIndex).Distinct().Count() != result.Steps.Count)
             throw new InvalidDataException("The terminal result is invalid.");
-        if (result.Outcome == BuildOutcome.Succeeded && result.Steps.Any(s => !s.Skipped && (s.ExitCode != 0 || s.TimedOut)))
+        if (result.Outcome == BuildOutcome.Succeeded && (result.Steps.Count != assignment.Steps.Count
+            || result.Steps.Any(s => s.ExitCode != 0 || s.TimedOut)))
             throw new InvalidDataException("Successful execution conflicts with its step evidence.");
         var watermarks = result.OutputWatermarks;
         if (result.OutputProducerLost ? watermarks.Count != 0 : watermarks.Count != assignment.Steps.Count * 2)

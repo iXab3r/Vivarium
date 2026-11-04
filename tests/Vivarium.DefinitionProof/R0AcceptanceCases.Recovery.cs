@@ -30,10 +30,17 @@ public sealed partial class R0AcceptanceCases
             var prefix = await WaitOutputAsync(actor.BuildClient, id, page => page.GetProperty("items").GetArrayLength() >= 2);
             handoff.Arm(); await File.WriteAllTextAsync(Path.Combine(gate, "release"), "release");
             await handoff.Stored.WaitAsync(TimeSpan.FromSeconds(15));
+            string orphan;
+            await using (var scope = host.Services.CreateAsyncScope())
+                orphan = await scope.ServiceProvider.GetRequiredService<VivariumDbContext>().RuntimeOutputDeletions.Select(d => d.ObjectKey).SingleAsync();
             var unpublished = await OutputAsync(actor.BuildClient, id);
             Assert.That(unpublished.GetProperty("items").GetRawText(), Is.EqualTo(prefix.GetProperty("items").GetRawText()),
                 "Successful private Storage PUT alone is not published output.");
             await host.RestartAsync(); handoff.Release();
+            await host.Services.GetRequiredService<RuntimeOutputRetention>().TickAsync(CancellationToken.None);
+            var missing = Assert.ThrowsAsync<HttpRequestException>(() => host.Services.GetRequiredService<RuntimeBuildBytes>().ReadAsync(
+                orphan, 15, Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData("owned-log-tail\n"u8)), CancellationToken.None));
+            Assert.That(missing!.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             await FinishedAsync(actor.BuildClient, id);
             var complete = await OutputAsync(actor.BuildClient, id);
             var streams = new Dictionary<string, List<byte>> { ["stdout"] = [], ["stderr"] = [] };

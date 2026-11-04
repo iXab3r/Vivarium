@@ -773,6 +773,11 @@ expired content returns `410 output_expired`; unknown/hidden entries remain 404.
 an otherwise young cursor with the same `cursor_expired` recovery contract. A fresh view reports
 `retention` gaps and `complete-with-gaps` when producer bytes were purged. This selected Host policy
 does not implement full TeamCity/per-project retention configuration.
+The same independent worker also retries up to 64 abandoned or quota-evicted private objects per
+tick. Their keys are journalled before PUT or eviction and survive a crash; active PUTs hold only
+their object-row lock and cleanup skips them. A pending-object backlog stops further object
+allocation until cleanup recovers. Data and gaps share the bounded published head; unpublished
+adjacent gaps may coalesce as `quota-exceeded` without rewriting published positions.
 
 The [workload-output contract](logging.md#terminal-watermarks-and-the-release-barrier) owns quotas,
 registered-secret masking before transport/persistence, per-stream sequence identity, independent

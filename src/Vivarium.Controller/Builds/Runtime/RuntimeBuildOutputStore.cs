@@ -54,11 +54,13 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
         // Check before Storage I/O, then repeat under the durable Agent fence after it. A staged
         // orphan object confers no authority and cannot overwrite another row's immutable bytes.
         var uploadNeeded = false;
+        long buildId;
         await using (var check = await databases.CreateDbContextAsync(token))
         {
             var agent = await check.AgentRegistrations.AsNoTracking().SingleAsync(a => a.AgentId == connection.Handle.AgentId, token);
             var execution = await check.RuntimeBuildExecutions.AsNoTracking().SingleOrDefaultAsync(e => e.WorkloadId == frame.BuildId, token);
             if (execution is null || !RuntimeBuildCoordinator.Owner(agent, execution, connection)) return;
+            buildId = execution.BuildId;
             var prefix = await check.RuntimeOutputStreams.AsNoTracking().SingleOrDefaultAsync(s => s.BuildId == execution.BuildId
                 && s.StepIndex == frame.StepIndex && s.Stream == (int)frame.Stream, token)
                 ?? throw new InvalidDataException("Output scope is not assigned.");
@@ -72,11 +74,28 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
             if (uploadNeeded)
             {
                 key = "build-output/" + Guid.NewGuid().ToString("N");
-                await bytes.PutAsync(key, frame.Data.Memory, token);
+                await using var intent = await databases.CreateDbContextAsync(token);
+                await using var stage = await intent.Database.BeginTransactionAsync(token);
+                await intent.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(83371856)", token);
+                // Failed deletions apply backpressure instead of accumulating unbounded objects.
+                if (await intent.RuntimeOutputDeletions.CountAsync(token) >= 1024) return;
+                intent.RuntimeOutputDeletions.Add(new() { ObjectKey = key, BuildId = buildId, CreatedAt = time.GetUtcNow() });
+                await intent.SaveChangesAsync(token); await stage.CommitAsync(token);
             }
         }
         await using var database = await databases.CreateDbContextAsync(token);
         await using var transaction = await database.Database.BeginTransactionAsync(token);
+        RuntimeOutputDeletion? staged = null;
+        if (key is not null)
+        {
+            // Only this object lock spans the bounded PUT. Cleanup skips it; no Agent or queue
+            // fence is held during Storage I/O. A crashed/failed upload retains deletion intent.
+            staged = await database.RuntimeOutputDeletions.FromSqlInterpolated($"""
+                SELECT * FROM "RuntimeOutputDeletions" WHERE "ObjectKey" = {key} FOR UPDATE
+                """).SingleOrDefaultAsync(token);
+            if (staged is null) return;
+            await bytes.PutAsync(key, frame.Data.Memory, token);
+        }
         await AgentCredentials.LockAgentAsync(database, connection.Handle.AgentId, token);
         var current = await database.AgentRegistrations.SingleAsync(a => a.AgentId == connection.Handle.AgentId, token);
         var owner = await database.RuntimeBuildExecutions.SingleOrDefaultAsync(e => e.WorkloadId == frame.BuildId, token);
@@ -123,31 +142,28 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
             ByteEnd = frame.SourceByteEndExclusive, ReceivedAt = time.GetUtcNow(), Sha256 = hash, ObjectKey = key,
             Kind = frame.Data.Length == 0 ? "GAP" : "HEAD", Reason = MapGap(frame.GapReason),
         };
+        var published = database.RuntimeOutputRanges.Where(r => r.BuildId == owner.BuildId && r.Position != null);
+        if (await published.CountAsync(token) >= HalfFrameCount) stream.TailStarted = true;
         if (frame.Data.Length > 0)
         {
             var head = database.RuntimeOutputRanges.Where(r => r.BuildId == owner.BuildId && r.Kind == "HEAD");
             var total = await head.SumAsync(r => (decimal?)(r.ByteEnd - r.ByteStart), token) ?? 0;
             var step = await head.Where(r => r.StepIndex == frame.StepIndex).SumAsync(r => (decimal?)(r.ByteEnd - r.ByteStart), token) ?? 0;
-            if (stream.TailStarted || total + frame.Data.Length > BuildHalfBytes || step + frame.Data.Length > StepHalfBytes
-                || await head.CountAsync(token) >= HalfFrameCount)
+            if (stream.TailStarted || total + frame.Data.Length > BuildHalfBytes || step + frame.Data.Length > StepHalfBytes)
             { stream.TailStarted = true; range.Kind = "TAIL"; }
         }
         if (!stream.TailStarted) range.Position = output.NextPosition++;
         database.RuntimeOutputRanges.Add(range);
+        if (staged is not null) database.RuntimeOutputDeletions.Remove(staged);
         stream.CommittedSequence = frame.SourceSequenceEndExclusive; stream.CommittedBytes = frame.SourceByteEndExclusive;
         await database.SaveChangesAsync(token);
-        var evicted = await BoundTailAsync(database, output.BuildId, token);
+        await BoundTailAsync(database, output.BuildId, token);
         await database.SaveChangesAsync(token); await transaction.CommitAsync(token);
         Acknowledge(connection, frame, stream);
-        foreach (var evictedKey in evicted)
-            try { await bytes.DeleteAsync(evictedKey, token); }
-            catch (Exception error) when (error is IOException or HttpRequestException or TimeoutException)
-            { logger.LogWarning("Unreferenced output cleanup is pending."); }
     }
 
-    private async Task<string[]> BoundTailAsync(VivariumDbContext database, long build, CancellationToken token)
+    private async Task BoundTailAsync(VivariumDbContext database, long build, CancellationToken token)
     {
-        var evicted = new List<string>();
         var tail = await database.RuntimeOutputRanges.Where(r => r.BuildId == build && r.Kind == "TAIL")
             .OrderBy(r => r.ReceiptOrder).ToListAsync(token);
         decimal Size(RuntimeOutputRange row) => row.ByteEnd!.Value - row.ByteStart;
@@ -158,7 +174,7 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
             var over = steps.Where(s => s.Value > StepHalfBytes).Select(s => (int?)s.Key).FirstOrDefault();
             var oldest = tail.First(r => over is null || r.StepIndex == over);
             total -= Size(oldest); steps[oldest.StepIndex] -= Size(oldest); tail.Remove(oldest);
-            evicted.Add(oldest.ObjectKey!);
+            database.RuntimeOutputDeletions.Add(new() { ObjectKey = oldest.ObjectKey!, BuildId = build, CreatedAt = time.GetUtcNow() });
             oldest.Kind = "GAP"; oldest.Reason = "quota-exceeded"; oldest.Sha256 = null; oldest.ObjectKey = null;
         }
         await database.SaveChangesAsync(token);
@@ -169,11 +185,14 @@ internal sealed class RuntimeBuildOutputStore(IDbContextFactory<VivariumDbContex
         foreach (var gap in gaps)
         {
             if (previous is not null && previous.StepIndex == gap.StepIndex && previous.Stream == gap.Stream
-                && previous.End == gap.Start && previous.ByteEnd == gap.ByteStart && previous.Reason == gap.Reason)
-            { previous.End = gap.End; previous.ByteEnd = gap.ByteEnd; database.RuntimeOutputRanges.Remove(gap); }
+                && previous.End == gap.Start && previous.ByteEnd == gap.ByteStart)
+            {
+                previous.End = gap.End; previous.ByteEnd = gap.ByteEnd;
+                if (previous.Reason != gap.Reason) previous.Reason = "quota-exceeded";
+                database.RuntimeOutputRanges.Remove(gap);
+            }
             else previous = gap;
         }
-        return evicted.ToArray();
     }
 
     internal async Task SealAsync(long buildId, CancellationToken token)

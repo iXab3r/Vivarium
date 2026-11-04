@@ -70,9 +70,18 @@ public sealed class RuntimeBuildProtocolTests
         result.OutputWatermarks.Add(new BuildOutputWatermark { StepIndex = 0, Stream = LogStream.Stdout });
         result.OutputWatermarks.Add(new BuildOutputWatermark { StepIndex = 0, Stream = LogStream.Stderr });
         Assert.DoesNotThrow(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps.Clear();
+        Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps.Add(new StepResult { StepIndex = 0 });
         result.Steps[0].ExitCode = 7;
         Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps[0].Skipped = true;
+        Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
         result.Steps[0].ExitCode = 0;
+        result.Steps[0].TimedOut = true;
+        Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
+        result.Steps[0].TimedOut = false;
+        result.Steps[0].Skipped = false;
         result.OutputWatermarks[1].Stream = LogStream.Stdout;
         Assert.Throws<InvalidDataException>(() => RuntimeBuildCoordinator.ValidateResult(result, assignment));
         result.OutputWatermarks[1].Stream = LogStream.Stderr;

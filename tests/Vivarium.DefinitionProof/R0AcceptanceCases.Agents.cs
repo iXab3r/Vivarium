@@ -12,6 +12,27 @@ namespace Vivarium.DefinitionProof;
 public sealed partial class R0AcceptanceCases
 {
     [Test]
+    public async Task Missing_reported_platform_does_not_claim_work_or_stop_the_scheduler_and_corrected_reconnect_recovers()
+    {
+        var wire = new R0AgentWireFaults { OmitPlatform = true };
+        await using var host = await installation.CreateCaseAsync(catalogued: true, configureServices: services =>
+        { services.AddSingleton(wire); services.AddGrpc(options => options.Interceptors.Add<R0AgentWireFaults>()); });
+        using var administrator = await host.AdministratorAsync(); var csrf = await host.AntiforgeryAsync(administrator);
+        await host.StartWindowsAgentAsync(administrator, csrf);
+        using var actor = await RestrictedActorAsync(host, administrator, csrf);
+        var id = await SubmitAsync(actor.BuildClient, "P_Empty");
+        await host.Services.GetRequiredService<RuntimeBuildCoordinator>().TickAsync(CancellationToken.None);
+        var queued = await ReadBuildAsync(actor.BuildClient, id);
+        Assert.That(queued.GetProperty("state").GetString(), Is.EqualTo("queued"));
+        await using (var scope = host.Services.CreateAsyncScope())
+            Assert.That(await scope.ServiceProvider.GetRequiredService<VivariumDbContext>().RuntimeBuildExecutions.CountAsync(e => e.BuildId == id), Is.Zero);
+        wire.OmitPlatform = false;
+        await host.StopOwnedAgentAsync(); await host.RestartOwnedAgentAsync();
+        await FinishedAsync(actor.BuildClient, id);
+        Assert.That((await ReadBuildAsync(actor.BuildClient, id)).GetProperty("status").GetString(), Is.EqualTo("SUCCESS"));
+    }
+
+    [Test]
     public async Task Readiness_keeps_authorization_enablement_requirements_occupancy_and_connection_independent()
     {
         await using var host = await installation.CreateCaseAsync(catalogued: true);

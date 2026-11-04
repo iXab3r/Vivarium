@@ -30,6 +30,35 @@ public sealed class BuildExecutorTests
     }
 
     [Test]
+    public async Task Publisher_failure_stops_a_flooding_process_without_waiting_for_its_pipe_to_drain()
+    {
+        var assignment = new BuildAssignment { BuildId = "publisher-flood", ArtifactPublicationContractMajor = 1 };
+        var step = new Step { Program = OperatingSystem.IsWindows() ? "powershell.exe" : "/bin/sh" };
+        if (OperatingSystem.IsWindows()) step.Args.Add(["-NoProfile", "-NonInteractive", "-Command",
+            "[Console]::WriteLine(\"##teamcity[publishArtifacts '../escape']\"); while ($true) { [Console]::Write(('x' * 8192)) }"]);
+        else step.Args.Add(["-c", "printf \"##teamcity[publishArtifacts '../escape']\\n\"; while :; do printf '%8192s' x; done"]);
+        assignment.Steps.Add(step);
+        using var blobs = new BlobClient("https://localhost", "unused");
+        using var watchdog = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        using var stop = new BuildStopController(watchdog.Token);
+        var stopped = false;
+        var execution = BuildExecutor.ExecuteAsync(root, assignment, blobs, (_, _) => Task.CompletedTask,
+            "publisher-flood-session", stop, process => { if (process is null) stopped = true; });
+        try
+        {
+            Assert.That(await Task.WhenAny(execution, Task.Delay(TimeSpan.FromSeconds(5))), Is.SameAs(execution),
+                "A failed stdout parser must terminate the producer before the external watchdog.");
+            Assert.ThrowsAsync<InvalidDataException>(async () => await execution);
+            Assert.That(stopped, Is.True, "The owned process must have exited before failure is reported.");
+        }
+        finally
+        {
+            await watchdog.CancelAsync();
+            try { await execution; } catch (InvalidDataException) { }
+        }
+    }
+
+    [Test]
     public async Task Execute_sets_the_portable_environment_and_recreates_results_for_each_step()
     {
         var scriptPath = Path.Combine(root, OperatingSystem.IsWindows() ? "capture.cmd" : "capture.sh");
