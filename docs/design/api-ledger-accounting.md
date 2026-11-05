@@ -1,5 +1,67 @@
 # Offline API ledger accounting
 
+## Current Host status (#172)
+
+After building the tool once, run this offline projection from the repository root:
+
+```powershell
+dotnet tools/Vivarium.ApiLedger/bin/Debug/net10.0/Vivarium.ApiLedger.dll . --current 1> artifacts/rest-status172/current.json 2> artifacts/rest-status172/current.txt
+```
+
+Create the output directory first if saving files. Without redirection, stdout is JSON and stderr is
+the readable report. The command itself writes no files, builds nothing, runs no tests and starts no
+network hosts. Exit 0 means the bounded registry projection is valid, **including UNKNOWN evidence**;
+exit 2 means unreadable/invalid accounting. Inspect `evidence_state`, never infer compatibility from
+the exit code. Original normal/`--r0`/`--pilot` exit semantics remain unchanged.
+
+The normal reader's second argument is a named assessment identity: the default assessment names
+`ledger-accounting-working-tree`. Passing an arbitrary HEAD SHA there legitimately yields “Unknown
+candidate”; this is invocation misuse, not proof of an API regression. Using the correct name still
+does not renew its old expected HEAD or missing producer provenance. `--current` observes HEAD
+without weakening that strict gate. It does not manufacture an assessment or edit retained hashes.
+
+The projection joins the canonical subsystem, discovery, materialized-case, R0-binding, PILOT
+declaration, native-source and source-disposition tables. JSON retains source paths/current hashes,
+missing source observations, historical outcome IDs, assessment/receipt identity and hashes of every
+consumed register plus the selected final delivery record. Current adapter source observations are
+bounded to existing Controller adapter directories. They are neither exhaustive route discovery nor
+wire proof. Read the surface descriptions with their source observations; source presence alone
+does not qualify implementation behavior. Unmatched routes and unknown owners remain open under
+#161/#162/#163. Each subsystem links its owner and existing contract/acceptance work.
+
+Validated example at HEAD `5fe8bf4292a309bc0d228c040996265e902a7125` (dirty implementation tree,
+2026-11-05; report executes no tests):
+
+```text
+Accounting: VALID; evidence: UNQUALIFIED_CURRENT_HEAD
+Global denominator/percentage: UNKNOWN; API complete: false
+449 discovery headings; 25 materialized historical cases (5 RED, 20 PRODUCT_BLOCKED)
+28 selected R0 bindings; 7 declared PILOT wire variants (unmaterialized)
+SS-CFG: 94 headings, 10 historical cases, 4 R0 bindings
+SS-RUN: 51 headings, 4 historical cases, 5 R0 bindings, 7 declarations
+SS-AGT: 42 headings, 0 historical cases, 2 R0 bindings
+SS-IAM: 58 headings, 10 historical cases, 8 R0 bindings
+SS-LOG: 1 heading, 0 historical cases, 7 R0 bindings
+```
+
+These are different populations. Zero materialized historical cases does not mean an unsupported
+native API. The selected Chiral/PG R0 delivery (28 obligations) and PILOT delivery (34 business/SDK
+rows) remain accepted at their recorded identities in the
+[final delivery record](../../.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md).
+They are not automatically current full-wire GREEN. Supply explicit assessments with
+`--current --r0 <assessment.json> --pilot <assessment.json>`; the existing selected readers
+validate current HEAD, source/producer hashes and exact raw bindings. Invalid supplied evidence
+exits 1. R0 optionally accepts a nonempty unique `selected_case_ids` subset: `contract_required`
+retains 28 and `required` counts only that subset. Defaults still require all 28.
+See [the bounded renewal](current-status172-qualification.md). Missing defaults are not proof absence.
+No blanket rerun is needed just to display status. Missing reference variants stay with the owning
+contract tasks; exact progress/cancel behavior stays #166. The private farm smoke cannot fill these
+wire gaps. No previously GREEN result is deleted or relabeled by this projection.
+
+Focused controls: `dotnet test tests/Vivarium.Tests/Vivarium.Tests.csproj --filter FullyQualifiedName~ApiLedgerCurrentTests`.
+Local report/JSON and standard TRX are under `artifacts/rest-status172/`; full root verification and
+independent aggregate/Security review belong to the parent integration checkpoint.
+
 > Implemented partial P0 foundation under #110/#111/#112; former #36/#42 are retained source context.
 > Source normalization, model decisions, allocation and
 > exact due-scope freeze remain open. No product API-complete or milestone acceptance is claimed.

@@ -35,6 +35,7 @@ internal static class WorkbenchShell
         }
         var session = JsonSerializer.Serialize(new
         {
+            localDevelopment = LocalDevelopment.Root(http.RequestServices.GetRequiredService<IConfiguration>()) is not null,
             user = user is null ? null : new
             {
                 user.Id, displayName = user.DisplayName ?? user.UserName ?? "Account",
@@ -44,7 +45,10 @@ internal static class WorkbenchShell
             requestVerificationToken = user is null ? "" : antiforgery.GetAndStoreTokens(http).RequestToken
         }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         // The stock JSON encoder escapes '<' in untrusted account presentation.
-        var html = await File.ReadAllTextAsync(Path.Combine(environment.WebRootPath, "workbench/index.html"), http.RequestAborted);
+        var development = LocalDevelopment.Root(http.RequestServices.GetRequiredService<IConfiguration>());
+        var html = development is null
+            ? await File.ReadAllTextAsync(Path.Combine(environment.WebRootPath, "workbench/index.html"), http.RequestAborted)
+            : "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Vivarium local development</title></head><body><div id=\"app\"></div><script type=\"module\" src=\"/workbench/@vite/client\"></script><script type=\"module\" src=\"/workbench/src/main.ts\"></script></body></html>";
         return Results.Content(html.Replace("</head>", "<script id=\"vivarium-session\" type=\"application/json\">"
             + session + "</script></head>", StringComparison.Ordinal), "text/html; charset=utf-8");
     }

@@ -32,6 +32,8 @@ public static class VivariumRuntime
         builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
         builder.Logging.AddFilter("OpenIddict", LogLevel.Warning);
         configureLogging?.Invoke(builder.Logging);
+        if (Environment.GetEnvironmentVariable("VIVARIUM_LOCAL_DEV_ROOT") is not null)
+            builder.Logging.AddFilter((_, level) => level >= LogLevel.Warning);
         builder.Services.AddDbContextFactory<VivariumDbContext>(options => options.UseNpgsql(
             builder.Configuration.GetConnectionString("Vivarium")
                 ?? throw new InvalidOperationException("Initialize the PostgreSQL node first.")));

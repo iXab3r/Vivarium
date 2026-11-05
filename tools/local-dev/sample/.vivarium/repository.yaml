@@ -1,0 +1,7 @@
+apiVersion: vivarium.io/v1alpha1
+kind: Repository
+id: local-development
+spec:
+  schemaVersion: "2"
+  documentKinds:
+    - Project

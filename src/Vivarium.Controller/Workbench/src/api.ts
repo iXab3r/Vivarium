@@ -1,4 +1,5 @@
 export interface Session {
+    localDevelopment?: boolean;
     user: { id: string; displayName: string; isInstallation: boolean } | null;
     canReadProfiles: boolean;
     canGrantRoles: boolean;

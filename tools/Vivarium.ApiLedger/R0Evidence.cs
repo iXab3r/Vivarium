@@ -9,11 +9,15 @@ public sealed class R0Report
     public string Status { get; set; } = "SELECTED_R0_UNVERIFIED";
     public string? ObservedHead { get; set; }
     public string? ExecutionBase { get; set; }
+    public StatusInput? ExecutionReceipt { get; set; }
+    public List<StatusInput> ExecutionProducers { get; } = [];
+    public Dictionary<string, string> CaseKinds { get; } = [];
     public string EvidenceMode => "REUSED; this offline command executes no tests";
     public bool GlobalApiComplete => false;
     public int? GlobalVariantDenominator => null;
     public string MilestoneAcceptance => "Not assessed by this command; separate review/debt/main/tracker evidence is required";
     public string ReviewState => "Independent aggregate/Security, findings, main delivery and tracker closure are separate gates";
+    public int ContractRequired { get; set; }
     public int Required { get; set; }
     public int FullReferenceCases { get; set; }
     public int BehavioralAndNativeObligations { get; set; }
@@ -57,7 +61,7 @@ public static partial class Ledger
         var scope = Json(root, Workstream + "r0-contract-scope.json");
         var requiredReference = scope["required_reference_cases"]!.AsArray().Select(n => n!.GetValue<string>()).ToHashSet();
         var required = requiredReference.Concat(variants.Keys).ToHashSet();
-        report.Required = required.Count; report.FullReferenceCases = requiredReference.Count;
+        report.ContractRequired = required.Count; report.Required = required.Count; report.FullReferenceCases = requiredReference.Count;
         report.BehavioralAndNativeObligations = variants.Count;
         foreach (var amendment in scope["owner_scope_amendments"]?.AsArray() ?? [])
             foreach (var item in amendment!["retained_full_cases"]!.AsArray()) report.RetainedFullWireCases.Add(item!.GetValue<string>());
@@ -71,15 +75,32 @@ public static partial class Ledger
         var assessment = Json(root, assessmentPath);
         Require(S(assessment, "candidate_id") == candidate && S(assessment, "expected_head") == identity.Head,
             "R0 candidate/HEAD differs from explicit evidence assessment.");
+        // Explicit bounded renewal uses the canonical roster and bindings; defaults retain all 28.
+        if (assessment["selected_case_ids"] is JsonArray selection)
+        {
+            var ids = selection.Select(n => n!.GetValue<string>()).ToArray();
+            Require(ids.Length > 0 && ids.Distinct().Count() == ids.Length && ids.All(required.Contains),
+                "Invalid selected R0 case roster.");
+            required = ids.ToHashSet();
+            report.Required = required.Count;
+            report.FullReferenceCases = required.Count(requiredReference.Contains);
+            report.BehavioralAndNativeObligations = required.Count - report.FullReferenceCases;
+        }
         var receiptPath = S(assessment, "receipt");
         Require(Hash(root, receiptPath) == S(assessment, "receipt_sha256"), "R0 execution receipt hash mismatch.");
+        report.ExecutionReceipt = new(receiptPath, Hash(root, receiptPath));
         var receipt = Json(root, receiptPath); var executed = receipt["candidate"]!;
         report.ExecutionBase = S(executed, "git_base");
         var source = executed["source_inputs"]!.AsArray().Select(n => n!).ToArray();
         Require(source.Select(n => S(n, "path")).Distinct().Count() == source.Length, "Duplicate R0 execution source input.");
         var sourceByPath = source.ToDictionary(n => S(n, "path"), n => S(n, "sha256"));
         Require(roster.All(sourceByPath.ContainsKey), "R0 receipt omits a required producer/harness/metadata input.");
-        Require(sourceByPath.All(p => Hash(root, p.Key) == p.Value), "STALE: R0 source/fixture/oracle input bytes changed.");
+        foreach (var input in sourceByPath.Where(p => Hash(root, p.Key) != p.Value))
+        {
+            var gaps = new List<string>();
+            QualifyPilotInput(root, assessment, input.Key, input.Value, "source", gaps);
+            Require(gaps.Count == 0, "STALE: R0 source/fixture/oracle input bytes changed. " + string.Join("; ", gaps));
+        }
         var fingerprint = Sha(System.Text.Encoding.UTF8.GetBytes(string.Join('\n', sourceByPath.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => p.Key + ":" + p.Value))));
         Require(fingerprint == S(executed, "source_fingerprint_sha256"), "R0 source fingerprint differs.");
         var transfer = assessment["decision"]!;
@@ -92,7 +113,19 @@ public static partial class Ledger
         var assemblies = executed["assemblies"]!.AsArray().Select(n => n!).ToArray();
         Require(assemblies.Length > 0 && assemblies.Select(a => S(a, "path")).Distinct().Count() == assemblies.Length,
             "Missing/duplicate retained R0 execution assemblies.");
-        Require(assemblies.All(a => Hash(root, S(a, "path")) == S(a, "sha256")), "Retained R0 execution assembly bytes differ.");
+        var retained = assessment["retained_assemblies"]?.AsArray().Select(n => n!).ToArray() ?? [];
+        Require(retained.Select(a => S(a, "recorded_path")).Distinct().Count() == retained.Length,
+            "Duplicate retained R0 execution assembly mapping.");
+        foreach (var item in retained)
+            Require(assemblies.Any(a => S(a, "path") == S(item, "recorded_path") && S(a, "sha256") == S(item, "sha256")),
+                "Wrong original R0 assembly binding.");
+        foreach (var assembly in assemblies)
+        {
+            var mapping = retained.SingleOrDefault(a => S(a, "recorded_path") == S(assembly, "path"));
+            var artifact = mapping is null ? S(assembly, "path") : S(mapping, "artifact");
+            Require(Hash(root, artifact) == S(assembly, "sha256"), "Retained R0 execution assembly bytes differ.");
+            report.ExecutionProducers.Add(new StatusInput(artifact, S(assembly, "sha256")));
+        }
         var assemblyByRole = assemblies.ToDictionary(a => S(a, "role"));
         foreach (var role in new[] { "Vivarium.Controller", "Vivarium.Agent", "Vivarium.Contracts", "Vivarium.DefinitionProof" })
             Require(assemblyByRole.TryGetValue(role, out var assembly) && Path.GetFileName(S(assembly, "path")) == role + ".dll",
@@ -118,6 +151,7 @@ public static partial class Ledger
             Require(requiredReference.Contains(id) ? owner == reference[id]["primary_owner"]
                 : Split(variants[id]["contribution_subsystems"]).Contains(owner), "R0 primary owner is outside its owning contribution.");
             var comparison = requiredReference.Contains(id) ? "full-wire" : variants[id]["kind"] == "reference-behavior" ? "behavioral" : "native";
+            report.CaseKinds.Add(id, comparison);
             Require(binding["comparison"] == comparison, "R0 behavior/native evidence cannot masquerade as full-wire conformance.");
             Require(results.TryGetValue(binding["result_set"], out var selected), "Missing R0 result set.");
             Require(binding["target"] == selected.Target && selected.Target is "fresh-host-agent" or "stock-oidc-browser", "Replay/component target cannot establish R0 product GREEN.");

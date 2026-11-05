@@ -1,5 +1,11 @@
 # Developing Vivarium
 
+## Persistent local development
+
+Run `./tools/local-dev/local-dev.ps1 start` for a real local Host, physical Agent and HTTPS Workbench
+HMR loop. See the [local development runbook](local-development.md) for login, debugger attachment,
+start/status/stop/reset, retained state, verification and troubleshooting.
+
 How Vivarium itself is built, tested, released, and upgraded. The *decisions* live in
 [`ARCHITECTURE.md`](ARCHITECTURE.md) (D19 — portable distribution, D20 — test tiers); this file is
 the practical companion.
