@@ -1,9 +1,25 @@
 using System.Text.Json;
 using Vivarium.ApiLedger;
 
+if (args.Length == 2 && args[1] == "--current")
+{
+    try
+    {
+        var current = Ledger.ReadCurrent(args[0]);
+        Console.WriteLine(JsonSerializer.Serialize(current, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower }));
+        Console.Error.WriteLine(Ledger.RenderCurrent(current));
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or KeyNotFoundException or InvalidOperationException)
+    {
+        Console.Error.WriteLine("INVALID_CURRENT_ACCOUNTING: " + ex.Message);
+        return 2;
+    }
+}
+
 if (args.Length is < 2 or > 4 || args.Length == 4 && args[2] is not ("--r0" or "--pilot"))
 {
-    Console.Error.WriteLine("Usage: Vivarium.ApiLedger <repository-root> <candidate-id> [assessment-file | --r0 [assessment-file] | --pilot assessment-file] (offline; reads evidence only)");
+    Console.Error.WriteLine("Usage: Vivarium.ApiLedger <repository-root> --current | <candidate-id> [assessment-file | --r0 [assessment-file] | --pilot assessment-file] (offline; reads evidence only)");
     return 2;
 }
 try
