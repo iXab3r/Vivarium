@@ -7,6 +7,8 @@ foreach ($name in @('DOTNET_ROOT','PATH','DOTNET_CLI_HOME','VIVARIUM_LOCAL_DEV_R
 }
 try {
 $ErrorActionPreference = 'Stop'
+# Caller credentials must not enter Host/Vite/Agent or native workload environments.
+Remove-Item Env:POSTGRES_PASSWORD -ErrorAction SilentlyContinue
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $lab = Join-Path $repo 'artifacts/local-dev/lab'
 $ownerFile = Join-Path $lab 'owner.json'

@@ -24,6 +24,7 @@ From the repository root:
 ./tools/local-dev/verify-scenarios.ps1
 ./tools/local-dev/verify-environment.ps1
 ./tools/local-dev/verify-bootstrap-recovery.ps1
+./tools/local-dev/verify-workload-environment.ps1
 ./tools/local-dev/local-dev.ps1 restart-host
 ./tools/local-dev/verify.ps1 -Retained
 ./tools/local-dev/local-dev.ps1 stop
@@ -62,6 +63,9 @@ and prevents that reinstall. Ordinary UI edits use HMR, and `restart-host` skips
 build. Keep root checkpoints separate from the warm development loop.
 Lifecycle commands restore the caller's SDK, logging and Development environment variables
 on both success and failure; child Host/Agent processes retain their own launch environment.
+An inherited `POSTGRES_PASSWORD` is removed before launching lab children and restored only
+to the caller. The workload-environment check uses a synthetic marker, restarts the lab and
+temporarily commits a guarded sample step, then restores its exact source and reconciles it.
 
 All endpoints bind `127.0.0.1`. PostgreSQL 17.10 uses the pinned digest and separately named, owner-labelled
 container/volume. Private Chiral settings, TLS/signing certificates, DP keys, Git, objects and Agent
