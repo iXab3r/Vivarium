@@ -175,6 +175,18 @@ object PublishDocker : BuildType({
             arguments = "run --rm %$DockerImageNameParameter%:%$DockerImageVersionParameter% --version"
         }
         exec {
+            name = "Smoke evaluator Docker client"
+            path = "docker"
+            arguments = "run --rm --entrypoint docker " +
+                "%$DockerImageNameParameter%:%$DockerImageVersionParameter% --version"
+        }
+        exec {
+            name = "Smoke Chiral Host command"
+            path = "docker"
+            arguments = "run --rm %$DockerImageNameParameter%:%$DockerImageVersionParameter% " +
+                "nodes --settings-directory /tmp/vivarium-smoke-settings"
+        }
+        exec {
             name = "Tag version"
             path = "docker"
             arguments = "tag %$DockerImageNameParameter%:%$DockerImageVersionParameter% " +

@@ -226,7 +226,10 @@ on every supported controller RID before an end-user release.
 
 `DockerImage` requires a local Docker engine and an existing `out/build/linux-x64/server` tree. It
 builds `viv-server:<version>` from those already-compiled bytes and runs the containerized server's
-`--version` probe; it never recompiles the product inside Docker.
+`--version`, Docker CLI and Chiral `nodes` probes; it never recompiles the product inside Docker.
+The image defaults to the PostgreSQL/Chiral Host with private settings under
+`/var/lib/vivarium/settings`. Follow [the private Host deployment recipe](../deploy/private-host.md)
+for explicit initialization/migration, Portainer deployment and private browser/Agent TLS layout.
 
 ## Test tiers (D20)
 

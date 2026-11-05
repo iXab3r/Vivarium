@@ -1,6 +1,8 @@
 services:
   viv-server:
     image: registry.eyeauras.net:5000/ixab3r/viv-server:latest
+    # Transitional SQLite controller; the image default is the PostgreSQL/Chiral Host.
+    command: ["--data", "/var/lib/vivarium"]
     restart: unless-stopped
     ports:
       - "8443:8443"

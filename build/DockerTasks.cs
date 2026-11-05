@@ -48,5 +48,11 @@ public sealed class DockerImageTask : AsyncFrostingTask<BuildContext>
             throw new InvalidDataException(
                 $"Docker server version mismatch: expected viv-server {version}, got {reported}.");
         }
+        Console.WriteLine(await BuildProcess.CaptureAsync("docker",
+            ["run", "--rm", "--entrypoint", "docker", image, "--version"], context.Root,
+            timeoutSeconds: 60));
+        Console.WriteLine(await BuildProcess.CaptureAsync("docker",
+            ["run", "--rm", image, "nodes", "--settings-directory", "/tmp/vivarium-smoke-settings"], context.Root,
+            timeoutSeconds: 60));
     }
 }

@@ -659,6 +659,15 @@ pulling and recreating the container; the image is replaceable and never owns in
 publication and deployment are separate operations — CI pushes the image but does not reach into a
 running user's controller.
 
+The image defaults to the PostgreSQL/Chiral Host (`run --settings-directory
+/var/lib/vivarium/settings`); legacy SQLite deployments select their command explicitly. The image
+contains Git and the Docker CLI for the trusted D43 coordinator. Private standalone deployment
+uses a dedicated VM Engine with no build Agents/workloads, persistent private Chiral settings and
+explicit PostgreSQL maintenance; see [the private Host recipe](../deploy/private-host.md).
+Browser ingress may use CA-valid TLS with verified HTTPS upstream while Agents keep a direct stable
+pinned Host endpoint for both AgentHub and relative blob transfers. This does not change D4 pinning
+or permit project code to access the Engine.
+
 The release runtime depends only on itself: every Server archive embeds both the unstamped public
 Agent template and a D30 child-only Agent package for every supported RID. The schema-v1
 `agent-packages/catalog.json` binds those immutable child packages to the exact Server version and is
