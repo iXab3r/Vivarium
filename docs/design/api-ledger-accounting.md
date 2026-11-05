@@ -48,10 +48,12 @@ These are different populations. Zero materialized historical cases does not mea
 native API. The selected Chiral/PG R0 delivery (28 obligations) and PILOT delivery (34 business/SDK
 rows) remain accepted at their recorded identities in the
 [final delivery record](../../.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md).
-They are not current full-wire GREEN. This increment deliberately grants no transfer: the current
-tree has additional producer inputs and no default `r0-api-evidence.json` or `pilot-api-evidence.json`.
-The existing `--r0`/`--pilot` readers remain the qualification entry points with explicit assessments;
-the parent must supply input-specific reviewed reuse or request the smallest affected renewal.
+They are not automatically current full-wire GREEN. Supply explicit assessments with
+`--current --r0 <assessment.json> --pilot <assessment.json>`; the existing selected readers
+validate current HEAD, source/producer hashes and exact raw bindings. Invalid supplied evidence
+exits 1. R0 optionally accepts a nonempty unique `selected_case_ids` subset: `contract_required`
+retains 28 and `required` counts only that subset. Defaults still require all 28.
+See [the bounded renewal](current-status172-qualification.md). Missing defaults are not proof absence.
 No blanket rerun is needed just to display status. Missing reference variants stay with the owning
 contract tasks; exact progress/cancel behavior stays #166. The private farm smoke cannot fill these
 wire gaps. No previously GREEN result is deleted or relabeled by this projection.

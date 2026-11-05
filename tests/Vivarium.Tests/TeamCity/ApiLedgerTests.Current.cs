@@ -27,6 +27,18 @@ public sealed class ApiLedgerCurrentTests
     private CurrentStatus Read() => Ledger.ReadCurrent(root, _ => new Identity("new-head", "tree", true));
 
     [Test]
+    public void Explicit_invalid_selected_assessment_fails_closed_without_historical_promotion()
+    {
+        File.WriteAllText(Path.Combine(root, "selected.json"), "{\"candidate_id\":\"other-head\",\"expected_head\":\"other-head\"}");
+        var report = Ledger.ReadCurrent(root, _ => new Identity("new-head", "tree", true), r0Assessment: "selected.json");
+        Assert.That(report.Errors, Is.Not.Empty);
+        Assert.That(report.EvidenceState, Is.EqualTo("UNQUALIFIED_CURRENT_HEAD"));
+        Assert.That(report.SelectedR0!.Green, Is.Zero);
+        Assert.That(report.GlobalVariantDenominator, Is.Null);
+        Assert.That(report.SelectedAssessments.Single().Path, Is.EqualTo("selected.json"));
+    }
+
+    [Test]
     public void Current_head_is_observed_without_relabeling_historical_results_or_inflating_green()
     {
         var report = Read();

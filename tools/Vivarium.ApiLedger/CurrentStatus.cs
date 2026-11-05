@@ -6,7 +6,11 @@ namespace Vivarium.ApiLedger;
 public sealed class CurrentStatus
 {
     public string AccountingState { get; set; } = "VALID";
-    public string EvidenceState => "UNQUALIFIED_CURRENT_HEAD";
+    public string EvidenceState => SelectedR0?.AllSelectedCasesGreen == true || SelectedPilot?.CurrentGreen > 0
+        ? "QUALIFIED_SELECTED_EVIDENCE" : "UNQUALIFIED_CURRENT_HEAD";
+    public R0Report? SelectedR0 { get; set; }
+    public PilotReport? SelectedPilot { get; set; }
+    public List<StatusInput> SelectedAssessments { get; } = [];
     public required string Head { get; init; }
     public bool ProductionDirty { get; init; }
     public bool GlobalApiComplete => false;
@@ -23,7 +27,7 @@ public sealed class CurrentStatus
         ["SS-IAM / US-013"] = "AccessEndpoints and token endpoints: native user/role/grant/current-access operations. Complete compatible identity family remains unknown under #119/#120/#121.",
         ["OTHER"] = "All remaining owners retain canonical scope and tasks below; implementation/variant completeness unknown. These observations require the named source files; they confer no GREEN."
     };
-    public string SourceObservationQualification => "Source bytes only, implementation and route ownership require review; historical native registry is not a current Host route census. US-013 selected delivery is retained in the hashed delivery record; current binding currency is unqualified.";
+    public string SourceObservationQualification => "Source bytes only, implementation and route ownership require review; historical native registry is not a current Host route census. US-013 selected delivery is retained in the hashed delivery record; current binding currency is reported separately in selected assessments.";
     public List<string> Errors { get; } = [];
     public required JsonNode HistoricalSnapshot { get; init; }
     public required JsonNode LegacyAssessment { get; init; }
@@ -46,7 +50,8 @@ public sealed record CurrentSubsystem(string Id, string Name, string Owner, stri
 public static partial class Ledger
 {
     // Projection of existing registers, never an alternative compatibility ledger.
-    public static CurrentStatus ReadCurrent(string root, Func<string, Identity>? inspect = null)
+    public static CurrentStatus ReadCurrent(string root, Func<string, Identity>? inspect = null,
+        string? r0Assessment = null, string? pilotAssessment = null)
     {
         root = Path.GetFullPath(root);
         var identity = (inspect ?? InspectGit)(root);
@@ -128,6 +133,21 @@ public static partial class Ledger
             Workstream + "pilot-final-delivery-20261105.md", Workstream + "r0-contract-scope.json", Workstream + "pilot-contract-scope.json" }).Order())
             report.Inputs.Add(new(path, Hash(root, path)));
         Require(report.Inputs.All(i => i.Sha256 != null), "Missing current status input.");
+        if (r0Assessment is not null)
+        {
+            var selected = Json(root, r0Assessment);
+            report.SelectedAssessments.Add(new(r0Assessment, Hash(root, r0Assessment)));
+            report.SelectedR0 = ReadR0(root, S(selected, "candidate_id"), _ => identity, r0Assessment);
+            report.Errors.AddRange(report.SelectedR0.Errors);
+        }
+        if (pilotAssessment is not null)
+        {
+            report.SelectedAssessments.Add(new(pilotAssessment, Hash(root, pilotAssessment)));
+            report.SelectedPilot = ReadPilot(root, identity.Head, pilotAssessment, _ => identity);
+            report.Errors.AddRange(report.SelectedPilot.Gaps);
+        }
+        if (report.SelectedAssessments.Count > 0)
+            report.Gaps.RemoveAll(g => g.StartsWith("No current-head input-specific"));
         return report;
     }
 
@@ -144,6 +164,13 @@ public static partial class Ledger
             if (s.HistoricalOutcomes.Length > 0) text.AppendLine("  Historical: " + string.Join(", ", s.HistoricalOutcomes));
             text.AppendLine("  Work: " + string.Join(", ", s.Tasks));
         }
+        if (report.SelectedR0 is { } r0)
+        {
+            text.AppendLine($"Selected R0: {r0.Green}/{r0.Required} current GREEN; {r0.FullReferenceCases} full wire, {r0.BehavioralAndNativeObligations} behavioral/native; full contract {r0.ContractRequired}; remaining obligations are not renewed.");
+            foreach (var c in r0.Cases) text.AppendLine($"  {c.CaseId} {c.PrimaryOwner} {c.State} {r0.CaseKinds.GetValueOrDefault(c.CaseId, "unbound")} R0 canonical binding");
+        }
+        if (report.SelectedPilot is { } pilot) text.AppendLine($"Selected PILOT business/SDK: {pilot.CurrentGreen} current GREEN, {pilot.RawPassed} raw Passed; not literal wire conformance; heavy currency separate: {pilot.HeavyComposition}");
+        foreach (var error in report.Errors) text.AppendLine("UNQUALIFIED: " + error);
         foreach (var gap in report.Gaps) text.AppendLine("UNKNOWN/UNQUALIFIED: " + gap);
         return text.ToString();
     }

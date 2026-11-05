@@ -1,14 +1,18 @@
 using System.Text.Json;
 using Vivarium.ApiLedger;
 
-if (args.Length == 2 && args[1] == "--current")
+if (args.Length >= 2 && args[1] == "--current")
 {
     try
     {
-        var current = Ledger.ReadCurrent(args[0]);
+        if (args.Length % 2 != 0 || args.Skip(2).Where((_, i) => i % 2 == 0).Any(a => a is not ("--r0" or "--pilot"))
+            || args.Skip(2).Where((_, i) => i % 2 == 0).Distinct().Count() != (args.Length - 2) / 2)
+            throw new InvalidDataException("Usage: <root> --current [--r0 assessment] [--pilot assessment]");
+        string? Assessment(string flag) => Array.IndexOf(args, flag) is var i && i >= 2 ? args[i + 1] : null;
+        var current = Ledger.ReadCurrent(args[0], r0Assessment: Assessment("--r0"), pilotAssessment: Assessment("--pilot"));
         Console.WriteLine(JsonSerializer.Serialize(current, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower }));
         Console.Error.WriteLine(Ledger.RenderCurrent(current));
-        return 0;
+        return current.Errors.Count == 0 ? 0 : 1;
     }
     catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or KeyNotFoundException or InvalidOperationException)
     {

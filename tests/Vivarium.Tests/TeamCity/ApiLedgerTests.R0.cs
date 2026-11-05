@@ -93,6 +93,62 @@ public sealed partial class ApiLedgerTests
     }
 
     [Test]
+    public void Bounded_R0_renewal_preserves_full_contract_without_inflating_selected_cases()
+    {
+        PrepareSyntheticR0Accounting();
+        evidence["selected_case_ids"] = new JsonArray("CASE-1");
+        var report = ReadR0Control();
+        Assert.That(report.Errors, Is.Empty);
+        Assert.That(report.ContractRequired, Is.EqualTo(2));
+        Assert.That(report.Required, Is.EqualTo(1));
+        Assert.That(report.FullReferenceCases, Is.EqualTo(1));
+        Assert.That(report.BehavioralAndNativeObligations, Is.Zero);
+        Assert.That(report.Cases.Single().CaseId, Is.EqualTo("CASE-1"));
+        Assert.That(report.GlobalApiComplete, Is.False);
+    }
+
+    [TestCase("unknown")]
+    [TestCase("duplicate")]
+    [TestCase("empty")]
+    public void Bounded_R0_rejects_invalid_selection(string corruption)
+    {
+        PrepareSyntheticR0Accounting();
+        evidence["selected_case_ids"] = corruption switch {
+            "unknown" => new JsonArray("UNKNOWN"),
+            "duplicate" => new JsonArray("CASE-1", "CASE-1"),
+            _ => new JsonArray()
+        };
+        var report = ReadR0Control();
+        Assert.That(report.Errors, Is.Not.Empty);
+        Assert.That(report.Green, Is.Zero);
+    }
+
+    [TestCase("valid")]
+    [TestCase("wrong-original")]
+    [TestCase("changed-archive")]
+    [TestCase("duplicate")]
+    public void Selected_R0_retained_binary_mapping_preserves_execution_bytes(string variant)
+    {
+        PrepareSyntheticR0Accounting();
+        const string original = "retained/Vivarium.Agent.dll";
+        const string archive = "archive/Vivarium.Agent.dll";
+        Write(archive, File.ReadAllText(Path.Combine(root, original)));
+        var mapping = new JsonObject { ["recorded_path"] = original, ["artifact"] = archive, ["sha256"] = Hash(original) };
+        evidence["retained_assemblies"] = new JsonArray(mapping);
+        Write(original, "later build output");
+        if (variant == "wrong-original") mapping["recorded_path"] = "other.dll";
+        if (variant == "changed-archive") Write(archive, "corrupted archive");
+        if (variant == "duplicate") evidence["retained_assemblies"]!.AsArray().Add(mapping.DeepClone());
+        var report = ReadR0Control();
+        if (variant == "valid")
+        {
+            Assert.That(report.Errors, Is.Empty);
+            Assert.That(report.ExecutionProducers.Any(p => p.Path == archive), Is.True);
+        }
+        else Assert.That(report.Errors, Is.Not.Empty);
+    }
+
+    [Test]
     public void Selected_R0_accounting_keeps_native_full_wire_and_milestone_claims_separate()
     {
         PrepareSyntheticR0Accounting(); var report = ReadR0Control();
