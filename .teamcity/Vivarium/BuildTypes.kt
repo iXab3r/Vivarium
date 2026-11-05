@@ -36,6 +36,9 @@ private fun cakeArguments(target: String, versionArguments: String) =
 object Compile : BuildType({
     // Keep the stable ID so the existing history and counter remain attached to Compile.
     id("Vivarium_CompileWindowsX64")
+    params {
+        password("env.GITHUB_TOKEN", "credentialsJSON:3037329c-567e-43e4-a236-0d2052a38d00")
+    }
     name = "Compile"
     buildNumberPattern = "%build.counter%"
     artifactRules = """
