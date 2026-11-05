@@ -6,6 +6,13 @@ legacy SQLite controller. TeamCity's Compile → Release → GitHub/Docker publi
 release. Select the same verified version/source SHA from both publishers; deploy the immutable
 Docker tag or digest through Portainer. Neither publication nor this template performs deployment.
 
+Owner-approved first-launch scope (2026-11-05): use only the installation superuser.
+Keep `SuperuserEnabled=true` and `Providers=[]` in the private initialization input.
+External OIDC and ordinary-user login are separate follow-up work, not this deployment's
+acceptance prerequisite. Protect the generated startup password in private operator logs;
+do not publish it in Git, build output or fleet logs. This scope does not permit superuser
+bearer/API-key authentication or change the existing cookie and authorization contracts.
+
 ## Prepare the instance
 
 The native VM configuration owns PostgreSQL, firewall, DNS, reverse proxy and Docker prerequisites.
