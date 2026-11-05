@@ -38,14 +38,16 @@ function Port {
     $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $listener.Start(); $portNumber = $listener.LocalEndpoint.Port; $listener.Stop(); return $portNumber
 }
+function VerifyVolume {
+    if (!$state.volume) { throw 'Owned labelled volume receipt is required.' }
+    $labels = Native docker @('volume','inspect','--format','{{json .Labels}}',$state.volume) | ConvertFrom-Json
+    if ($labels.'vivarium.owner' -ne $state.id) { throw 'Database volume ownership differs.' }
+}
 function VerifyContainer {
     $data = (Native docker @('inspect', $state.container) | ConvertFrom-Json)[0]
     if ($data.Config.Labels.'vivarium.owner' -ne $state.id) { throw 'Container ownership differs.' }
-    if ($state.volume) {
-        $volume = Native docker @('volume','inspect','--format','{{json .Labels}}',$state.volume) | ConvertFrom-Json
-        if ($volume.'vivarium.owner' -ne $state.id -or $data.Mounts[0].Name -ne $state.volume) { throw 'Database volume ownership differs.' }
-    }
-    if (!$state.volume) { throw 'Owned labelled volume receipt is required.' }
+    VerifyVolume
+    if ($data.Mounts[0].Name -ne $state.volume) { throw 'Database volume ownership differs.' }
     if ($data.HostConfig.PortBindings.'5432/tcp'[0].HostIp -ne '127.0.0.1') { throw 'Database is not loopback bound.' }
 }
 function Alive($record) {
@@ -133,6 +135,7 @@ try {
 if (Test-Path -LiteralPath $ownerFile) {
     $state = Get-Content -Raw -LiteralPath $ownerFile | ConvertFrom-Json -AsHashtable -DateKind String
     if ($state.root -ne $lab -or $state.repo -ne $repo -or $state.id -notmatch '^vivarium-local-dev-[a-f0-9]{12}$') { throw 'Lab ownership differs.' }
+    if ($state.container -ne ($state.id + '-pg') -or $state.volume -ne ($state.id + '-data')) { throw 'Resource names differ from the owned lab.' }
 } elseif ($Action -ne 'start') { throw 'No owned lab exists. Run start.' }
 if ($Action -eq 'status') {
     foreach ($name in @('host','agent','vite')) { "$name running: $(Alive $state.processes.$name)" }
@@ -151,17 +154,27 @@ if ($Action -eq 'status') {
     }
     return
 }
-if ($Action -in @('stop','reset')) {
+if ($Action -eq 'reset') {
+    if (!$ConfirmReset) { throw 'Reset requires -ConfirmReset. No resources were changed.' }
+    Native docker @('version','--format','{{.Server.Version}}') | Out-Null
+    $containerExists = (Native docker @('container','ls','-a','-q','--filter',"name=^/$($state.container)$")).Length -gt 0
+    $volumeExists = (Native docker @('volume','ls','-q','--filter',"name=$($state.volume)") -split '\r?\n') -contains $state.volume
+    if ($containerExists) { VerifyContainer }
+    if ($volumeExists) { VerifyVolume }
     foreach ($name in @('agent','host','vite')) { StopProcess $name }
-    VerifyContainer
-    Native docker @('stop', $state.container) | Out-Null
-    if ($Action -eq 'reset') {
-        if (!$ConfirmReset) { throw 'Stopped with data retained. Reset additionally requires -ConfirmReset.' }
+    if ($containerExists) {
+        Native docker @('stop', $state.container) | Out-Null
         Native docker @('rm', $state.container) | Out-Null
-        if ($state.volume) { Native docker @('volume','rm',$state.volume) | Out-Null }
-        # Rename the exact owned root instead of recursively deleting any data.
-        Move-Item -LiteralPath $lab -Destination ($lab + '-reset-' + [DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))
     }
+    if ($volumeExists) { Native docker @('volume','rm',$state.volume) | Out-Null }
+    # Archive only the exact owned root, including incomplete initialization without a container.
+    Move-Item -LiteralPath $lab -Destination ($lab + '-reset-' + [DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))
+    return
+}
+if ($Action -eq 'stop') {
+    VerifyContainer
+    foreach ($name in @('agent','host','vite')) { StopProcess $name }
+    Native docker @('stop', $state.container) | Out-Null
     return
 }
 Native docker @('version','--format','{{.Server.Version}}') | Out-Null
@@ -175,10 +188,10 @@ if (!(Test-Path -LiteralPath $ownerFile)) {
         origin="https://127.0.0.1:$(Port)"; backend="https://127.0.0.1:$(Port)"; storage="http://127.0.0.1:$(Port)"; processes=@{} }
     $state.container = $state.id + '-pg'
     $state.volume = $state.id + '-data'
-    Native docker @('volume','create','--label',"vivarium.owner=$($state.id)",$state.volume) | Out-Null
     $state.pgPort = Port
     $state.pgPassword = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
     Save
+    Native docker @('volume','create','--label',"vivarium.owner=$($state.id)",$state.volume) | Out-Null
     foreach ($name in @('https','ServerSigningCertificate','ServerEncryptionCertificate','ClientSigningCertificate','ClientEncryptionCertificate')) {
         $key = [Security.Cryptography.RSA]::Create(2048)
         $request = [Security.Cryptography.X509Certificates.CertificateRequest]::new("CN=$name",$key,[Security.Cryptography.HashAlgorithmName]::SHA256,[Security.Cryptography.RSASignaturePadding]::Pkcs1)

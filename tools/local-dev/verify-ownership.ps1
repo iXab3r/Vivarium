@@ -14,5 +14,8 @@ try {
     $refused = $false
     try { VerifyContainer } catch { $refused = $_.Exception.Message.Contains('ownership differs') }
     if (!$refused) { throw 'Foreign container label was accepted.' }
+    $refused = $false
+    try { VerifyVolume } catch { $refused = $_.Exception.Message.Contains('ownership differs') }
+    if (!$refused) { throw 'Foreign volume label was accepted.' }
 } finally { $state.id = $original }
-'Verified live process fence, reused PID refusal, and foreign Docker ownership refusal without signalling resources.'
+'Verified live process fence, reused PID refusal, and foreign container/volume refusal without signalling resources.'

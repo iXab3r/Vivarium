@@ -23,6 +23,7 @@ From the repository root:
 ./tools/local-dev/verify-hmr.ps1
 ./tools/local-dev/verify-scenarios.ps1
 ./tools/local-dev/verify-environment.ps1
+./tools/local-dev/verify-bootstrap-recovery.ps1
 ./tools/local-dev/local-dev.ps1 restart-host
 ./tools/local-dev/verify.ps1 -Retained
 ./tools/local-dev/local-dev.ps1 stop
@@ -75,6 +76,9 @@ and the verified owned container, retaining data. Deliberate reset is separate:
 Reset removes the verified container/labelled database volume and renames the exact owned directory
 to a timestamped archive. No recursive filesystem deletion or global Docker operation occurs. Archived
 private files remain sensitive. Next start creates a new installation.
+If initial setup fails before a container exists, confirmed reset independently checks any
+existing labelled volume/container and archives the owned root. Missing resources are allowed;
+foreign resources still refuse cleanup. Reset without `-ConfirmReset` changes no resources.
 
 Docker preflight failure leaves existing infrastructure untouched. Resolve Docker availability through
 the normal operator workflow and retry. Readiness failures retain owned state and protected lab logs for
