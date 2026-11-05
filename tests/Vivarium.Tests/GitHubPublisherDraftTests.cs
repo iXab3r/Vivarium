@@ -13,9 +13,21 @@ public sealed class GitHubPublisherDraftTests
     [TestCase("resume")]
     [TestCase("published")]
     [TestCase("older")]
+    [TestCase("missing-fresh")]
+    [TestCase("missing-resume")]
+    [TestCase("missing-race")]
     public async Task Publication_preserves_exact_bytes_and_resumes_without_duplicate_creation(string mode)
     {
         await Run(mode, 200);
+    }
+
+    [TestCase("missing-conflict")]
+    [TestCase("missing-denied")]
+    [TestCase("missing-error")]
+    public void Missing_tag_creation_never_bypasses_source_or_authority(string mode)
+    {
+        var failure = Assert.ThrowsAsync<InvalidOperationException>(() => Run(mode, 200));
+        Assert.That(failure!.Message, Does.Contain(mode == "missing-conflict" ? "resolves to" : "Could not create tag"));
     }
 
     [TestCase(403)]
@@ -43,10 +55,11 @@ public sealed class GitHubPublisherDraftTests
             var publisher = Activator.CreateInstance(assembly.GetType("GitHubReleasePublisher")!, context, http, "owner/repo", "0.1.30", new string('a', 40));
             await (Task)publisher!.GetType().GetMethod("PublishAsync")!.Invoke(publisher, null)!;
             Assert.Multiple(() => {
-                Assert.That(source.Created, Is.EqualTo(mode == "fresh" ? 1 : 0));
-                Assert.That(source.Uploads, Is.EqualTo(mode == "published" ? 0 : names.Length - (mode == "fresh" ? 0 : 1)));
+                Assert.That(source.Created, Is.EqualTo(mode is "fresh" or "missing-fresh" ? 1 : 0));
+                Assert.That(source.Uploads, Is.EqualTo(mode == "published" ? 0 : names.Length - (mode is "fresh" or "missing-fresh" ? 0 : 1)));
                 Assert.That(source.Patches, Is.EqualTo(mode == "published" ? 0 : 1));
                 Assert.That(source.Refreshes, Is.EqualTo(mode == "published" ? 0 : 1));
+                Assert.That(source.TagPosts, Is.EqualTo(mode.StartsWith("missing-", StringComparison.Ordinal) ? 1 : 0));
             });
         }
         finally { Directory.Delete(root, true); }
@@ -54,24 +67,34 @@ public sealed class GitHubPublisherDraftTests
 
     private sealed class Source(string mode, int listStatus, string[] names, byte[] bytes) : HttpMessageHandler
     {
-        public int Created, Uploads, Patches, Refreshes;
+        public int Created, Uploads, Patches, Refreshes, TagPosts;
+        private bool tagExists = !mode.StartsWith("missing-", StringComparison.Ordinal);
         private bool published = mode == "published";
-        private readonly HashSet<string> uploaded = mode == "fresh" ? [] : mode == "published" ? [..names] : [names[0]];
+        private readonly HashSet<string> uploaded = mode is "fresh" or "missing-fresh" ? [] : mode == "published" ? [..names] : [names[0]];
         private object Release() => new { id = 42, tag_name = "v0.1.30", draft = !published, assets = uploaded.Select(n => new { name = n, size = bytes.Length, digest = "sha256:" + Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() }) };
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage r, CancellationToken token)
         {
             var path = r.RequestUri!.AbsolutePath;
             object body = new { };
             int status = 200;
-            if (path.EndsWith("/git/ref/tags/v0.1.30")) { }
-            else if (path.EndsWith("/commits/v0.1.30")) body = new { sha = new string('a', 40) };
+            if (path.EndsWith("/git/ref/tags/v0.1.30")) { status = tagExists ? 200 : 404; }
+            else if (path.EndsWith("/git/refs") && r.Method == HttpMethod.Post)
+            {
+                using var input = JsonDocument.Parse(await r.Content!.ReadAsStringAsync(token));
+                Assert.That(input.RootElement.GetProperty("ref").GetString(), Is.EqualTo("refs/tags/v0.1.30"));
+                Assert.That(input.RootElement.GetProperty("sha").GetString(), Is.EqualTo(new string('a', 40)));
+                TagPosts++;
+                status = mode == "missing-denied" ? 403 : mode == "missing-error" ? 500 : mode is "missing-race" or "missing-conflict" ? 422 : 201;
+                tagExists = status is 201 or 422;
+            }
+            else if (path.EndsWith("/commits/v0.1.30")) body = new { sha = new string(mode == "missing-conflict" ? 'b' : 'a', 40) };
             else if (path.EndsWith("/releases/tags/v0.1.30")) { if (published) body = Release(); else status = 404; }
             else if (path.EndsWith("/releases") && r.Method == HttpMethod.Get)
             {
                 status = listStatus;
                 body = mode == "older" && !r.RequestUri.Query.Contains("page=2")
                     ? Enumerable.Range(0,100).Select(i => new { id = 100+i, tag_name = "other"+i, draft = true, assets = Array.Empty<object>() }).ToArray()
-                    : mode == "fresh" ? Array.Empty<object>() : new[] { Release() };
+                    : mode is "fresh" or "missing-fresh" ? Array.Empty<object>() : new[] { Release() };
             }
             else if (path.EndsWith("/releases") && r.Method == HttpMethod.Post) { Created++; body = Release(); }
             else if (path.EndsWith("/assets") && r.Method == HttpMethod.Post)

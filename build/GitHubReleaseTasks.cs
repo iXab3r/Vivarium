@@ -79,14 +79,22 @@ internal sealed class GitHubReleasePublisher
         var tagExists = await VerifyTagIfPresentAsync();
         var expected = ExpectedAssets();
         var release = await GetReleaseAsync();
+        if (!tagExists)
+        {
+            if (release is { Draft: false })
+                throw new InvalidOperationException($"GitHub release {tag} exists, but its tag does not.");
+            // Saving a draft does not create its tag. Materialize the exact producer ref first.
+            using var content = JsonContent.Create(new { @ref = "refs/tags/" + tag, sha = sourceSha });
+            using var created = await http.PostAsync($"repos/{repository}/git/refs", content);
+            if (created.StatusCode is not (HttpStatusCode.Created or HttpStatusCode.UnprocessableEntity))
+                await EnsureSuccessAsync(created, $"Could not create tag {tag}");
+            // A concurrent creator may return 422: accept only the same independently resolved SHA.
+            await VerifyTagIfPresentAsync(requireTag: true);
+        }
         if (release is null)
         {
             release = await CreateDraftAsync();
             await VerifyTagIfPresentAsync(requireTag: true);
-        }
-        else if (!tagExists)
-        {
-            throw new InvalidOperationException($"GitHub release {tag} exists, but its tag does not.");
         }
 
         if (!release.Draft)
