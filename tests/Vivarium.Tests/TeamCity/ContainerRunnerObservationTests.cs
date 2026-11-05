@@ -17,8 +17,8 @@ public sealed class ContainerRunnerObservationTests
             Assert.That(root.GetProperty(property).GetBoolean(), Is.True, property);
         var repository = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "Vivarium.slnx"))) repository = repository.Parent;
-        Assert.That(Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(Path.Combine(repository!.FullName,
-            "tools/teamcity-reference/docker-runner-capture.mjs")))), Is.EqualTo(root.GetProperty("sourceSha256").GetString()));
+        Assert.That(CapturedSourceBinding.OriginalCrlfSha256(File.ReadAllBytes(Path.Combine(repository!.FullName,
+            "tools/teamcity-reference/docker-runner-capture.mjs"))), Is.EqualTo(root.GetProperty("sourceSha256").GetString()));
         var cases = root.GetProperty("cases").EnumerateArray().ToDictionary(c => c.GetProperty("id").GetString()!);
         Assert.That(cases.Count, Is.EqualTo(4));
         foreach (var (id, value) in cases)

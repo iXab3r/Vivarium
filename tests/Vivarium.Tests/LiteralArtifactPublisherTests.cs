@@ -3,6 +3,7 @@ using Vivarium.Agent;
 using Vivarium.Contracts;
 using System.Text.Json;
 using System.Security.Cryptography;
+using Vivarium.Tests.TeamCity;
 
 namespace Vivarium.Tests;
 
@@ -18,8 +19,8 @@ public sealed class LiteralArtifactPublisherTests
             Assert.That(reference.GetProperty(key).GetBoolean(), Is.True);
         var repository = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "Vivarium.slnx"))) repository = repository.Parent;
-        Assert.That(Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(Path.Combine(repository!.FullName,
-            "tools/teamcity-reference/artifact-rules-capture.mjs")))), Is.EqualTo(reference.GetProperty("sourceSha256").GetString()));
+        Assert.That(CapturedSourceBinding.OriginalCrlfSha256(File.ReadAllBytes(Path.Combine(repository!.FullName,
+            "tools/teamcity-reference/artifact-rules-capture.mjs"))), Is.EqualTo(reference.GetProperty("sourceSha256").GetString()));
         var scenario = reference.GetProperty("cases")[0];
         var expected = scenario.GetProperty("artifacts").EnumerateObject().Single(p => p.Name.EndsWith("_Prepare", StringComparison.Ordinal)).Value;
         var sources = new Dictionary<string, string> { ["prepare/a.tar.gz"] = "ci-out/a.tar.gz",
