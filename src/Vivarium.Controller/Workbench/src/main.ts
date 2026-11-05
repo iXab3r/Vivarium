@@ -7,6 +7,12 @@ import { renderBuilds } from "./builds";
 
 const app = document.querySelector<HTMLElement>("#app")!;
 app.innerHTML = '<header class="app-header"><a class="brand" href="/">Vivarium</a><div class="account"></div></header><div id="workspace"></div>';
+if (session.localDevelopment) {
+    const guide = document.createElement("aside");
+    guide.className = "notice";
+    guide.innerHTML = '<strong>Local development examples</strong> · <a href="/projects/Local">Open the sample project</a>. Run Success for a real log and proof.txt artifact, Failure for exit 7, or Cancel me to practice stopping a Build. Inspect build history in each configuration; step declarations are in the local Git source. Edit sources under artifacts/local-dev/lab/definitions and commit, then reconcile. Host restart rotates the password in operator.private.json.';
+    app.querySelector("header")!.after(guide);
+}
 const account = app.querySelector<HTMLElement>(".account")!;
 if (session.user) {
     const name = document.createElement("span");
@@ -31,7 +37,7 @@ const workbench = createWorkbench(app.querySelector<HTMLElement>("#workspace")!,
 });
 workbench.registerPage({ id: "access", title: "Access", render: renderAccess });
 workbench.registerPage({ id: "builds", title: "Builds", render: renderBuilds });
-const isBuilds = () => /^\/(builds|projects|build-configurations)(\/|$)/.test(location.pathname);
+const isBuilds = () => (session.localDevelopment && location.pathname === "/") || /^\/(builds|projects|build-configurations)(\/|$)/.test(location.pathname);
 workbench.registerToggle({ id: "builds", title: "Builds", icon: "tools", rail: "sidebar", isActive: isBuilds,
     run() { location.assign("/builds"); } });
 workbench.registerToggle({ id: "access", title: "Access", icon: "shield", rail: "sidebar", isActive: () => !isBuilds(),

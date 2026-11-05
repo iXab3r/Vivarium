@@ -60,8 +60,17 @@ internal static class VivariumIdentityStartup
         await transaction.CommitAsync(cancellationToken);
         // D34's explicit private startup disclosure, after the framework hash is durably committed.
         if (password is not null)
+        {
+            if (LocalDevelopment.Root(configuration) is { } root)
+            {
+                await File.WriteAllTextAsync(Path.Combine(root, "operator.private.json"),
+                    System.Text.Json.JsonSerializer.Serialize(new { login = "superuser", password,
+                        changedAt = DateTimeOffset.UtcNow, note = "Changes on every Host restart. Use cookie login." }), cancellationToken);
+                return;
+            }
             services.GetRequiredService<ILoggerFactory>().CreateLogger("Vivarium.PrivateStartup")
                 .LogWarning("Installation superuser login: superuser; password: {SuperuserPassword}", password);
+        }
     }
 
     private static void Require(IdentityResult result)
