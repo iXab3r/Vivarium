@@ -128,6 +128,7 @@ object PublishGitHub : BuildType({
             arguments = cakeArguments(
                 "Publish",
                 "--build-version %$BuildVersionParameter% --github-repository iXab3r/Vivarium")
+                .replace("%build.vcs.number%", "%dep.Vivarium_Vivarium_Release.build.vcs.number%")
         }
     }
     requireDotNet()
