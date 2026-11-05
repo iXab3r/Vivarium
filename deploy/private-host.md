@@ -13,6 +13,21 @@ acceptance prerequisite. Protect the generated startup password in private opera
 do not publish it in Git, build output or fleet logs. This scope does not permit superuser
 bearer/API-key authentication or change the existing cookie and authorization contracts.
 
+First private instance checkpoint (2026-11-05): `https://viv.eyeauras.net` is reachable
+inside Tailscale. Portainer endpoint3/Host stack48 runs version0.1.30 from source
+`f56b0e640ab5ccd0a237aead79df05beda4b449e`, pinned image
+`registry.eyeauras.net:5000/ixab3r/viv-server-private-host@sha256:3faa2bc0f689928ef44c078a383bfc0f37d49767061c0e68dfb9ad66b0457874`.
+Separate PostgreSQL stack46, superuser cookie login, one independent Windows Agent,
+two successful C#/Git builds, exact log/artifact bytes and restart passed. The selected
+disconnected application restore and original Agent renewal passed; catalogue source
+identity has a separate clean-tree qualification. Infrastructure is delivered through
+[cluster-infra PR3](https://github.com/iXab3r/cluster-infra/pull/3), with independent
+aggregate and Security reviews. Product publisher confirmation and final product reviews
+remain tracked by [issue169](https://github.com/iXab3r/Vivarium/issues/169) and
+[PR170](https://github.com/iXab3r/Vivarium/pull/170). This is not general backup support,
+off-host DR, HA or full TeamCity API conformance. Permanent fleet/checker promotion and
+Tailscale node-expiry policy remain under cluster-infra issue2; external OIDC is separate.
+
 ## Prepare the instance
 
 The native VM configuration owns PostgreSQL, firewall, DNS, reverse proxy and Docker prerequisites.
@@ -116,13 +131,14 @@ Budget remaining RAM for PostgreSQL, Docker, ingress and the OS; these are initi
 budgets, not measured capacity claims. Host networking and bind mounts make this a standalone
 Linux Compose template, not a Swarm service definition.
 
-Before accepting the instance, verify trusted browser TLS and login at PublicOrigin, token creation
-and redemption through its real callback, `/health/live` and `/health/ready`, masked node state,
+Before accepting the superuser-only instance, verify trusted browser TLS and cookie login at PublicOrigin,
+`/health/live` and `/health/ready`, masked node state,
 catalogue reconciliation through the actual evaluator, and an independently enrolled Agent's
 run/output/artifact bytes over the stable endpoint. Verify unauthenticated requests remain denied,
 loopback Storage/PostgreSQL remain unreachable remotely, and VM restart retains identity/settings/
 catalogue/bytes. The image packaging probes only check executable version, Docker CLI and Chiral
-command availability; they do not prove this operational acceptance.
+command availability; they do not prove this operational acceptance. Ordinary-user token creation
+and callback redemption belong to the later OIDC/account slice; superuser API-key access remains denied.
 
 To upgrade, stop the stack, back up the complete persistence boundary, apply explicit migrations
 from the new verified release, then recreate the stack with that release. A downgrade requires a
