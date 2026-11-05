@@ -1,6 +1,6 @@
 # Vivarium Project Notes
 
-Current delivery — 2026-11-05: selected PILOT gates are reviewed and ready for parent delivery. See the [canonical final delivery record](.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+Current delivery — 2026-11-05: selected PILOT is accepted and delivered on main by [PR #167](https://github.com/iXab3r/Vivarium/pull/167), merge `a2aa5b309963eec0d20cb7ca00d161b1753c38b0` (2026-11-04T23:57:04Z; November 5 in Europe/Berlin). See the [canonical final delivery record](.workspace/workstreams/coherent-refactor/pilot-final-delivery-20261105.md). Selected 34/34 uses four current targeted PASS results (three normative renewals plus explicit-selection evidence) and 31 qualified-reuse normative/SDK rows. Root checks retained: 728 passed/11 skipped, build zero warnings/errors. One unchanged CLI0.5.6 heavy chain completed Prepare1/Windows2/Release3, version1297/release434492192; observer raw FAIL and read-only continuation PASS remain separate. No full API denominator or parity claim; seven wire declarations remain unmaterialized and legacy five stale/twenty blocked remain separate. Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against prior main base `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt. After verified main delivery, #117/#116/#79/#80/#81/#118/#78 were closed; milestone 9 is CLOSED with zero open and nine closed issues (#82/#83 remain unchanged legacy closures). Global API-complete remains false; SS-RUN R2 #134/#135/#136 and D46/#166 remain unaccepted. The merged tree equals delivery candidate `452f0770c0feed663c7f0fd1a0c43f47db7acc6a`; reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
 
 
 Vivarium is an OSS TeamCity-style CI build server and test farm plus AgentExplorer fleet manager. One cross-platform agent runs
@@ -24,24 +24,24 @@ file is the shared contract for all of them; keep it harness-agnostic. Subdirect
 
 ## Project status
 
-D52 checkpoint (2026-11-04): one fresh unchanged CLI 0.5.6 chain completed Prepare 1,
+Historical D52 checkpoint (2026-11-04; pending gates below superseded by the current delivery record): one fresh unchanged CLI 0.5.6 chain completed Prepare 1,
 Windows 2 and Release root 3 and published test release434492192, version1297. A post-success
 EF observer failure remains raw FAIL; corrected read-only continuation passed exact GitHub bytes
 and ordinary REST/Workbench readbacks without further execution/publication. Prior retained
 root8/version918 remains separate provenance. See the
-[current PILOT checkpoint and remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
+[historical PILOT checkpoint and then-remaining gates](.workspace/workstreams/coherent-refactor/t3personal-pilot.md#current-checkpoint--2026-11-04-not-milestone-closure).
 Portable publisher34 controls, four offline transport controls and tiny worker lifecycle pass;
 root700/11skip and prior cumulative34/34 have explicit reuse qualifications. Independent aggregate
 and Security/Adversarial review at the parent's new commit, model unknowns, zero-debt and main
 delivery remain open; no full API percentage is known.
 
 
-The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); the full
-Prepare → Windows → Release integration remains in progress under #116–#118.
-The active PILOT branch has selected real source-free Linux → Windows → Linux chain evidence through
+The selected fresh D34/D35 Host passed US-013/R0 and is delivered on main (PR #165); selected
+Prepare → Windows → Release integration is delivered by PR #167 under closed #116–#118.
+The delivered PILOT has selected real source-free Linux → Windows → Linux chain evidence through
 independent compatible REST, unchanged CLI 0.5.6 and Workbench entries, including exact selected
 artifact bytes, dependency failure/cancellation, native graph reads and same-cookie withdrawal.
-Explicit successful snapshot reuse and durable queued-request resolution also have selected evidence.
+The following implementation chronology retains its checkpoint-specific pending gates; the current delivery record above governs selected PILOT acceptance. Explicit successful snapshot reuse and durable queued-request resolution also have selected evidence.
 The branch now adds anonymous ON_AGENT Git checkout on Windows/Linux, separate immutable selected
 and consumed workload revisions, same-chain revision pinning, private generated script inputs and
 source-collection/missing-Git failure evidence. These are selected cohorts, not PILOT/main acceptance;

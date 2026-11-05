@@ -1,12 +1,12 @@
 # PILOT final delivery record — 2026-11-05
 
-Status: READY FOR PARENT DELIVERY, not main accepted. Story Delivery lead, Docs and Test Steward co-held. Documentation/accounting only; no runtime, build, publication, credentials or retained installation operations.
+Status: SELECTED PILOT ACCEPTED AND DELIVERED ON MAIN; milestone 9 CLOSED (zero open, nine closed issues). Story Delivery lead, Docs and Test Steward co-held. Documentation/accounting only; no runtime, build, publication, credentials or retained installation operations.
 
 ## Authority and review identity
 
-Reviewed candidate: `6b8cc40bc03645242776570b97967032ed69bd1e`; actual main base: `2f053e608637e04628334c797ad33609a9c29e61`. Parent owns push, PR167 update/readiness, exact-head merge, actual-main evidence transfer and issue closure. Existing remote draft head d9e8c3d is not this reviewed candidate.
+[PR #167](https://github.com/iXab3r/Vivarium/pull/167) merged at `2026-11-04T23:57:04Z` (November 5 in Europe/Berlin) as actual main `a2aa5b309963eec0d20cb7ca00d161b1753c38b0`. Its complete Git tree equals delivery candidate `452f0770c0feed663c7f0fd1a0c43f47db7acc6a`.
 
-Independent aggregate and Security/Adversarial PASS at `6b8cc40bc03645242776570b97967032ed69bd1e` against main `2f053e608637e04628334c797ad33609a9c29e61`. Zero unresolved due PILOT implementation/review debt; main delivery and task closure remain pending. Reviews transfer by unchanged src/tests/tools identity, not a fresh review of this documentation commit.
+Independent aggregate and Security/Adversarial PASS at reviewed candidate `6b8cc40bc03645242776570b97967032ed69bd1e` against prior main base `2f053e608637e04628334c797ad33609a9c29e61`. Actual main's `src`, `tests` and `tools` trees equal that reviewed candidate. Zero unresolved due PILOT implementation/review debt; main delivery and selected task closure are complete. Reviews transfer by unchanged code identity, not a fresh independent review of later documentation.
 
 The retained independent [aggregate review](pilot-final-aggregate-6b8cc40.md) and [Security/Adversarial review](pilot-final-security-6b8cc40.md) cover the complete base-to-candidate PILOT delta, with targeted static/retained-proof limits. They do not claim exhaustive inspection or fresh runtime execution. Earlier aggregate publisher portability/checksum, awaited worker lifetime and ordinary CLI/readback findings were reassessed as fixed. Their reciprocal pending-other-review sentences describe review-time state; both final verdicts now exist.
 
@@ -19,19 +19,19 @@ The retained independent [aggregate review](pilot-final-aggregate-6b8cc40.md) an
 - [x] One actual unchanged published CLI0.5.6 chain: Prepare1/Windows2/Release3 all SUCCESS, version `0.1.6-nightly.20261104.1297`, test release434492192. Source `3ae8f481bc7c118747c8d01f0ec14f3f18e8b6ec`, versioned definition `70ea3e173fb28f8bc91c15b5db971d2d3234d92a`. Existing heavy composition binds publisher checksum/creation-ID provenance and ten exact asset SHA/size receipts; retained ordinary REST/Workbench readbacks inspect this same run. Raw observer FAIL remains FAIL; corrected read-only continuation PASS does not execute or publish. Prior root8/version918/release434102890 is distinct.
 - [x] Required retained root build zero warnings/errors, tests728 PASS/11 console skips; raw NotExecuted classifications remain in original receipts. Publisher34 offline controls, four fake-GH transport controls and tiny lifecycle proof are separate evidence. No rerun for this documentation change.
 - [x] Independent final aggregate and Security PASS at exact reviewed candidate; source tree transfer is explicit below.
-- [ ] Parent push/update PR167 and verify actual main delivery, evidence transfer and final issue links before closing tasks.
+- [x] PR #167 merged; complete delivery/main tree identity and reviewed code identity verified before selected task closure. Milestone 9 closed with zero open and nine closed issues.
 
 ## Debt and later-owner allocation
 
-Zero unresolved DUE PILOT implementation/review debt was identified against the accepted #78/#116/#117/#118 bodies and owner-confirmed boundaries. The required remaining gate is delivery itself, not a claim of accepted main. The four bounded reference profiles (viewer403, required filename failure, contradictory graph400, advanced HEAD retaining old producers/bytes) have literal observations and targeted product proof: [boundary record](selection-boundaries-20261105.md). Required filename absence does not prove physical deleted bytes.
+Zero unresolved DUE PILOT implementation/review debt was identified against the accepted #78/#116/#117/#118 bodies and owner-confirmed boundaries. The selected main-delivery gate is complete; broader family/API acceptance remains separate. The four bounded reference profiles (viewer403, required filename failure, contradictory graph400, advanced HEAD retaining old producers/bytes) have literal observations and targeted product proof: [boundary record](selection-boundaries-20261105.md). Required filename absence does not prove physical deleted bytes.
 
 Physical deleted-byte behavior, broader settings/branches/multiple-direct graphs and absent-field/same-value/secure-token profiles remain unaccepted under the existing SS-RUN full-family R2 implementation/contract/acceptance owners #134/#135/#136 (legacy owner #20), with SS-CHAIN/#21 and SS-BLOB/#26 related. They must be frozen/reference-bound before affected R2 implementation and accepted at R2/full-family closure. Existing api-ledger.tsv assigns addBuildToQueue to that owner packet; this record adds no waiver or new denominator. Seven declared wire variants remain unmaterialized, not literal wire GREEN. D46/#166 exact progress stays SS-RUN@R2/US-010. Legacy five stale/twenty blocked probes are not renewed. Global API denominator remains UNKNOWN and API-complete=false.
 
 No built T3 GUI/CLI launch, production publication, existing-data migration, fleet operation or TeamCity cutover is required or claimed. Retained PG/Storage/private keys/credentials/checkpoints remain untouched. Owned fixture cleanup is attributed to original receipts, not a new cleanup execution.
 
-## Issue closure map (parent, only after verified main)
+## Issue closure map (completed after verified main)
 
-GitHub bodies read on 2026-11-05: all seven targets OPEN in milestone9; #82/#83 already CLOSED legacy tasks and must not be rewritten.
+After verified main delivery, #117/#116/#79/#80/#81/#118/#78 were closed as completed with proof comments. GitHub milestone 9 is CLOSED with zero open and nine closed issues. #82/#83 were already CLOSED legacy tasks and were left untouched.
 
 | Target | Delivered scope and closure source |
 | --- | --- |
@@ -43,15 +43,17 @@ GitHub bodies read on 2026-11-05: all seven targets OPEN in milestone9; #82/#83 
 | #118 | Selected cumulative evidence, independent reviews, zero due debt, exact-main transfer and handoff links |
 | #78 | Whole scoped actor outcome, after supporting target delivery is verified |
 
-Issue snapshots and SHA inventory are retained in `artifacts/pilot-chain/final-delivery/`; actual task state remains GitHub. No automatic closing markers or GitHub writes are made here.
+Issue snapshots and SHA inventory are retained in `artifacts/pilot-chain/final-delivery/`; the applied closure comment is retained in `main-task-closure.md` and verified main/tree/issue readbacks in `verified-main-delivery.json` there. Actual task state remains GitHub. This documentation follow-up performs no GitHub writes and does not rewrite historical issue snapshots.
 
-## Candidate accounting and handoff
+## Retained candidate accounting and completed handoff
 
-`artifacts/pilot-chain/final-delivery/current-assessment.json` and `current-report.json` name the final local HEAD, generated after commit with the existing offline ApiLedger --pilot reader. Input-specific old/current hashes, observed documentation diffs, reviewer identity, retained proof hashes and reviewed code identity qualify transfer from the 6b8 checkpoint. Earlier runtime-producer decisions remain runtime qualifications, never metadata-only.
+`artifacts/pilot-chain/final-delivery/current-assessment.json` and `current-report.json` name the premerge delivery candidate, generated after its commit with the existing offline ApiLedger --pilot reader. Input-specific old/current hashes, observed documentation diffs, reviewer identity, retained proof hashes and reviewed code identity qualify transfer from the 6b8 checkpoint. Earlier runtime-producer decisions remain runtime qualifications, never metadata-only.
 
-The reader intentionally reports NOT_ACCEPTED and generic review/debt/main text; that constant is not modified. Its selected/heavy gaps and this delivery record serve different purposes. Parent must verify `git diff 6b8cc40bc03645242776570b97967032ed69bd1e HEAD -- src tests tools` is empty, exact reviewed trees match, worktree is clean and use the actual pushed head for merge. Documentation review transfer is not a fresh independent review of new prose.
+The existing offline ApiLedger `--pilot` reader intentionally reports NOT_ACCEPTED and generic review/debt/main text; its constant is unchanged. Its selected-profile evidence accounting and GitHub's verified milestone/main-delivery state have different authority. The reader's broader unmaterialized wire/global gaps remain gaps; GitHub milestone closure does not make them GREEN. Candidate receipts retain their original identities rather than being relabeled as fresh evidence for this documentation change.
 
-PR body: `artifacts/pilot-chain/pilot-final-pr-body.md`. No push/PR write/readiness/merge/issue closure in this subtask.
+Main delivery transferred by complete tree equality to `452f0770c0feed663c7f0fd1a0c43f47db7acc6a` and unchanged reviewed `src`/`tests`/`tools` trees from `6b8cc40bc03645242776570b97967032ed69bd1e`. This follow-up changes current status documentation only. No build, tests, runtime, publication or fleet operations were rerun; retained root checks and evidence retain the qualifications above.
+
+Original delivery PR body: `artifacts/pilot-chain/pilot-final-pr-body.md`. Documentation follow-up PR body: `artifacts/pilot-chain/pilot-main-record-pr-body.md`.
 
 ## Immutable source inventory
 
