@@ -1,6 +1,6 @@
 #requires -Version 7.5
 $ErrorActionPreference = 'Stop'
-$names = @('DOTNET_ROOT','PATH','DOTNET_CLI_HOME','VIVARIUM_LOCAL_DEV_ROOT','ASPNETCORE_ENVIRONMENT','Logging__LogLevel__Default')
+$names = @('DOTNET_ROOT','PATH','DOTNET_CLI_HOME','VIVARIUM_LOCAL_DEV_ROOT','ASPNETCORE_ENVIRONMENT','Logging__LogLevel__Default','POSTGRES_PASSWORD')
 $before = @{}
 foreach ($name in $names) { $before[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
 & "$PSScriptRoot/local-dev.ps1" status | Out-Null

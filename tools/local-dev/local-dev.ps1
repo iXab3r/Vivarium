@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param([ValidateSet('start','status','stop','restart-host','reset')][string]$Action = 'status', [switch]$ConfirmReset)
 $previousEnvironment = @{}
-foreach ($name in @('DOTNET_ROOT','PATH','DOTNET_CLI_HOME','VIVARIUM_LOCAL_DEV_ROOT','ASPNETCORE_ENVIRONMENT','Logging__LogLevel__Default')) {
+foreach ($name in @('DOTNET_ROOT','PATH','DOTNET_CLI_HOME','VIVARIUM_LOCAL_DEV_ROOT','ASPNETCORE_ENVIRONMENT','Logging__LogLevel__Default','POSTGRES_PASSWORD')) {
     $previousEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
 }
 try {
