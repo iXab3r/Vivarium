@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../build/Vivarium.Build.csproj" />
     <Compile Include="../../build/DependencyArtifacts.cs" Link="Build/DependencyArtifacts.cs" />
     <ProjectReference Include="..\..\tools\Vivarium.ApiLedger\Vivarium.ApiLedger.csproj" />
     <!-- Build the separately invoked raw target without running it as ordinary GREEN evidence. -->

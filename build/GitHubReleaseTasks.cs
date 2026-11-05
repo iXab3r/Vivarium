@@ -116,12 +116,15 @@ internal sealed class GitHubReleasePublisher
 
     private async Task<bool> VerifyTagIfPresentAsync(bool requireTag = false)
     {
-        using var response = await http.GetAsync($"repos/{repository}/commits/{tag}");
-        if (response.StatusCode == HttpStatusCode.NotFound && !requireTag)
+        // The reference endpoint documents 404 for absence; commit resolution can return 422.
+        using var reference = await http.GetAsync($"repos/{repository}/git/ref/tags/{tag}");
+        if (reference.StatusCode == HttpStatusCode.NotFound && !requireTag)
         {
             return false;
         }
 
+        await EnsureSuccessAsync(reference, $"Could not inspect tag {tag}");
+        using var response = await http.GetAsync($"repos/{repository}/commits/{tag}");
         await EnsureSuccessAsync(response, $"Could not resolve tag {tag}");
         var commit = await ReadAsync<RemoteCommit>(response);
         if (!string.Equals(commit.Sha, sourceSha, StringComparison.OrdinalIgnoreCase))
