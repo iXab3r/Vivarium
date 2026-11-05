@@ -1,0 +1,40 @@
+{
+  "vivarium-host": {
+    "PublicOrigin": "https://viv.eyeauras.net",
+    "ListenUrl": "https://100.120.230.43:8443",
+    "StorageListenUrl": "http://127.0.0.1:8444",
+    "CertificatePath": "/var/lib/vivarium/certificates/https.pfx",
+    "DefinitionSources": {
+      "RepositoryId": "private-control",
+      "Path": "/var/lib/vivarium/control",
+      "SettingsRepositories": []
+    }
+  },
+  "vivarium-database": {
+    "ConnectionString": "Host=127.0.0.1;Port=5432;Database=vivarium;Username=vivarium;Password=REPLACE_PRIVATE_RUNTIME_PASSWORD;Maximum Pool Size=20"
+  },
+  "vivarium-identity": {
+    "SuperuserEnabled": true,
+    "TokenLifetimeDays": 30,
+    "DataProtectionDirectory": "/var/lib/vivarium/keys",
+    "ServerSigningCertificate": { "Path": "/var/lib/vivarium/certificates/server-signing.pfx" },
+    "ServerEncryptionCertificate": { "Path": "/var/lib/vivarium/certificates/server-encryption.pfx" },
+    "ClientSigningCertificate": { "Path": "/var/lib/vivarium/certificates/client-signing.pfx" },
+    "ClientEncryptionCertificate": { "Path": "/var/lib/vivarium/certificates/client-encryption.pfx" },
+    "Providers": [],
+    "TokenCreationPermitLimit": 10,
+    "TokenCreationWindowSeconds": 60,
+    "TokenCreationConcurrencyLimit": 2,
+    "TokenCreationQueueLimit": 0,
+    "TokenRedemptionConcurrencyLimit": 2
+  },
+  "vivarium-storage": {
+    "Backend": "Local",
+    "Root": "/var/lib/vivarium/objects",
+    "PublicBaseUrl": "http://127.0.0.1:8444",
+    "SigningKey": "REPLACE_PRIVATE_BASE64_32_RANDOM_BYTES",
+    "MaxObjectBytes": 2147483648,
+    "DefaultLifetimeSeconds": 60,
+    "MaxLifetimeSeconds": 300
+  }
+}

@@ -1,4 +1,7 @@
+FROM docker:28-cli AS docker-cli
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble
+
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
 
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends git \
@@ -24,3 +27,4 @@ EXPOSE 8443
 VOLUME ["/var/lib/vivarium"]
 
 ENTRYPOINT ["/app/viv-server"]
+CMD ["run", "--settings-directory", "/var/lib/vivarium/settings"]

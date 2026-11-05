@@ -1,0 +1,40 @@
+# Standalone Portainer Docker endpoint on a dedicated Vivarium VM. See private-host.md.
+services:
+  viv-server:
+    image: ${VIVARIUM_IMAGE:?Set the verified immutable release image tag or digest}
+    restart: unless-stopped
+    network_mode: host
+    command: ["run", "--settings-directory", "/var/lib/vivarium/settings"]
+    environment:
+      DOCKER_HOST: unix:///run/vivarium-engine.sock
+    group_add:
+      - ${VIVARIUM_ENGINE_GID:?Set the numeric group of the dedicated Engine socket}
+    volumes:
+      - type: bind
+        source: ${VIVARIUM_STATE:?Set the existing private absolute state directory}
+        target: /var/lib/vivarium
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${VIVARIUM_OBJECTS:?Set the existing private absolute object directory}
+        target: /var/lib/vivarium/objects
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${VIVARIUM_ENGINE_SOCKET:?Set the existing dedicated Engine socket path}
+        target: /run/vivarium-engine.sock
+        bind:
+          create_host_path: false
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 256
+    # Startup credentials stay in root/Portainer-owned logs, outside fleet JSON tailing.
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: '3'
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

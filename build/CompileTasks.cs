@@ -3,6 +3,7 @@ using System.Text;
 
 [TaskName("Compile")]
 [TaskDescription("Compiles runnable binaries for one supported RID.")]
+[IsDependentOn(typeof(PrepareDependenciesTask))]
 public sealed class CompileTask : AsyncFrostingTask<BuildContext>
 {
     public override Task RunAsync(BuildContext context) =>
@@ -11,6 +12,7 @@ public sealed class CompileTask : AsyncFrostingTask<BuildContext>
 
 [TaskName("CompileAll")]
 [TaskDescription("Compiles runnable binaries for every supported RID.")]
+[IsDependentOn(typeof(PrepareDependenciesTask))]
 public sealed class CompileAllTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)

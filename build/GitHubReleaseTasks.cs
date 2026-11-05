@@ -79,14 +79,22 @@ internal sealed class GitHubReleasePublisher
         var tagExists = await VerifyTagIfPresentAsync();
         var expected = ExpectedAssets();
         var release = await GetReleaseAsync();
+        if (!tagExists)
+        {
+            if (release is { Draft: false })
+                throw new InvalidOperationException($"GitHub release {tag} exists, but its tag does not.");
+            // Saving a draft does not create its tag. Materialize the exact producer ref first.
+            using var content = JsonContent.Create(new { @ref = "refs/tags/" + tag, sha = sourceSha });
+            using var created = await http.PostAsync($"repos/{repository}/git/refs", content);
+            if (created.StatusCode is not (HttpStatusCode.Created or HttpStatusCode.UnprocessableEntity))
+                await EnsureSuccessAsync(created, $"Could not create tag {tag}");
+            // A concurrent creator may return 422: accept only the same independently resolved SHA.
+            await VerifyTagIfPresentAsync(requireTag: true);
+        }
         if (release is null)
         {
             release = await CreateDraftAsync();
             await VerifyTagIfPresentAsync(requireTag: true);
-        }
-        else if (!tagExists)
-        {
-            throw new InvalidOperationException($"GitHub release {tag} exists, but its tag does not.");
         }
 
         if (!release.Draft)
@@ -103,8 +111,7 @@ internal sealed class GitHubReleasePublisher
             await UploadAsync(release.Id, asset);
         }
 
-        release = await GetReleaseAsync()
-            ?? throw new InvalidOperationException("GitHub draft disappeared after asset upload.");
+        release = await GetReleaseByIdAsync(release.Id);
         VerifyRemoteAssets(release, expected);
         release = await PublishDraftAsync(release.Id);
         VerifyRemoteAssets(release, expected);
@@ -116,12 +123,15 @@ internal sealed class GitHubReleasePublisher
 
     private async Task<bool> VerifyTagIfPresentAsync(bool requireTag = false)
     {
-        using var response = await http.GetAsync($"repos/{repository}/commits/{tag}");
-        if (response.StatusCode == HttpStatusCode.NotFound && !requireTag)
+        // The reference endpoint documents 404 for absence; commit resolution can return 422.
+        using var reference = await http.GetAsync($"repos/{repository}/git/ref/tags/{tag}");
+        if (reference.StatusCode == HttpStatusCode.NotFound && !requireTag)
         {
             return false;
         }
 
+        await EnsureSuccessAsync(reference, $"Could not inspect tag {tag}");
+        using var response = await http.GetAsync($"repos/{repository}/commits/{tag}");
         await EnsureSuccessAsync(response, $"Could not resolve tag {tag}");
         var commit = await ReadAsync<RemoteCommit>(response);
         if (!string.Equals(commit.Sha, sourceSha, StringComparison.OrdinalIgnoreCase))
@@ -138,7 +148,16 @@ internal sealed class GitHubReleasePublisher
         using var response = await http.GetAsync($"repos/{repository}/releases/tags/{tag}");
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
-            return null;
+            // By-tag lookup covers published releases. Authorized listings also include drafts.
+            for (var page = 1; ; page++)
+            {
+                using var listing = await http.GetAsync($"repos/{repository}/releases?per_page=100&page={page}");
+                await EnsureSuccessAsync(listing, "Could not list GitHub releases");
+                var releases = await ReadAsync<RemoteRelease[]>(listing);
+                var match = releases.SingleOrDefault(item => string.Equals(item.TagName, tag, StringComparison.Ordinal));
+                if (match is not null) return match;
+                if (releases.Length < 100) return null;
+            }
         }
 
         await EnsureSuccessAsync(response, "Could not inspect GitHub release");
@@ -148,6 +167,16 @@ internal sealed class GitHubReleasePublisher
             throw new InvalidDataException($"GitHub returned release tag '{release.TagName}', expected '{tag}'.");
         }
 
+        return release;
+    }
+
+    private async Task<RemoteRelease> GetReleaseByIdAsync(long releaseId)
+    {
+        using var response = await http.GetAsync($"repos/{repository}/releases/{releaseId}");
+        await EnsureSuccessAsync(response, "Could not refresh GitHub release");
+        var release = await ReadAsync<RemoteRelease>(response);
+        if (release.Id != releaseId || !string.Equals(release.TagName, tag, StringComparison.Ordinal))
+            throw new InvalidDataException("GitHub returned a different release during refresh.");
         return release;
     }
 
