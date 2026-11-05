@@ -43,10 +43,18 @@ TeamCity. Its generated status remains partial with unknown global scope and API
 
 ## Building
 
-Before restoring the fresh Host dependencies, run `pwsh -File tools/PrepareDependencies.ps1` from
-the repository root with GitHub CLI access to the owner releases. `dependency-artifacts.json` pins
-the exact Chiral/Storage prerelease bytes; preparation verifies SHA256 before populating the local
-feed selected by `NuGet.Config`. These are the adopted Depot package APIs, not local source projects.
+Cake `Build`/`CI` and `Compile`/`CompileAll` prepare the fresh Host dependencies before product
+restore, including in a clean TeamCity checkout. For direct root `dotnet build`/`dotnet test`, first
+run `dotnet run --project build/Vivarium.Build.csproj -- --target PrepareDependencies` (the existing
+`tools/PrepareDependencies.ps1` is a thin wrapper). `dependency-artifacts.json` pins exact owner
+GitHub release assets, source commits and SHA256. Preparation verifies cached bytes, checks missing
+assets' release tags against the recorded commits, downloads through GitHub's authenticated asset
+API and publishes only hash-verified bytes into the local feed selected by `NuGet.Config`.
+Supply repository-read access through `GITHUB_TOKEN` (or `GH_TOKEN`); no token enters arguments,
+configuration or logs. Valid cached packages require no network. The build driver depends only on
+public packages, so its initial restore precedes owner-package acquisition. EyeAuras feed environment
+settings are not a substitute for this pinned release input. These are the adopted Depot package
+APIs, not local source projects. Storage's owner-approved licensing exception remains unchanged.
 The Controller lock file pins the resolved runtime graph.
 
 The in-progress fresh-install runtime has explicit local commands:

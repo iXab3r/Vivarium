@@ -12,6 +12,10 @@ The native VM configuration owns PostgreSQL, firewall, DNS, reverse proxy and Do
 Provision PostgreSQL on loopback with a dedicated database, maintenance principal and runtime
 principal. Runtime requires the ordinary application tables/sequence permissions; migrations use
 the separate maintenance connection. Keep the Host stopped during schema maintenance.
+The optional [private PostgreSQL stack](private-postgres.compose.yml) uses the same pinned17.10
+image as the selected real-PG proofs, loopback binding, separate SSD data and a protected password
+file. Deploy it through Portainer before initialization; create separate maintenance/runtime roles
+through private SQL input. No password belongs in a stack environment.
 
 The VM's Docker Engine is a trusted administrative dependency of the Host coordinator. It must
 carry only this dedicated Vivarium control plane and its definition evaluators. Do not enroll a
@@ -35,6 +39,9 @@ It must persist settings, five private certificates, Data Protection keys, objec
 managed control-Git checkout. PostgreSQL has its own durable data. Back up these together with
 the instance configuration; lost Data Protection keys make encrypted queued inputs/assignments
 unrecoverable. Protect backups and private startup logs as credentials.
+The templates select Docker's bounded `local` log driver for Host/PostgreSQL, keeping private
+startup credentials and SQL diagnostics outside the fleet collector's JSON-file inputs. Authorized
+Portainer/Engine administrators can still read these logs; do not forward them without redaction.
 
 Copy [private-host.init.sample.json](private-host.init.sample.json) to a private file outside Git.
 Replace its runtime password and Storage signing-key placeholders; use 32 cryptographically random
@@ -91,7 +98,8 @@ re-pin procedure; never disable Agent verification or silently enroll against th
 
 Use [private-host.compose.yml](private-host.compose.yml) as the Portainer stack input. Supply
 `VIVARIUM_IMAGE`, `VIVARIUM_STATE`, `VIVARIUM_ENGINE_SOCKET` and `VIVARIUM_ENGINE_GID` as deployment
-inputs. The bind paths must already exist. No database passwords, PFX passwords or Storage keys
+inputs, plus `VIVARIUM_OBJECTS` for the separately mounted artifact disk. The bind paths must already
+exist and the Host UID must own the state and object directories. No database passwords, PFX passwords or Storage keys
 belong in the stack environment. The image's default command is the new Host `run` command;
 `--version`, `init`, `nodes` and `migrate` remain explicit executable commands.
 

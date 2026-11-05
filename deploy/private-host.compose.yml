@@ -16,6 +16,11 @@ services:
         bind:
           create_host_path: false
       - type: bind
+        source: ${VIVARIUM_OBJECTS:?Set the existing private absolute object directory}
+        target: /var/lib/vivarium/objects
+        bind:
+          create_host_path: false
+      - type: bind
         source: ${VIVARIUM_ENGINE_SOCKET:?Set the existing dedicated Engine socket path}
         target: /run/vivarium-engine.sock
         bind:
@@ -23,6 +28,12 @@ services:
     mem_limit: 1536m
     cpus: 1.0
     pids_limit: 256
+    # Startup credentials stay in root/Portainer-owned logs, outside fleet JSON tailing.
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: '3'
     security_opt:
       - no-new-privileges:true
     cap_drop:

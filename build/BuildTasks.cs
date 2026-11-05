@@ -12,6 +12,7 @@ public sealed class HelpTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         Console.WriteLine("Vivarium build targets:");
+        Console.WriteLine("  PrepareDependencies      Acquire and verify the pinned owner release packages.");
         Console.WriteLine("  Build                    Build Vivarium.slnx in Release configuration.");
         Console.WriteLine("  Test                     Run host-native tests and write deterministic TRX output.");
         Console.WriteLine("  CI                       Build and test the solution on the current host.");
@@ -60,6 +61,7 @@ public sealed class CleanTask : FrostingTask<BuildContext>
 
 [TaskName("Build")]
 [TaskDescription("Builds the complete Vivarium solution.")]
+[IsDependentOn(typeof(PrepareDependenciesTask))]
 public sealed class BuildTask : AsyncFrostingTask<BuildContext>
 {
     public override async Task RunAsync(BuildContext context)
