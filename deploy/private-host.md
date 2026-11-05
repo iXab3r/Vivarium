@@ -22,8 +22,14 @@ two successful C#/Git builds, exact log/artifact bytes and restart passed. The s
 disconnected application restore and original Agent renewal passed; catalogue source
 identity has a separate clean-tree qualification. Infrastructure is delivered through
 [cluster-infra PR3](https://github.com/iXab3r/cluster-infra/pull/3), with independent
-aggregate and Security reviews. Product publisher confirmation and final product reviews
-remain tracked by [issue169](https://github.com/iXab3r/Vivarium/issues/169) and
+aggregate and Security reviews. Product aggregate and Security rechecks passed at
+`eaffe479c5a559f8b9c3f78a5b69b23d644c7642`; root build has zero warnings/errors and
+753 tests passed with11 skipped. Publisher33062 successfully verified the existing
+release using selected Release33048/source `f56b0e6`, with all12 remote asset IDs,
+lengths and digests unchanged. Historical33054/33057 failures and manual initial
+publication remain separate. First publication without a tag is covered by current
+stateful HTTP controls; it has not been repeated live after the final fix. Delivery is
+recorded in [issue169](https://github.com/iXab3r/Vivarium/issues/169) and
 [PR170](https://github.com/iXab3r/Vivarium/pull/170). This is not general backup support,
 off-host DR, HA or full TeamCity API conformance. Permanent fleet/checker promotion and
 Tailscale node-expiry policy remain under cluster-infra issue2; external OIDC is separate.
