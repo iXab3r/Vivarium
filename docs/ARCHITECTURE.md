@@ -5,7 +5,8 @@
 > slices are running. When a decision changes, this file changes in the same commit.
 > D32 adopts TeamCity behavioral parity as the immediate build-product goal, with C# definitions,
 > in-process Chiral composition and PostgreSQL as the new target. SQLite/YAML remain implemented
-> transitional components; the persistence and authoring migration is not yet implemented.
+> transitional components. This opening is historical; the fresh PostgreSQL Host exists.
+> D53 adds the accepted selectable-provider target; new SQLite-provider implementation remains pending.
 
 ## 1. Problem and goals
 
@@ -1751,6 +1752,43 @@ required filename absence admitted HTTP200 then failed-to-start, and advanced ro
 producer identities/bytes retained. Filename absence does not prove physical deleted-byte behavior.
 Changed settings/branches, multiple-direct graphs and absent-field variants remain unaccepted.
 Token issuance HTTP403 remains a separate prerequisite failure. No complete API-family GREEN.
+
+### D53. Selectable data providers preserve one headless product
+
+Accepted owner direction, 2026-11-06; **implementation and acceptance pending** under
+[feature #227](https://github.com/iXab3r/Vivarium/issues/227).
+
+SQLite and PostgreSQL are selectable relational data providers of the current Host, not separate
+local/server modes or feature tiers. D53 refines the PostgreSQL-only target wording in D23, D26,
+D32, D34 and D35: structured identity, authorization, catalogue projections, runtime, history and
+audit use one selected relational authority. It does not revive the legacy SQLite/YAML controller.
+Git, Chiral private settings, Storage bytes and protected key ownership remain unchanged.
+
+Selection uses the existing Database node and is fixed for an active Host. Existing installations
+retain PostgreSQL on configuration upgrade. Never fall back to another provider or activate an empty
+replacement when a database fails. Provider selection is not automatic transfer of existing data;
+cross-provider transfer is outside the first feature. SQLite initially requires a local filesystem
+and exclusive Host ownership; this topology constraint does not remove core functionality.
+
+Domain models, application services, current permissions, Agent protocol and native/TeamCity-compatible
+API behavior remain shared. Isolate only demonstrated provider differences in model mapping,
+transactions, queries, migration and error handling. Preserve public identities, numeric/time ordering,
+current-authority fences, acknowledged durability and recovery. Short database transactions and
+separately proven object-upload/cleanup ownership must prevent long byte I/O from monopolizing SQLite
+writes. Exact mechanics are gated design work, not accepted by this decision.
+
+The business contract is [AC-DP-01 through AC-DP-20](acceptance/operations/data-providers.feature).
+The [provider design](design/data-providers.md) defines the dependency inventory, test allocation and
+five delivery gates. Provider-sensitive cases use both real engines; mocks do not prove durability,
+and SQLite success cannot replace PostgreSQL concurrency evidence. Existing accepted product behavior
+must survive; subsequent stories implement their common core on both providers. Broader missing
+TeamCity functionality is not claimed by this prerequisite.
+
+No Vivarium UI work is required. Product orchestration uses .NET. D43's isolated C# evaluator remains
+unchanged, so choosing SQLite does not itself remove Docker. Initial backup/restore is coordinated
+and same-provider, covering relational data, settings, bytes and keys. Independent aggregate and
+Security/Adversarial review, zero due debt and verified delivery close the prerequisite before M1
+implementation; API reference research and planning may proceed meanwhile.
 
 ## 5. Protocol sketch
 

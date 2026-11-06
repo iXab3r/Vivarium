@@ -4,6 +4,16 @@
 > Maintainer: Persistence/Migrations Expert
 > Decisions: D23, D27, D32–D37 in [ARCHITECTURE](../ARCHITECTURE.md)
 
+## Provider refinement (D53)
+
+[Selectable data providers](data-providers.md) refines the PostgreSQL-only target below: the current
+Host will select PostgreSQL or SQLite while preserving the same product and authority boundaries.
+The new SQLite provider is not implemented. PostgreSQL-specific mechanisms below remain current
+implementation evidence, not a mandate to emulate their SQL in SQLite. Legacy SQLite sections remain
+historical. The provider feature owns explicit mappings, concurrency, migrations and backup contracts.
+The existing bounded object-PUT row-lock exception is documented in D35; its replacement must pass
+D53's object-lifetime proof before claiming short write transactions on both providers.
+
 ## Storage authority
 
 PostgreSQL is the structured business/runtime store. Git owns only versioned desired build/fleet

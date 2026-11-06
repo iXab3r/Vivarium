@@ -215,6 +215,14 @@ durable instructions in harness-specific prompt files. Follow the index's indepe
 
 ## Configuration and management contracts
 
+- D53 refines earlier PostgreSQL-only target wording: SQLite and PostgreSQL are data providers of
+  the same current Host, not product modes. The new SQLite provider remains unimplemented. Preserve
+  shared domain/API semantics and current-authority/durability guarantees; do not reactivate legacy
+  SQLite/YAML or silently fall back after storage failure. See [provider design](docs/design/data-providers.md)
+  and [business criteria](docs/acceptance/operations/data-providers.feature). Provider-sensitive proof
+  must name the real engine; mock/SQLite success does not replace PostgreSQL concurrency evidence.
+
+
 - Git is the source of truth for versioned **desired configuration**: projects/build definitions,
   fleet policy and agent desired properties use one Git validation/mutation/reconciliation path.
   D34 explicitly replaces Git identity/RBAC authority with PostgreSQL application data: users,

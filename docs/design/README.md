@@ -42,3 +42,5 @@ below provide the technical details; legacy implementation sections describe evi
 
 Read [`documentation-governance.md`](documentation-governance.md) for precedence, status metadata,
 decision promotion, and handoff rules.
+
+[Selectable data providers](data-providers.md) — D53 / #227: one headless product, PostgreSQL and SQLite implementations, dependency inventory, business criteria and provider-specific evidence. Specification only; implementation pending.

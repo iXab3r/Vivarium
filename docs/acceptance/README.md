@@ -1,6 +1,6 @@
 # System Acceptance Criteria
 
-Status: **110 specified business criteria in 11 subsystem folders; all specified-unbound for the replacement**.
+Status: **131 distinct business criterion IDs in 11 subsystem folders; all specified-unbound for the replacement**.
 These are requirements, not a test run or a claim that existing/new runtime behavior passed them.
 
 The English Gherkin files here are the canonical highest-level acceptance text. They use product
@@ -26,6 +26,7 @@ the linked technical contracts and [testing model](../design/testing-model.md), 
 | [Automation](automation/compatibility.feature) | Unchanged clients and extension-neutral base behavior |
 | [Migration](migration/import.feature) | Preview, initial/repeated/interrupted import, coexistence and retirement proof |
 | [Local lab](operations/local-lab.feature), [backup](operations/backup-restore.feature), [resources/audit](operations/resources-audit.feature) | Real local installation, restore, saved/active settings, private credentials and attribution |
+| [Data providers](operations/data-providers.feature) | Select SQLite or PostgreSQL for the same headless product; durability, current rights, concurrency, migrations and recovery |
 
 Folders follow business responsibility, not code projects. All 31 original AC identifiers survive
 the move. The [lifecycle review](lifecycle-review.md) separates specified behavior from unresolved
@@ -73,3 +74,8 @@ For expected business behavior, start here and follow the current focused contra
 architecture decisions govern adopted shape; code/tests describe current implementation. Older
 examples cannot silently override this baseline. Reconcile conflicting documents in the same change
 or record the unresolved decision; see [documentation governance](../design/documentation-governance.md).
+
+D53 adds 20 provider-selection criteria (AC-DP-01–20) without changing the historical 110-AC gap
+review. The [provider evidence allocation](../design/data-providers.md#test-allocation-and-traceability)
+links each to the owning story and minimal real-engine checks. All new bindings remain specified-unbound;
+19 two-provider outlines and one SQLite-specific criterion are requirements, not 39 executed tests.
